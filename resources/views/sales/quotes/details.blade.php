@@ -4,6 +4,19 @@
 {{ __('Quote Details') }}
 @endsection
 
+@push('css-page')
+<style>
+    #window-previewer {
+        width: 500px;
+        height: 500px;
+        border: 1px solid #ccc;
+        margin: 20px auto;
+        position: relative;
+    }
+
+</style>
+@endpush
+
 @section('breadcrumb')
 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
 <li class="breadcrumb-item"><a href="{{ route('sales.quotes.index') }}">Quotes</a></li>
@@ -183,7 +196,7 @@
         <div class="modal-content">
             <form id="quoteItemForm" method="POST" action="{{ route('sales.quotes.storeItem', $quote->id) }}">
                 @csrf
-                <input type="hidden" name="quote_id" value="{{ $quote->id }}">
+                <input type="hidden" name="quote_id" id="quoteId" value="{{ $quote->id }}">
 
                 <!-- Hidden fields for JS-generated display values -->
                 <input type="hidden" name="description" id="description">
@@ -209,8 +222,6 @@
                         <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#grids">Grids</a></li>
                         <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#other">Other</a></li>
                     </ul>
-
-
                     <div class="row">
                         <!-- Left Form -->
                         <div class="col-md-6">
@@ -279,7 +290,6 @@
                                         </select>
                                     </div>
                                 </div>
-
 
                                 <div class="tab-pane fade" id="general">
                                     <div class="mb-3">
@@ -354,17 +364,16 @@
                                     </div>
                                 </div>
 
-
                                 <div class="tab-pane fade" id="grids">
                                     <!-- <div class="mb-3">
-        <label>Grid Type</label>
-        <select class="form-control" name="grid_type">
-            <option value="None">None</option>
-        <option value="GR">Non Glass Diving Grilles</option>
-        <option value="CAD">Grille Macro</option>
-        <option value="INS">DXF/Inser Macro</option>
-        </select>
-    </div>-->
+                                        <label>Grid Type</label>
+                                        <select class="form-control" name="grid_type">
+                                            <option value="None">None</option>
+                                        <option value="GR">Non Glass Diving Grilles</option>
+                                        <option value="CAD">Grille Macro</option>
+                                        <option value="INS">DXF/Inser Macro</option>
+                                        </select>
+                                    </div>-->
                                     <div class="mb-3">
                                         <label>Grid Pattern</label>
                                         <select class="form-control" name="grid_pattern">
@@ -413,7 +422,6 @@
                                         <textarea name="internal_note" class="form-control" rows="3" placeholder="Enter internal notes..."></textarea>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
 
@@ -437,9 +445,9 @@
                                 <div class="tab-pane fade show active" id="preview-panel">
 
                                     <!-- SVG Preview Box -->
-                                    <div id="window-svg-preview" class="border rounded bg-light p-4 mb-3 text-center" style="height: 300px; position: relative;">
+                                    <div id="window-previewer" class="border rounded bg-light p-4 mb-3 text-center" style="height: 300px; position: relative;">
                                         <!-- This gets dynamically replaced -->
-                                        <svg>...dynamic SVG content here...</svg>
+                                        <canvas id="windowCanvas" width="500" height="200"></canvas>
                                     </div>
 
                                     <!-- View Mode Buttons -->
@@ -457,9 +465,6 @@
                                 </div>
                             </div>
 
-
-
-
                             <div class="tab-pane fade" id="options-panel">
                                 <p class="text-muted">Option settings will go here.</p>
                             </div>
@@ -473,22 +478,15 @@
                             <h2 class="mb-0">Total Price: $<span id="globalTotalPrice">0.00</span></h2>
                             <div>
                                 <a href="javascript:void(0);" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
-                                <button type="button" id="saveQuoteItem" data-bs-dismiss="modal" class="btn btn-primary">Add to Quote</button>
-
-
-
+                                <button type="button" id="saveQuoteItem" class="btn btn-primary">Add to Quote</button>
                             </div>
 
                         </div>
-
-
                     </div>
                 </div>
+            </form>
         </div>
-
-        </form>
     </div>
-</div>
 </div>
 
 
@@ -568,7 +566,7 @@
         const qty = form.querySelector('[name="qty"]').value;
         const width = form.querySelector('[name="width"]').value;
         const height = form.querySelector('[name="height"]').value;
-        const series = document.getElementById('seriesSelect').selectedOptions[0] ? .text ? ? '';
+        const series = document.getElementById('seriesSelect').selectedOptions[0] ?.text ?? '';
         const config = document.getElementById('seriesTypeSelect').value;
 
         const glassType = form.querySelector('[name="glass_type"]').value;
@@ -585,8 +583,8 @@
         const colorConfig = form.querySelector('[name="color_config"]').value;
         const colorExt = form.querySelector('[name="color_exterior"]');
         const colorInt = form.querySelector('[name="color_interior"]');
-        const laminateExtText = colorExt ? .selectedOptions[0] ? .text ? ? '';
-        const colorIntText = colorInt ? .selectedOptions[0] ? .text ? ? '';
+        const laminateExtText = colorExt ?.selectedOptions[0] ?.text ?? '';
+        const colorIntText = colorInt ?.selectedOptions[0] ?.text ?? '';
 
         let colorDisplay = '';
         if (colorConfig.includes('LAM')) {
@@ -661,21 +659,33 @@
             })
             .then(res => res.json())
             .then(data => {
-                if (!data.success) {
+                if(data.success) {
+                    const currentModal = document.getElementById('addItemModal');
+                        // close modal if open
+                    const currentModalInstance = bootstrap.Modal.getInstance(currentModal) ?? new bootstrap.Modal(currentModal);
+                    if (currentModalInstance) {
+                        currentModalInstance.hide();
+                    }
+
+                    console.log('Modal closed');
+                } else {
                     alert('Item failed to save.');
                 }
             })
             .catch(() => alert('Server error'));
 
 
-
         // 3. Hide modal
         const modalElement = document.getElementById('quoteItemModal');
-        const modal = bootstrap.Modal.getInstance(modalElement) ? ? new bootstrap.Modal(modalElement);
-        modal.hide();
-
+        const modal = bootstrap.Modal.getInstance(modalElement) ?? new bootstrap.Modal(modalElement);
+        if (modal) {
+            modal.hide();
+        }
         // 4. Reset form + preview
         form.reset();
+
+
+
         document.getElementById('window-svg-preview').innerHTML = '<svg></svg>';
     });
 
@@ -715,7 +725,7 @@
 
     // Window preview logic
     function updateWindowPreview() {
-        const series = document.getElementById('seriesSelect').selectedOptions[0] ? .text ? .toLowerCase();
+        const series = document.getElementById('seriesSelect').selectedOptions[0] ?.text ?.toLowerCase();
         const config = document.getElementById('seriesTypeSelect').value;
         const width = document.querySelector('[name="width"]').value || 60;
         const height = document.querySelector('[name="height"]').value || 48;
@@ -829,7 +839,7 @@
                 , width: width
                 , height: height
             }, function(res) {
-                const price = parseFloat(res.price ? ? 0).toFixed(2);
+                const price = parseFloat(res.price ?? 0).toFixed(2);
                 $('#globalTotalPrice').text(price);
                 $('input[name="price"]').val(price);
                 $('input[name="total"]').val(price);
@@ -862,7 +872,7 @@
         });
     });
 
-@if (isset($allConfigurations))
+    @if(isset($allConfigurations))
 
     const allConfigurations = @json($allConfigurations);
 
@@ -872,7 +882,7 @@
 
         modalTrigger.addEventListener('click', function() {
             const selectedSeriesId = document.getElementById('seriesSelect').value;
-            const selectedSeriesText = document.getElementById('seriesSelect').selectedOptions[0]?.text?.trim();
+            const selectedSeriesText = document.getElementById('seriesSelect').selectedOptions[0] ?.text ?.trim();
             const accordion = document.getElementById('categoryAccordion');
             accordion.innerHTML = '';
 
@@ -957,6 +967,8 @@
             bootstrap.Modal.getInstance(document.getElementById('configLookupModal')).hide();
         });
     });
-@endif
+    @endif
+
+    
 </script>
 @endpush

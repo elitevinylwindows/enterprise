@@ -89,9 +89,15 @@ public function checkPrice(Request $request)
         'height' => 'required|numeric',
     ]);
 
+    // The 'series_type' column is a JSON array, so we use whereJsonContains for matching
+    $seriesType = DB::table('elitevw_master_series_types')
+        ->where('series_id', $request->series_id)
+        ->whereJsonContains('series_type', $request->series_type)
+        ->first();
+
     $price = DB::table('elitevw_master_price_price_matrices')
         ->where('series_id', $request->series_id)
-        ->where('series_type', $request->series_type)
+        ->where('series_type_id', $seriesType->id)
         ->where('width', $request->width)
         ->where('height', $request->height)
         ->value('price');
@@ -113,7 +119,6 @@ public function storeItem(Request $request, $id)
 \Log::info('Request path:', ['url' => $request->fullUrl(), 'isJson' => $request->isJson()]);
 \Log::info('POST data:', $request->all());
    // Optionally:
-    dd($request->all());
 
     try {
         $request->validate([
