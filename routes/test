@@ -1,0 +1,184 @@
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.sub-option-toggle').forEach(function(toggle) {
+            toggle.addEventListener('change', function () {
+                let field = this.closest('.mb-3').querySelector('.sub-option-field');
+                field.style.display = this.checked ? 'block' : 'none';
+            });
+        });
+
+        document.querySelectorAll('.edit-size-toggle').forEach(toggle => {
+            toggle.addEventListener('change', function () {
+                let wrapper = this.closest('form').querySelector('.edit-size-fields');
+                wrapper.style.display = this.checked ? 'block' : 'none';
+            });
+        });
+
+        document.querySelectorAll('#editThicknessToggle{{ $option->id }}').forEach(toggle => {
+            toggle.addEventListener('change', function () {
+                let field = this.closest('form').querySelector('.thickness-field');
+                field.style.display = this.checked ? 'block' : 'none';
+            });
+        });
+
+        document.querySelectorAll('.add-size-row').forEach(button => {
+            button.addEventListener('click', function () {
+                const container = this.closest('.edit-size-fields');
+                const count = container.querySelectorAll('.row').length;
+                const row = document.createElement('div');
+                row.classList.add('row', 'g-2', 'mb-2');
+                row.innerHTML = `
+                    <div class="col-md-6">
+                        <input type="text" name="sizes[${count}][size]" class="form-control" placeholder="Size">
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" name="sizes[${count}][name]" class="form-control" placeholder="Size Name">
+                    </div>`;
+                container.insertBefore(row, this);
+            });
+        });
+    });
+</script>
+
+@endpush
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- EDIT MODAL: Sub option toggle ---
+    document.querySelectorAll('.sub-option-toggle').forEach(function (toggle) {
+        toggle.addEventListener('change', function () {
+            let field = this.closest('.mb-3').querySelector('.sub-option-field');
+            field.style.display = this.checked ? 'block' : 'none';
+        });
+    });
+
+    // --- EDIT MODAL: Size toggle ---
+    document.querySelectorAll('.edit-size-toggle').forEach(toggle => {
+        toggle.addEventListener('change', function () {
+            let wrapper = this.closest('form').querySelector('.edit-size-fields');
+            wrapper.style.display = this.checked ? 'block' : 'none';
+        });
+    });
+
+    // --- EDIT MODAL: Thickness toggle ---
+    document.querySelectorAll('[id^="editThicknessToggle"]').forEach(toggle => {
+        toggle.addEventListener('change', function () {
+            let field = this.closest('form').querySelector('.thickness-field');
+            field.style.display = this.checked ? 'block' : 'none';
+        });
+    });
+
+    // --- EDIT MODAL: Add more size rows ---
+    document.querySelectorAll('.add-size-row').forEach(button => {
+        button.addEventListener('click', function () {
+            const container = this.closest('.edit-size-fields');
+            const count = container.querySelectorAll('.row').length;
+            const row = document.createElement('div');
+            row.classList.add('row', 'g-2', 'mb-2');
+            row.innerHTML = `
+                <div class="col-md-6">
+                    <input type="text" name="sizes[${count}][size]" class="form-control" placeholder="Size">
+                </div>
+                <div class="col-md-6">
+                    <input type="text" name="sizes[${count}][name]" class="form-control" placeholder="Size Name">
+                </div>`;
+            container.insertBefore(row, this);
+        });
+    });
+
+    // --- CREATE MODAL: Sub-option toggle ---
+    document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('sub-option-check')) {
+            const row = e.target.closest('.option-row');
+            const field = row.querySelector('.sub-option-field');
+            field.style.display = e.target.checked ? 'block' : 'none';
+        }
+    });
+
+    // --- CREATE MODAL: Size toggle ---
+    const sizeToggleCreate = document.getElementById('hasSize');
+    const sizeFieldsCreate = document.getElementById('size-fields');
+    if (sizeToggleCreate && sizeFieldsCreate) {
+        sizeToggleCreate.addEventListener('change', function () {
+            sizeFieldsCreate.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+
+    // --- CREATE MODAL: Add size rows ---
+    const addSizeBtn = document.getElementById('add-more-size');
+    if (addSizeBtn) {
+        addSizeBtn.addEventListener('click', function () {
+            const container = document.getElementById('size-fields');
+            const count = container.querySelectorAll('.row').length;
+            const row = document.createElement('div');
+            row.classList.add('row', 'g-3', 'mb-2');
+            row.innerHTML = `
+                <div class="col-md-4">
+                    <input type="text" name="size[${count}][size]" class="form-control" placeholder="Size">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="size[${count}][name]" class="form-control" placeholder="Size Name">
+                </div>`;
+            container.insertBefore(row, addSizeBtn.closest('.mb-3'));
+        });
+    }
+
+    // --- CREATE MODAL: Add more option rows ---
+    const optionList = document.getElementById('option-list');
+    const addOptionBtn = document.getElementById('add-more-options');
+    let optionIndex = optionList?.querySelectorAll('.option-row').length || 1;
+
+    if (addOptionBtn && optionList) {
+        addOptionBtn.addEventListener('click', function () {
+            const newRow = document.createElement('div');
+            newRow.classList.add('row', 'g-3', 'mb-2', 'align-items-center', 'option-row');
+            newRow.innerHTML = `
+                <div class="col-md-4">
+                    <input type="text" name="options[${optionIndex}][name]" class="form-control" placeholder="Option Name" required>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="options[${optionIndex}][sub_option]" class="form-control sub-option-field" placeholder="Sub Option" style="display:none">
+                </div>
+                <div class="col-md-1">
+                    <input type="checkbox" class="form-check-input sub-option-check" data-index="${optionIndex}">
+                    <label class="form-check-label small">Sub</label>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-sm btn-danger remove-option">&times;</button>
+                </div>`;
+            optionList.appendChild(newRow);
+            optionIndex++;
+        });
+    }
+
+    // --- CREATE MODAL: Remove option row ---
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-option')) {
+            e.target.closest('.option-row').remove();
+        }
+    });
+});
+</script>
+@endpush

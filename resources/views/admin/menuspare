@@ -1,0 +1,937 @@
+@php
+    $admin_logo = getSettingsValByName('company_logo');
+    $ids = parentId();
+    $authUser = \App\Models\User::find($ids);
+    $subscription = \App\Models\Subscription::find($authUser->subscription);
+    $routeName = \Request::route()->getName();
+    $pricing_feature_settings = getSettingsValByIdName(1, 'pricing_feature');
+    $canManageOrders = \Illuminate\Support\Facades\Gate::has('manage orders') && \Illuminate\Support\Facades\Gate::check('manage orders');
+    $canManageCarts = \Illuminate\Support\Facades\Gate::has('manage carts') && \Illuminate\Support\Facades\Gate::check('manage carts');
+    app(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+
+@endphp
+<nav class="pc-sidebar">
+    <div class="navbar-wrapper">
+        <div class="m-header">
+            <a href="{{ route('home') }}" class="b-brand text-primary">
+                <img src="{{ asset(Storage::url('upload/logo/')) . '/' . (isset($admin_logo) && !empty($admin_logo) ? $admin_logo : 'logo.png') }}"
+                    alt="" class="logo logo-lg" />
+            </a>
+        </div>
+        <div class="navbar-content">
+            <ul class="pc-navbar">
+                <li class="pc-item pc-caption">
+                    <label>{{ __('Home') }}</label>
+                    <i class="ti ti-dashboard"></i>
+                </li>
+                <li class="pc-item {{ in_array($routeName, ['dashboard', 'home', '']) ? 'active' : '' }}">
+                    <a href="{{ route('dashboard') }}" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
+                        <span class="pc-mtext">{{ __('Dashboard') }}</span>
+                    </a>
+                </li>
+                @if (\Auth::user()->type == 'super admin')
+                    @if (Gate::check('manage user'))
+                        <li class="pc-item {{ in_array($routeName, ['users.index', 'users.show']) ? 'active' : '' }}">
+                            <a href="{{ route('users.index') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-user-plus"></i></span>
+                                <span class="pc-mtext">{{ __('Company Users') }}</span>
+                            </a>
+                        </li>
+                    @endif
+                @else
+                    @if (Gate::check('manage user') || Gate::check('manage role') || Gate::check('manage logged history'))
+                        <li
+                            class="pc-item pc-hasmenu {{ in_array($routeName, ['users.index', 'logged.history', 'role.index', 'role.create', 'role.edit']) ? 'pc-trigger active' : '' }}">
+                            <a href="#!" class="pc-link">
+                                <span class="pc-micon">
+                                    <i class="ti ti-users"></i>
+                                </span>
+                                <span class="pc-mtext">{{ __('Staff Management') }}</span>
+                                <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                            </a>
+                            <ul class="pc-submenu"
+                                style="display: {{ in_array($routeName, ['users.index', 'logged.history', 'role.index', 'role.create', 'role.edit']) ? 'block' : 'none' }}">
+                                @if (Gate::check('manage user'))
+                                    <li class="pc-item {{ in_array($routeName, ['users.index']) ? 'active' : '' }}">
+                                        <a class="pc-link" href="{{ route('users.index') }}">{{ __('Users') }}</a>
+                                    </li>
+                                @endif
+                                @if (Gate::check('manage role'))
+                                    <li
+                                        class="pc-item  {{ in_array($routeName, ['role.index', 'role.create', 'role.edit']) ? 'active' : '' }}">
+                                        <a class="pc-link" href="{{ route('role.index') }}">{{ __('Roles') }} </a>
+                                    </li>
+                                @endif
+                                @if ($pricing_feature_settings == 'off' || $subscription->enabled_logged_history == 1)
+                                    @if (Gate::check('manage logged history'))
+                                        <li
+                                            class="pc-item  {{ in_array($routeName, ['logged.history']) ? 'active' : '' }}">
+                                            <a class="pc-link"
+                                                href="{{ route('logged.history') }}">{{ __('Logged History') }}</a>
+                                        </li>
+                                    @endif
+                                @endif
+                            </ul>
+                        </li>
+                    @endif
+                @endif
+                
+
+
+<li class="pc-item pc-caption d-flex justify-content-between align-items-center">
+    <div>
+        <label>{{ __('CRUD Generator') }}</label>
+        <i class="ti ti-chart-arcs"></i>
+    </div>
+    <i class="ti ti-plus text-muted pe-2" style="font-size: 0.9rem;"></i>
+</li>
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('crud.*') ? 'active pc-trigger' : '' }}">
+    <a href="{{ route('crud.index') }}" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-laptop-code"></i></span>
+        <span class="pc-mtext ms-2">Generator</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+<ul class="pc-submenu">
+<li class="pc-item {{ request()->routeIs('sales.dashboard.*') ? 'active' : '' }}">
+    <a href="{{ route('sales.dashboard.index') }}" class="pc-link">
+    <!--    <span class="pc-micon"><i class="ti ti-dashboard"></i></span>-->
+        <span class="pc-mtext">Dashboard</span>
+    </a>
+</li>
+</ul>
+</li>
+
+<li class="pc-item pc-caption d-flex justify-content-between align-items-center">
+    <div>
+        <label>{{ __('Enterprise') }}</label>
+        <i class="ti ti-chart-arcs"></i>
+    </div>
+    <i class="ti ti-plus text-muted pe-2" style="font-size: 0.9rem;"></i>
+</li>
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('sales.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="ti ti-receipt"></i></span>
+        <span class="pc-mtext ms-2">Sales</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+<ul class="pc-submenu">
+<li class="pc-item {{ request()->routeIs('sales.dashboard.*') ? 'active' : '' }}">
+    <a href="{{ route('sales.dashboard.index') }}" class="pc-link">
+    <!--    <span class="pc-micon"><i class="ti ti-dashboard"></i></span>-->
+        <span class="pc-mtext">Dashboard</span>
+    </a>
+</li>
+ <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Leads</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('leads.index') }}">Leads</a></li>
+                <li><a class="pc-link" href="{{ route('leads.kanban') }}">Kanban</a></li>
+            </ul>
+        </li>
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Quotes</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('sales.quotes.create') }}">New Quote</a></li>
+                <li><a class="pc-link" href="{{ route('sales.quotes.index') }}">Quote History</a></li>
+            </ul>
+        </li>
+
+        <!-- Orders submenu with toggle icon -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Orders</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('sales.orders.create') }}">New Order</a></li>
+                <li><a class="pc-link" href="{{ route('sales.orders.index') }}">Order History</a></li>
+            </ul>
+        </li>
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Invoice</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">New Invoice</a></li>
+                <li><a class="pc-link" href="{{ route('sales.invoices.index') }}">Invoice History</a></li>
+            </ul>
+        </li>
+    </ul>
+</li>
+
+<!-- Purchasing -->
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('purchasing.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-money-check-dollar"></i></span>
+        <span class="pc-mtext ms-2">Purchasing</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>New Purchase</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">Send PO</a></li>
+                <li><a class="pc-link" href="#">Purchasing History</a></li>
+            </ul>
+        </li>
+
+        <!-- Orders submenu with toggle icon -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Office Purchase</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">New Order</a></li>
+                <li><a class="pc-link" href="#">Order History</a></li>
+            </ul>
+        </li>
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Production Purchase</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">New Purchase</a></li>
+                <li><a class="pc-link" href="#">Purchase History</a></li>
+            </ul>
+        </li>
+    </ul>
+</li>
+
+
+<!-- Production -->
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('production.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-hands-holding-circle"></i></span>
+        <span class="pc-mtext ms-2">Production</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Purchasing</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">New Quote</a></li>
+                <li><a class="pc-link" href="#">Quote History</a></li>
+            </ul>
+        </li>
+
+        <!-- Orders submenu with toggle icon -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Orders</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">New Order</a></li>
+                <li><a class="pc-link" href="#">Order History</a></li>
+            </ul>
+        </li>
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Invoice</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">New Invoice</a></li>
+                <li><a class="pc-link" href="#">Invoice History</a></li>
+            </ul>
+        </li>
+    </ul>
+</li>
+
+
+
+
+<!-- Shipping -->
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('shipping.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-dolly"></i></span>
+        <span class="pc-mtext ms-2">Shipping</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Uploads</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('orders.index') }}">Orders</a></li>
+                <li><a class="pc-link" href="{{ route('cims.index') }}">Locations</a></li>
+            </ul>
+        </li>
+
+        <!-- Orders submenu with toggle icon -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Panel</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('calendar.index') }}">Calendar</a></li>
+                <li><a class="pc-link" href="{{ route('sr.deliveries.all') }}">Panel View</a></li>
+                <li><a class="pc-link" href="{{ route('sr.deliveries.today') }}">Today's Panel</a></li>
+                <li><a class="pc-link" href="{{ route('sr.deliveries.upcoming') }}">Upcoming Panel</a></li>
+                <li><a class="pc-link" href="{{ route('deliveries.index') }}">Deliveries</a></li>
+                <li><a class="pc-link" href="{{ route('pickups.index') }}">Pickups</a></li>
+                
+            </ul>
+        </li>
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Routes</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('deliveries.today') }}">Today's Route</a></li>
+                <li><a class="pc-link" href="{{ route('deliveries.upcoming') }}">Upcoming Route</a></li>
+                <li><a class="pc-link" href="{{ route('routes.auto') }}">Auto Routes</a></li>
+                <li><a class="pc-link" href="{{ route('routes.plan') }}">Route Plan</a></li>
+            </ul>
+        </li>
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Dispatch</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('drivers.index') }}">Drivers</a></li>
+                <li><a class="pc-link" href="{{ route('trucks.index') }}">Trucks</a></li>
+                <li><a class="pc-link" href="{{ route('shops.index') }}">Shops</a></li>
+            </ul>
+        </li>
+    </ul>
+</li>
+
+
+
+<!-- Miscellaneous -->
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('miscellaneous.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-network-wired"></i></span>
+        <span class="pc-mtext ms-2">Miscellaneous</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Purchasing</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">New Quote</a></li>
+                <li><a class="pc-link" href="#">Quote History</a></li>
+            </ul>
+        </li>
+    </ul>
+</li>
+
+
+
+<!-- Bill of Material -->
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('bom.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-b"></i></span>
+        <span class="pc-mtext ms-2">Bill of Material</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+ <li class="pc-item {{ request()->routeIs('master.bom.*') ? 'active' : '' }}">
+    <a href="{{ route('calculator.index') }}" class="pc-link">
+        <span class="pc-mtext">Calculator</span>
+    </a>
+</li>   
+
+        <!-- Colors -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Menu</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+<li><a class="pc-link" href="{{ route('frametype.index') }}">Frame Type</a></li>
+<li><a class="pc-link" href="{{ route('gridtype.index') }}">Grid Type</a></li>
+<li><a class="pc-link" href="{{ route('glasstype.index') }}">Glass Type</a></li>
+<li><a class="pc-link" href="{{ route('lockcover.index') }}">Lock Cover</a></li>
+<li><a class="pc-link" href="{{ route('waterflow.index') }}">Water Flow</a></li>
+<li><a class="pc-link" href="{{ route('mullcap.index') }}">Mull Cap</a></li>
+<li><a class="pc-link" href="{{ route('mesh.index') }}">Mesh</a></li>
+<li><a class="pc-link" href="{{ route('mullstack.index') }}">Mull Stack</a></li>
+<li><a class="pc-link" href="{{ route('stop.index') }}">Stop</a></li>
+<li><a class="pc-link" href="{{ route('rollertrack.index') }}">Roller Track</a></li>
+<li><a class="pc-link" href="{{ route('doubletape.index') }}">Double Tape</a></li>
+<li><a class="pc-link" href="{{ route('snapping.index') }}">Snapping</a></li>
+<li><a class="pc-link" href="{{ route('gridpattern.index') }}">Grid Pattern</a></li>
+<li><a class="pc-link" href="{{ route('locktype.index') }}">Lock Type</a></li>
+<li><a class="pc-link" href="{{ route('spacer.index') }}">Spacer</a></li>
+<li><a class="pc-link" href="{{ route('screen.index') }}">Screen</a></li>
+<li><a class="pc-link" href="{{ route('strikescrew.index') }}">Strike Screw</a></li>
+<li><a class="pc-link" href="{{ route('strike.index') }}">Strike</a></li>
+<li><a class="pc-link" href="{{ route('lockscrew.index') }}">Lock Screw</a></li>
+<li><a class="pc-link" href="{{ route('tensionspring.index') }}">Tension Spring</a></li>
+<li><a class="pc-link" href="{{ route('pullers.index') }}">Pullers</a></li>
+<li><a class="pc-link" href="{{ route('corners.index') }}">Corners</a></li>
+<li><a class="pc-link" href="{{ route('spline.index') }}">Spline</a></li>
+<li><a class="pc-link" href="{{ route('warninglabel.index') }}">Warning Label</a></li>
+<li><a class="pc-link" href="{{ route('aluminumreinforcement.index') }}">Aluminum Reinforcement</a></li>
+<li><a class="pc-link" href="{{ route('steelreinforcement.index') }}">Steel Reinforcement</a></li>
+<li><a class="pc-link" href="{{ route('reinforcementmaterial.index') }}">Reinforcement Material</a></li>
+<li><a class="pc-link" href="{{ route('mullscrew.index') }}">Mull Screw</a></li>
+<li><a class="pc-link" href="{{ route('interlockreinforcement.index') }}">Interlock Reinforcement</a></li>
+<li><a class="pc-link" href="{{ route('rollers.index') }}">Rollers</a></li>
+<li><a class="pc-link" href="{{ route('interlock.index') }}">Interlock</a></li>
+<li><a class="pc-link" href="{{ route('sash.index') }}">Sash</a></li>
+<li><a class="pc-link" href="{{ route('elitelabel.index') }}">Elite Label</a></li>
+<li><a class="pc-link" href="{{ route('settingblock.index') }}">Setting Block</a></li>
+<li><a class="pc-link" href="{{ route('nightlock.index') }}">Night Lock</a></li>
+<li><a class="pc-link" href="{{ route('antitheft.index') }}">Anti-Theft</a></li>
+<li><a class="pc-link" href="{{ route('ammalabel.index') }}">AMMA Label</a></li>
+<a class="pc-link" href="{{ route('mullreinforcement.index') }}">Mull Reinforcement</a>
+<a class="pc-link" href="{{ route('sashreinforcement.index') }}">Sash Reinforcement</a>
+
+            </ul>
+        </li>
+        <!-- Prices -->
+<li class="pc-item {{ request()->routeIs('master.dashboard.*') ? 'active' : '' }}">
+    <a href="{{ route('prices.index') }}" class="pc-link">
+        <span class="pc-mtext">Prices</span>
+    </a>
+</li>  
+        
+    </ul>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Master -->
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-brain"></i></span>
+        <span class="pc-mtext ms-2">Master</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+ <li class="pc-item {{ request()->routeIs('master.dashboard.*') ? 'active' : '' }}">
+    <a href="{{ route('master.customers.index') }}" class="pc-link">
+        <span class="pc-mtext">Customers</span>
+    </a>
+</li>   
+<li class="pc-item {{ request()->routeIs('master.dashboard.*') ? 'active' : '' }}">
+    <a href="{{ route('master.suppliers.index') }}" class="pc-link">
+        <span class="pc-mtext">Suppliers</span>
+    </a>
+</li>
+        <!-- Library -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Library</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('master.library.configurations.index') }}">Configuration</a></li>
+                <li><a class="pc-link" href="#">Files</a></li>
+
+            </ul>
+        </li>
+
+
+        <!-- Colors -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Colors</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('color-options.color-configurations.index') }}">Configuration</a></li>
+<li><a class="pc-link" href="{{ route('color-options.exterior-colors.index') }}">Exterior Colors</a></li>
+<li><a class="pc-link" href="{{ route('color-options.interior-colors.index') }}">Interior Colors</a></li>
+<li><a class="pc-link" href="{{ route('color-options.laminate-colors.index') }}">Laminate Colors</a></li>
+
+                <li><a class="pc-link" href="#">System Colors</a></li>
+                <li><a class="pc-link" href="#">Status Colors</a></li>
+
+            </ul>
+        </li>
+        <!-- Series -->
+<li class="pc-item pc-hasmenu">
+    <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+        <span>Series</span>
+        <span class="ms-auto icon-wrapper">
+            <i class="fa-solid fa-circle-plus"></i>
+        </span>
+    </a>
+    <ul class="pc-submenu" style="display: none;">
+        <li><a class="pc-link" href="{{ route('master.series.index') }}">Series</a></li>
+        <li><a class="pc-link" href="{{ route('master.series-type.index') }}">Configuration</a></li>
+    </ul>
+</li>
+
+        <!-- Products -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Products</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+    <li>
+        <a class="pc-link" href="#">Product Master</a>
+        <ul class="pc-submenu" style="display: none;">
+            <li>
+                <a class="pc-link" href="{{ route('product_master.accessories.index') }}">Accessories</a>
+            </li>
+            <li>
+                <a class="pc-link" href="{{ route('product_master.glassinsert.index') }}">Glass/Inserts</a>
+            </li>
+            <li>
+                <a class="pc-link" href="{{ route('product_master.hardwarevariant.index') }}">Hardware Variants</a>
+                <ul class="pc-submenu" style="display: none;">
+                    <li>
+                        <a class="pc-link" href="{{ route('product_master.hardwareparts.index') }}">Parts</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a class="pc-link" href="{{ route('product_master.materials.index') }}">Materials</a>
+            </li>
+            <li>
+                <a class="pc-link" href="{{ route('product_master.profiles.index') }}">Profiles</a>
+                <ul class="pc-submenu" style="display: none;">
+                    <li>
+                        <a class="pc-link" href="#">Reinforcements</a> {{-- Not yet defined --}}
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a class="pc-link" href="{{ route('product_master.units.index') }}">Units</a>
+            </li>
+        </ul>
+    </li>
+
+                <li><a class="pc-link" href="{{ route('products.product_classes.index') }}">Product Classes</a></li>
+<li><a class="pc-link" href="{{ route('products.basic_products.index') }}">Basic Products</a></li>
+<li><a class="pc-link" href="{{ route('products.grille_patterns.index') }}">Grille Patterns</a></li>
+<li><a class="pc-link" href="{{ route('products.profile_records.index') }}">Profile Records</a></li>
+<li><a class="pc-link" href="{{ route('products.corner_exchange.index') }}">Corner Exchange</a></li>
+<li><a class="pc-link" href="{{ route('products.profile_types.index') }}">Profile Types</a></li>
+<li><a class="pc-link" href="{{ route('products.sealing_assignment.index') }}">Sealing Assignment</a></li>
+<li><a class="pc-link" href="{{ route('products.reinforcement_assignments.index') }}">Reinforcement Assignments</a></li>
+<li><a class="pc-link" href="{{ route('products.hardware_types.index') }}">Hardware Types</a></li>
+<li><a class="pc-link" href="{{ route('products.system_color.index') }}">System / Color</a></li>
+
+
+            </ul>
+        </li>
+        <!-- Colors -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Product Keys</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('product_keys.producttypes.index') }}">Product Types</a></li>
+<li><a class="pc-link" href="{{ route('product_keys.productareas.index') }}">Product Areas</a></li>
+<li><a class="pc-link" href="{{ route('product_keys.productsystems.index') }}">Product Systems</a></li>
+<li><a class="pc-link" href="{{ route('product_keys.manufacturersystems.index') }}">Manufacturer Systems</a></li>
+<li><a class="pc-link" href="{{ route('product_keys.specialshapemacros.index') }}">Special Shape Macros</a></li>
+<li><a class="pc-link" href="{{ route('product_keys.shapecatalog.index') }}">Shape Catalog</a></li>
+<li><a class="pc-link" href="{{ route('product_keys.drawingobjects.index') }}">Drawing Objects</a></li>
+
+                <li><a class="pc-link" href="#">Color Groups</a></li>
+                <li><a class="pc-link" href="#">Color Classes</a></li>
+                <li><a class="pc-link" href="#">Color Levels</a></li>
+                <li><a class="pc-link" href="#">System / Color</a></li>
+
+            </ul>
+        </li>
+         
+         
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Prices/Discounts</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('master.prices.matrice.index') }}">Price Matrice</a></li>
+                <li><a class="pc-link" href="#">Customer Prices</a></li>
+<li><a class="pc-link" href="{{ route('prices.productprices.index') }}">Add-On Prices</a></li>
+                <li><a class="pc-link" href="{{ route('master.prices.markup.index') }}">Markup</a></li>
+                <li><a class="pc-link" href="#">Schema</a></li>
+                <li><a class="pc-link" href="#">Price Group</a></li>
+                <li><a class="pc-link" href="#">Global Discount</a></li>
+                <li><a class="pc-link" href="#">Price Cycle</a></li>
+                <li><a class="pc-link" href="#">Generation</a></li>
+                <li><a class="pc-link" href="#">Currencies</a></li>
+                <li><a class="pc-link" href="#">Exchange Rates</a></li>
+                <li><a class="pc-link" href="#">FinAc Accounts</a></li>
+                <li><a class="pc-link" href="#">Acc Assignment</a></li>
+                <li><a class="pc-link" href="#">Global Discount</a></li>
+                <li><a class="pc-link" href="#">Calc Schemes</a></li>
+                <li><a class="pc-link" href="#">Calc Set</a></li>
+                <li><a class="pc-link" href="#">Commissions</a></li>
+                <li><a class="pc-link" href="#">Tax Codes</a></li>
+                <li><a class="pc-link" href="#">Tax Classes</a></li>
+                <li><a class="pc-link" href="#">Exchange Rules</a></li>
+                <li><a class="pc-link" href="#">Tax Rules</a></li>
+            </ul>
+        </li>
+        
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Prices Addons</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">Schema</a></li>
+                <li><a class="pc-link" href="">Price Addon Formula</a></li>
+            </ul>
+        </li>
+    </ul>
+</li>
+
+
+<!-- Addon Schema -->
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('schema.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-database"></i></span>
+        <span class="pc-mtext ms-2">Schema/Addon</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Schema</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">HS Unit</a></li>
+                <li><a class="pc-link" href="#">SH Unit</a></li>
+                <li><a class="pc-link" href="#">DH Unit</a></li>
+                <li><a class="pc-link" href="#">XX Unit</a></li>
+                <li><a class="pc-link" href="#">CM Unit</a></li>
+                <li><a class="pc-link" href="#">PW Unit</a></li>
+                <li><a class="pc-link" href="#">SLD Unit</a></li>
+                <li><a class="pc-link" href="#">PW Unit</a></li>
+                <li><a class="pc-link" href="#">SLD Unit</a></li>
+                <li><a class="pc-link" href="#">SWD Unit</a></li>
+                <li><a class="pc-link" href="#">GSCO HS Unit</a></li>
+                <li><a class="pc-link" href="#">GSCO SH Unit</a></li>
+                <li><a class="pc-link" href="#">GSCO DH Unit</a></li>
+                <li><a class="pc-link" href="#">GSCO PW Unit</a></li>
+                <li><a class="pc-link" href="#">GSCO XX Unit</a></li>
+                <li><a class="pc-link" href="#">GSCO CM Unit</a></li>
+                <li><a class="pc-link" href="#">GSCO CM Unit</a></li>
+                <li><a class="pc-link" href="#">GSCO SLD Unit</a></li>
+                <li><a class="pc-link" href="#">GSCO SWD Unit</a></li>
+                <li><a class="pc-link" href="#">CM Promo</a></li>
+                <li><a class="pc-link" href="#">Window & Door Field</a></li>
+
+            </ul>
+        </li>
+
+        <!-- Orders submenu with toggle icon -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>AddOns</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('master.sales.addons.index') }}">Prices</a></li>
+                <li><a class="pc-link" href="#">AddOns</a></li>
+            </ul>
+        </li>
+    </ul>
+</li>
+
+
+
+
+<!-- Reports -->
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('reports.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-flag"></i></span>
+        <span class="pc-mtext ms-2">Reports</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Purchasing</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">New Quote</a></li>
+                <li><a class="pc-link" href="#">Quote History</a></li>
+            </ul>
+        </li>
+
+        <!-- Orders submenu with toggle icon -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Orders</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">New Order</a></li>
+                <li><a class="pc-link" href="#">Order History</a></li>
+            </ul>
+        </li>
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Invoice</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="#">New Invoice</a></li>
+                <li><a class="pc-link" href="#">Invoice History</a></li>
+            </ul>
+        </li>
+    </ul>
+</li>
+
+                
+                
+<!-- Executive -->
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('executives.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="ti ti-briefcase"></i></span>
+        <span class="pc-mtext ms-2">Executive</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Benefits</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('executives.tiers.index') }}">Tiers</a></li>
+                <li><a class="pc-link" href="{{ route('executives.raffle.index') }}">Raffle</a></li>
+            </ul>
+        </li>
+        <!-- Orders submenu with toggle icon -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Pricing</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('inventory.configurator.index') }}">Configurator</a></li>
+                <li><a class="pc-link" href="{{ route('executives.formulas.index') }}">Formula</a></li>
+                <li><a class="pc-link" href="{{ route('inventory.bom.index') }}">Pricing</a></li>
+                <li><a class="pc-link" href="{{ route('form-options.index') }}">Form Options</a></li>
+            </ul>
+        </li>
+    </ul>
+</li>
+                
+
+
+<li class="pc-item pc-caption d-flex justify-content-between align-items-center">
+    <div>
+        <label>{{ __('Settings') }}</label>
+        <i class="ti ti-chart-arcs"></i>
+    </div>
+    <i class="ti ti-plus text-muted pe-2" style="font-size: 0.9rem;"></i>
+</li>
+<!-- Settings -->
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('shipping.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="ti ti-briefcase"></i></span>
+        <span class="pc-mtext ms-2">Settings</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>CMS</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('homepage.index') }}">Home Page</a></li>
+                <li><a class="pc-link" href="{{ route('pages.index') }}">Custom Page</a></li>
+                <li><a class="pc-link" href="{{ route('FAQ.index') }}">FAQ</a></li>
+                <li class="pc-item {{ in_array($routeName, ['footerSetting']) ? 'active' : '' }} ">
+                                        <a class="pc-link href="{{ route('footerSetting') }}">Footer</a></li>
+            </ul>
+        </li>
+
+        <!-- Orders submenu with toggle icon -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Pricing</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('subscriptions.index') }}">Packages</a></li>
+                <li class="pc-item {{ in_array($routeName, ['subscription.transaction']) ? 'active' : '' }}">
+                                            <a class="pc-link"
+                                                href="{{ route('subscription.transaction') }}">Transactions</a></li>
+            </ul>
+        </li>
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Coupon</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('coupons.index') }}">All Coupon</a></li>
+                <li><a class="pc-link" href="{{ route('coupons.history') }}">Coupon History</a></li>
+            </ul>
+        </li>
+        <li class="pc-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+    <a href="{{ route('setting.index') }}" class="pc-link">
+    <!--    <span class="pc-micon"><i class="ti ti-dashboard"></i></span>-->
+        <span class="pc-mtext">Settings</span>
+    </a>
+</li>
+    </ul>
+</li>
+              
+                
+                
+                
+                
+                
+
+
+
+
+            </ul>
+            <div class="w-100 text-center">
+                <div class="badge theme-version badge rounded-pill bg-light text-dark f-12"></div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+
+@push('scripts')
+<script>
+    function toggleSubmenu(el) {
+        const submenu = el.nextElementSibling;
+        const icon = el.querySelector('.icon-wrapper i');
+
+        if (submenu && icon) {
+            const isOpen = submenu.style.display === 'block';
+            submenu.style.display = isOpen ? 'none' : 'block';
+            icon.className = isOpen ? 'fa-solid fa-circle-plus' : 'fa-solid fa-circle-minus';
+        }
+    }
+</script>
+@endpush

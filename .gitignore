@@ -1,0 +1,7 @@
+/vendor/srmklive
+/.idea
+/.vscode
+/vendor
+/storage
+.well-known
+.env

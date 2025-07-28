@@ -1,0 +1,401 @@
+@extends('layouts.app')
+
+@section('page-title')
+    {{ __('Quotes') }}
+@endsection
+
+@section('breadcrumb')
+    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ __('New Quotes') }}</li>
+@endsection
+
+
+@section('content')
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0 text-dark">Start Quote</h4>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('sales.quotes.store') }}" method="POST">
+                        @csrf
+
+                        <div class="row">
+                            <div class="col-md-2 mb-3">
+                                <label>Customer #</label>
+                                <input type="text" name="customer_number" class="form-control" value="1232">
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label>Quote #</label>
+                                <input type="text" name="quote_number" class="form-control" value="1232">
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label>Order Type</label>
+                                <select name="order_type" class="form-control">
+                                    <option value="pickup">Office Pick-up</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-2 mb-3">
+                                <label>Entry Date</label>
+                                <input type="date" name="order_date" class="form-control" value="{{ date('Y-m-d') }}">
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label>Expected Delivery</label>
+                                <input type="date" name="order_date" class="form-control" value="{{ date('Y-m-d') }}">
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label>Valid Until</label>
+                                <input type="date" name="order_date" class="form-control" value="{{ date('Y-m-d') }}">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label>Customer Name</label>
+                                <input type="text" name="customer_name" class="form-control" value="TOLA">
+                            </div>
+                             <div class="col-md-2 mb-3">
+                                <label>Entered By</label>
+                                 <input type="text" name="entered_by" class="form-control" value="Berenis">
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label>Region</label>
+                                <select name="order_type" class="form-control">
+                                    <option value="pickup">Region 1</option>
+                                </select>
+                            </div>
+                             <div class="col-md-2 mb-3">
+                                <label>Measurement Type</label>
+                                <select name="order_type" class="form-control">
+                                    <option value="pickup">Imperial</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label>PO #</label>
+                                <input type="text" name="po_number" class="form-control" value="TOLA">
+                            </div>
+                             <div class="col-md-2 mb-3">
+                                <label>Reference</label>
+                                 <input type="text" name="entered_by" class="form-control" value="Berenis">
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label>Contact</label>
+                                 <input type="text" name="entered_by" class="form-control" value="Berenis">
+                            </div>
+                        </div>
+                        <div class="row">
+                        <div class="col-md-5 mb-3">
+                            <label>Comment</label>
+                            <textarea name="po_number" class="form-control" rows="4">Enter Comment</textarea>
+                        </div>
+                        
+                        <div class="col-md-5 mb-3">
+                            <label>Notes</label>
+                            <textarea name="po_number" class="form-control" rows="4">Enter Notes</textarea>
+                        </div>
+                        </div>
+
+                        <div class="text-end mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-play"></i> Start Quote
+                            </button>
+                        </div>
+                        <!--This Locks the top card, so they can proceed with the quote details-->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--Quote Details-->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 text-dark">Quote Details</h5>
+            </div>
+            <div class="card-body">
+<div class="row mb-3">
+    <div class="col-md-2">
+        <label>Customer Number</label>
+        <input type="text" name="customer_number" class="form-control" value="{{ old('customer_number', $customer_number ?? '') }}" readonly>
+    </div>
+    <div class="col-md-3">
+        <label>Customer Name</label>
+        <input type="text" name="customer_name" class="form-control" value="{{ old('customer_name', $customer_name ?? '') }}" readonly>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label>Entered By</label>
+        <input type="text" name="entered_by" class="form-control" value="{{ auth()->user()->name ?? 'System' }}" readonly>
+    </div>
+
+    <div class="col-md-4">
+        <label>Entry Date</label>
+        <input type="date" name="entry_date" class="form-control" value="{{ date('Y-m-d') }}" readonly>
+    </div>
+
+    <div class="col-md-4">
+        <label>Expected Delivery</label>
+        <input type="date" name="expected_delivery" class="form-control" value="{{ old('expected_delivery') }}">
+    </div>
+</div>
+
+                <div class="row mb-3 align-items-end">
+    <div class="col-md-5">
+        <label>Series</label>
+        <select name="category" class="form-control">
+            <option value="8000">8000 Series Windows</option>
+            <!-- Add more categories -->
+        </select>
+    </div>
+    <div class="col-md-5">
+        <label>Configuration</label>
+        <select name="part" class="form-control">
+            <option value="8220SL">8220SL - TWO-LITE SLIDER</option>
+            <!-- Add more parts -->
+        </select>
+    </div>
+    <div class="col-md-2 text-end">
+        <button type="button" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add
+        </button>
+    </div>
+</div>
+
+
+                <table class="table table-bordered table-striped">
+    <thead class="table-light">
+        <tr>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Part</th>
+            <th>Size</th>
+            <th>Price</th>
+            <th>Total</th>
+            <th>Image</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Example item row -->
+        <tr>
+    <td>1</td>
+    <td>
+        <input type="number" name="qty[]" class="form-control form-control-sm" value="1" style="width: 50px;">
+    </td>
+    <td>8220SL</td>
+    <td>48" x 36"</td>
+    <td>$0.00</td>
+    <td>$0.00</td>
+    <td>
+        <img src="https://via.placeholder.com/50" alt="Item Image" class="img-thumbnail" style="width: 20px;">
+    </td>
+    <td></td>
+</tr>
+
+        <tr>
+            <td colspan="8">
+                <strong>Description:</strong> Two-lite horizontal slider, white vinyl frame, clear tempered glass.
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+                <button type="button" class="btn btn-primary btn-sm mt-2">UPDATE QTY</button>
+
+                <div class="row mt-4">
+                    <div class="col-md-6 offset-md-6">
+                        <table class="table">
+                            <tr>
+                                <th>Surcharge:</th>
+                                <td>$0.00</td>
+                            </tr>
+                            <tr>
+                                <th>Subtotal:</th>
+                                <td>$0.00</td>
+                            </tr>
+                            <tr>
+                                <th>Tax:</th>
+                                <td>$0.00</td>
+                            </tr>
+                            <tr>
+                                <th>Total:</th>
+                                <td><strong>$0.00</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row mt-3 text-muted small">
+                    <div class="col-md-4">
+                        <strong>Entered By:</strong> Doe, John
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Date:</strong> 4/15/2025
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Expires:</strong> 5/15/2025
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="card shadow">
+    <div class="card-header d-flex justify-content-between align-items-center bg-white text-dark">
+        <h5 class="mb-0">Add Quote Item - 8000PW</h5>
+        <div>
+            <button class="btn btn-sm btn-success me-2"><i class="fas fa-check"></i> Add</button>
+            <button class="btn btn-sm btn-secondary"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-3" id="quoteItemTabs" role="tablist">
+            <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#item">Item</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#sizing">Sizing</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#color">Color</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#glass">Glass</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#grids">Grids</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#other">Other</a></li>
+        </ul>
+
+        <div class="row">
+            <!-- Left Form -->
+            <div class="col-md-6">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="item">
+                        <div class="mb-3">
+                            <label>Qty</label>
+                            <input type="number" name="qty" class="form-control" value="1">
+                        </div>
+                        <div class="mb-3">
+                            <label>Call Size</label>
+                            <input type="text" name="call_size" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label>Width</label>
+                            <div class="input-group">
+                                <input type="text" name="width" class="form-control" value="60">
+                                <span class="input-group-text">inches</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Height</label>
+                            <div class="input-group">
+                                <input type="text" name="height" class="form-control" value="48">
+                                <span class="input-group-text">inches</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Line Item Comment</label>
+                            <textarea name="item_comment" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Other tabs can be filled similarly -->
+<div class="tab-pane fade" id="sizing" role="tabpanel">
+    <h6 class="mb-3">Sizing</h6>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <button type="button" class="btn w-100 text-start border {{ ($selectedSizing ?? '') === 'EX' ? 'bg-primary text-white' : '' }}">
+                <img src="/images/exact_size.png" class="img-fluid mb-2" alt="Exact Size">
+                <div><strong>EX</strong> - Exact Size</div>
+            </button>
+        </div>
+        <div class="col-md-3">
+            <button type="button" class="btn w-100 text-start border {{ ($selectedSizing ?? '') === 'RO' ? 'bg-primary text-white' : '' }}">
+                <img src="/images/rough_opening.png" class="img-fluid mb-2" alt="Rough Opening">
+                <div><strong>RO</strong> - Rough Opening</div>
+            </button>
+        </div>
+    </div>
+</div>
+
+
+                    <div class="tab-pane fade" id="color">...</div>
+                    <div class="tab-pane fade" id="glass">...</div>
+                    <div class="tab-pane fade" id="grids">...</div>
+                    <div class="tab-pane fade" id="other">...</div>
+                </div>
+            </div>
+
+           <!-- Right Preview + Tabs -->
+<div class="col-md-6">
+    <!-- Right Tabs -->
+    <ul class="nav nav-pills justify-content-end mb-3" id="previewTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="pill" href="#preview-panel">Preview</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="pill" href="#options-panel">Options</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="pill" href="#pricing-panel">Pricing - $669.88</a>
+        </li>
+    </ul>
+
+    <!-- Tab Content Area -->
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="preview-panel">
+            <div class="border rounded bg-light p-4 mb-3 text-center" style="height: 300px; position: relative;">
+                <p style="position: absolute; top: 30%; left: 40%; font-size: 24px;">CLCL</p>
+                <p style="position: absolute; bottom: 10%; right: 20%; font-size: 18px;">ARG</p>
+            </div>
+
+            <div class="btn-group mb-3 w-100" role="group">
+                <button type="button" class="btn btn-secondary active">Inside</button>
+                <button type="button" class="btn btn-light">Outside</button>
+                <button type="button" class="btn btn-light">Both</button>
+            </div>
+
+            <div class="alert alert-light border text-muted small text-center">
+                <strong>NFRC Ratings</strong> — SHG: 0.34 UF: 0.22 VT: 0.47
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="options-panel">
+            <p class="text-muted">Option settings will go here.</p>
+        </div>
+
+        <div class="tab-pane fade" id="pricing-panel">
+            <h5 class="text-center">$669.88</h5>
+            <p class="text-muted text-center">Detailed pricing breakdown can be shown here.</p>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+function addRow() {
+    let table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+    let rowCount = table.rows.length;
+    let row = table.insertRow();
+
+    let fields = ['quantity', 'type', 'product_code', 'width', 'height', 'color', 'sale_net_price', 'rem_price'];
+    for (let i = 0; i < fields.length; i++) {
+        let cell = row.insertCell(i);
+        cell.innerHTML = `<input type="text" name="products[${rowCount}][${fields[i]}]" class="form-control">`;
+    }
+}
+</script>
+@endsection
