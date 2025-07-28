@@ -750,8 +750,7 @@
         document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
     });
 
-</script>
-<script>
+
     document.getElementById('colorConfigDropdown').addEventListener('change', function() {
         const value = this.value;
         const [exterior, interior] = value.split('-');
@@ -779,8 +778,6 @@
         }
     });
 
-</script>
-<script>
     function filterColorOptions(dropdown, group) {
         let options = dropdown.querySelectorAll('option');
 
@@ -818,8 +815,6 @@
         }
     });
 
-</script>
-<script>
     function fetchBasePrice() {
         const series_id = $('#seriesSelect').val();
         const series_type = $('#seriesTypeSelect').val();
@@ -847,9 +842,7 @@
     $('#seriesSelect, #seriesTypeSelect').on('change', fetchBasePrice);
     $('input[name="width"], input[name="height"]').on('keyup', fetchBasePrice);
 
-</script>
 
-<script>
     document.querySelectorAll('.view-quote-item').forEach(btn => {
         btn.addEventListener('click', function() {
             const url = this.dataset.url;
@@ -869,9 +862,8 @@
         });
     });
 
-</script>
 @if (isset($allConfigurations))
-<script>
+
     const allConfigurations = @json($allConfigurations);
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -880,7 +872,7 @@
 
         modalTrigger.addEventListener('click', function() {
             const selectedSeriesId = document.getElementById('seriesSelect').value;
-            const selectedSeriesText = document.getElementById('seriesSelect').selectedOptions[0] ? .text ? .trim();
+            const selectedSeriesText = document.getElementById('seriesSelect').selectedOptions[0]?.text?.trim();
             const accordion = document.getElementById('categoryAccordion');
             accordion.innerHTML = '';
 
@@ -965,7 +957,6 @@
             bootstrap.Modal.getInstance(document.getElementById('configLookupModal')).hide();
         });
     });
-
-</script>
 @endif
+</script>
 @endpush
