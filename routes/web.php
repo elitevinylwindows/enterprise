@@ -871,7 +871,7 @@ Route::prefix('sales')->name('sales.')->group(function () {
     Route::get('quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
     Route::post('quotes', [QuoteController::class, 'store'])->name('quotes.store');
     Route::get('quotes/{id}', [QuoteController::class, 'details'])->name('quotes.details');
-Route::post('/quotes/check-price', [QuoteController::class, 'checkPrice'])->name('quotes.checkPrice');
+    Route::post('/quotes/check-price', [QuoteController::class, 'checkPrice'])->name('quotes.checkPrice');
 
 
     Route::get('customers/{customer_number}', [QuoteController::class, 'getCustomer'])->name('customers.get');
