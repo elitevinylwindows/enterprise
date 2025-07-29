@@ -458,8 +458,6 @@ Route::prefix('master/prices')->name('master.prices.')->group(function () {
     Route::post('matrice/check', [MatriceController::class, 'checkPrice'])->name('matrice.check'); 
 });
 
-    
-
 
 Route::prefix('master/product_keys')->name('product_keys.')->group(function () {
     Route::resource('producttypes', ProductTypeController::class);
