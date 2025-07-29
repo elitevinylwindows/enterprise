@@ -2,6 +2,6 @@
 /.idea
 /.vscode
 /vendor
-/storage
+/storage/logs/*
 .well-known
 .env
