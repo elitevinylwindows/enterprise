@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File; 
 use App\Models\Sales\QuoteItem;
+use App\Models\Schemas\HSUnit;
 use Illuminate\Support\Facades\View;
 
 
@@ -101,6 +102,9 @@ public function checkPrice(Request $request)
         ->where('width', $request->width)
         ->where('height', $request->height)
         ->value('price');
+
+    
+    $price = getMarkup($request->series_id, $price);
 
     \Log::info('Checking price matrix', [
         'series_id' => $request->series_id,
@@ -406,5 +410,25 @@ public function edit($id)
     ]);
 }
 
+public function getSchemaPrice(Request $request)
+{
+    $request->validate([
+        'series_type' => 'required|string',
+        'dropdown_value' => 'required|string',
+    ]);
+
+    if (preg_match('/XO|OX/', $request->series_type)) {
+        $price = HSUnit::first();
+        $column = strtolower($request->dropdown_value);
+        if (isset($price->$column)) {
+            $price = $price->$column;
+        } else {
+            return response()->json(['error' => 'Invalid column name'], 400);
+        }
+    }
+
+    return response()->json(['price' => (int)$price]);
+
+}
 
 }
