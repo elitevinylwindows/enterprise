@@ -5,3 +5,4 @@
 /storage/logs/*
 .well-known
 .env
+/storage/framework
