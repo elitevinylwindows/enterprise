@@ -240,7 +240,7 @@
             </a>
             <ul class="pc-submenu" style="{{ request()->routeIs('sales.quotes.*') ? 'display: block;' : 'display: none;' }}">
                 <li><a class="pc-link" href="{{ route('sales.quotes.create') }}">New Quote</a></li>
-                <li><a class="pc-link" href="{{ route('sales.quotes.index') }}">Quote History</a></li>
+                <li><a class="pc-link" href="{{ route('sales.quotes.index') }}">All Quoutes</a></li>
             </ul>
         </li>
         @endif
@@ -253,8 +253,8 @@
                 <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
             </a>
             <ul class="pc-submenu" style="{{ request()->routeIs('sales.orders.*') ? 'display: block;' : 'display: none;' }}">
-                <li><a class="pc-link" href="{{ route('sales.orders.create') }}">New Order</a></li>
-                <li><a class="pc-link" href="{{ route('sales.orders.index') }}">Order History</a></li>
+                <!--<li><a class="pc-link" href="{{ route('sales.orders.create') }}">New Order</a></li>-->
+                <li><a class="pc-link" href="{{ route('sales.orders.index') }}">All Orders</a></li>
             </ul>
         </li>
         @endif
@@ -267,12 +267,12 @@
                 <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
             </a>
             <ul class="pc-submenu" style="{{ request()->routeIs('sales.invoices.*') ? 'display: block;' : 'display: none;' }}">
-                <li><a class="pc-link" href="{{ route('sales.invoices.create') }}">New Invoice</a></li>
-                <li><a class="pc-link" href="{{ route('sales.invoices.index') }}">Invoice History</a></li>
+                <!--<li><a class="pc-link" href="{{ route('sales.invoices.create') }}">New Invoice</a></li>-->
+                <li><a class="pc-link" href="{{ route('sales.invoices.index') }}">All Invoices</a></li>
             </ul>
         </li>
         @endif
-
+        
         {{-- Settings --}}
         @if (Gate::check('manage sales settings'))
         <li class="pc-item">

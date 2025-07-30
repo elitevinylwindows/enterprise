@@ -35,6 +35,7 @@
                             <tr>
                                 <th>{{ __('Schema ID') }}</th>
                                 <th>{{ __('Product ID') }}</th>
+                                <th>{{ __('Product Code') }}</th>
                                 <th>{{ __('Retrofit') }}</th>
                                 <th>{{ __('Nailon') }}</th>
                                 <th>{{ __('Block') }}</th>
@@ -63,6 +64,7 @@
                                 <tr>
                                     <td>{{ $unit->schema_id }}</td>
                                     <td>{{ $unit->product_id }}</td>
+                                    <td>{{ $unit->product_code }}</td>
                                     <td>{{ $unit->retrofit }}</td>
                                     <td>{{ $unit->nailon }}</td>
                                     <td>{{ $unit->block }}</td>
