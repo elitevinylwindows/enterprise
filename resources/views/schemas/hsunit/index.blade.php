@@ -27,6 +27,7 @@
                         <thead>
                             <tr><th>{{ __('Schema Id') }}</th>
                             <th>{{ __('Product Id') }}</th>
+                            <th>{{ __('Product Code') }}</th>
                             <th>{{ __('Retrofit') }}</th>
                             <th>{{ __('Nailon') }}</th>
                             <th>{{ __('Block') }}</th>
@@ -48,6 +49,7 @@
                             <tr>
                                 <td>{{ $hsunit->schema_id }}</td>
                                 <td>{{ $hsunit->product_id }}</td>
+                                <td>{{ $hsunit->product_code }}</td>
                                 <td>{{ $hsunit->retrofit }}</td>
                                 <td>{{ $hsunit->nailon }}</td>
                                 <td>{{ $hsunit->block }}</td>

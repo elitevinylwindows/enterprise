@@ -9,6 +9,8 @@
             <tr>
                 <th>ID</th>
                 <th>Schema ID</th>
+                <th>Product ID</th>
+                <th>Product Code</th>
                 <th>Retrofit</th>
                 <th>Nailon</th>
                 <th>Block</th>
@@ -32,6 +34,8 @@
                 <tr>
                     <td>{{ $item->id }}</td>
                     <td>{{ $item->schema_id }}</td>
+                    <td>{{ $unit->product_id }}</td>
+                    <td>{{ $unit->product_code }}</td>
                     <td>{{ $item->retrofit }}</td>
                     <td>{{ $item->nailon }}</td>
                     <td>{{ $item->block }}</td>

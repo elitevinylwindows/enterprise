@@ -4,6 +4,7 @@
 @foreach ([
     'schema_id' => 'Schema ID',
     'product_id' => 'Product ID',
+    'product_code' => 'Product Code',
     'retrofit' => 'Retrofit',
     'nailon' => 'Nailon',
     'block' => 'Block',

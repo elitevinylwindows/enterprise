@@ -15,80 +15,6 @@
     
 <div class="mb-4"></div> {{-- Space --}}
     
-<div class="card shadow mb-4">
-            <div class="card-body p-3">
-                <!-- Ribbon Tabs -->
-                <ul class="nav nav-tabs mb-3 small" id="ribbonTabs" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab">Orders</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="production-tab" data-bs-toggle="tab" href="#production" role="tab">Production</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="crm-tab" data-bs-toggle="tab" href="#crm" role="tab">CRM</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="setup-tab" data-bs-toggle="tab" href="#setup" role="tab">Setup</a>
-                    </li>
-                </ul>
-
-                <!-- Tab Contents -->
-                <div class="tab-content" id="ribbonTabsContent">
-                    <!-- Orders Tab -->
-                    <div class="tab-pane fade show active" id="orders" role="tabpanel">
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-users fa-2x d-block mb-1"></i>
-                                <small>Customers</small>
-                            </a>
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-truck fa-2x d-block mb-1"></i>
-                                <small>Shipping</small>
-                            </a>
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-coins fa-2x d-block mb-1"></i>
-                                <small>Pricing</small>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Production Tab -->
-                    <div class="tab-pane fade" id="production" role="tabpanel">
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-cube fa-2x d-block mb-1"></i>
-                                <small>Products</small>
-                            </a>
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-pencil-ruler fa-2x d-block mb-1"></i>
-                                <small>Designers</small>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- CRM Tab -->
-                    <div class="tab-pane fade" id="crm" role="tabpanel">
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-address-book fa-2x d-block mb-1"></i>
-                                <small>Contacts</small>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Setup Tab -->
-                    <div class="tab-pane fade" id="setup" role="tabpanel">
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-cogs fa-2x d-block mb-1"></i>
-                                <small>System</small>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
 
 <div class="row">
@@ -183,7 +109,7 @@
                                             <i data-feather="mail"></i>
                                         </a>
 
-                                        {{-- Orders --}}
+                                        {{-- Manual Convert to Order --}}
                                         <a class="avtar avtar-xs btn-link-info text-info"
                                            data-bs-toggle="tooltip"
                                            data-bs-original-title="Orders"

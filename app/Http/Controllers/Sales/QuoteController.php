@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File; 
 use App\Models\Sales\QuoteItem;
 use Illuminate\Support\Facades\View;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class QuoteController extends Controller
@@ -265,6 +265,68 @@ public function getCustomer($customer_number)
     }
 }
 
+public function approveQuote($quoteId)
+{
+    $quote = Quote::with('items')->findOrFail($quoteId);
+
+    // 1. Create Order
+    $order = Order::create([
+        'quote_id' => $quote->id,
+        'order_number' => generateOrderNumber(),
+        'order_date' => now(),
+        'due_date' => now()->addDays(14),
+        'approved_by' => auth()->user()->name,
+        'entered_by' => $quote->entered_by,
+       
+    ]);
+
+    foreach ($quote->items as $item) {
+        $order->items()->create($item->toArray());
+    }
+
+    // 2. Send Order PDF
+    $pdf = Pdf::loadView('pdf.order', compact('order'));
+    Mail::to($quote->customer->email)->send(new OrderGenerated($pdf));
+
+    // 3. Create Invoice
+    $invoice = Invoice::create([
+        'order_id' => $order->id,
+        'quote_id' => $quote->id,
+        'invoice_number' => generateInvoiceNumber(),
+        'work_order' => 'WO' . $order->id,
+        'due_date' => now()->addDays(14),
+        'entered_by' => auth()->user()->name,
+        'status' => 'Pending',
+    ]);
+
+    return response()->json(['success' => true, 'order_id' => $order->id]);
+}
+
+public function preview($id)
+{
+    $quote = Quote::with('items')->findOrFail($id);
+    $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
+    return $pdf->stream("Quote_{$id}.pdf");
+}
+
+public function download($id)
+{
+    $quote = Quote::with('items')->findOrFail($id);
+    $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
+    return $pdf->download("Quote_{$id}.pdf");
+}
+
+public function send(Request $request, $id)
+{
+    // logic to email the quote PDF
+    return back()->with('success', 'Quote emailed successfully.');
+}
+
+public function save(Request $request, $id)
+{
+    // logic to mark quote as saved/finalized
+    return back()->with('success', 'Quote saved successfully.');
+}
 
 
 public function details($id)

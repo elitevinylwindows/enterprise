@@ -12,15 +12,25 @@
         </div>
 
        
-
-       <div class="form-group mb-3">
+<div class="row">
+    <div class="col-md-6">
+<div class="form-group mb-3">
     <label for="series_type">Series Type</label>
     <input type="text" id="series_type_input" class="form-control" placeholder="Type and press enter">
     <div id="series_type_tags" class="mt-2"></div>
     <input type="hidden" name="series_type" id="series_type_hidden">
 </div>
-
+</div>
+ <div class="col-md-6">
+    <div class="form-group mb-3">
+    <label for="series_type">Product ID</label>
+    <input type="text" id="series_type_input" class="form-control" placeholder="Enter Product ID">
+    <div id="series_type_tags" class="mt-2"></div>
+    <input type="hidden" name="series_type" id="series_type_hidden">
+</div>
     </div>
+    </div>
+</div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Save</button>
     </div>

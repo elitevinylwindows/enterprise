@@ -23,6 +23,8 @@ class SHUnitController extends Controller
     {
                 $validated = $request->validate([
             'schema_id' => 'nullable|string',
+            'product_id' => 'nullable|string',
+            'product_code' => 'nullable|string',
             'retrofit' => 'nullable|string',
             'nailon' => 'nullable|string',
             'block' => 'nullable|string',
@@ -36,7 +38,7 @@ class SHUnitController extends Controller
             'feat3' => 'nullable|string',
             'clr_clr' => 'nullable|string',
             'le3_clr_le3' => 'nullable|string',
-            'le3_combo' => 'nullable|string',
+            'twole3_oneclr_temp' => 'nullable|string',
             'sta_grid' => 'nullable|string',
             'tpi' => 'nullable|string',
             'tpo' => 'nullable|string',
@@ -45,7 +47,7 @@ class SHUnitController extends Controller
             'status' => 'nullable|string',
         ]);
 SHUnit::create($validated);
-        return redirect()->route('shunit.index')->with('success', 'Created successfully.');
+        return redirect()->route('sh-unit.index')->with('success', 'Created successfully.');
     }
 
     public function show($id)
