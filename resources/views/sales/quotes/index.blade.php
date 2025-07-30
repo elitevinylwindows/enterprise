@@ -183,13 +183,22 @@
                                             <i data-feather="mail"></i>
                                         </a>
 
+<<<<<<< Updated upstream
                                         {{-- Orders --}}
                                         <a class="avtar avtar-xs btn-link-info text-info"
                                            data-bs-toggle="tooltip"
                                            data-bs-original-title="Orders"
                                            href="{{ route('sales.orders.index', ['quote' => $quote->id]) }}">
+=======
+                                        {{-- Manual Convert to Order --}}
+                                        <a href="{{ route('sales.quotes.convertToOrder', ['id' => $quote->id]) }}"
+                                            class="avtar avtar-xs btn-link-info text-info"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-original-title="Convert to Order">
+>>>>>>> Stashed changes
                                             <i data-feather="shopping-cart"></i>
                                         </a>
+
 
                                         {{-- Delete --}}
                                         <a class="avtar avtar-xs btn-link-danger text-danger customModal"

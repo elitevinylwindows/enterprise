@@ -254,7 +254,72 @@ class QuoteController extends Controller
             'customer_name'    => $quote->customer_name
         ]);
 
+<<<<<<< Updated upstream
         return redirect()->route('sales.quotes.details', $quote->id);
+=======
+    session([
+        'quote_number'     => $quote->quote_number,
+        'customer_number'  => $quote->customer_number,
+        'customer_name'    => $quote->customer_name
+    ]);
+
+    return redirect()->route('sales.quotes.details', $quote->id);
+}
+
+
+
+public function getCustomer($customer_number)
+{
+    $customer = DB::table('elitevw_master_customers')
+        ->where('customer_number', $customer_number)
+        ->first();
+
+    if ($customer) {
+        return response()->json(['customer_name' => $customer->customer_name]);
+    } else {
+        return response()->json(['error' => 'Customer not found'], 404);
+    }
+}
+
+public function convertToOrder($id)
+{
+    $quote = \App\Models\Sales\Quote::with('customer')->findOrFail($id);
+
+    $order = Order::create([
+        'order_number' => 'ORD-' . time(),
+        'quote_number' => $quote->quote_number,
+        'customer_id' => $quote->customer_id,
+        'customer_number' => $quote->customer_number,
+        'customer_name' => $quote->customer_name,
+        'invoice_date' => now(),
+        'net_price' => $quote->total,
+        'paid_amount' => 0,
+        'remaining_amount' => $quote->total,
+        'status' => 'pending',
+        'notes' => 'Auto-converted from quote #' . $quote->id,
+    ]);
+
+    return redirect()->route('sales.orders.edit', $order->id)->with('success', 'Order created from quote.');
+}
+
+public function approveQuote($quoteId)
+{
+    $quote = Quote::with('items')->findOrFail($quoteId);
+
+    // 1. Create Order
+    $order = Order::create([
+        'quote_id' => $quote->id,
+        'order_number' => generateOrderNumber(),
+        'order_date' => now(),
+        'due_date' => now()->addDays(14),
+        'approved_by' => auth()->user()->name,
+        'entered_by' => $quote->entered_by,
+       
+    ]);
+
+    foreach ($quote->items as $item) {
+        $order->items()->create($item->toArray());
+>>>>>>> Stashed changes
     }
 
 

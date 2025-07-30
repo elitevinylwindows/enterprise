@@ -350,7 +350,18 @@ Route::post('quotes/{id}/items', [QuoteController::class, 'storeItem'])->name('q
 Route::get('quotes/items/{id}/edit', [QuoteController::class, 'editItem'])->name('quotes.items.edit');
 Route::get('quotes/items/{id}', [QuoteController::class, 'showItem'])->name('quotes.items.show');
 
+<<<<<<< Updated upstream
 // ❗️This should be LAST to avoid hijacking the other routes
+=======
+
+Route::get('/quotes/{id}/preview', [QuoteController::class, 'preview'])->name('quotes.preview');
+Route::get('/quotes/{id}/download', [QuoteController::class, 'download'])->name('quotes.download');
+Route::post('/quotes/{id}/send', [QuoteController::class, 'send'])->name('quotes.send');
+Route::post('/quotes/{id}/save', [QuoteController::class, 'save'])->name('quotes.save');
+Route::get('quotes/{id}/convert-to-order', [QuoteController::class, 'convertToOrder'])->name('sales.quotes.convertToOrder');
+
+
+>>>>>>> Stashed changes
 Route::get('quotes/{id}', [QuoteController::class, 'show']);
 
 
