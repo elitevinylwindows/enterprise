@@ -30,9 +30,9 @@ public function index(Request $request)
 public function store(Request $request)
 {
     $request->validate([
-        'customer_number' => 'required|unique:elitevw_sr_customers,customer_number',
+        'customer_number' => 'required|unique:elitevw_master_customers,customer_number',
         'name' => 'required|string|max:255',
-        'tier' => 'nullable|string',
+        'tier_id' => 'nullable|integer|exists:elitevw_sr_tiers,id',
         'loyalty_credit' => 'nullable|numeric',
         'total_spent' => 'nullable|numeric',
     ]);
@@ -40,7 +40,7 @@ public function store(Request $request)
     Customer::create([
         'customer_number' => $request->customer_number,
         'name' => $request->name,
-        'tier' => $request->tier,
+        'tier_id' => $request->tier_id,
         'loyalty_credit' => $request->loyalty_credit ?? 0,
         'total_spent' => $request->total_spent ?? 0,
     ]);

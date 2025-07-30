@@ -17,7 +17,7 @@
             </div>
             <div class="col-md-6">
               <label class="form-label">Customer Name</label>
-              <input type="text" name="name" class="form-control" value="{{ $customer->name }}" required>
+              <input type="text" name="name" class="form-control" value="{{ $customer->customer_name }}" required>
             </div>
             <div class="col-md-6">
               <label class="form-label">Street</label>

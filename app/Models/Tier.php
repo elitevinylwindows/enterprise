@@ -13,5 +13,11 @@ class Tier extends Model
         'name',
         'benefits',
         'sort_order',
+        'percentage',
     ];
+
+    public function getPercentageAttribute($value)
+    {
+        return number_format($value, 2) ?? 0; // Ensure percentage is always a number
+    }
 }

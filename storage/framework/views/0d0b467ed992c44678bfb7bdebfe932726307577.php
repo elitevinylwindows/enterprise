@@ -840,7 +840,8 @@
                 , series_id: series_id
                 , series_type: series_type
                 , width: width
-                , height: height
+                , height: height,
+                customer_number: "<?php echo e($quote->customer_number ?? ''); ?>"
             }, function(res) {
                 const price = parseFloat(res.price ?? 0).toFixed(2);
                 $('#globalTotalPrice').text(price);
@@ -984,11 +985,8 @@
             },
             success: function(data) {
                 
-                if (data.price) {
-                    const currentTotal = parseFloat($('#globalTotalPrice').text()) || 0;
-                    const newTotal = currentTotal + parseFloat(data.price);
-                    $('#globalTotalPrice').text(newTotal.toFixed(2));
-                }
+                const currentTotal = parseFloat($('#globalTotalPrice').text()) || 0;
+                $('#globalTotalPrice').text(currentTotal + data.price);
                 // You can update the UI or perform other actions based on the response
             },
             error: function(xhr, status, error) {

@@ -839,7 +839,8 @@
                 , series_id: series_id
                 , series_type: series_type
                 , width: width
-                , height: height
+                , height: height,
+                customer_number: "{{ $quote->customer_number ?? '' }}"
             }, function(res) {
                 const price = parseFloat(res.price ?? 0).toFixed(2);
                 $('#globalTotalPrice').text(price);
