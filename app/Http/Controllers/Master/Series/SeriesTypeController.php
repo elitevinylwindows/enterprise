@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Master\Series\Series;
 use App\Models\Master\Series\SeriesType;
+use App\Models\Master\ProductKeys\ProductType;
 
 class SeriesTypeController extends Controller
 {
@@ -18,10 +19,11 @@ class SeriesTypeController extends Controller
     }
 
     public function create()
-    {
-        $series = Series::all();
-        return view('master.series.series_type.create', compact('series'));
-    }
+{
+    $series = Series::all();
+    $productTypes = ProductType::all();
+    return view('master.series.series_type.create', compact('series', 'productTypes'));
+}
 
     public function store(Request $request)
     {
@@ -41,12 +43,12 @@ class SeriesTypeController extends Controller
     }
 
     public function edit($id)
-    {
-        $seriesType = SeriesType::findOrFail($id);
-        $series = Series::all();
-
-        return view('master.series.series_type.edit', compact('seriesType', 'series'));
-    }
+{
+    $seriesType = SeriesType::findOrFail($id);
+    $series = Series::all();
+    $productTypes = ProductType::all();
+    return view('master.series.series_type.edit', compact('seriesType', 'series', 'productTypes'));
+}
 
     public function update(Request $request, $id)
     {
