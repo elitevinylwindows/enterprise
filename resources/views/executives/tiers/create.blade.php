@@ -13,6 +13,10 @@
                     <input type="text" name="name" class="form-control" placeholder="e.g. Gold, Silver" required>
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">Percentage</label>
+                    <input type="number" name="percentage" class="form-control" required min="0" max="100">
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Benefits</label>
                     <textarea name="benefits" rows="4" class="form-control" placeholder="List the benefits..." required></textarea>
                 </div>

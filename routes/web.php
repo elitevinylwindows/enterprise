@@ -351,11 +351,14 @@ Route::get('quotes/items/{id}/edit', [QuoteController::class, 'editItem'])->name
 Route::get('quotes/items/{id}', [QuoteController::class, 'showItem'])->name('quotes.items.show');
 
 
+
 Route::get('/quotes/{id}/preview', [QuoteController::class, 'preview'])->name('quotes.preview');
 Route::get('/quotes/{id}/download', [QuoteController::class, 'download'])->name('quotes.download');
 Route::post('/quotes/{id}/send', [QuoteController::class, 'send'])->name('quotes.send');
 Route::post('/quotes/{id}/save', [QuoteController::class, 'save'])->name('quotes.save');
 
+
+Route::get('quotes/{id}/convert-to-order', [QuoteController::class, 'convertToOrder'])->name('sales.quotes.convertToOrder');
 
 Route::get('quotes/{id}', [QuoteController::class, 'show']);
 
@@ -463,8 +466,6 @@ Route::prefix('master/prices')->name('master.prices.')->group(function () {
     Route::post('matrice/import', [MatriceController::class, 'import'])->name('matrice.import');
     Route::post('matrice/check', [MatriceController::class, 'checkPrice'])->name('matrice.check'); 
 });
-
-    
 
 
 Route::prefix('master/product_keys')->name('product_keys.')->group(function () {
@@ -877,9 +878,8 @@ Route::prefix('sales')->name('sales.')->group(function () {
     Route::get('quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
     Route::post('quotes', [QuoteController::class, 'store'])->name('quotes.store');
     Route::get('quotes/{id}', [QuoteController::class, 'details'])->name('quotes.details');
-Route::post('/quotes/check-price', [QuoteController::class, 'checkPrice'])->name('quotes.checkPrice');
-
-
+    Route::post('/quotes/check-price', [QuoteController::class, 'checkPrice'])->name('quotes.checkPrice');
+    Route::post('quotes/schema/price', [QuoteController::class, 'getSchemaPrice'])->name('quotes.schema.price');
     Route::get('customers/{customer_number}', [QuoteController::class, 'getCustomer'])->name('customers.get');
 });
 

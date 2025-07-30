@@ -1866,3 +1866,18 @@ if (!function_exists('authPage')) {
         return $createdTemplates;
     }
 }
+
+if (!function_exists('getMarkup')) {
+    function getMarkup($seriesId, $price)
+    {
+       $markup = DB::table('elitevw_master_markup')
+            ->where('series_id', $seriesId)
+            ->value('percentage');
+
+        if ($markup) {
+            $price = round($price * (1 + $markup / 100), 2);
+        }
+        
+        return $price;
+    }
+}
