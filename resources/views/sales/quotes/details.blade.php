@@ -679,7 +679,7 @@
                     const row = `
                     <tr data-id="${data.item_id}">
                         <td>${itemDesc}</td>
-                        <td><input type="number" name="qty[]" value="${qty}" class="form-control form-control-sm qty-input" style="width: 60px;" data-price="${price}" data-id="${data.item_id}"></td>
+                        <td><input type="number" name="qty[]" value="${qty}" min="1" class="form-control form-control-sm qty-input" style="width: 60px;" data-price="${price}" data-id="${data.item_id}"></td>
                         <td>${size}</td>
                         <td>${glass}</td>
                         <td>${grid}</td>
