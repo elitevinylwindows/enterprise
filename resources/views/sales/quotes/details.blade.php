@@ -118,16 +118,14 @@
 
                 <tbody>
                     @foreach ($quoteItems as $item)
-                    <tr data-id="{{ $item->id }}">
+                    <tr>
                         <td>{{ $item->description }}</td>
-                        <td>
-                            <input type="number" name="qty[]" value="{{ $item->qty }}" class="form-control form-control-sm qty-input" style="width: 60px;" min="1" data-price="{{ $item->price }}" data-id="{{ $item->id }}">
-                        </td>
+                        <td><input type="number" name="qty[]" value="{{ $item->qty }}" class="form-control form-control-sm" style="width: 60px;"></td>
                         <td>{{ $item->width }}" x {{ $item->height }}"</td>
                         <td>{{ $item->glass }}</td>
                         <td>{{ $item->grid }}</td>
                         <td>${{ number_format($item->price, 2) }}</td>
-                        <td class="item-total" data-id="{{ $item->id }}">${{ number_format($item->total, 2) }}</td>
+                        <td>${{ number_format($item->total, 2) }}</td>
                         <td><img src="{{ $item->image_url ?? 'https://via.placeholder.com/40' }}" class="img-thumbnail" alt="Item"></td>
                         <td class="text-nowrap">
                             <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item" data-id="{{ $item->id }}">
@@ -143,27 +141,29 @@
                     </tr>
                     @endforeach
                 </tbody>
+
+
             </table>
 
             <!-- Totals -->
             <div class="row mt-4">
                 <div class="col-md-6 offset-md-6">
-                    <table class="table" id="totalsTable">
+                    <table class="table">
                         <tr>
                             <th>Surcharge:</th>
-                            <td id="surcharge-amount">$0.00</td>
+                            <td>$0.00</td>
                         </tr>
                         <tr>
                             <th>Subtotal:</th>
-                            <td id="subtotal-amount">$0.00</td>
+                            <td>$0.00</td>
                         </tr>
                         <tr>
                             <th>Tax:</th>
-                            <td id="tax-amount">$0.00</td>
+                            <td>$0.00</td>
                         </tr>
                         <tr>
                             <th>Total:</th>
-                            <td><strong id="total-amount">$0.00</strong></td>
+                            <td><strong>$0.00</strong></td>
                         </tr>
                     </table>
                 </div>
@@ -182,9 +182,10 @@
 
                 <div class=class="d-flex gap-2">
                     <a href="" class="btn btn-secondary">Save Draft</a>
-                    <a href="javascript:void(0);" class="btn btn-primary" onclick="openQuotePreview({{ $quote->id }})">
-                        Continue &rarr;
-                    </a>
+                   <a href="javascript:void(0);" class="btn btn-primary" onclick="openQuotePreview({{ $quote->id }})">
+    Continue &rarr;
+</a>
+
 
                 </div>
 
@@ -431,27 +432,30 @@
                         </div>
 
 
-                        <!-- Quote PDF Preview Modal -->
-                        <div class="modal fade" id="quotePreviewModal" tabindex="-1" aria-labelledby="quotePreviewModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Quote Preview</h5>
-                                        <a href="{{ route('sales.quotes.download', $quote->id) }}" target="_blank" class="btn btn-outline-primary btn-sm">Download PDF</a>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
 
-                                    <div class="modal-body" style="min-height: 80vh;">
-                                        <iframe src="{{ route('sales.quotes.preview', $quote->id) }}" width="100%" height="100%" style="min-height: 70vh;" frameborder="0"></iframe>
-                                    </div>
 
-                                    <div class="modal-footer justify-content-between">
-                                        <button type="button" class="btn btn-success">Send Quote</button>
-                                        <button type="button" class="btn btn-primary">Save Quote</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
+                     <!-- Quote PDF Preview Modal -->
+<div class="modal fade" id="quotePreviewModal" tabindex="-1" aria-labelledby="quotePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Quote Preview</h5>
+                <a href="{{ route('sales.quotes.download', $quote->id) }}" target="_blank" class="btn btn-outline-primary btn-sm">Download PDF</a>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body" style="min-height: 80vh;">
+                <iframe src="{{ route('sales.quotes.preview', $quote->id) }}" width="100%" height="100%" style="min-height: 70vh;" frameborder="0"></iframe>
+            </div>
+
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-success">Send Quote</button>
+                <button type="button" class="btn btn-primary">Save Quote</button>
+            </div>
+        </div>
+    </div>
+</div>
 
                         <!-- Right Preview + Tabs -->
                         <div class="col-md-6">
@@ -618,7 +622,7 @@
         const glass = `${glassType}-${spacer} / ${tempered} / ${specialtyGLass}`;
         const grid = `${gridPattern} / ${gridProfile}`;
         const size = `${width}" x ${height}"`;
-        const price = $('#globalTotalPrice').text();
+        const price = '0.00';
         const total = (qty * parseFloat(price)).toFixed(2);
         const item_comment = form.querySelector('[name="item_comment"]').value;
         const internal_note = form.querySelector('[name="internal_note"]').value;
@@ -665,9 +669,9 @@
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
+                if(data.success) {
                     const currentModal = document.getElementById('addItemModal');
-                    // close modal if open
+                        // close modal if open
                     const currentModalInstance = bootstrap.Modal.getInstance(currentModal) ?? new bootstrap.Modal(currentModal);
                     if (currentModalInstance) {
                         currentModalInstance.hide();
@@ -723,29 +727,7 @@
     // Delete row
     document.querySelector('#quoteDetailsTable tbody').addEventListener('click', function(e) {
         if (e.target.closest('.remove-row')) {
-            
-            const row = e.target.closest('tr');
-            const itemId = row.getAttribute('data-id');
-            const quoteId = "{{ $quote->id }}";
-            if (confirm('Are you sure you want to delete this item?')) {
-                fetch(`/sales/quotes/${quoteId}/items/${itemId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.success) {
-                        alert('Failed to delete item.');
-                        return;
-                    }
-                    // Optionally recalculate totals
-                      e.target.closest('tr').remove();
-                    calculateTotals();
-                })
-                .catch(() => alert('Server error'));
-            }
+            e.target.closest('tr').remove();
         }
     });
 
@@ -954,8 +936,8 @@
                 , series_id: series_id
                 , series_type: series_type
                 , width: width
-                , height: height
-                , customer_number: "{{ $quote->customer_number ?? '' }}"
+                , height: height,
+                customer_number: "{{ $quote->customer_number ?? '' }}"
             }, function(res) {
                 const price = parseFloat(res.price ?? 0).toFixed(2);
                 $('#globalTotalPrice').text(price);
@@ -1071,20 +1053,20 @@
     $('#frame_type').on('change', function() {
         const selectedFrame = $(this).val();
         $.ajax({
-            url: '/sales/quotes/schema/price'
-            , method: 'POST'
-            , data: {
-                _token: '{{ csrf_token() }}'
-                , dropdown_value: selectedFrame
-                , series_type: $('#seriesTypeSelect').val()
-            }
-            , success: function(data) {
-
+            url: '/sales/quotes/schema/price',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                dropdown_value: selectedFrame,
+                series_type: $('#seriesTypeSelect').val()
+            },
+            success: function(data) {
+                
                 const currentTotal = parseFloat($('#globalTotalPrice').text()) || 0;
                 $('#globalTotalPrice').text(currentTotal + data.price);
                 // You can update the UI or perform other actions based on the response
-            }
-            , error: function(xhr, status, error) {
+            },
+            error: function(xhr, status, error) {
                 console.error('Error fetching frame details:', error);
             }
         });
@@ -1095,7 +1077,8 @@
         const selectedFin = $(this).val();
         console.log('Selected finish type:', selectedFin);
     });
-
+</script>
+<script>
     function openQuotePreview(quoteId) {
         const pdfUrl = `/quotes/pdf/${quoteId}/preview`; // You can adjust route if different
         document.getElementById('quotePdfIframe').src = pdfUrl;
@@ -1103,45 +1086,6 @@
         const modal = new bootstrap.Modal(document.getElementById('quotePdfPreviewModal'));
         modal.show();
     }
-
-    function calculateTotals() {
-        let subtotal = 0;
-        document.querySelectorAll('.qty-input').forEach(function(input) {
-            const qty = parseInt(input.value) || 0;
-            const price = parseFloat(input.dataset.price) || 0;
-            const rowTotal = qty * price;
-            subtotal += rowTotal;
-
-            // Update row total
-            const id = input.dataset.id;
-            const totalCell = document.querySelector('.item-total[data-id="' + id + '"]');
-            if (totalCell) {
-                totalCell.textContent = '$' + rowTotal.toFixed(2);
-            }
-        });
-
-        // Example: Surcharge is 0, tax is 8%
-        const surcharge = 0;
-        const taxRate = 0.08;
-        const tax = subtotal * taxRate;
-        const total = subtotal + surcharge + tax;
-
-        document.getElementById('surcharge-amount').textContent = '$' + surcharge.toFixed(2);
-        document.getElementById('subtotal-amount').textContent = '$' + subtotal.toFixed(2);
-        document.getElementById('tax-amount').textContent = '$' + tax.toFixed(2);
-        document.getElementById('total-amount').textContent = '$' + total.toFixed(2);
-    }
-
-    // Listen for qty input changes
-    document.addEventListener('input', function(e) {
-        if (e.target.classList.contains('qty-input')) {
-            calculateTotals();
-        }
-    });
-
-    // Initial calculation on page load
-    document.addEventListener('DOMContentLoaded', calculateTotals);
-
 </script>
 
 @endpush

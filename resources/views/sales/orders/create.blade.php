@@ -1,367 +1,142 @@
-@extends('layouts.app')
+<div class="modal fade" id="createOrderModal" tabindex="-1" aria-labelledby="createOrderLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <form method="POST" action="{{ route('sales.orders.store') }}" id="orderCreateForm">
+      @csrf
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create Order</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
 
-@section('page-title')
-    {{ __('Orders') }}
-@endsection
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label>Quote Number</label>
+              <input type="text" name="quote_number" id="quote_number" class="form-control" placeholder="Enter Quote Number">
+            </div>
+            <div class="col-md-4">
+              <label>Order Number</label>
+              <input type="text" name="order_number" id="order_number" class="form-control" readonly>
+            </div>
+          </div>
 
-@section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ __('Orders') }}</li>
-@endsection
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label>Customer #</label>
+              <input type="text" name="customer_number" id="customer_number" class="form-control" readonly>
+            </div>
+            <div class="col-md-4">
+              <label>Customer Name</label>
+              <input type="text" name="customer_name" id="customer_name" class="form-control" readonly>
+            </div>
+          </div>
 
-@section('content')
-<div class="mb-4"></div> {{-- Space --}}
-
-
-<div class="card shadow mb-4">
-            <div class="card-body p-3">
-                <!-- Ribbon Tabs -->
-                <ul class="nav nav-tabs mb-3 small" id="ribbonTabs" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab">Orders</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="production-tab" data-bs-toggle="tab" href="#production" role="tab">Production</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="crm-tab" data-bs-toggle="tab" href="#crm" role="tab">CRM</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="setup-tab" data-bs-toggle="tab" href="#setup" role="tab">Setup</a>
-                    </li>
-                </ul>
-
-                <!-- Tab Contents -->
-                <div class="tab-content" id="ribbonTabsContent">
-                    <!-- Orders Tab -->
-                    <div class="tab-pane fade show active" id="orders" role="tabpanel">
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-users fa-2x d-block mb-1"></i>
-                                <small>Customers</small>
-                            </a>
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-truck fa-2x d-block mb-1"></i>
-                                <small>Shipping</small>
-                            </a>
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-coins fa-2x d-block mb-1"></i>
-                                <small>Pricing</small>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Production Tab -->
-                    <div class="tab-pane fade" id="production" role="tabpanel">
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-cube fa-2x d-block mb-1"></i>
-                                <small>Products</small>
-                            </a>
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-pencil-ruler fa-2x d-block mb-1"></i>
-                                <small>Designers</small>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- CRM Tab -->
-                    <div class="tab-pane fade" id="crm" role="tabpanel">
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-address-book fa-2x d-block mb-1"></i>
-                                <small>Contacts</small>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Setup Tab -->
-                    <div class="tab-pane fade" id="setup" role="tabpanel">
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="#" class="btn text-center p-2" style="min-width: 100px; background-color: #f8f9fa !important; color: #212529 !important; border: 1px solid #dee2e6;">
-                                <i class="fas fa-cogs fa-2x d-block mb-1"></i>
-                                <small>System</small>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label>Entry Date</label>
+              <input type="date" name="entry_date" class="form-control" value="{{ date('Y-m-d') }}" readonly>
+            </div>
+            <div class="col-md-4">
+              <label>Delivery Date</label>
+              <input type="date" name="delivery_date" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label>Status</label>
+              <select name="status" class="form-control">
+                <option value="active">Active</option>
+                <option value="draft">Draft</option>
+              </select>
+            </div>
+          </div>
+        <div class="row mb-3">
+          <div class="col-md-12">
+              <label>Quote Notes</label>
+              <textarea name="notes" id="quote_notes" class="form-control" rows="3" readonly></textarea>
             </div>
         </div>
 
+          <hr>
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Billing Information</h6>
+              <input type="text" name="billing_address" id="billing_address" class="form-control mb-2" placeholder="Billing Address" readonly>
+              <input type="text" name="billing_city" id="billing_city" class="form-control mb-2" placeholder="City" readonly>
+              <input type="text" name="billing_state" id="billing_state" class="form-control mb-2" placeholder="State" readonly>
+              <input type="text" name="billing_zip" id="billing_zip" class="form-control mb-2" placeholder="ZIP" readonly>
+              <input type="text" name="phone" id="customer_phone" class="form-control mb-2" placeholder="Phone" readonly>
+              <input type="email" name="email" id="customer_email" class="form-control mb-2" placeholder="Email" readonly>
+            </div>
+            <div class="col-md-6">
+              <h6>Delivery Information</h6>
+              <input type="text" name="delivery_address" id="delivery_address" class="form-control mb-2" placeholder="Delivery Address" readonly>
+              <input type="text" name="delivery_city" id="delivery_city" class="form-control mb-2" placeholder="City" readonly>
+              <input type="text" name="delivery_state" id="delivery_state" class="form-control mb-2" placeholder="State" readonly>
+              <input type="text" name="delivery_zip" id="delivery_zip" class="form-control mb-2" placeholder="ZIP" readonly>
+              <input type="text" name="phone" id="customer_phone" class="form-control mb-2" placeholder="Phone" readonly>
+              <input type="email" name="email" id="customer_email" class="form-control mb-2" placeholder="Email" readonly>
+            </div>
+ </div>
 
-
-<div class="container-fluid mt-4">
-    <div class="card shadow">
-        <div class="card-header bg-white">
-            <h5 class="mb-0 text-dark">Order Entry</h5>
-        </div>
-        <div class="card-body">
-            <form action="{{ route('sales.orders.store') }}" method="POST">
-                @csrf
-
-
-
-       <div class="d-flex justify-content-start align-items-center gap-2 mb-2">
-    {{-- Create / Add Order --}}
-    <a href="#"
-       class="avtar avtar-xs btn-link-primary text-primary customModal"
-       data-bs-toggle="tooltip"
-       data-bs-original-title="Add"
-       data-size="lg"
-       data-url="{{ route('sales.orders.create') }}"
-       data-title="Add Order">
-        <i data-feather="plus"></i>
-    </a>
-
-    {{-- Edit Order --}}
-    <a href="#"
-       class="avtar avtar-xs btn-link-primary text-primary customModal"
-       data-bs-toggle="tooltip"
-       data-bs-original-title="Edit"
-       data-size="lg"
-       data-url="{{ route('sales.orders.edit', $order->id ?? 1) }}"
-       data-title="Edit Order">
-        <i data-feather="edit"></i>
-    </a>
-
-    {{-- Delete Order --}}
-    <a href="#"
-       class="avtar avtar-xs btn-link-primary text-primary customModal"
-       data-bs-toggle="tooltip"
-       data-bs-original-title="Delete"
-       data-size="lg"
-       data-url="{{ route('sales.orders.destroy', $order->id ?? 1) }}"
-       data-title="Delete Order">
-        <i data-feather="trash-2"></i>
-    </a>
-
-    {{-- Email Order --}}
-    <a href="#"
-       class="avtar avtar-xs btn-link-primary text-primary customModal"
-       data-bs-toggle="tooltip"
-       data-bs-original-title="Email"
-       data-size="lg"
-       data-url="{{ route('sales.orders.email', $order->id ?? 1) }}"
-       data-title="Email Order">
-        <i data-feather="mail"></i>
-    </a>
-
-    {{-- Print Order (optional route) --}}
-    <a href="#"
-       class="avtar avtar-xs btn-link-primary text-primary customModal"
-       data-bs-toggle="tooltip"
-       data-bs-original-title="Print"
-       data-size="lg"
-       data-url="{{ route('sales.orders.print', $order->id ?? 1) }}"
-       data-title="Print Order">
-        <i data-feather="printer"></i>
-    </a>
-</div>
-
-<div class="mb-4"></div> {{-- Space --}}
-
-
-        <!-- Tab Navigation -->
-        <ul class="nav nav-tabs card-header-tabs mt-2" id="orderTabs" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="order-tab" data-bs-toggle="tab" href="#order" role="tab">Order</a>
+ <div class="row mt-4">
+    <div class="col-md-6 offset-md-6">
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Subtotal:</span>
+                <strong id="subtotalDisplay">$0.00</strong>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" id="shipping-tab" data-bs-toggle="tab" href="#shipping" role="tab">Shipping</a>
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Tax:</span>
+                <strong id="taxDisplay">$0.00</strong>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" id="financial-tab" data-bs-toggle="tab" href="#financial" role="tab">Financial</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="general-tab" data-bs-toggle="tab" href="#general" role="tab">General</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="project-tab" data-bs-toggle="tab" href="#project" role="tab">Project</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="notes-tab" data-bs-toggle="tab" href="#notes" role="tab">Notes</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="userdefined-tab" data-bs-toggle="tab" href="#userdefined" role="tab">User Defined</a>
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Total:</span>
+                <strong id="totalDisplay">$0.00</strong>
             </li>
         </ul>
     </div>
-
-    <!-- Tab Content + Form Fields -->
-    <div class="card-body tab-content" id="orderTabsContent">
-        <div class="tab-pane fade show active" id="order" role="tabpanel">
-                {{-- Top Rows: Order Info --}}
-                <div class="row mb-3">
-                    <div class="col-md-2">
-                        <label>Order Number</label>
-                        <input type="text" name="order_number" class="form-control">
-                    </div>
-                    <div class="col-md-2">
-                        <label>PO Number</label>
-                        <input type="text" name="po_number" class="form-control">
-                    </div>
-                    <div class="col-md-2">
-                        <label>Order Type</label>
-                        <select name="order_type" class="form-control">
-                            <option value="Order">Order</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label>Customer #</label>
-                        <input type="text" name="po_number" class="form-control">
-                    </div>
-                    <div class="col-md-4">
-                        <label>Customer</label>
-                        <input type="text" name="customer" class="form-control" value="Atlantic Installers - 28">
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-2">
-                        <label>Order Date</label>
-                        <input type="date" name="order_date" class="form-control">
-                    </div>
-                    <div class="col-md-2">
-                        <label>Required Date</label>
-                        <input type="date" name="required_date" class="form-control">
-                    </div>
-                    <div class="col-md-2">
-                        <label>Ack Date</label>
-                        <input type="date" name="ask_date" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label>Invoice Date</label>
-                        <input type="date" name="invoice_date" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label>Ship Date</label>
-                        <input type="date" name="ship_date" class="form-control">
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-3">
-                        <label>Ship To</label>
-                        <input type="text" name="ship_to" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label>Order Contact</label>
-                        <input type="text" name="order_contact" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label>Customer Ref #</label>
-                        <input type="text" name="customer_ref" class="form-control">
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    
-                    <div class="col-md-3">
-                        <label>Salesperson</label>
-                        <input type="text" name="salesperson" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label>Sales Code</label>
-                        <input type="text" name="sales_code" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label>Terms</label>
-                        <input type="text" name="terms" class="form-control">
-                    </div>
-                </div>
-
-                {{-- Item Table --}}
-<div class="table-responsive my-3 small">
-    <table class="table table-bordered table-striped table-sm">
-        <thead class="table-light">
-            <tr>
-                <th>Qty</th>
-                <th>Category</th>
-                <th>Part</th>
-                <th>Call Size</th>
-                <th>Width</th>
-                <th>Height</th>
-                <th>Thickness</th>
-                <th>Price</th>
-                <th>SqFt Price</th>
-                <th>Discount</th>
-                <th>Total</th>
-                <th>Configure</th>
-                <th>Commands</th>
-                <th>Customer Ref</th>
-                <th>Group</th>
-                <th>Image</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><input type="number" class="form-control form-control-sm" name="items[0][qty]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][category]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][part]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][call_size]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][width]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][height]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][thickness]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][price]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][sqft_price]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][discount]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][total]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][commands]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][commands]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][customer_ref]"></td>
-                <td><input type="text" class="form-control form-control-sm" name="items[0][group]"></td>
-                <td><input type="file" class="form-control form-control-sm" name="items[0][image]"></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-
-                {{-- Comments --}}
-                <div class="row mb-3">
-                    <div class="col-md-8 mb-2">
-                        <label>Item Comment</label>
-                        <textarea name="item_comment" rows="2" class="form-control"></textarea>
-                    </div>
-                    <div class="col-md-8">
-                        <label>Order Comment</label>
-                        <textarea name="order_comment" rows="2" class="form-control"></textarea>
-                    </div>
-                </div>
-
-                {{-- Totals --}}
-                <div class="row justify-content-end">
-                    <div class="col-md-4">
-                        <table class="table table-sm table-bordered">
-                            <tr><th>Total Quantity</th><td>0</td></tr>
-                            <tr><th>Total SqFt</th><td>0.00</td></tr>
-                            <tr><th>Total Weight</th><td>0.00</td></tr>
-                            <tr><th>Surcharge</th><td>$0.00</td></tr>
-                            <tr><th>Subtotal</th><td>$0.00</td></tr>
-                            <tr><th>Tax</th><td>$0.00</td></tr>
-                            <tr><th>Non-Taxable Misc</th><td>$0.00</td></tr>
-                            <tr><th>Total</th><td><strong>$0.00</strong></td></tr>
-                            <tr><th>Amount Received</th><td>$0.00</td></tr>
-                            <tr><th>Balance</th><td>$0.00</td></tr>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="text-end mt-4">
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-check"></i> Submit Order
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 </div>
         </div>
 
-@endsection
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Create Order</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.getElementById('quote_number').addEventListener('change', function () {
+    const quoteNumber = this.value;
+    if (!quoteNumber) return;
 
+    fetch(`/sales/quotes/fetch-info/${quoteNumber}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const q = data.quote;
+                document.getElementById('order_number').value = q.generated_order_number ?? '';
+                document.getElementById('customer_number').value = q.customer.customer_number;
+                document.getElementById('customer_name').value = q.customer.customer_name;
+                document.getElementById('customer_phone').value = q.customer.phone;
+                document.getElementById('customer_email').value = q.customer.email;
+                document.getElementById('billing_address').value = q.customer.billing_address;
+                document.getElementById('billing_city').value = q.customer.billing_city;
+                document.getElementById('billing_state').value = q.customer.billing_state;
+                document.getElementById('billing_zip').value = q.customer.billing_zip;
+                document.getElementById('quote_notes').value = q.notes ?? '';
+                document.getElementById('total_qty').value = q.total_qty ?? 0;
+                document.getElementById('subtotal').value = `$${q.subtotal ?? 0}`;
+                document.getElementById('total').value = `$${q.total ?? 0}`;
+            } else {
+                alert('Quote not found');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Error fetching quote');
+        });
+});
+</script>

@@ -37,8 +37,19 @@
                     <div class="col">
                         <h5>{{ __('Invoice List') }}</h5>
                     </div>
+                    <div class="row">
+    <div class="col-auto ms-auto">
+        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">
+    <i class="fas fa-circle-plus"></i> Create Invoice
+</a>
+
+    </div>
+</div>
                 </div>
             </div>
+
+
+
             <div class="card-body pt-0">
                 <div class="dt-responsive table-responsive">
                     <table class="table table-hover advance-datatable" id="invoicesTable">
@@ -166,11 +177,9 @@
             </div> <!-- card-body -->
         </div> <!-- card -->
     </div> <!-- col -->
-
-
 </div>
 @endsection
 
-
+@include('sales.invoices.create') {{-- Modal included after content --}}
 
 
