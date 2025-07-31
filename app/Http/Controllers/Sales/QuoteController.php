@@ -8,6 +8,7 @@ use App\Models\Sales\Quote;
 use App\Models\Master\Series\Series;
 use App\Models\Master\Series\SeriesType;
 use App\Models\Master\Customers\Customer;
+use App\Models\Sales\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -368,41 +369,6 @@ public function convertToOrder($id)
     return redirect()->route('sales.orders.edit', $order->id)->with('success', 'Order created from quote.');
 }
 
-public function approveQuote($quoteId)
-{
-    $quote = Quote::with('items')->findOrFail($quoteId);
-
-    // 1. Create Order
-    $order = Order::create([
-        'quote_id' => $quote->id,
-        'order_number' => generateOrderNumber(),
-        'order_date' => now(),
-        'due_date' => now()->addDays(14),
-        'approved_by' => auth()->user()->name,
-        'entered_by' => $quote->entered_by,
-       
-    ]);
-
-    foreach ($quote->items as $item) {
-        $order->items()->create($item->toArray());
-    }
-
-
-
-    public function getCustomer($customer_number)
-    {
-        $customer = DB::table('elitevw_master_customers')
-            ->where('customer_number', $customer_number)
-            ->first();
-
-        if ($customer) {
-            return response()->json(['customer_name' => $customer->customer_name]);
-        } else {
-            return response()->json(['error' => 'Customer not found'], 404);
-        }
-    }
-
-
 
     public function details($id)
     {
@@ -562,6 +528,14 @@ public function approveQuote($quoteId)
 
         return response()->json(['price' => (int)$price]);
 
+    }
+
+    public function destroyItem()
+    {
+        $itemId = request()->route('itemId');
+        $item = QuoteItem::findOrFail($itemId);
+        $item->delete();
+        return response()->json(['success' => true]);
     }
 
 }
