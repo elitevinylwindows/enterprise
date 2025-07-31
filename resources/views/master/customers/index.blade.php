@@ -70,9 +70,9 @@
                         <tbody>
                             @foreach ($customers as $customer)
                             <tr>
-                                <td><input type="checkbox" class="customer-checkbox" value="{{ $customer['id'] }}"></td>
-                                <td>{{ $customer['customer_number'] }}</td>
-                                <td>{{ $customer->name }}</td>
+                                <td><input type="checkbox" class="customer-checkbox" value="{{ $customer->id }}"></td>
+                                <td>{{ $customer->customer_number }}</td>
+                                <td>{{ $customer->customer_name }}</td>
                                 <td>{{ $customer->street }}</td>
                                 <td>{{ $customer->city }}</td>
                                 <td>{{ $customer->zip }}</td>

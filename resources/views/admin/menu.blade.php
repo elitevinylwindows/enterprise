@@ -348,12 +348,12 @@
             </ul>
         </li>
 
-        <!-- Purchase Request -->
+        <!-- Purchase Request 
         <li class="pc-item {{ request()->routeIs('inventory.purchase-requests.index') ? 'active' : '' }}">
             <a href="{{ route('inventory.purchase-requests.index') }}" class="pc-link">
                 <span class="pc-mtext">Requests</span>
             </a>
-        </li>
+        </li>-->
 
         <!-- Product Master Data -->
         <li class="pc-item pc-hasmenu">

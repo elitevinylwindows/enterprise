@@ -347,6 +347,7 @@ Route::get('quotes/customer/{customer_number}', [QuoteController::class, 'getCus
 Route::get('quotes/{id}/details', [QuoteController::class, 'details'])->name('quotes.details');
 
 Route::post('quotes/{id}/items', [QuoteController::class, 'storeItem'])->name('quotes.storeItem');
+Route::delete('quotes/{id}/items/{itemId}', [QuoteController::class, 'destroyItem'])->name('quotes.items.destroy');
 Route::get('quotes/items/{id}/edit', [QuoteController::class, 'editItem'])->name('quotes.items.edit');
 Route::get('quotes/items/{id}', [QuoteController::class, 'showItem'])->name('quotes.items.show');
 

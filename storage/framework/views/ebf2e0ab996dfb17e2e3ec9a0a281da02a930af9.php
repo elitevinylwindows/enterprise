@@ -1,1 +1,0 @@
-<?php /**PATH /home4/aizwmjte/sr.elitevinylwindows.com/resources/views/sales/orders/index.blade.php ENDPATH**/ ?>
