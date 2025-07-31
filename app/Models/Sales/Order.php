@@ -48,4 +48,7 @@ class Order extends Model
     {
         return $this->hasMany(\App\Models\Sales\OrderItem::class);
     }
+
 }
+
+

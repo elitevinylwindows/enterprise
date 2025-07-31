@@ -526,6 +526,7 @@ Route::get('/sales/quotes/previous', [QuoteController::class, 'previous'])->name
 Route::get('sales/settings', [SalesSettingsController::class, 'index'])->name('sales.settings.index');
 Route::post('sales/settings/update', [SalesSettingsController::class, 'update'])->name('sales.settings.update');
 Route::post('/sales/settings/save', [SalesSettingsController::class, 'save'])->name('sales.settings.save');
+Route::post('quotes/{id}/convert-to-order', [\App\Http\Controllers\Sales\QuoteController::class, 'convertToOrder'])->name('quotes.convertToOrder');
 
 //Invoices
 Route::prefix('sales')->name('sales.')->group(function () {
@@ -882,6 +883,8 @@ Route::prefix('sales')->name('sales.')->group(function () {
     Route::post('/quotes/check-price', [QuoteController::class, 'checkPrice'])->name('quotes.checkPrice');
     Route::post('quotes/schema/price', [QuoteController::class, 'getSchemaPrice'])->name('quotes.schema.price');
     Route::get('customers/{customer_number}', [QuoteController::class, 'getCustomer'])->name('customers.get');
+    Route::post('quotes/{id}/convert-to-order', [\App\Http\Controllers\Sales\QuoteController::class, 'convertToOrder'])->name('quotes.convertToOrder');
+
 });
 
 
