@@ -30,19 +30,29 @@ public function index(Request $request)
 public function store(Request $request)
 {
     $request->validate([
-        'customer_number' => 'required|unique:elitevw_sr_customers,customer_number',
+        'customer_number' => 'required|unique:elitevw_master_customers,customer_number',
         'name' => 'required|string|max:255',
-        'tier' => 'nullable|string',
+        'tier_id' => 'nullable|integer|exists:elitevw_sr_tiers,id',
         'loyalty_credit' => 'nullable|numeric',
         'total_spent' => 'nullable|numeric',
+        'status' => 'nullable|string|in:active,inactive',
+        'street' => 'nullable|string|max:255',
+        'city' => 'nullable|string|max:255',
+        'zip' => 'nullable|string|max:20',
     ]);
 
     Customer::create([
         'customer_number' => $request->customer_number,
         'name' => $request->name,
-        'tier' => $request->tier,
+        'tier_id' => $request->tier_id,
         'loyalty_credit' => $request->loyalty_credit ?? 0,
         'total_spent' => $request->total_spent ?? 0,
+        'status' => $request->status,
+        'street' => $request->street,
+        'city' => $request->city,
+        'zip' => $request->zip,
+        'customer_name' => $request->name,
+        'customer_number' => $request->customer_number,
     ]);
 
     return redirect()->route('executives.customers.index')->with('success', 'Customer added successfully.');
@@ -56,6 +66,40 @@ public function edit($id){
     return view('executives.customers.edit', compact('customer', 'tiers'));
 }
 
+public function update(Request $request, $id)
+{
+    $customer = Customer::findOrFail($id);
+
+    $request->validate([
+        'customer_number' => 'required|unique:elitevw_master_customers,customer_number,' . $customer->id,
+        'status' => 'nullable|string|in:active,inactive',
+        'loyalty_credit' => 'nullable|numeric',
+        'total_spent' => 'nullable|numeric',
+        'name' => 'required|string|max:255',
+        'tier_id' => 'nullable|integer|exists:elitevw_sr_tiers,id',
+        'loyalty_credit' => 'nullable|numeric',
+        'total_spent' => 'nullable|numeric',
+        'status' => 'nullable|string|in:active,inactive',
+        'street' => 'nullable|string|max:255',
+        'city' => 'nullable|string|max:255',
+        'zip' => 'nullable|string|max:20',
+
+    ]);
+
+    $customer->update([
+        'customer_name' => $request->name,
+        'tier_id' => $request->tier_id,
+        'loyalty_credit' => $request->loyalty_credit ?? 0,
+        'total_spent' => $request->total_spent ?? 0,
+        'status' => $request->status,
+        'street' => $request->street,
+        'city' => $request->city,
+        'zip' => $request->zip,
+        'customer_number' => $request->customer_number,
+    ]);
+
+    return redirect()->route('executives.customers.index')->with('success', 'Customer updated successfully.');
+}
 
 public function handleImports(Request $request)
 {

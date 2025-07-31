@@ -298,7 +298,8 @@
                                 <div class="tab-pane fade" id="general">
                                     <div class="mb-3">
                                         <label>Frame Type</label>
-                                        <select class="form-control" name="frame_type">
+                                        <select class="form-control" name="frame_type" id="frame_type">
+                                            <option value="">Select Frame Type</option>
                                             <option value="Retrofit">Retrofit</option>
                                             <option value="Nailon">Nailon</option>
                                             <option value="Block">Block</option>
@@ -307,7 +308,8 @@
 
                                     <div class="mb-3">
                                         <label>Retrofit Fin Type</label>
-                                        <select class="form-control" name="fin_type" required>
+                                        <select class="form-control" name="fin_type" required id="fin_type">
+                                            <option value="">Select Fin Type</option>
                                             <option value="Regular">Regular</option>
                                             <option value="Longfin">Longfin</option>
                                         </select>
@@ -871,7 +873,8 @@
                 , series_id: series_id
                 , series_type: series_type
                 , width: width
-                , height: height
+                , height: height,
+                customer_number: "{{ $quote->customer_number ?? '' }}"
             }, function(res) {
                 const price = parseFloat(res.price ?? 0).toFixed(2);
                 $('#globalTotalPrice').text(price);
@@ -1003,7 +1006,33 @@
     });
     @endif
 
-    
+    $('#frame_type').on('change', function() {
+        const selectedFrame = $(this).val();
+        $.ajax({
+            url: '/sales/quotes/schema/price',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                dropdown_value: selectedFrame,
+                series_type: $('#seriesTypeSelect').val()
+            },
+            success: function(data) {
+                
+                const currentTotal = parseFloat($('#globalTotalPrice').text()) || 0;
+                $('#globalTotalPrice').text(currentTotal + data.price);
+                // You can update the UI or perform other actions based on the response
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching frame details:', error);
+            }
+        });
+        console.log('Selected frame type:', selectedFrame);
+    });
+
+    $('#fin_type').on('change', function() {
+        const selectedFin = $(this).val();
+        console.log('Selected finish type:', selectedFin);
+    });
 </script>
 <script>
     function openQuotePreview(quoteId) {
