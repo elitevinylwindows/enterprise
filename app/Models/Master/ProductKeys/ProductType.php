@@ -8,5 +8,5 @@ class ProductType extends Model
 {
     protected $table = 'elitevw_master_productkeys_producttypes';
 
-    protected $fillable = ['product_type', 'description', 'material_type', 'glazing_bead_position'];
+    protected $fillable = ['product_type', 'description', 'material_type', 'glazing_bead_position', 'product_id'];
 }

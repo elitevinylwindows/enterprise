@@ -11,7 +11,7 @@
 
 @section('card-action-btn')
     <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
-        <i data-feather="plus"></i> {{ __('Add Producttype') }}
+        <i data-feather="plus"></i> {{ __('Add Product type') }}
     </a>
 @endsection
 
@@ -31,10 +31,11 @@
                     <table class="table table-hover advance-datatable" id="dataTable">
                         <thead>
                             <tr>
-                                <th>{{{ __('Product Type') }}}</th>
-<th>{{{ __('Description') }}}</th>
-<th>{{{ __('Material Type') }}}</th>
-<th>{{{ __('Glazing Bead Position') }}}</th>
+                                <th>{{ __('Product Type') }}</th>
+                                <th>{{ __('Description') }}</th>
+                                <th>{{ __('Material Type') }}</th>
+                                <th>{{ __('Glazing Bead Position') }}</th>
+                                <th>{{ __('Schema Product ID') }}</th>
                                 <th class="text-end">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
@@ -42,19 +43,48 @@
                             @foreach($items as $item)
                                 <tr>
                                     <td>{{ $item->product_type }}</td>
-<td>{{ $item->description }}</td>
-<td>{{ $item->material_type }}</td>
-<td>{{ $item->glazing_bead_position }}</td>
+                                    <td>{{ $item->description }}</td>
+                                    <td>{{ $item->material_type }}</td>
+                                    <td>{{ $item->glazing_bead_position }}</td>
+                                    <td>{{ $item->product_id }}</td>
                                     <td class="text-end">
-                                        <a href="#" class="btn btn-sm btn-info" data-id="{ $item->id }"><i data-feather="edit"></i></a>
-                                        <button class="btn btn-sm btn-danger" data-id="{ $item->id }"><i data-feather="trash-2"></i></button>
-                                    </td>
+    <a href="#" class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#editModal{{ $item->id }}">
+        <i data-feather="edit"></i>
+    </a>
+
+    <form action="{{ route('product_keys.producttypes.destroy', $item->id) }}" method="POST" class="d-inline">
+        @csrf
+        @method('DELETE')
+        <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+            <i data-feather="trash-2"></i>
+        </button>
+    </form>
+</td>
+
                                 </tr>
+
+                                <!-- Edit Modal -->
+                                <div class="modal fade" id="editModal{{ $item->id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            @include('master.product_keys.producttypes.edit', ['productType' => $item])
+                                        </div>
+                                    </div>
+                                </div>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @include('master.product_keys.producttypes.create')
         </div>
     </div>
 </div>

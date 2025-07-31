@@ -6,35 +6,38 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Master\Series\Series;
 use App\Models\Master\Series\SeriesType;
+use App\Models\Master\ProductKeys\ProductType;
 
 class SeriesTypeController extends Controller
 {
     public function index()
     {
-        $seriesTypes = SeriesType::with('series')->get();
+        $seriesTypes = SeriesType::with(['series', 'productType'])->get();
         $series = Series::all();
+        $productTypes = ProductType::all();
 
-        return view('master.series.series_type.index', compact('seriesTypes', 'series'));
+        return view('master.series.series_type.index', compact('seriesTypes', 'series', 'productTypes'));
     }
 
     public function create()
     {
         $series = Series::all();
-        return view('master.series.series_type.create', compact('series'));
+        $productTypes = ProductType::all();
+        return view('master.series.series_type.create', compact('series', 'productTypes'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'series_id' => 'required|exists:elitevw_master_series,id',
-            'series_type' => 'required|string',
+            'product_type_id' => 'required|exists:elitevw_master_product_types,id',
+            'series_type' => 'required|string|max:255',
         ]);
-
-        $seriesTypes = array_filter(array_map('trim', explode(',', $request->series_type)));
 
         SeriesType::create([
             'series_id' => $request->series_id,
-            'series_type' => json_encode($seriesTypes),
+            'product_type_id' => $request->product_type_id,
+            'series_type' => $request->series_type,
         ]);
 
         return redirect()->back()->with('success', 'Series Type saved.');
@@ -44,24 +47,24 @@ class SeriesTypeController extends Controller
     {
         $seriesType = SeriesType::findOrFail($id);
         $series = Series::all();
+        $productTypes = ProductType::all();
 
-        return view('master.series.series_type.edit', compact('seriesType', 'series'));
+        return view('master.series.series_type.edit', compact('seriesType', 'series', 'productTypes'));
     }
 
     public function update(Request $request, $id)
     {
-        $seriesType = SeriesType::findOrFail($id);
-
         $request->validate([
             'series_id' => 'required|exists:elitevw_master_series,id',
-            'series_type' => 'required|string',
+            'product_type_id' => 'required|exists:elitevw_master_product_types,id',
+            'series_type' => 'required|string|max:255',
         ]);
 
-        $seriesTypes = array_filter(array_map('trim', explode(',', $request->series_type)));
-
+        $seriesType = SeriesType::findOrFail($id);
         $seriesType->update([
             'series_id' => $request->series_id,
-            'series_type' => json_encode($seriesTypes),
+            'product_type_id' => $request->product_type_id,
+            'series_type' => $request->series_type,
         ]);
 
         return redirect()->route('master.series-type.index')->with('success', 'Series Type updated successfully.');
