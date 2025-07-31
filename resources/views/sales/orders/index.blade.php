@@ -12,6 +12,14 @@
 @section('content')
 <div class="mb-4"></div> {{-- Space after title --}}
 
+<div class="row">
+    <div class="col-auto ms-auto">
+        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createOrderModal">
+            <i class="fas fa-circle-plus"></i> Create Order
+        </a>
+    </div>
+</div>
+
     
 <div class="mb-4"></div> {{-- Space --}}
 
@@ -146,4 +154,30 @@
 </div>
 @endsection
 
+@include('sales.orders.create')
 
+@push('scripts')
+<script>
+document.getElementById('quote_number').addEventListener('blur', function () {
+    const quoteNumber = this.value;
+    if (!quoteNumber) return;
+
+    fetch(`/sales/quotes/get-by-number/${quoteNumber}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('customerName').textContent = data.customer_name;
+                document.getElementById('deliveryDate').textContent = data.delivery_date;
+                document.getElementById('quote_id').value = data.quote_id;
+                document.getElementById('customer_id').value = data.customer_id;
+
+                document.getElementById('quoteDetailsPreview').style.display = 'block';
+                document.getElementById('submitOrderBtn').disabled = false;
+            } else {
+                alert('Quote not found.');
+                document.getElementById('submitOrderBtn').disabled = true;
+            }
+        });
+});
+</script>
+@endpush

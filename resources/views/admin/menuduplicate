@@ -246,23 +246,32 @@
         @endif
 
         {{-- Orders --}}
-@if (Gate::check('manage sales orders'))
-    <li class="pc-item">
-        <a class="pc-link {{ request()->routeIs('sales.orders.*') ? 'active' : '' }}" href="{{ route('sales.orders.index') }}">
-            <span>Orders</span>
-        </a>
-    </li>
-@endif
+        @if (Gate::check('manage sales orders'))
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(event, this)">
+                <span>Orders</span>
+                <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+            </a>
+            <ul class="pc-submenu" style="{{ request()->routeIs('sales.orders.*') ? 'display: block;' : 'display: none;' }}">
+                <!--<li><a class="pc-link" href="{{ route('sales.orders.create') }}">New Order</a></li>-->
+                <li><a class="pc-link" href="{{ route('sales.orders.index') }}">All Orders</a></li>
+            </ul>
+        </li>
+        @endif
 
-{{-- Invoice --}}
-@if (Gate::check('manage invoices'))
-    <li class="pc-item">
-        <a class="pc-link {{ request()->routeIs('sales.invoices.*') ? 'active' : '' }}" href="{{ route('sales.invoices.index') }}">
-            <span>Invoices</span>
-        </a>
-    </li>
-@endif
-
+        {{-- Invoice --}}
+        @if (Gate::check('manage invoices'))
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(event, this)">
+                <span>Invoice</span>
+                <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+            </a>
+            <ul class="pc-submenu" style="{{ request()->routeIs('sales.invoices.*') ? 'display: block;' : 'display: none;' }}">
+                <!--<li><a class="pc-link" href="{{ route('sales.invoices.create') }}">New Invoice</a></li>-->
+                <li><a class="pc-link" href="{{ route('sales.invoices.index') }}">All Invoices</a></li>
+            </ul>
+        </li>
+        @endif
         
         {{-- Settings --}}
         @if (Gate::check('manage sales settings'))

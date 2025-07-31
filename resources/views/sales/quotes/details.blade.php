@@ -441,12 +441,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Quote Preview</h5>
-                <a href="{{ route('quotes.download', $quote->id) }}" target="_blank" class="btn btn-outline-primary btn-sm">Download PDF</a>
+                <a href="{{ route('sales.quotes.download', $quote->id) }}" target="_blank" class="btn btn-outline-primary btn-sm">Download PDF</a>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <div class="modal-body" style="min-height: 80vh;">
-                <iframe src="{{ route('quotes.preview', $quote->id) }}" width="100%" height="100%" style="min-height: 70vh;" frameborder="0"></iframe>
+                <iframe src="{{ route('sales.quotes.preview', $quote->id) }}" width="100%" height="100%" style="min-height: 70vh;" frameborder="0"></iframe>
             </div>
 
             <div class="modal-footer justify-content-between">
