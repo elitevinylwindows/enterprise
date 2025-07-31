@@ -26,6 +26,19 @@ protected $fillable = [
     'internal_note',
     'item_comment',
     'checked_count',
+    'color_config',
+    'color_exterior',
+    'color_interior',
+    'frame_type',
+    'fin_type',
+    'glass_type',
+    'spacer',
+    'tempered',
+    'specialty_glass',
+    'grid_pattern',
+    'grid_profile',
+    'knocked_down',
+
 ];
 
 

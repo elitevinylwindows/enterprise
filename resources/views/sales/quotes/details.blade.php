@@ -211,7 +211,7 @@
 
 
                 <div class="modal-header bg-white text-dark">
-                    <h5 class="mb-0">Add Quote Item</h5>
+                    <h5 class="mb-0" id="modalTitle">Add Quote Item</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -262,7 +262,7 @@
                                         <select class="form-control" name="color_config" id="colorConfigDropdown">
                                             <option value="">Select Configuration</option>
                                             @foreach($colorConfigurations as $config)
-                                            <option value="{{ $config->code }}">{{ $config->code }}</option>
+                                            <option value="{{ $config->id }}">{{ $config->code }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -272,10 +272,10 @@
                                         <select class="form-control" name="color_exterior" id="colorExteriorDropdown">
                                             <option value="">Select Exterior Color</option>
                                             @foreach($exteriorColors as $color)
-                                            <option value="{{ $color->code }}" data-group="regular">{{ $color->name }}</option>
+                                            <option value="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
                                             @endforeach
                                             @foreach($laminateColors as $color)
-                                            <option value="{{ $color->code }}" data-group="laminate">{{ $color->name }}</option>
+                                            <option value="{{ $color->id }}" data-group="laminate">{{ $color->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -285,10 +285,10 @@
                                         <select class="form-control" name="color_interior" id="colorInteriorDropdown">
                                             <option value="">Select Interior Color</option>
                                             @foreach($interiorColors as $color)
-                                            <option value="{{ $color->code }}" data-group="regular">{{ $color->name }}</option>
+                                            <option value="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
                                             @endforeach
                                             @foreach($laminateColors as $color)
-                                            <option value="{{ $color->code }}" data-group="laminate">{{ $color->name }}</option>
+                                            <option value="{{ $color->id }}" data-group="laminate">{{ $color->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -431,9 +431,6 @@
                         </div>
 
 
-
-
-
                         <!-- Quote PDF Preview Modal -->
                         <div class="modal fade" id="quotePreviewModal" tabindex="-1" aria-labelledby="quotePreviewModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -455,10 +452,6 @@
                                 </div>
                             </div>
                         </div>
-
-
-
-
 
                         <!-- Right Preview + Tabs -->
                         <div class="col-md-6">
@@ -548,20 +541,6 @@
 </div>
 
 
-
-
-<!-- View Quote Item Modal -->
-<div class="modal fade" id="viewQuoteItemModal" tabindex="-1" aria-labelledby="viewQuoteItemLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content" id="viewQuoteItemModalContent">
-            <!-- AJAX-loaded content goes here -->
-        </div>
-    </div>
-</div>
-
-
-
-
 @endsection
 
 
@@ -641,9 +620,9 @@
         const size = `${width}" x ${height}"`;
         const price = $('#globalTotalPrice').text();
         const total = (qty * parseFloat(price)).toFixed(2);
-
-    
-
+        const item_comment = form.querySelector('[name="item_comment"]').value;
+        const internal_note = form.querySelector('[name="internal_note"]').value;
+        
         const formData = new FormData();
         formData.append('description', itemDesc);
         formData.append('width', width);
@@ -653,8 +632,26 @@
         formData.append('qty', qty);
         formData.append('price', price);
         formData.append('total', total);
-        formData.append('item_comment', '');
-        formData.append('internal_note', '');
+        formData.append('item_comment', item_comment);
+        formData.append('internal_note', internal_note);
+        formData.append('color_config', colorConfig);
+        formData.append('color_exterior', colorExt.value);
+        formData.append('color_interior', colorInt.value);
+        formData.append('frame_type', frameType);
+        formData.append('fin_type', finType);
+        formData.append('glass_type', glassType);
+        formData.append('spacer', spacer);
+        formData.append('tempered', tempered);
+        formData.append('specialty_glass', specialtyGLass);
+        formData.append('grid_pattern', gridPattern);
+        formData.append('grid_profile', gridProfile);
+        formData.append('retrofit_bottom_only', form.querySelector('[name="retrofit_bottom_only"]').checked ? 1 : 0);
+        formData.append('no_logo_lock', form.querySelector('[name="no_logo_lock"]').checked ? 1 : 0);
+        formData.append('double_lock', form.querySelector('[name="double_lock"]').checked ? 1 : 0);
+        formData.append('custom_lock_position', form.querySelector('[name="custom_lock_position"]').checked ? 1 : 0);
+        formData.append('custom_vent_latch', form.querySelector('[name="custom_vent_latch"]').checked ? 1 : 0);
+        formData.append('knocked_down', form.querySelector('[name="knocked_down"]').checked ? 1 : 0);
+        
 
         const quoteId = document.getElementById('quoteId').value;
 
@@ -687,10 +684,10 @@
                         <td class="item-total" data-id="${data.item_id}">$${total}</td>
                         <td><img src="https://via.placeholder.com/40" class="img-thumbnail" alt="Item"></td>
                         <td class="text-nowrap">
-                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item">
+                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item" data-id="${data.item_id}">
                                 <i data-feather="eye"></i>
                             </a>
-                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item">
+                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item" data-id="${data.item_id}">
                                 <i data-feather="edit"></i>
                             </a>
                             <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row">
@@ -750,6 +747,70 @@
                 .catch(() => alert('Server error'));
             }
         }
+    });
+
+    document.querySelector('#quoteDetailsTable tbody').addEventListener('click', function(e) {
+        const viewBtn = e.target.closest('.view-quote-item');
+        // Only run if the actual button was clicked (not bubbling from table row)
+        if (viewBtn && viewBtn.classList.contains('view-quote-item')) {
+            const itemId = viewBtn.getAttribute('data-id');
+            if (!itemId) return; // Prevent API call if no itemId
+
+            const quoteId = "{{ $quote->id }}";
+            fetch(`/sales/quotes/view/${quoteId}/items/${itemId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success || !data.item) {
+                        alert('Failed to load item.');
+                        return;
+                    }
+                    const form = document.getElementById('quoteItemForm');
+                    // Populate fields
+                    form.querySelector('[name="qty"]').value = data.item.qty;
+                    form.querySelector('[name="width"]').value = data.item.width;
+                    form.querySelector('[name="height"]').value = data.item.height;
+                    form.querySelector('[name="item_comment"]').value = data.item.item_comment || '';
+                    form.querySelector('[name="color_config"]').value = data.item.color_config || '';
+                    form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                    form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                    form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
+                    form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
+                    form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
+                    form.querySelector('[name="spacer"]').value = data.item.spacer || '';
+                    form.querySelector('[name="tempered"]').value = data.item.tempered || '';
+                    form.querySelector('[name="specialty_glass"]').value = data.item.specialty_glass || '';
+                    form.querySelector('[name="grid_pattern"]').value = data.item.grid_pattern || '';
+                    form.querySelector('[name="grid_profile"]').value = data.item.grid_profile || '';
+                    form.querySelector('[name="internal_note"]').value = data.item.internal_note || '';
+                    form.querySelector('[name="retrofit_bottom_only"]').checked = !!data.item.retrofit_bottom_only;
+                    form.querySelector('[name="no_logo_lock"]').checked = !!data.item.no_logo_lock;
+                    form.querySelector('[name="double_lock"]').checked = !!data.item.double_lock;
+                    form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
+                    form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
+                    form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
+
+                    form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                    // Disable all fields
+                    Array.from(form.elements).forEach(el => el.disabled = true);
+                    // Hide add button
+                    document.getElementById('saveQuoteItem').style.display = 'none';
+                    // Show modal
+                    document.getElementById('modalTitle').textContent = 'View Quote Item';
+                    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+                    modal.show();
+                })
+                .catch(() => alert('Server error'));
+        }
+    });
+
+    // When modal closes, re-enable fields and show add button
+    document.getElementById('addItemModal').addEventListener('hidden.bs.modal', function() {
+        const form = document.getElementById('quoteItemForm');
+        Array.from(form.elements).forEach(el => el.disabled = false);
+        document.getElementById('saveQuoteItem').style.display = '';
+        form.reset();
+        document.getElementById('modalTitle').textContent = 'Add Quote Item';
+        document.getElementById('globalTotalPrice').textContent = '0.00';
     });
 
 
@@ -909,25 +970,6 @@
     $('#seriesSelect, #seriesTypeSelect').on('change', fetchBasePrice);
     $('input[name="width"], input[name="height"]').on('keyup', fetchBasePrice);
 
-
-    document.querySelectorAll('.view-quote-item').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const url = this.dataset.url;
-            const modalContent = document.getElementById('viewQuoteItemModalContent');
-
-            modalContent.innerHTML = '<div class="modal-body text-center p-4"><div class="spinner-border text-primary" role="status"></div></div>';
-
-            fetch(url)
-                .then(res => res.text())
-                .then(html => {
-                    modalContent.innerHTML = html;
-                })
-                .catch(err => {
-                    modalContent.innerHTML = '<div class="modal-body text-danger">Failed to load item.</div>';
-                    console.error(err);
-                });
-        });
-    });
 
     @if(isset($allConfigurations))
 

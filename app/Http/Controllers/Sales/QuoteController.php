@@ -100,6 +100,12 @@ class QuoteController extends Controller
             ->where('height', $request->height)
             ->value('price');
 
+        $price = getMarkup($request->series_id, $price);
+        $customer = Customer::where('customer_number', $request->customer_number)
+            ->first();
+        $percentage = $customer->tier?->percentage;
+        $price = $price - ($price * ($percentage / 100));
+
         \Log::info('Checking price matrix', [
             'series_id' => $request->series_id,
             'series_type' => $request->series_type,
@@ -113,23 +119,35 @@ class QuoteController extends Controller
 
     public function storeItem(Request $request, $id)
     {
-        \Log::info('Incoming request to storeItem:', $request->all());
-        \Log::info('Request path:', ['url' => $request->fullUrl(), 'isJson' => $request->isJson()]);
-        \Log::info('POST data:', $request->all());
-        // Optionally:
-
         try {
             $request->validate([
                 'description' => 'required|string',
-                'glass' => 'nullable|string',
-                'grid' => 'nullable|string',
                 'width' => 'required|numeric',
                 'height' => 'required|numeric',
+                'glass' => 'required|string',
+                'grid' => 'required|string',
                 'qty' => 'required|numeric',
                 'price' => 'required|numeric',
                 'total' => 'required|numeric',
-                'internal_note' => 'nullable|string',
-                'item_comment' => 'nullable|string',
+                'item_comment' => 'required|string',
+                'internal_note' => 'required|string',
+                'color_config' => 'required|numeric',
+                'color_exterior' => 'required|numeric',
+                'color_interior' => 'required|numeric',
+                'frame_type' => 'required|string',
+                'fin_type' => 'required|string',
+                'glass_type' => 'required|string',
+                'spacer' => 'required|string',
+                'tempered' => 'required|string',
+                'specialty_glass' => 'required|string',
+                'grid_pattern' => 'required|string',
+                'grid_profile' => 'required|string',
+                'retrofit_bottom_only' => 'required|boolean',
+                'no_logo_lock' => 'required|boolean',
+                'double_lock' => 'required|boolean',
+                'custom_lock_position' => 'required|boolean',
+                'custom_vent_latch' => 'required|boolean',
+                'knocked_down' => 'required|boolean',
             ]);
 
             $item = QuoteItem::create([
@@ -142,13 +160,25 @@ class QuoteController extends Controller
                 'qty' => $request->qty,
                 'price' => $request->price,
                 'total' => $request->total,
+                'item_comment' => $request->item_comment,
+                'internal_note' => $request->internal_note,
+                'color_config' => $request->color_config,
+                'color_exterior' => $request->color_exterior,
+                'color_interior' => $request->color_interior,
+                'frame_type' => $request->frame_type,
+                'fin_type' => $request->fin_type,
+                'glass_type' => $request->glass_type,
+                'spacer' => $request->spacer,
+                'tempered' => $request->tempered,
+                'specialty_glass' => $request->specialty_glass,
+                'grid_pattern' => $request->grid_pattern,
+                'grid_profile' => $request->grid_profile,
                 'retrofit_bottom_only' => $request->boolean('retrofit_bottom_only'),
                 'no_logo_lock' => $request->boolean('no_logo_lock'),
                 'double_lock' => $request->boolean('double_lock'),
                 'custom_lock_position' => $request->boolean('custom_lock_position'),
                 'custom_vent_latch' => $request->boolean('custom_vent_latch'),
-                'internal_note' => $request->internal_note,
-                'item_comment' => $request->item_comment,
+                'knocked_down' => $request->boolean('knocked_down'),
                 'checked_count' => collect([
                     $request->retrofit_bottom_only,
                     $request->no_logo_lock,
@@ -181,6 +211,13 @@ class QuoteController extends Controller
     {
         $item = QuoteItem::findOrFail($id);
         return view('sales.quotes.quote_items.show', compact('item'));
+    }
+
+    public function getItem($id, $itemId)
+    {
+        $item = QuoteItem::findOrFail($itemId);
+
+        return response()->json(['success' => true, 'item' => $item]);
     }
 
     public function updateDetails(Request $request, $id)

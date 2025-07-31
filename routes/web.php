@@ -211,26 +211,7 @@ use App\Http\Controllers\Purchasing\{
     SupplierQuoteController,
     PurchaseOrderController
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+use App\Http\Controllers\Sales\Quotes\GridProfileController;
 
 // Auth
 require __DIR__ . '/auth.php';
@@ -337,49 +318,48 @@ Route::prefix('sales')->name('sales.')->group(function () {
     Route::get('dashboard', [\App\Http\Controllers\Sales\DashboardController::class, 'index'])->name('dashboard.index');
     
     // Quotes
-Route::get('quotes', [QuoteController::class, 'index'])->name('quotes.index');
-Route::get('quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
-Route::get('quotes/{id}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');
-Route::delete('quotes/{id}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
-Route::post('quotes/{id}/email', [QuoteController::class, 'email'])->name('quotes.email');
-Route::post('quotes', [QuoteController::class, 'store'])->name('quotes.store');
-Route::get('quotes/customer/{customer_number}', [QuoteController::class, 'getCustomer'])->name('quotes.getCustomer');
-Route::get('quotes/{id}/details', [QuoteController::class, 'details'])->name('quotes.details');
+    // Quotes routes - static and specific routes FIRST
+    Route::get('quotes', [QuoteController::class, 'index'])->name('quotes.index');
+    Route::get('quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
+    Route::post('quotes', [QuoteController::class, 'store'])->name('quotes.store');
+    Route::get('quotes/customer/{customer_number}', [QuoteController::class, 'getCustomer'])->name('quotes.getCustomer');
+    Route::get('quotes/{id}/details', [QuoteController::class, 'details'])->name('quotes.details');
 
-Route::post('quotes/{id}/items', [QuoteController::class, 'storeItem'])->name('quotes.storeItem');
-Route::delete('quotes/{id}/items/{itemId}', [QuoteController::class, 'destroyItem'])->name('quotes.items.destroy');
-Route::get('quotes/items/{id}/edit', [QuoteController::class, 'editItem'])->name('quotes.items.edit');
-Route::get('quotes/items/{id}', [QuoteController::class, 'showItem'])->name('quotes.items.show');
+    // Item routes - static before dynamic
+    Route::get('quotes/view/{id}/items/{itemId}', [QuoteController::class, 'getItem'])->name('quotes.items.view');
+    Route::post('quotes/{id}/items', [QuoteController::class, 'storeItem'])->name('quotes.storeItem');
+    Route::delete('quotes/{id}/items/{itemId}', [QuoteController::class, 'destroyItem'])->name('quotes.items.destroy');
+    Route::get('quotes/items/{id}/edit', [QuoteController::class, 'editItem'])->name('quotes.items.edit');
+    Route::get('quotes/items/{id}', [QuoteController::class, 'showItem'])->name('quotes.items.show');
 
-
-
-Route::get('/quotes/{id}/preview', [QuoteController::class, 'preview'])->name('quotes.preview');
-Route::get('/quotes/{id}/download', [QuoteController::class, 'download'])->name('quotes.download');
-Route::post('/quotes/{id}/send', [QuoteController::class, 'send'])->name('quotes.send');
-Route::post('/quotes/{id}/save', [QuoteController::class, 'save'])->name('quotes.save');
+    // Edit, delete, email, etc. - dynamic routes LAST
+    Route::get('quotes/{id}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');
+    Route::delete('quotes/{id}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
+    Route::post('quotes/{id}/email', [QuoteController::class, 'email'])->name('quotes.email');
 
 
-Route::get('quotes/{id}/convert-to-order', [QuoteController::class, 'convertToOrder'])->name('sales.quotes.convertToOrder');
+    Route::get('/quotes/{id}/preview', [QuoteController::class, 'preview'])->name('quotes.preview');
+    Route::get('/quotes/{id}/download', [QuoteController::class, 'download'])->name('quotes.download');
+    Route::post('/quotes/{id}/send', [QuoteController::class, 'send'])->name('quotes.send');
+    Route::post('/quotes/{id}/save', [QuoteController::class, 'save'])->name('quotes.save');
 
-Route::get('quotes/{id}', [QuoteController::class, 'show']);
 
+    Route::get('quotes/{id}/convert-to-order', [QuoteController::class, 'convertToOrder'])->name('sales.quotes.convertToOrder');
 
+    Route::get('quotes/{id}', [QuoteController::class, 'show']);
 
     // Orders
-Route::get('orders', [\App\Http\Controllers\Sales\OrderController::class, 'index'])->name('orders.index');
-Route::get('orders/create', [\App\Http\Controllers\Sales\OrderController::class, 'create'])->name('orders.create');
-Route::get('orders/{id}/edit', [\App\Http\Controllers\Sales\OrderController::class, 'edit'])->name('orders.edit');
-Route::delete('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
-Route::post('orders/{id}/email', [\App\Http\Controllers\Sales\OrderController::class, 'email'])->name('orders.email');
-Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
+    Route::get('orders', [\App\Http\Controllers\Sales\OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/create', [\App\Http\Controllers\Sales\OrderController::class, 'create'])->name('orders.create');
+    Route::get('orders/{id}/edit', [\App\Http\Controllers\Sales\OrderController::class, 'edit'])->name('orders.edit');
+    Route::delete('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
+    Route::post('orders/{id}/email', [\App\Http\Controllers\Sales\OrderController::class, 'email'])->name('orders.email');
+    Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
     Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
     
     // Invoices
     Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
-
-
-
 
     // Settings
     Route::get('settings', [\App\Http\Controllers\Sales\SettingController::class, 'index'])->name('settings.index');
