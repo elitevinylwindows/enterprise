@@ -38,7 +38,8 @@ protected $fillable = [
     'grid_pattern',
     'grid_profile',
     'knocked_down',
-
+    'series_id',
+    'series_type',
 ];
 
 

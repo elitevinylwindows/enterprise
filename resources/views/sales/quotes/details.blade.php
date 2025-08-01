@@ -118,7 +118,7 @@
 
                 <tbody>
                     @foreach ($quoteItems as $item)
-                    <tr>
+                    <tr data-id="{{ $item->id }}">
                         <td>{{ $item->description }}</td>
                         <td><input type="number" name="qty[]" value="{{ $item->qty }}" class="form-control form-control-sm" style="width: 60px;"></td>
                         <td>{{ $item->width }}" x {{ $item->height }}"</td>
@@ -201,6 +201,7 @@
             <form id="quoteItemForm" method="POST" action="{{ route('sales.quotes.storeItem', $quote->id) }}">
                 @csrf
                 <input type="hidden" name="quote_id" id="quoteId" value="{{ $quote->id }}">
+                <input type="hidden" name="item_id" id="itemId">
 
                 <!-- Hidden fields for JS-generated display values -->
                 <input type="hidden" name="description" id="description">
@@ -584,7 +585,7 @@
         const qty = form.querySelector('[name="qty"]').value;
         const width = form.querySelector('[name="width"]').value;
         const height = form.querySelector('[name="height"]').value;
-        const series = document.getElementById('seriesSelect').selectedOptions[0] ?.text ?? '';
+        const series = document.getElementById('seriesSelect').selectedOptions[0] ?? '';
         const config = document.getElementById('seriesTypeSelect').value;
 
         const glassType = form.querySelector('[name="glass_type"]').value;
@@ -601,6 +602,7 @@
         const colorConfig = form.querySelector('[name="color_config"]').value;
         const colorExt = form.querySelector('[name="color_exterior"]');
         const colorInt = form.querySelector('[name="color_interior"]');
+        const item_id = form.querySelector('[name="item_id"]').value;
         const laminateExtText = colorExt ?.selectedOptions[0] ?.text ?? '';
         const colorIntText = colorInt ?.selectedOptions[0] ?.text ?? '';
 
@@ -611,9 +613,11 @@
             colorDisplay = `${colorConfig}`;
         }
 
-        if (!series || !config || !width || !height) {
-            alert('Please select Series, Configuration, Width, and Height.');
-            return;
+        if(!item_id) {
+            if (!series || !config || !width || !height) {
+                alert('Please select Series, Configuration, Width, and Height.');
+                return;
+            }
         }
 
         const itemDesc = `${series}-${config} / ${colorDisplay} / ${frameType}-${finType}`;
@@ -628,6 +632,9 @@
         const internal_note = form.querySelector('[name="internal_note"]').value;
         
         const formData = new FormData();
+        formData.append('item_id', item_id);
+        formData.append('series_id', series);
+        formData.append('series_type', config);
         formData.append('description', itemDesc);
         formData.append('width', width);
         formData.append('height', height);
@@ -694,7 +701,7 @@
                             <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item" data-id="${data.item_id}">
                                 <i data-feather="edit"></i>
                             </a>
-                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row">
+                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row" data-id="${data.item_id}">
                                 <i data-feather="trash-2"></i>
                             </a>
                         </td>
@@ -726,11 +733,35 @@
 
     // Delete row
     document.querySelector('#quoteDetailsTable tbody').addEventListener('click', function(e) {
+
         if (e.target.closest('.remove-row')) {
-            e.target.closest('tr').remove();
+            const row = e.target.closest('tr');
+            const itemId = row.getAttribute('data-id');
+            const quoteId = "{{ $quote->id }}";
+            if (!itemId) return;
+
+            if (!confirm('Are you sure you want to delete this item?')) return;
+            fetch(`/sales/quotes/${quoteId}/items/${itemId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    row.remove();
+                    calculateTotals();
+                } else {
+                    alert('Failed to delete item.');
+                }
+            })
+            .catch(() => alert('Server error'));
         }
+        
     });
 
+    // open modal in view mode
     document.querySelector('#quoteDetailsTable tbody').addEventListener('click', function(e) {
         const viewBtn = e.target.closest('.view-quote-item');
         // Only run if the actual button was clicked (not bubbling from table row)
@@ -778,6 +809,58 @@
                     document.getElementById('saveQuoteItem').style.display = 'none';
                     // Show modal
                     document.getElementById('modalTitle').textContent = 'View Quote Item';
+                    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+                    modal.show();
+                })
+                .catch(() => alert('Server error'));
+        }
+    });
+
+    document.querySelector('#quoteDetailsTable tbody').addEventListener('click', function(e) {
+        const editBtn = e.target.closest('.edit-quote-item');
+        // Only run if the actual button was clicked (not bubbling from table row)
+        if (editBtn && editBtn.classList.contains('edit-quote-item')) {
+            const itemId = editBtn.getAttribute('data-id');
+            if (!itemId) return; // Prevent API call if no itemId
+
+            const quoteId = "{{ $quote->id }}";
+            fetch(`/sales/quotes/view/${quoteId}/items/${itemId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success || !data.item) {
+                        alert('Failed to load item.');
+                        return;
+                    }
+                    const form = document.getElementById('quoteItemForm');
+                    // Populate fields
+                    form.querySelector('[name="item_id"]').value = data.item.id;
+                    form.querySelector('[name="qty"]').value = data.item.qty;
+                    form.querySelector('[name="width"]').value = data.item.width;
+                    form.querySelector('[name="height"]').value = data.item.height;
+                    form.querySelector('[name="item_comment"]').value = data.item.item_comment || '';
+                    form.querySelector('[name="color_config"]').value = data.item.color_config || '';
+                    form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                    form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                    form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
+                    form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
+                    form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
+                    form.querySelector('[name="spacer"]').value = data.item.spacer || '';
+                    form.querySelector('[name="tempered"]').value = data.item.tempered || '';
+                    form.querySelector('[name="specialty_glass"]').value = data.item.specialty_glass || '';
+                    form.querySelector('[name="grid_pattern"]').value = data.item.grid_pattern || '';
+                    form.querySelector('[name="grid_profile"]').value = data.item.grid_profile || '';
+                    form.querySelector('[name="internal_note"]').value = data.item.internal_note || '';
+                    form.querySelector('[name="retrofit_bottom_only"]').checked = !!data.item.retrofit_bottom_only;
+                    form.querySelector('[name="no_logo_lock"]').checked = !!data.item.no_logo_lock;
+                    form.querySelector('[name="double_lock"]').checked = !!data.item.double_lock;
+                    form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
+                    form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
+                    form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
+
+                    form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                    // Show modal
+                    document.getElementById('modalTitle').textContent = 'Edit Quote Item';
+                    document.getElementById('saveQuoteItem').textContent = 'Update Quote Item';
                     const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
                     modal.show();
                 })
