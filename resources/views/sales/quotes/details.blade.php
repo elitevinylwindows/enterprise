@@ -180,15 +180,12 @@
             <div class="d-flex justify-content-between mt-4">
                 <a href="{{ route('sales.quotes.create') }}" class="btn btn-secondary">&larr; Previous</a>
 
-                <div class=class="d-flex gap-2">
+                <div class="d-flex gap-2">
                     <a href="" class="btn btn-secondary">Save Draft</a>
-                   <a href="javascript:void(0);" class="btn btn-primary" onclick="openQuotePreview({{ $quote->id }})">
-    Continue &rarr;
-</a>
-
-
+                    <a href="javascript:void(0);" class="btn btn-primary" onclick="openQuotePreview({{ $quote->id }})">
+                        Continue &rarr;
+                    </a>
                 </div>
-
             </div>
         </div>
     </div>
@@ -815,7 +812,12 @@
 
                     form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
                     // Disable all fields
-                    Array.from(form.elements).forEach(el => el.disabled = true);
+                    Array.from(form.elements).forEach(el => {
+                        // Do not disable the btn-close button
+                        if (!(el.classList && el.classList.contains('btn-close'))) {
+                            el.disabled = true;
+                        }
+                    });
                     // Hide add button
                     document.getElementById('saveQuoteItem').style.display = 'none';
                     // Show modal
