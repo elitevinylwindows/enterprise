@@ -300,7 +300,6 @@
                                     <div class="mb-3">
                                         <label>Frame Type</label>
                                         <select class="form-control" name="frame_type" id="frame_type">
-                                            <option value="">Select Frame Type</option>
                                             <option value="Retrofit">Retrofit</option>
                                             <option value="Nailon">Nailon</option>
                                             <option value="Block">Block</option>
@@ -310,7 +309,6 @@
                                     <div class="mb-3">
                                         <label>Retrofit Fin Type</label>
                                         <select class="form-control" name="fin_type" required id="fin_type">
-                                            <option value="">Select Fin Type</option>
                                             <option value="Regular">Regular</option>
                                             <option value="Longfin">Longfin</option>
                                         </select>
