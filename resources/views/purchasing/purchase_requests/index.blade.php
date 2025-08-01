@@ -80,6 +80,16 @@
 
 
 
+<a class="avtar avtar-xs btn-link-warning text-secondary customModal"
+   data-size="lg"
+   data-url="{{ route('purchasing.purchase-requests.show', $request->id) }}"
+   data-title="Email">
+    <i data-feather="mail"></i>
+</a>
+
+
+
+
 <a class="avtar avtar-xs btn-link-danger text-danger"
    data-bs-toggle="tooltip"
    data-bs-original-title="Delete Request"

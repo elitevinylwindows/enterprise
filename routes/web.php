@@ -14,6 +14,7 @@ use App\Http\Controllers\Master\Suppliers\SupplierController;
 use App\Http\Controllers\CrudGenerator\CrudGeneratorController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Settings\ShippingSettingsController;
+use App\Http\Controllers\Supplier\PurchaseRequestController;
 
 
 use App\Http\Controllers\{
@@ -393,6 +394,13 @@ Route::prefix('master/suppliers')->name('master.suppliers.')->group(function () 
     Route::get('{id}/edit', [SupplierController::class, 'edit'])->name('edit');
     Route::put('{id}', [SupplierController::class, 'update'])->name('update'); // ✅ THIS IS REQUIRED
 });
+
+
+//Supplier for PurchaseRequest Quotes
+Route::get('/supplier/request/secure-view/{token}', [\App\Http\Controllers\Supplier\PurchaseRequestController::class, 'secureView'])->name('supplier.purchase_request.view');
+Route::post('/supplier/request/respond/{id}', [\App\Http\Controllers\Supplier\PurchaseRequestController::class, 'submitResponse'])->name('supplier.purchase_request.response');
+
+
 
 
 

@@ -61,6 +61,10 @@
             <input type="text" name="phone" value="{{ $supplier->phone }}" class="form-control">
           </div>
           <div class="col-md-6">
+            <label>Email</label>
+            <input type="text" name="email" value="{{ $supplier->email }}" class="form-control">
+          </div>
+          <div class="col-md-6">
             <label>Website</label>
             <input type="text" name="website" value="{{ $supplier->website }}" class="form-control">
           </div>
