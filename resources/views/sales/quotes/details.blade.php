@@ -120,12 +120,12 @@
                     @foreach ($quoteItems as $item)
                     <tr data-id="{{ $item->id }}">
                         <td>{{ $item->description }}</td>
-                        <td><input type="number" name="qty[]" value="{{ $item->qty }}" class="form-control form-control-sm" style="width: 60px;"></td>
+                        <td><input type="number" name="qty[]" value="{{ $item->qty }}" class="form-control form-control-sm qty-input" style="width: 60px;" data-id="{{ $item->id }}" data-price="{{ $item->price }}"></td>
                         <td>{{ $item->width }}" x {{ $item->height }}"</td>
                         <td>{{ $item->glass }}</td>
                         <td>{{ $item->grid }}</td>
                         <td>${{ number_format($item->price, 2) }}</td>
-                        <td>${{ number_format($item->total, 2) }}</td>
+                        <td class="item-total" data-id="{{ $item->id }}">${{ number_format($item->total, 2) }}</td>
                         <td><img src="{{ $item->image_url ?? 'https://via.placeholder.com/40' }}" class="img-thumbnail" alt="Item"></td>
                         <td class="text-nowrap">
                             <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item" data-id="{{ $item->id }}">
@@ -148,22 +148,22 @@
             <!-- Totals -->
             <div class="row mt-4">
                 <div class="col-md-6 offset-md-6">
-                    <table class="table">
+                    <table class="table"  id="totalsTable">
                         <tr>
                             <th>Surcharge:</th>
-                            <td>$0.00</td>
+                            <td id="surcharge-amount">$0.00</td>
                         </tr>
                         <tr>
                             <th>Subtotal:</th>
-                            <td>$0.00</td>
+                            <td id="subtotal-amount">$0.00</td>
                         </tr>
                         <tr>
                             <th>Tax:</th>
-                            <td>$0.00</td>
+                            <td id="tax-amount">$0.00</td>
                         </tr>
                         <tr>
                             <th>Total:</th>
-                            <td><strong>$0.00</strong></td>
+                            <td><strong id="total-amount">$0.00</strong></td>
                         </tr>
                     </table>
                 </div>
@@ -585,7 +585,8 @@
         const qty = form.querySelector('[name="qty"]').value;
         const width = form.querySelector('[name="width"]').value;
         const height = form.querySelector('[name="height"]').value;
-        const series = document.getElementById('seriesSelect').selectedOptions[0] ?? '';
+        const series = document.getElementById('seriesSelect').selectedOptions[0] ?.text ?? '';
+        const series_id = document.getElementById('seriesSelect').value ?? '';
         const config = document.getElementById('seriesTypeSelect').value;
 
         const glassType = form.querySelector('[name="glass_type"]').value;
@@ -626,14 +627,14 @@
         const glass = `${glassType}-${spacer} / ${tempered} / ${specialtyGLass}`;
         const grid = `${gridPattern} / ${gridProfile}`;
         const size = `${width}" x ${height}"`;
-        const price = '0.00';
+        const price = form.querySelector('[name="price"]').value;
         const total = (qty * parseFloat(price)).toFixed(2);
         const item_comment = form.querySelector('[name="item_comment"]').value;
         const internal_note = form.querySelector('[name="internal_note"]').value;
         
         const formData = new FormData();
         formData.append('item_id', item_id);
-        formData.append('series_id', series);
+        formData.append('series_id', series_id);
         formData.append('series_type', config);
         formData.append('description', itemDesc);
         formData.append('width', width);
@@ -685,29 +686,39 @@
                     }
 
                     const row = `
-                    <tr data-id="${data.item_id}">
-                        <td>${itemDesc}</td>
-                        <td><input type="number" name="qty[]" value="${qty}" min="1" class="form-control form-control-sm qty-input" style="width: 60px;" data-price="${price}" data-id="${data.item_id}"></td>
-                        <td>${size}</td>
-                        <td>${glass}</td>
-                        <td>${grid}</td>
-                        <td>$${price}</td>
-                        <td class="item-total" data-id="${data.item_id}">$${total}</td>
-                        <td><img src="https://via.placeholder.com/40" class="img-thumbnail" alt="Item"></td>
-                        <td class="text-nowrap">
-                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item" data-id="${data.item_id}">
-                                <i data-feather="eye"></i>
-                            </a>
-                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item" data-id="${data.item_id}">
-                                <i data-feather="edit"></i>
-                            </a>
-                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row" data-id="${data.item_id}">
-                                <i data-feather="trash-2"></i>
-                            </a>
-                        </td>
-                    </tr>
-                `;
-                document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
+                        <tr data-id="${data.item_id}">
+                            <td>${itemDesc}</td>
+                            <td><input type="number" name="qty[]" value="${qty}" min="1" class="form-control form-control-sm qty-input" style="width: 60px;" data-price="${price}" data-id="${data.item_id}"></td>
+                            <td>${size}</td>
+                            <td>${glass}</td>
+                            <td>${grid}</td>
+                            <td>$${price}</td>
+                            <td class="item-total" data-id="${data.item_id}">$${total}</td>
+                            <td><img src="https://via.placeholder.com/40" class="img-thumbnail" alt="Item"></td>
+                            <td class="text-nowrap">
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item" data-id="${data.item_id}">
+                                    <i data-feather="eye"></i>
+                                </a>
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item" data-id="${data.item_id}">
+                                    <i data-feather="edit"></i>
+                                </a>
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row" data-id="${data.item_id}">
+                                    <i data-feather="trash-2"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                            
+                    if(data.is_update == false) {
+                        document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
+                    } else {
+                        const existingRow = document.querySelector(`#quoteDetailsTable tbody tr[data-id="${data.item_id}"]`);
+                        if (existingRow) {
+                            existingRow.remove();
+                        }
+                   
+                        document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
+                    }
                     calculateTotals();
                     console.log('Modal closed');
                 } else {
@@ -856,6 +867,25 @@
                     form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
                     form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
                     form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
+                    // Pre-select series_id (dropdown)
+                    const seriesSelect = $('#seriesSelect');
+                    seriesSelect.val(data.item.series_id ?? '');
+
+                    // Trigger change to load dependent series_type_id options
+                    document.getElementById('seriesSelect').dispatchEvent(new Event('change'));
+
+                    // Wait for the fetch to complete and then set the value
+                    setTimeout(() => {
+                        const seriesTypeSelect = document.getElementById('seriesTypeSelect');
+                        Array.from(seriesTypeSelect.options).forEach(opt => {
+                            if (opt.value == (data.item.series_type ?? '')) {
+                                seriesTypeSelect.value = opt.value;
+                            }
+                        });
+
+                        document.getElementById('seriesTypeSelect').dispatchEvent(new Event('change'));
+
+                    }, 1000);
 
                     form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
                     // Show modal
@@ -1160,8 +1190,7 @@
         const selectedFin = $(this).val();
         console.log('Selected finish type:', selectedFin);
     });
-</script>
-<script>
+
     function openQuotePreview(quoteId) {
         const pdfUrl = `/quotes/pdf/${quoteId}/preview`; // You can adjust route if different
         document.getElementById('quotePdfIframe').src = pdfUrl;
@@ -1169,6 +1198,45 @@
         const modal = new bootstrap.Modal(document.getElementById('quotePdfPreviewModal'));
         modal.show();
     }
+
+     function calculateTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('.qty-input').forEach(function(input) {
+            const qty = parseInt(input.value) || 0;
+            const price = parseFloat(input.dataset.price) || 0;
+            const rowTotal = qty * price;
+            subtotal += rowTotal;
+
+            // Update row total
+            const id = input.dataset.id;
+            const totalCell = document.querySelector('.item-total[data-id="' + id + '"]');
+            if (totalCell) {
+                totalCell.textContent = '$' + rowTotal.toFixed(2);
+            }
+        });
+
+        // Example: Surcharge is 0, tax is 8%
+        const surcharge = 0;
+        const taxRate = 0.08;
+        const tax = subtotal * taxRate;
+        const total = subtotal + surcharge + tax;
+
+        document.getElementById('surcharge-amount').textContent = '$' + surcharge.toFixed(2);
+        document.getElementById('subtotal-amount').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('tax-amount').textContent = '$' + tax.toFixed(2);
+        document.getElementById('total-amount').textContent = '$' + total.toFixed(2);
+    }
+
+    // Listen for qty input changes
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('qty-input')) {
+            calculateTotals();
+        }
+    });
+
+    // Initial calculation on page load
+    document.addEventListener('DOMContentLoaded', calculateTotals);
+
 </script>
 
 @endpush

@@ -115,40 +115,42 @@ class QuoteController extends Controller
     public function storeItem(Request $request, $id)
     {
         try {
-            $request->validate([
+           $validated =  $request->validate([
                 'description' => 'required|string',
                 'series_id' => 'required|integer|exists:elitevw_master_series,id',
                 'series_type' => 'required|string',
                 'item_id' => ' nullable|integer',
                 'width' => 'required|numeric',
                 'height' => 'required|numeric',
-                'glass' => 'required|string',
-                'grid' => 'required|string',
+                'glass' => 'nullable|string',
+                'grid' => 'nullable|string',
                 'qty' => 'required|numeric',
                 'price' => 'required|numeric',
                 'total' => 'required|numeric',
-                'item_comment' => 'required|string',
-                'internal_note' => 'required|string',
-                'color_config' => 'required|numeric',
-                'color_exterior' => 'required|numeric',
-                'color_interior' => 'required|numeric',
-                'frame_type' => 'required|string',
-                'fin_type' => 'required|string',
-                'glass_type' => 'required|string',
-                'spacer' => 'required|string',
-                'tempered' => 'required|string',
-                'specialty_glass' => 'required|string',
-                'grid_pattern' => 'required|string',
-                'grid_profile' => 'required|string',
-                'retrofit_bottom_only' => 'required|boolean',
-                'no_logo_lock' => 'required|boolean',
-                'double_lock' => 'required|boolean',
-                'custom_lock_position' => 'required|boolean',
-                'custom_vent_latch' => 'required|boolean',
-                'knocked_down' => 'required|boolean',
+                'item_comment' => 'nullable|string',
+                'internal_note' => 'nullable|string',
+                'color_config' => 'nullable|numeric',
+                'color_exterior' => 'nullable|numeric',
+                'color_interior' => 'nullable|numeric',
+                'frame_type' => 'nullable|string',
+                'fin_type' => 'nullable|string',
+                'glass_type' => 'nullable|string',
+                'spacer' => 'nullable|string',
+                'tempered' => 'nullable|string',
+                'specialty_glass' => 'nullable|string',
+                'grid_pattern' => 'nullable|string',
+                'grid_profile' => 'nullable|string',
+                'retrofit_bottom_only' => 'nullable|boolean',
+                'no_logo_lock' => 'nullable|boolean',
+                'double_lock' => 'nullable|boolean',
+                'custom_lock_position' => 'nullable|boolean',
+                'custom_vent_latch' => 'nullable|boolean',
+                'knocked_down' => 'nullable|boolean',
             ]);
+            $isUpdate = false;
+
             // Check if item already exists
-            if (isset($validated['item_id']) && $validated['item_id']) {
+            if (isset($validated['item_id'])) {
 
                 $existingItem = QuoteItem::where('id', $validated['item_id'])->first();
 
@@ -192,6 +194,7 @@ class QuoteController extends Controller
                     ]);
                 }
                 $item = $existingItem;
+                $isUpdate = true;
             } else {
 
                 $item = QuoteItem::create([
@@ -237,7 +240,8 @@ class QuoteController extends Controller
 
             return response()->json([
                 'success' => true,
-                'item_id' => $item->id
+                'item_id' => $item->id,
+                'is_update' => $isUpdate ?? false,
             ]);
         } catch (\Exception $e) {
             \Log::error('QuoteItem store error: ' . $e->getMessage());
@@ -584,11 +588,13 @@ class QuoteController extends Controller
         return redirect()->route('sales.orders.show', $order->id)->with('success', 'Quote converted to Order successfully.');
     }
 
-    public function destroyItem(Request $request, $id)
+    public function destroyItem($id, $itemId)
     {
-        $itemId = $request->input('item_id');
         $item = QuoteItem::find($itemId);
-        $item?->delete();
+        if(!$item) {
+            return response()->json(['success' => false, 'message' => 'Item not found.'], 404);
+        }
+        $item->delete();
 
         return response()->json(['success' => true, 'message' => 'Item deleted successfully.']);
     }
