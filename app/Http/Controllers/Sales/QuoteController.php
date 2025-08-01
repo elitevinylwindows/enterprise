@@ -383,9 +383,8 @@ class QuoteController extends Controller
 
     public function preview($id)
     {
-        $quote = Quote::with('items')->findOrFail($id);
-        $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
-        return $pdf->stream("Quote_{$id}.pdf");
+        $quote = Quote::with('items')->findOrFail($id); 
+        return view('sales.quotes.preview', compact('quote'));
     }
 
     public function download($id)
