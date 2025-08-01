@@ -478,9 +478,7 @@
                                 <div class="tab-pane fade show active" id="preview-panel">
 
                                     <!-- SVG Preview Box -->
-                                    <div id="window-previewer" class="border rounded bg-light p-4 mb-3 text-center" style="height: 300px; position: relative;">
-                                        <!-- This gets dynamically replaced -->
-                                        <canvas id="windowCanvas" width="500" height="200"></canvas>
+                                    <div id="window-svg-preview" class="border rounded bg-light p-4 mb-3 text-center" style="height: 300px; position: relative;">
                                     </div>
 
                                     <!-- View Mode Buttons -->
