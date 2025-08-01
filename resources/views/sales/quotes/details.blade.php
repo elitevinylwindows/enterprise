@@ -264,7 +264,7 @@
                                         <select class="form-control" name="color_config" id="colorConfigDropdown">
                                             <option value="">Select Configuration</option>
                                             @foreach($colorConfigurations as $config)
-                                            <option value="{{ $config->id }}">{{ $config->code }}</option>
+                                            <option value="{{ $config->code }}" data-id="{{ $config->id }}">{{ $config->code }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -274,10 +274,10 @@
                                         <select class="form-control" name="color_exterior" id="colorExteriorDropdown">
                                             <option value="">Select Exterior Color</option>
                                             @foreach($exteriorColors as $color)
-                                            <option value="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
+                                            <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
                                             @endforeach
                                             @foreach($laminateColors as $color)
-                                            <option value="{{ $color->id }}" data-group="laminate">{{ $color->name }}</option>
+                                            <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="laminate">{{ $color->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -287,10 +287,10 @@
                                         <select class="form-control" name="color_interior" id="colorInteriorDropdown">
                                             <option value="">Select Interior Color</option>
                                             @foreach($interiorColors as $color)
-                                            <option value="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
+                                            <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
                                             @endforeach
                                             @foreach($laminateColors as $color)
-                                            <option value="{{ $color->id }}" data-group="laminate">{{ $color->name }}</option>
+                                            <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="laminate">{{ $color->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -598,9 +598,13 @@
         const frameType = form.querySelector('[name="frame_type"]').value;
         const finType = form.querySelector('[name="fin_type"]').value;
 
-        const colorConfig = form.querySelector('[name="color_config"]').value;
+        const colorConfigDropdown = form.querySelector('[name="color_config"]');
+        const colorConfig = colorConfigDropdown.value;
+        const colorConfigId = colorConfigDropdown.selectedOptions[0]?.getAttribute('data-id') ?? '';
         const colorExt = form.querySelector('[name="color_exterior"]');
         const colorInt = form.querySelector('[name="color_interior"]');
+        const colorExtId = colorExt.selectedOptions[0]?.getAttribute('data-id') ?? '';
+        const colorIntId = colorInt.selectedOptions[0]?.getAttribute('data-id') ?? '';
         const item_id = form.querySelector('[name="item_id"]').value;
         const laminateExtText = colorExt ?.selectedOptions[0] ?.text ?? '';
         const colorIntText = colorInt ?.selectedOptions[0] ?.text ?? '';
@@ -644,9 +648,9 @@
         formData.append('total', total);
         formData.append('item_comment', item_comment);
         formData.append('internal_note', internal_note);
-        formData.append('color_config', colorConfig);
-        formData.append('color_exterior', colorExt.value);
-        formData.append('color_interior', colorInt.value);
+        formData.append('color_config', colorConfigId);
+        formData.append('color_exterior', colorExtId);
+        formData.append('color_interior', colorIntId);
         formData.append('frame_type', frameType);
         formData.append('fin_type', finType);
         formData.append('glass_type', glassType);
@@ -911,7 +915,7 @@
     document.getElementById('colorConfigDropdown').addEventListener('change', function() {
         const value = this.value;
         const [exterior, interior] = value.split('-');
-
+        console.log(exterior, interior);
         const exteriorDropdown = document.getElementById('colorExteriorDropdown');
         const interiorDropdown = document.getElementById('colorInteriorDropdown');
 
