@@ -1,0 +1,67 @@
+/* Base Select2 container styles */
+.select2-container--default .select2-selection--single {
+    height: 38px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Dropdown arrow */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+    right: 8px;
+}
+
+/* Selected value display */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #495057;
+    line-height: 24px;
+    padding-left: 0;
+}
+
+/* Focus state */
+.select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Dropdown panel styles */
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Dropdown search field */
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 6px 12px;
+}
+
+/* Match Bootstrap's form-control height and appearance */
+.select2-container .select2-selection--single {
+    height: calc(1.5em + 0.75rem + 2px) !important;
+}
+
+/* Optional: Make the dropdown wider */
+.select2-container {
+    width: 100% !important;
+}
+
+/* For dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+    .select2-container--default .select2-selection--single {
+        background-color: #343a40;
+        border-color: #454d55;
+        color: #f8f9fa;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #f8f9fa;
+    }
+}

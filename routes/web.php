@@ -620,6 +620,8 @@ Route::prefix('inventory')->name('inventory.')->group(function () {
 Route::get('stock-alerts/batch-create-requests', [StockAlertController::class, 'createGroupedPurchaseRequests'])
     ->name('stock-alerts.batch_requests');
 
+Route::get('/inventory/products/by-location/{locationId}', [StockInController::class, 'productsByLocation']);
+
 
 
     // Purchase Requests (Inventory context)

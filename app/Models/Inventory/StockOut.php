@@ -9,6 +9,14 @@ class StockOut extends Model
     protected $table = 'elitevw_inventory_stock_out';
 
     protected $fillable = [
-        'product_id', 'location_id', 'quantity', 'issued_by', 'issued_date', 'reference', 'note'
-    ];
+    'product_id',
+    'location_id',
+    'quantity',
+    'issued_to',
+    'issued_date',
+    'status',
+    'reference',
+    'note'
+];
+
 }
