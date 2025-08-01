@@ -1,3 +1,35 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    /* Base Select2 styles to match Tailwind */
+    .select2-container--default .select2-selection--single {
+        @apply h-[38px] py-[6px] px-[12px] text-gray-700 bg-white border border-gray-300 rounded-md transition-all;
+    }
+
+    /* Dropdown arrow */
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        @apply h-[36px] right-2;
+    }
+
+    /* Selected value */
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        @apply text-gray-700 leading-6 pl-0;
+    }
+
+    /* Focus state (matches Tailwind's ring) */
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        @apply border-blue-500 ring-2 ring-blue-200 outline-none;
+    }
+
+    /* Dropdown options */
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        @apply bg-blue-600 text-white;
+    }
+
+    /* Search input inside dropdown */
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        @apply border border-gray-300 rounded-md p-2;
+    }
+}
