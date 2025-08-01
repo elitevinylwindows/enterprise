@@ -12,12 +12,10 @@
                 <div class="row align-items-center g-2">
                     <div class="col"><h5>{{ __('Stock Adjustments') }}</h5></div>
                     <div class="col-auto">
-                        <a href="#" class="btn btn-primary customModal"
-                           data-size="lg"
-                           data-url="{{ route('inventory.stock-adjustments.create') }}"
-                           data-title="{{ __('Create Stock Adjustment') }}">
-                           <i data-feather="plus"></i> {{ __('Create') }}
-                        </a>
+                        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createStockAdjustmentModal">
+    <i class="fas fa-plus"></i> New Adjustment
+</a>
+
                     </div>
                 </div>
             </div>
@@ -62,3 +60,6 @@
     </div>
 </div>
 @endsection
+
+
+@include('inventory.stock_adjustments.create')
