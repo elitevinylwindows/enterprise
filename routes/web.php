@@ -267,13 +267,13 @@ Route::middleware(['auth', 'XSS'])->group(function () {
         'authPage' => AuthPageController::class,
     ]);
 
-// Coupons
+    // Coupons
     Route::get('coupons/history', [CouponController::class, 'history'])->name('coupons.history');
     Route::delete('coupons/history/{id}/destroy', [CouponController::class, 'historyDestroy'])->name('coupons.history.destroy');
     Route::get('coupons/apply', [CouponController::class, 'apply'])->name('coupons.apply');
     Route::resource('coupons', CouponController::class);
 
-// Subscription Payments
+    // Subscription Payments
     Route::post('subscription/{id}/stripe/payment', [SubscriptionController::class, 'stripePayment'])->name('subscription.stripe.payment');
     Route::get('subscription/transaction', [SubscriptionController::class, 'transaction'])->name('subscription.transaction');
     Route::post('subscription/{id}/bank-transfer', [PaymentController::class, 'subscriptionBankTransfer'])->name('subscription.bank.transfer');
@@ -283,7 +283,7 @@ Route::middleware(['auth', 'XSS'])->group(function () {
     Route::post('subscription/{id}/{user_id}/manual-assign-package', [PaymentController::class, 'subscriptionManualAssignPackage'])->name('subscription.manual_assign_package');
     Route::get('subscription/flutterwave/{sid}/{tx_ref}', [PaymentController::class, 'subscriptionFlutterwave'])->name('subscription.flutterwave');
 
-// Settings
+    // Settings
     Route::prefix('settings')->group(function () {
         Route::get('/', [SettingController::class, 'index'])->name('setting.index');
         Route::post('/account', [SettingController::class, 'accountData'])->name('setting.account');
@@ -305,7 +305,7 @@ Route::middleware(['auth', 'XSS'])->group(function () {
     Route::get('language/{lang}', [SettingController::class, 'lanquageChange'])->name('language.change');
     Route::post('theme/settings', [SettingController::class, 'themeSettings'])->name('theme.settings');
 
-// Logged History
+    // Logged History
     Route::prefix('logged')->group(function () {
         Route::get('history', [UserController::class, 'loggedHistory'])->name('logged.history');
         Route::get('{id}/history/show', [UserController::class, 'loggedHistoryShow'])->name('logged.history.show');
@@ -313,350 +313,350 @@ Route::middleware(['auth', 'XSS'])->group(function () {
     });
     
     
-//Sales    
-Route::prefix('sales')->name('sales.')->group(function () {
-    Route::get('dashboard', [\App\Http\Controllers\Sales\DashboardController::class, 'index'])->name('dashboard.index');
+    //Sales    
+    Route::prefix('sales')->name('sales.')->group(function () {
+        Route::get('dashboard', [\App\Http\Controllers\Sales\DashboardController::class, 'index'])->name('dashboard.index');
+        
+        // Quotes
+        // Quotes routes - static and specific routes FIRST
+        Route::get('quotes', [QuoteController::class, 'index'])->name('quotes.index');
+        Route::get('quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
+        Route::post('quotes', [QuoteController::class, 'store'])->name('quotes.store');
+        Route::get('quotes/customer/{customer_number}', [QuoteController::class, 'getCustomer'])->name('quotes.getCustomer');
+        Route::get('quotes/{id}/details', [QuoteController::class, 'details'])->name('quotes.details');
+
+        // Item routes - static before dynamic
+        Route::get('quotes/view/{id}/items/{itemId}', [QuoteController::class, 'getItem'])->name('quotes.items.view');
+        Route::post('quotes/{id}/items', [QuoteController::class, 'storeItem'])->name('quotes.storeItem');
+        Route::delete('quotes/{id}/items/{itemId}', [QuoteController::class, 'destroyItem'])->name('quotes.items.destroy');
+        Route::get('quotes/items/{id}/edit', [QuoteController::class, 'editItem'])->name('quotes.items.edit');
+        Route::get('quotes/items/{id}', [QuoteController::class, 'showItem'])->name('quotes.items.show');
+
+        // Edit, delete, email, etc. - dynamic routes LAST
+        Route::get('quotes/{id}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');
+        Route::delete('quotes/{id}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
+        Route::post('quotes/{id}/email', [QuoteController::class, 'email'])->name('quotes.email');
+
+
+        Route::get('/quotes/{id}/preview', [QuoteController::class, 'preview'])->name('quotes.preview');
+        Route::get('/quotes/{id}/pdf/preview', [QuoteController::class, 'previewPDF'])->name('quotes.pdf.preview');
+        Route::get('/quotes/{id}/download', [QuoteController::class, 'download'])->name('quotes.download');
+        Route::get('/quotes/{id}/send', [QuoteController::class, 'send'])->name('quotes.send');
+        Route::post('/quotes/{id}/save', [QuoteController::class, 'save'])->name('quotes.save');
+
+
+        Route::get('quotes/{id}/convert-to-order', [QuoteController::class, 'convertToOrder'])->name('sales.quotes.convertToOrder');
+
+        Route::get('quotes/{id}', [QuoteController::class, 'show']);
+
+        // Orders
+        Route::get('orders', [\App\Http\Controllers\Sales\OrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/create', [\App\Http\Controllers\Sales\OrderController::class, 'create'])->name('orders.create');
+        Route::get('orders/{id}/edit', [\App\Http\Controllers\Sales\OrderController::class, 'edit'])->name('orders.edit');
+        Route::delete('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
+        Route::post('orders/{id}/email', [\App\Http\Controllers\Sales\OrderController::class, 'email'])->name('orders.email');
+        Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
+        Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
+        
+        // Invoices
+        Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
+
+        // Settings
+        Route::get('settings', [\App\Http\Controllers\Sales\SettingController::class, 'index'])->name('settings.index');
+    });
+
+
+    //Supplier
+    Route::prefix('master/suppliers')->name('master.suppliers.')->group(function () {
+        Route::get('/', [SupplierController::class, 'index'])->name('index');
+        Route::post('/', [SupplierController::class, 'store'])->name('store');
+        Route::get('{id}/edit', [SupplierController::class, 'edit'])->name('edit');
+        Route::put('{id}', [SupplierController::class, 'update'])->name('update'); // ✅ THIS IS REQUIRED
+    });
+
+
+
+    //Crud Generator 
+    Route::get('/crud-generator', [CrudGeneratorController::class, 'index'])->name('crud.index');
+    Route::post('/crud-generator', [CrudGeneratorController::class, 'generate'])->name('crud.generate');
+
+    //Menus
+    Route::prefix('admin/menu')->name('menu.')->group(function () {
+        Route::get('/', [MenuController::class, 'index'])->name('index');
+        Route::get('/create', [MenuController::class, 'create'])->name('create');
+        Route::post('/store', [MenuController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [MenuController::class, 'edit'])->name('edit');
+        Route::put('/{id}/update', [MenuController::class, 'update'])->name('update');
+        Route::delete('/{id}', [MenuController::class, 'destroy'])->name('destroy');
+
+        // Add these two lines for reorder
+        Route::get('/reorder', [MenuController::class, 'reorder'])->name('reorder');
+        Route::post('/reorder/save', [MenuController::class, 'saveReorder'])->name('reorder.save');
+    });
+
+
+
+    // Library
+    Route::prefix('master/library/configurations')->name('master.library.configurations.')->group(function () {
+        Route::get('/', [ConfigurationController::class, 'index'])->name('index');
+        Route::get('/{series}', [ConfigurationController::class, 'show'])->name('show');
+        Route::post('/{series}/add-category', [ConfigurationController::class, 'addCategory'])->name('addCategory');
+        Route::post('/{series}/{category}/upload', [ConfigurationController::class, 'uploadImage'])->name('uploadImage');
+        Route::delete('/{series}/{category}/{image}', [ConfigurationController::class, 'deleteImage'])->name('deleteImage');
+    });
+    Route::get('/library-image/{series}/{category}/{image}', function ($series, $category, $image) {
+        $path = public_path("config-thumbs/$series/$category/$image");
+
+        if (!file_exists($path)) {
+            abort(404, 'Image not found at: ' . $path);
+        }
+
+        return response()->file($path);
+    })->where('image', '.*');
+
+
+    Route::prefix('products')->name('products.')->group(function () {
+        Route::get('product-classes', [ProductClassesController::class, 'index'])->name('product_classes.index');
+        Route::get('basic-products', [BasicProductsController::class, 'index'])->name('basic_products.index');
+        Route::get('grille-patterns', [GrillePatternsController::class, 'index'])->name('grille_patterns.index');
+        Route::get('profile-records', [ProfileRecordsController::class, 'index'])->name('profile_records.index');
+        Route::get('corner-exchange', [CornerExchangeController::class, 'index'])->name('corner_exchange.index');
+        Route::get('profile-types', [ProfileTypesController::class, 'index'])->name('profile_types.index');
+        Route::get('sealing-assignment', [SealingAssignmentController::class, 'index'])->name('sealing_assignment.index');
+        Route::get('reinforcement-assignments', [ReinforcementAssignmentsController::class, 'index'])->name('reinforcement_assignments.index');
+        Route::get('hardware-types', [HardwareTypesController::class, 'index'])->name('hardware_types.index');
+        Route::get('system-color', [SystemColorController::class, 'index'])->name('system_color.index');
+    });
+
+
+        
+    Route::prefix('products/product-master')->name('product_master.')->group(function () {
+        Route::get('accessories', [AccessoriesController::class, 'index'])->name('accessories.index');
+        Route::get('glassinsert', [GlassInsertController::class, 'index'])->name('glassinsert.index');
+        Route::get('hardwarevariant', [HardwareVariantController::class, 'index'])->name('hardwarevariant.index');
+        Route::get('hardwareparts', [HardwarePartsController::class, 'index'])->name('hardwareparts.index');
+        Route::get('materials', [MaterialsController::class, 'index'])->name('materials.index');
+        Route::get('profiles', [ProfilesController::class, 'index'])->name('profiles.index');
+        Route::get('units', [UnitsController::class, 'index'])->name('units.index');
+    });    
+        
+        
+        
+    Route::prefix('master/prices')->name('master.prices.')->group(function () {
+        Route::get('matrice', [MatriceController::class, 'index'])->name('matrice.index');
+        Route::post('matrice/import', [MatriceController::class, 'import'])->name('matrice.import');
+        Route::post('matrice/check', [MatriceController::class, 'checkPrice'])->name('matrice.check'); 
+    });
+
+
+    Route::prefix('master/product_keys')->name('product_keys.')->group(function () {
+        Route::resource('producttypes', ProductTypeController::class);
+        Route::resource('productareas', ProductAreaController::class);
+        Route::resource('productsystems', ProductSystemController::class);
+        Route::resource('manufacturersystems', ManufacturerSystemController::class);
+        Route::resource('specialshapemacros', SpecialShapeMacroController::class);
+        Route::resource('shapecatalog', ShapeCatalogController::class);
+        Route::resource('drawingobjects', DrawingObjectController::class);
+    });
+        
+        
+    Route::prefix('color-options')->name('color-options.')->group(function () {
+        Route::resource('color-configurations', ColorConfigurationController::class);
+        Route::resource('exterior-colors', ExteriorColorController::class);
+        Route::resource('interior-colors', InteriorColorController::class);
+        Route::resource('laminate-colors', LaminateColorController::class);
+    });
     
-    // Quotes
-    // Quotes routes - static and specific routes FIRST
-    Route::get('quotes', [QuoteController::class, 'index'])->name('quotes.index');
-    Route::get('quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
-    Route::post('quotes', [QuoteController::class, 'store'])->name('quotes.store');
-    Route::get('quotes/customer/{customer_number}', [QuoteController::class, 'getCustomer'])->name('quotes.getCustomer');
-    Route::get('quotes/{id}/details', [QuoteController::class, 'details'])->name('quotes.details');
+    Route::prefix('grid-options')->name('grid-options.')->group(function () {
+        Route::resource('grid-types', GridTypeController::class);
+        Route::resource('grid-patterns', GridPatternController::class);
+        Route::resource('grid-profiles', GridProfileController::class);   
+    });  
+        
+    Route::prefix('glass-options')->name('glass-options.')->group(function () {
+        Route::resource('glass-types', GlassTypeController::class);
+        Route::resource('spacers', SpacerController::class);
+        Route::resource('tempered-options', TemperedOptionController::class);
+        Route::resource('special-glasses', SpecialGlassController::class);
+    });     
 
-    // Item routes - static before dynamic
-    Route::get('quotes/view/{id}/items/{itemId}', [QuoteController::class, 'getItem'])->name('quotes.items.view');
-    Route::post('quotes/{id}/items', [QuoteController::class, 'storeItem'])->name('quotes.storeItem');
-    Route::delete('quotes/{id}/items/{itemId}', [QuoteController::class, 'destroyItem'])->name('quotes.items.destroy');
-    Route::get('quotes/items/{id}/edit', [QuoteController::class, 'editItem'])->name('quotes.items.edit');
-    Route::get('quotes/items/{id}', [QuoteController::class, 'showItem'])->name('quotes.items.show');
+    Route::prefix('frame-options')->name('frame-options.')->group(function () {
+    Route::resource('frame-types', FrameTypeController::class);
+        Route::resource('retrofit-fin-types', RetrofitFinTypeController::class);
+    }); 
 
-    // Edit, delete, email, etc. - dynamic routes LAST
-    Route::get('quotes/{id}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');
-    Route::delete('quotes/{id}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
-    Route::post('quotes/{id}/email', [QuoteController::class, 'email'])->name('quotes.email');
+    Route::prefix('other-options')->name('other-options.')->group(function () {
+        Route::resource('additional-options', AdditionalOptionController::class);
+    }); 
+        
+        // Series routes
+    Route::prefix('master')->name('master.')->group(function () {
+        Route::resource('series', SeriesController::class);
+        Route::resource('series-type', SeriesTypeController::class);
+    });
+        
+    //Prices  
+    Route::prefix('master/prices')->name('prices.')->group(function () {
+        Route::get('productprices', [ProductPricesController::class, 'index'])->name('productprices.index');
+    });
+    Route::get('/series/{id}/types', [QuoteController::class, 'getSeriesTypes']);
+    Route::get('/sales/series-types/{seriesId}', [QuoteController::class, 'getSeriesTypes']);
+
+    Route::get('/sales/quotes/previous', [QuoteController::class, 'previous'])->name('sales.quotes.previous');
+    Route::get('sales/settings', [SalesSettingsController::class, 'index'])->name('sales.settings.index');
+    Route::post('sales/settings/update', [SalesSettingsController::class, 'update'])->name('sales.settings.update');
+    Route::post('/sales/settings/save', [SalesSettingsController::class, 'save'])->name('sales.settings.save');
+    Route::post('quotes/{id}/convert-to-order', [\App\Http\Controllers\Sales\QuoteController::class, 'convertToOrder'])->name('quotes.convertToOrder');
+
+    //Invoices
+    Route::prefix('sales')->name('sales.')->group(function () {
+        Route::resource('invoices', \App\Http\Controllers\Sales\InvoiceController::class);
+    });
 
 
-    Route::get('/quotes/{id}/preview', [QuoteController::class, 'preview'])->name('quotes.preview');
-    Route::get('/quotes/{id}/pdf/preview', [QuoteController::class, 'previewPDF'])->name('quotes.pdf.preview');
-    Route::get('/quotes/{id}/download', [QuoteController::class, 'download'])->name('quotes.download');
-    Route::get('/quotes/{id}/send', [QuoteController::class, 'send'])->name('quotes.send');
-    Route::post('/quotes/{id}/save', [QuoteController::class, 'save'])->name('quotes.save');
 
+    Route::get('/master/prices/matrice/types/{seriesId}', [\App\Http\Controllers\Master\Prices\MatriceController::class, 'getTypes']);
+    Route::post('/master/prices/matrice/import', [MatriceController::class, 'import'])->name('master.prices.matrice.import');
+    Route::post('/master/prices/matrice/check', [MatriceController::class, 'checkPrice'])->name('master.prices.matrice.check');
 
-    Route::get('quotes/{id}/convert-to-order', [QuoteController::class, 'convertToOrder'])->name('sales.quotes.convertToOrder');
+    Route::prefix('master/prices/markup')->name('master.prices.markup.')->group(function () {
+        Route::get('/', [MarkupController::class, 'index'])->name('index');
+        Route::post('/', [MarkupController::class, 'store'])->name('store');
+        Route::put('/{id}', [MarkupController::class, 'update'])->name('update');
+        Route::post('/{id}/lock', [MarkupController::class, 'lock'])->name('lock');
+    });
 
-    Route::get('quotes/{id}', [QuoteController::class, 'show']);
 
     // Orders
-    Route::get('orders', [\App\Http\Controllers\Sales\OrderController::class, 'index'])->name('orders.index');
-    Route::get('orders/create', [\App\Http\Controllers\Sales\OrderController::class, 'create'])->name('orders.create');
-    Route::get('orders/{id}/edit', [\App\Http\Controllers\Sales\OrderController::class, 'edit'])->name('orders.edit');
-    Route::delete('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
-    Route::post('orders/{id}/email', [\App\Http\Controllers\Sales\OrderController::class, 'email'])->name('orders.email');
-    Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
-    Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
-    
-    // Invoices
-    Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
-    Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
-
-    // Settings
-    Route::get('settings', [\App\Http\Controllers\Sales\SettingController::class, 'index'])->name('settings.index');
-});
+    Route::resource('orders', OrderController::class)->except(['index']);
+    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/import', [OrderController::class, 'import'])->name('orders.import');
+    Route::post('/orders/import', [OrderController::class, 'handleImports'])->name('orders.import');
+    //CIMs
+    Route::resource('cims', CimController::class)->except(['index']);
+    Route::get('cims/import', [CimController::class, 'import'])->name('cims.import');
+    Route::post('/cims/import', [CimController::class, 'handleImports'])->name('cims.import');
+    Route::get('/cims', [CimController::class, 'index'])->name('cims.index');
 
 
-//Supplier
-Route::prefix('master/suppliers')->name('master.suppliers.')->group(function () {
-    Route::get('/', [SupplierController::class, 'index'])->name('index');
-    Route::post('/', [SupplierController::class, 'store'])->name('store');
-    Route::get('{id}/edit', [SupplierController::class, 'edit'])->name('edit');
-    Route::put('{id}', [SupplierController::class, 'update'])->name('update'); // ✅ THIS IS REQUIRED
-});
+    // Carts
+    Route::resource('cart', CartController::class)->except(['show', 'destroy']);
+    Route::put('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
+    Route::put('cart/{cart_barcode}', [CartController::class, 'update'])->name('cart.update');
+    Route::get('deliveries/refresh-carts', [SrDeliveryController::class, 'refreshCartsForAll'])->name('sr.deliveries.refreshCarts');
+    Route::get('/carts/create', [App\Http\Controllers\CartController::class, 'create'])->name('cart.create');
 
-
-
-//Crud Generator 
-Route::get('/crud-generator', [CrudGeneratorController::class, 'index'])->name('crud.index');
-Route::post('/crud-generator', [CrudGeneratorController::class, 'generate'])->name('crud.generate');
-
-//Menus
-Route::prefix('admin/menu')->name('menu.')->group(function () {
-    Route::get('/', [MenuController::class, 'index'])->name('index');
-    Route::get('/create', [MenuController::class, 'create'])->name('create');
-    Route::post('/store', [MenuController::class, 'store'])->name('store');
-    Route::get('/{id}/edit', [MenuController::class, 'edit'])->name('edit');
-    Route::put('/{id}/update', [MenuController::class, 'update'])->name('update');
-    Route::delete('/{id}', [MenuController::class, 'destroy'])->name('destroy');
-
-    // Add these two lines for reorder
-    Route::get('/reorder', [MenuController::class, 'reorder'])->name('reorder');
-    Route::post('/reorder/save', [MenuController::class, 'saveReorder'])->name('reorder.save');
-});
+    //Calendar
+    Route::get('/calendar/deliveries/{date}', [\App\Http\Controllers\CalendarController::class, 'deliveriesByDate'])->name('calendar.deliveries.byDate');
+    Route::post('/calendar/store', [\App\Http\Controllers\SrDeliveryController::class, 'store'])->name('calendar.store');
+    Route::get('/calendars/create', [\App\Http\Controllers\CalendarController::class, 'create'])->name('calendar.create');
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
+    Route::get('/calendar/order-details/{order_number}', [\App\Http\Controllers\CalendarController::class, 'getOrderDetails']);
+    Route::post('/calendar/update-date', [CalendarController::class, 'updateDate'])->name('calendar.updateDate');
 
 
 
-// Library
-Route::prefix('master/library/configurations')->name('master.library.configurations.')->group(function () {
-    Route::get('/', [ConfigurationController::class, 'index'])->name('index');
-    Route::get('/{series}', [ConfigurationController::class, 'show'])->name('show');
-    Route::post('/{series}/add-category', [ConfigurationController::class, 'addCategory'])->name('addCategory');
-    Route::post('/{series}/{category}/upload', [ConfigurationController::class, 'uploadImage'])->name('uploadImage');
-    Route::delete('/{series}/{category}/{image}', [ConfigurationController::class, 'deleteImage'])->name('deleteImage');
-});
-Route::get('/library-image/{series}/{category}/{image}', function ($series, $category, $image) {
-    $path = public_path("config-thumbs/$series/$category/$image");
+    //Template
+    Route::resource('template', TemplateController::class);
+    Route::get('/send-template/{id}/{template_id}', [ActionController::class, 'sendTemplate'])->name('action.sendTemplate');
 
-    if (!file_exists($path)) {
-        abort(404, 'Image not found at: ' . $path);
-    }
-
-    return response()->file($path);
-})->where('image', '.*');
+    //RingCentral
+    Route::get('/ringcentral/connect', [RingCentralController::class, 'connect'])->name('ringcentral.connect');
+    Route::get('/ringcentral/callback', [RingCentralController::class, 'callback'])->name('ringcentral.callback');
+    Route::get('/rc/connect', [RingCentralController::class, 'connect'])->name('rc.connect');
+    Route::get('/rc/callback', [RingCentralController::class, 'callback'])->name('rc.callback');
+    Route::post('/delivery/{id}/call', [RingCentralController::class, 'callDeliveryContact'])->name('ringcentral.call');
+    Route::get('/ringcentral/call/{id}', [RingCentralController::class, 'call'])->name('ringcentral.call');
 
 
-Route::prefix('products')->name('products.')->group(function () {
-    Route::get('product-classes', [ProductClassesController::class, 'index'])->name('product_classes.index');
-    Route::get('basic-products', [BasicProductsController::class, 'index'])->name('basic_products.index');
-    Route::get('grille-patterns', [GrillePatternsController::class, 'index'])->name('grille_patterns.index');
-    Route::get('profile-records', [ProfileRecordsController::class, 'index'])->name('profile_records.index');
-    Route::get('corner-exchange', [CornerExchangeController::class, 'index'])->name('corner_exchange.index');
-    Route::get('profile-types', [ProfileTypesController::class, 'index'])->name('profile_types.index');
-    Route::get('sealing-assignment', [SealingAssignmentController::class, 'index'])->name('sealing_assignment.index');
-    Route::get('reinforcement-assignments', [ReinforcementAssignmentsController::class, 'index'])->name('reinforcement_assignments.index');
-    Route::get('hardware-types', [HardwareTypesController::class, 'index'])->name('hardware_types.index');
-    Route::get('system-color', [SystemColorController::class, 'index'])->name('system_color.index');
-});
-
-
-    
-Route::prefix('products/product-master')->name('product_master.')->group(function () {
-    Route::get('accessories', [AccessoriesController::class, 'index'])->name('accessories.index');
-    Route::get('glassinsert', [GlassInsertController::class, 'index'])->name('glassinsert.index');
-    Route::get('hardwarevariant', [HardwareVariantController::class, 'index'])->name('hardwarevariant.index');
-    Route::get('hardwareparts', [HardwarePartsController::class, 'index'])->name('hardwareparts.index');
-    Route::get('materials', [MaterialsController::class, 'index'])->name('materials.index');
-    Route::get('profiles', [ProfilesController::class, 'index'])->name('profiles.index');
-    Route::get('units', [UnitsController::class, 'index'])->name('units.index');
-});    
-    
-    
-    
-Route::prefix('master/prices')->name('master.prices.')->group(function () {
-    Route::get('matrice', [MatriceController::class, 'index'])->name('matrice.index');
-    Route::post('matrice/import', [MatriceController::class, 'import'])->name('matrice.import');
-    Route::post('matrice/check', [MatriceController::class, 'checkPrice'])->name('matrice.check'); 
-});
-
-
-Route::prefix('master/product_keys')->name('product_keys.')->group(function () {
-    Route::resource('producttypes', ProductTypeController::class);
-    Route::resource('productareas', ProductAreaController::class);
-    Route::resource('productsystems', ProductSystemController::class);
-    Route::resource('manufacturersystems', ManufacturerSystemController::class);
-    Route::resource('specialshapemacros', SpecialShapeMacroController::class);
-    Route::resource('shapecatalog', ShapeCatalogController::class);
-    Route::resource('drawingobjects', DrawingObjectController::class);
-});
-    
-    
-Route::prefix('color-options')->name('color-options.')->group(function () {
-    Route::resource('color-configurations', ColorConfigurationController::class);
-    Route::resource('exterior-colors', ExteriorColorController::class);
-    Route::resource('interior-colors', InteriorColorController::class);
-    Route::resource('laminate-colors', LaminateColorController::class);
-});
-    
-Route::prefix('grid-options')->name('grid-options.')->group(function () {
- Route::resource('grid-types', GridTypeController::class);
-    Route::resource('grid-patterns', GridPatternController::class);
-    Route::resource('grid-profiles', GridProfileController::class);   
-});  
-    
-Route::prefix('glass-options')->name('glass-options.')->group(function () {
-    Route::resource('glass-types', GlassTypeController::class);
-    Route::resource('spacers', SpacerController::class);
-    Route::resource('tempered-options', TemperedOptionController::class);
-    Route::resource('special-glasses', SpecialGlassController::class);
-});     
-
-Route::prefix('frame-options')->name('frame-options.')->group(function () {
-Route::resource('frame-types', FrameTypeController::class);
-    Route::resource('retrofit-fin-types', RetrofitFinTypeController::class);
-}); 
-
-Route::prefix('other-options')->name('other-options.')->group(function () {
-    Route::resource('additional-options', AdditionalOptionController::class);
-}); 
-    
-    // Series routes
-Route::prefix('master')->name('master.')->group(function () {
-    Route::resource('series', SeriesController::class);
-    Route::resource('series-type', SeriesTypeController::class);
-});
-    
-//Prices  
-Route::prefix('master/prices')->name('prices.')->group(function () {
-    Route::get('productprices', [ProductPricesController::class, 'index'])->name('productprices.index');
-});
-Route::get('/series/{id}/types', [QuoteController::class, 'getSeriesTypes']);
-Route::get('/sales/series-types/{seriesId}', [QuoteController::class, 'getSeriesTypes']);
-
-Route::get('/sales/quotes/previous', [QuoteController::class, 'previous'])->name('sales.quotes.previous');
-Route::get('sales/settings', [SalesSettingsController::class, 'index'])->name('sales.settings.index');
-Route::post('sales/settings/update', [SalesSettingsController::class, 'update'])->name('sales.settings.update');
-Route::post('/sales/settings/save', [SalesSettingsController::class, 'save'])->name('sales.settings.save');
-Route::post('quotes/{id}/convert-to-order', [\App\Http\Controllers\Sales\QuoteController::class, 'convertToOrder'])->name('quotes.convertToOrder');
-
-//Invoices
-Route::prefix('sales')->name('sales.')->group(function () {
-    Route::resource('invoices', \App\Http\Controllers\Sales\InvoiceController::class);
-});
+    //Addons
+    Route::prefix('master/sales/addons')->name('master.sales.addons.')->group(function () {
+        Route::get('/', [AddonController::class, 'index'])->name('index');
+        Route::post('/', [AddonController::class, 'store'])->name('store');
+        Route::delete('/{id}', [AddonController::class, 'destroy'])->name('destroy');
+    });
 
 
 
-Route::get('/master/prices/matrice/types/{seriesId}', [\App\Http\Controllers\Master\Prices\MatriceController::class, 'getTypes']);
-Route::post('/master/prices/matrice/import', [MatriceController::class, 'import'])->name('master.prices.matrice.import');
-Route::post('/master/prices/matrice/check', [MatriceController::class, 'checkPrice'])->name('master.prices.matrice.check');
+    Route::prefix('schemas')->group(function () {
+        Route::resource('hs-unit', HSUnitController::class);
+        Route::resource('sh-unit', SHUnitController::class);
+        Route::resource('dh-unit', DHUnitController::class);
+        Route::resource('xx-unit', XXUnitController::class);
+        Route::resource('cm-unit', CMUnitController::class);
+        Route::resource('pw-unit', PWUnitController::class);
+        Route::resource('sld-unit', SLDUnitController::class);
+        Route::resource('swd-unit', SWDUnitController::class);
 
-Route::prefix('master/prices/markup')->name('master.prices.markup.')->group(function () {
-    Route::get('/', [MarkupController::class, 'index'])->name('index');
-    Route::post('/', [MarkupController::class, 'store'])->name('store');
-    Route::put('/{id}', [MarkupController::class, 'update'])->name('update');
-    Route::post('/{id}/lock', [MarkupController::class, 'lock'])->name('lock');
-});
+        Route::resource('gsco-hsunit', GSCOHSUnitController::class);
+        Route::resource('gsco-shunit', GSCOSHUnitController::class);
+        Route::resource('gsco-dhunit', GSCODHUnitController::class);
+        Route::resource('gsco-pwunit', GSCOPWUnitController::class);
+        Route::resource('gsco-xxunit', GSCOXXUnitController::class);
+        Route::resource('gsco-cmunit', GSCOCMUnitController::class);
+        Route::resource('gsco-sldunit', GSCOSLDUnitController::class);
+        Route::resource('gsco-swdunit', GSCOSWDUnitController::class);
 
-
-// Orders
-Route::resource('orders', OrderController::class)->except(['index']);
-Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
-Route::get('orders/import', [OrderController::class, 'import'])->name('orders.import');
-Route::post('/orders/import', [OrderController::class, 'handleImports'])->name('orders.import');
-//CIMs
-Route::resource('cims', CimController::class)->except(['index']);
-Route::get('cims/import', [CimController::class, 'import'])->name('cims.import');
-Route::post('/cims/import', [CimController::class, 'handleImports'])->name('cims.import');
-Route::get('/cims', [CimController::class, 'index'])->name('cims.index');
-
-
-// Carts
-Route::resource('cart', CartController::class)->except(['show', 'destroy']);
-Route::put('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
-Route::put('cart/{cart_barcode}', [CartController::class, 'update'])->name('cart.update');
-Route::get('deliveries/refresh-carts', [SrDeliveryController::class, 'refreshCartsForAll'])->name('sr.deliveries.refreshCarts');
-Route::get('/carts/create', [App\Http\Controllers\CartController::class, 'create'])->name('cart.create');
-
-//Calendar
-Route::get('/calendar/deliveries/{date}', [\App\Http\Controllers\CalendarController::class, 'deliveriesByDate'])->name('calendar.deliveries.byDate');
-Route::post('/calendar/store', [\App\Http\Controllers\SrDeliveryController::class, 'store'])->name('calendar.store');
-Route::get('/calendars/create', [\App\Http\Controllers\CalendarController::class, 'create'])->name('calendar.create');
-Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
-Route::get('/calendar/order-details/{order_number}', [\App\Http\Controllers\CalendarController::class, 'getOrderDetails']);
-Route::post('/calendar/update-date', [CalendarController::class, 'updateDate'])->name('calendar.updateDate');
-
-
-
-//Template
-Route::resource('template', TemplateController::class);
-Route::get('/send-template/{id}/{template_id}', [ActionController::class, 'sendTemplate'])->name('action.sendTemplate');
-
-//RingCentral
-Route::get('/ringcentral/connect', [RingCentralController::class, 'connect'])->name('ringcentral.connect');
-Route::get('/ringcentral/callback', [RingCentralController::class, 'callback'])->name('ringcentral.callback');
-Route::get('/rc/connect', [RingCentralController::class, 'connect'])->name('rc.connect');
-Route::get('/rc/callback', [RingCentralController::class, 'callback'])->name('rc.callback');
-Route::post('/delivery/{id}/call', [RingCentralController::class, 'callDeliveryContact'])->name('ringcentral.call');
-Route::get('/ringcentral/call/{id}', [RingCentralController::class, 'call'])->name('ringcentral.call');
-
-
-//Addons
-Route::prefix('master/sales/addons')->name('master.sales.addons.')->group(function () {
-    Route::get('/', [AddonController::class, 'index'])->name('index');
-    Route::post('/', [AddonController::class, 'store'])->name('store');
-    Route::delete('/{id}', [AddonController::class, 'destroy'])->name('destroy');
-});
-
-
-
-Route::prefix('schemas')->group(function () {
-    Route::resource('hs-unit', HSUnitController::class);
-    Route::resource('sh-unit', SHUnitController::class);
-    Route::resource('dh-unit', DHUnitController::class);
-    Route::resource('xx-unit', XXUnitController::class);
-    Route::resource('cm-unit', CMUnitController::class);
-    Route::resource('pw-unit', PWUnitController::class);
-    Route::resource('sld-unit', SLDUnitController::class);
-    Route::resource('swd-unit', SWDUnitController::class);
-
-    Route::resource('gsco-hsunit', GSCOHSUnitController::class);
-    Route::resource('gsco-shunit', GSCOSHUnitController::class);
-    Route::resource('gsco-dhunit', GSCODHUnitController::class);
-    Route::resource('gsco-pwunit', GSCOPWUnitController::class);
-    Route::resource('gsco-xxunit', GSCOXXUnitController::class);
-    Route::resource('gsco-cmunit', GSCOCMUnitController::class);
-    Route::resource('gsco-sldunit', GSCOSLDUnitController::class);
-    Route::resource('gsco-swdunit', GSCOSWDUnitController::class);
-
-    Route::resource('cmpromo', CMPromoController::class);
-    Route::resource('window-door-field', WindowDoorFieldController::class);
-});
+        Route::resource('cmpromo', CMPromoController::class);
+        Route::resource('window-door-field', WindowDoorFieldController::class);
+    });
 
 
 
 
-// Inventory
-Route::prefix('inventory')->name('inventory.')->group(function () {
+    // Inventory
+    Route::prefix('inventory')->name('inventory.')->group(function () {
 
-    // Inventory Operations
-    Route::resource('stock-level', StockLevelController::class)->except(['show']);
-    Route::resource('stock-in', StockInController::class)->except(['show']);
-    Route::resource('stock-out', StockOutController::class)->except(['show']);
-    Route::resource('stock-transfer', StockTransferController::class)->except(['show']);
-    Route::resource('stock-adjustments', StockAdjustmentController::class)->except(['show']);
-    Route::resource('stock-alerts', StockAlertController::class)->except(['show']);
-    Route::get('stock-alerts/{id}/create-request', [StockAlertController::class, 'createPurchaseRequest'])
-    ->name('stock-alerts.create_request');
+        // Inventory Operations
+        Route::resource('stock-level', StockLevelController::class)->except(['show']);
+        Route::resource('stock-in', StockInController::class)->except(['show']);
+        Route::resource('stock-out', StockOutController::class)->except(['show']);
+        Route::resource('stock-transfer', StockTransferController::class)->except(['show']);
+        Route::resource('stock-adjustments', StockAdjustmentController::class)->except(['show']);
+        Route::resource('stock-alerts', StockAlertController::class)->except(['show']);
+        Route::get('stock-alerts/{id}/create-request', [StockAlertController::class, 'createPurchaseRequest'])
+        ->name('stock-alerts.create_request');
 
-Route::get('stock-alerts/batch-create-requests', [StockAlertController::class, 'createGroupedPurchaseRequests'])
-    ->name('stock-alerts.batch_requests');
-
-
-
-    // Purchase Requests (Inventory context)
-    Route::resource('purchase-requests', InventoryPurchaseRequestController::class)->except(['show']);
-
-    // Product Master
-    Route::resource('products', ProductController::class)->except(['show']);
-    Route::resource('categories', CategoryController::class)->except(['show']);
-    Route::resource('uoms', UnitOfMeasureController::class)->except(['show']);
-    Route::resource('locations', LocationController::class)->except(['show']);
-    Route::resource('barcodes', BarcodeController::class);
-    Route::resource('logs', LogController::class)->only(['index']);
-
-    // BOM
-    Route::get('/bom', [BomController::class, 'index'])->name('bom.index');
-    Route::get('/bom/create', [BomController::class, 'create'])->name('bom.create');
-    Route::post('/bom', [BomController::class, 'store'])->name('bom.store');
-    Route::get('/bom/{bom}/edit', [BomController::class, 'edit'])->name('bom.edit');
-    Route::put('/bom/{bom}', [BomController::class, 'update'])->name('bom.update');
-    Route::delete('/bom/{bom}', [BomController::class, 'destroy'])->name('bom.destroy');
-    Route::post('/bom/import', [BomController::class, 'handleImports'])->name('bom.import');
-});
+        Route::get('stock-alerts/batch-create-requests', [StockAlertController::class, 'createGroupedPurchaseRequests'])
+        ->name('stock-alerts.batch_requests');
 
 
 
-// Purchasing
-Route::prefix('purchasing')->name('purchasing.')->group(function () {
-    Route::resource('purchase-requests', PurchasingPurchaseRequestController::class);
-    Route::resource('supplier-quotes', SupplierQuoteController::class);
-    Route::resource('purchase-orders', PurchaseOrderController::class);
-    Route::resource('receiving', ReceivingController::class); // ← new
-    Route::resource('invoices', PurchaseInvoiceController::class); 
-    Route::get('purchase-requests/{id}/download', [PurchasingPurchaseRequestController::class, 'download'])
-        ->name('purchase-requests.download');
+        // Purchase Requests (Inventory context)
+        Route::resource('purchase-requests', InventoryPurchaseRequestController::class)->except(['show']);
 
-});
+        // Product Master
+        Route::resource('products', ProductController::class)->except(['show']);
+        Route::resource('categories', CategoryController::class)->except(['show']);
+        Route::resource('uoms', UnitOfMeasureController::class)->except(['show']);
+        Route::resource('locations', LocationController::class)->except(['show']);
+        Route::resource('barcodes', BarcodeController::class);
+        Route::resource('logs', LogController::class)->only(['index']);
+
+        // BOM
+        Route::get('/bom', [BomController::class, 'index'])->name('bom.index');
+        Route::get('/bom/create', [BomController::class, 'create'])->name('bom.create');
+        Route::post('/bom', [BomController::class, 'store'])->name('bom.store');
+        Route::get('/bom/{bom}/edit', [BomController::class, 'edit'])->name('bom.edit');
+        Route::put('/bom/{bom}', [BomController::class, 'update'])->name('bom.update');
+        Route::delete('/bom/{bom}', [BomController::class, 'destroy'])->name('bom.destroy');
+        Route::post('/bom/import', [BomController::class, 'handleImports'])->name('bom.import');
+    });
+
+
+
+    // Purchasing
+    Route::prefix('purchasing')->name('purchasing.')->group(function () {
+        Route::resource('purchase-requests', PurchasingPurchaseRequestController::class);
+        Route::resource('supplier-quotes', SupplierQuoteController::class);
+        Route::resource('purchase-orders', PurchaseOrderController::class);
+        Route::resource('receiving', ReceivingController::class); // ← new
+        Route::resource('invoices', PurchaseInvoiceController::class); 
+        Route::get('purchase-requests/{id}/download', [PurchasingPurchaseRequestController::class, 'download'])
+            ->name('purchase-requests.download');
+
+    });
 
 
 
@@ -667,159 +667,159 @@ Route::prefix('purchasing')->name('purchasing.')->group(function () {
 
 
 
-// Trucks, Drivers, Routes
-Route::resource('trucks', TruckController::class);
-Route::resource('drivers', DriverController::class);
+    // Trucks, Drivers, Routes
+    Route::resource('trucks', TruckController::class);
+    Route::resource('drivers', DriverController::class);
 
 
 
-// Deliveries & Pickups
-Route::resource('deliveries', DeliveryController::class);
-Route::get('deliveries/fix-statuses', [SrDeliveryController::class, 'fixEmptyStatuses'])->name('sr.deliveries.fixStatuses');
-Route::get('deliveries/{delivery}/edit', [DeliveryController::class, 'edit'])->name('deliveries.edit');
-Route::get('/today', [DeliveryController::class, 'today'])->name('deliveries.today');
-Route::get('/upcoming', [DeliveryController::class, 'upcoming'])->name('deliveries.upcoming');
+    // Deliveries & Pickups
+    Route::resource('deliveries', DeliveryController::class);
+    Route::get('deliveries/fix-statuses', [SrDeliveryController::class, 'fixEmptyStatuses'])->name('sr.deliveries.fixStatuses');
+    Route::get('deliveries/{delivery}/edit', [DeliveryController::class, 'edit'])->name('deliveries.edit');
+    Route::get('/today', [DeliveryController::class, 'today'])->name('deliveries.today');
+    Route::get('/upcoming', [DeliveryController::class, 'upcoming'])->name('deliveries.upcoming');
 
-//Shops
-Route::resource('shops', ShopController::class)->except(['show']);
-Route::get('shops/import', [ShopController::class, 'importForm'])->name('shops.import');
-Route::post('shops/import', [ShopController::class, 'import']);
-Route::get('/shops/fetch/{customer}', [ShopController::class, 'fetchShop']);
-Route::post('/calendar/get-shop-details', [App\Http\Controllers\CalendarController::class, 'getShopByCustomer'])->name('calendar.getShop');
-Route::post('/calendar/get-shop-details', [CalendarController::class, 'getShopByCustomer'])->name('calendar.getShop');
-Route::post('/calendar/get-shop', [\App\Http\Controllers\ShopController::class, 'fetchShop'])->name('calendar.getShop');
-Route::post('/calendar/get-shop', [CalendarController::class, 'getShopByCustomer'])->name('calendar.getShop');
-Route::post('/shop/contact', [SrDeliveryController::class, 'getShopByCustomer'])->name('shop.contact');
+    //Shops
+    Route::resource('shops', ShopController::class)->except(['show']);
+    Route::get('shops/import', [ShopController::class, 'importForm'])->name('shops.import');
+    Route::post('shops/import', [ShopController::class, 'import']);
+    Route::get('/shops/fetch/{customer}', [ShopController::class, 'fetchShop']);
+    Route::post('/calendar/get-shop-details', [App\Http\Controllers\CalendarController::class, 'getShopByCustomer'])->name('calendar.getShop');
+    Route::post('/calendar/get-shop-details', [CalendarController::class, 'getShopByCustomer'])->name('calendar.getShop');
+    Route::post('/calendar/get-shop', [\App\Http\Controllers\ShopController::class, 'fetchShop'])->name('calendar.getShop');
+    Route::post('/calendar/get-shop', [CalendarController::class, 'getShopByCustomer'])->name('calendar.getShop');
+    Route::post('/shop/contact', [SrDeliveryController::class, 'getShopByCustomer'])->name('shop.contact');
 
 
 
-Route::get('/pickups', [PickupController::class, 'index'])->name('pickups.index');
-Route::get('pickups/{pickup}/edit', [PickupController::class, 'edit'])->name('pickups.edit');
-Route::put('pickups/{pickup}', [PickupController::class, 'update'])->name('pickups.update');
-Route::delete('/pickup/{pickup}', [PickupController::class, 'destroy'])->name('pickup.destroy');
-Route::resource('pickup', \App\Http\Controllers\PickupController::class);
+    Route::get('/pickups', [PickupController::class, 'index'])->name('pickups.index');
+    Route::get('pickups/{pickup}/edit', [PickupController::class, 'edit'])->name('pickups.edit');
+    Route::put('pickups/{pickup}', [PickupController::class, 'update'])->name('pickups.update');
+    Route::delete('/pickup/{pickup}', [PickupController::class, 'destroy'])->name('pickup.destroy');
+    Route::resource('pickup', \App\Http\Controllers\PickupController::class);
     Route::patch('/pickups/{pickup}', [PickupController::class, 'update'])->name('pickups.update');
 
 
-Route::get('/leads/my-kanban', [LeadController::class, 'mykanban'])
-    ->name('leads.mykanban')
-    ->middleware('can:view my kanban');
-Route::post('/leads/reassign-unassigned', [LeadController::class, 'reassignUnassigned'])
-    ->name('leads.reassignUnassigned')
-    ->middleware('can:manage leads'); // Or any appropriate permission
+    Route::get('/leads/my-kanban', [LeadController::class, 'mykanban'])
+        ->name('leads.mykanban')
+        ->middleware('can:view my kanban');
+    Route::post('/leads/reassign-unassigned', [LeadController::class, 'reassignUnassigned'])
+        ->name('leads.reassignUnassigned')
+        ->middleware('can:manage leads'); // Or any appropriate permission
 
-Route::get('/leads/kanban', [LeadController::class, 'kanban'])->name('leads.kanban');
-Route::post('/leads/kanban/update-status', [LeadController::class, 'updateStatus'])->name('leads.kanban.update-status');
-
-
+    Route::get('/leads/kanban', [LeadController::class, 'kanban'])->name('leads.kanban');
+    Route::post('/leads/kanban/update-status', [LeadController::class, 'updateStatus'])->name('leads.kanban.update-status');
 
 
 
 
-//Leads & Kanban  
-Route::resource('leads', LeadController::class);
-Route::get('leads/import', [LeadController::class, 'import'])->name('leads.import');
-Route::post('/leads/import', [LeadController::class, 'handleImports'])->name('leads.import');
-Route::post('/leads/call-status', [LeadController::class, 'updateCallStatus'])->name('leads.call-status');
-Route::post('/leads/update-status', [LeadController::class, 'updateStatus'])->name('leads.updateStatus');
-Route::put('/leads/{lead}', [LeadController::class, 'update'])->name('leads.update');
+
+
+    //Leads & Kanban  
+    Route::resource('leads', LeadController::class);
+    Route::get('leads/import', [LeadController::class, 'import'])->name('leads.import');
+    Route::post('/leads/import', [LeadController::class, 'handleImports'])->name('leads.import');
+    Route::post('/leads/call-status', [LeadController::class, 'updateCallStatus'])->name('leads.call-status');
+    Route::post('/leads/update-status', [LeadController::class, 'updateStatus'])->name('leads.updateStatus');
+    Route::put('/leads/{lead}', [LeadController::class, 'update'])->name('leads.update');
 
 
 
-Route::get('/inventory/form-options', [FormOptionController::class, 'index'])->name('form-options.index');
-Route::post('/inventory/form-options/group', [FormOptionController::class, 'storeGroup'])->name('form-options.groups.store');
-Route::post('/inventory/form-options/option', [FormOptionController::class, 'storeOption'])->name('form-options.options.store');
-Route::get('/inventory/configurator', [App\Http\Controllers\ProductConfiguratorController::class, 'index'])->name('inventory.configurator.index');
+    Route::get('/inventory/form-options', [FormOptionController::class, 'index'])->name('form-options.index');
+    Route::post('/inventory/form-options/group', [FormOptionController::class, 'storeGroup'])->name('form-options.groups.store');
+    Route::post('/inventory/form-options/option', [FormOptionController::class, 'storeOption'])->name('form-options.options.store');
+    Route::get('/inventory/configurator', [App\Http\Controllers\ProductConfiguratorController::class, 'index'])->name('inventory.configurator.index');
 
 
 
 
-Route::prefix('inventory/form-options')->name('form-options.')->group(function () {
-    Route::put('groups/{group}', [FormOptionGroupController::class, 'update'])->name('groups.update');
-});
-Route::get('/form-options/create', [\App\Http\Controllers\FormOptionController::class, 'create'])->name('form-options.create');
-Route::post('/form-options', [\App\Http\Controllers\FormOptionController::class, 'store'])->name('form-options.store');
-Route::post('/form-options/store-option', [FormOptionController::class, 'storeOption'])->name('form-options.options.store');
+    Route::prefix('inventory/form-options')->name('form-options.')->group(function () {
+        Route::put('groups/{group}', [FormOptionGroupController::class, 'update'])->name('groups.update');
+    });
+    Route::get('/form-options/create', [\App\Http\Controllers\FormOptionController::class, 'create'])->name('form-options.create');
+    Route::post('/form-options', [\App\Http\Controllers\FormOptionController::class, 'store'])->name('form-options.store');
+    Route::post('/form-options/store-option', [FormOptionController::class, 'storeOption'])->name('form-options.options.store');
 
-Route::get('/form-options/{option}/edit', [FormOptionController::class, 'edit'])->name('form-options.edit');
-Route::delete('/form-options/{option}', [FormOptionController::class, 'destroy'])->name('form-options.destroy');
-Route::put('/form-options/options/{id}', [FormOptionController::class, 'updateOption'])->name('form-options.options.update');
-
-
-Route::prefix('inventory/form-options/groups')->name('form-options.groups.')->group(function () {
-    Route::get('/', [FormOptionGroupController::class, 'index'])->name('index');
-    Route::get('/{id}/edit', [FormOptionGroupController::class, 'edit'])->name('edit');
-    Route::put('/{id}', [FormOptionGroupController::class, 'update'])->name('update');
-});
+    Route::get('/form-options/{option}/edit', [FormOptionController::class, 'edit'])->name('form-options.edit');
+    Route::delete('/form-options/{option}', [FormOptionController::class, 'destroy'])->name('form-options.destroy');
+    Route::put('/form-options/options/{id}', [FormOptionController::class, 'updateOption'])->name('form-options.options.update');
 
 
-// web.php
-Route::get('/window/render/{series}/{code}', [WindowRenderController::class, 'render']);
+    Route::prefix('inventory/form-options/groups')->name('form-options.groups.')->group(function () {
+        Route::get('/', [FormOptionGroupController::class, 'index'])->name('index');
+        Route::get('/{id}/edit', [FormOptionGroupController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [FormOptionGroupController::class, 'update'])->name('update');
+    });
+
+
+    // web.php
+    Route::get('/window/render/{series}/{code}', [WindowRenderController::class, 'render']);
 
 
 
-//BOMMENU
-Route::prefix('bill-of-material/menu')->group(function () {
-    Route::resource('frametype', FrameTypeController::class);
-    Route::resource('gridtype', GridTypeController::class);
-    Route::resource('glasstype', GlassTypeController::class);
-    Route::resource('lockcover', LockCoverController::class);
-    Route::resource('waterflow', WaterFlowController::class);
-    Route::resource('mullcap', MullCapController::class);
-    Route::resource('mesh', MeshController::class);
-    Route::resource('mullstack', MullStackController::class);
-    Route::resource('stop', StopController::class);
-    Route::resource('rollertrack', RollerTrackController::class);
-    Route::resource('doubletape', DoubleTapeController::class);
-    Route::resource('snapping', SnappingController::class);
-    Route::resource('gridpattern', GridPatternController::class);
-    Route::resource('locktype', LockTypeController::class);
-    Route::resource('spacer', SpacerController::class);
-    Route::resource('screen', ScreenController::class);
-    Route::resource('strikescrew', StrikeScrewController::class);
-    Route::resource('strike', StrikeController::class);
-    Route::resource('lockscrew', LockScrewController::class);
-    Route::resource('tensionspring', TensionSpringController::class);
-    Route::resource('pullers', PullersController::class);
-Route::resource('corners', CornersController::class);
-Route::resource('spline', SplineController::class);
-Route::resource('warninglabel', WarningLabelController::class);
-Route::resource('aluminumreinforcement', AluminumReinforcementController::class);
-Route::resource('steelreinforcement', SteelReinforcementController::class);
-Route::resource('reinforcementmaterial', ReinforcementMaterialController::class);
-Route::resource('mullscrew', MullScrewController::class);
-Route::resource('interlockreinforcement', InterlockReinforcementController::class);
-Route::resource('rollers', RollersController::class);
-Route::resource('interlock', InterlockController::class);
-Route::resource('sash', SashController::class);
-Route::resource('elitelabel', EliteLabelController::class);
-Route::resource('settingblock', SettingBlockController::class);
-Route::resource('nightlock', NightLockController::class);
-Route::resource('antitheft', AntiTheftController::class);
-Route::resource('ammalabel', AmmaLabelController::class);
-Route::resource('mullreinforcement', MullReinforcementController::class);
-    Route::resource('sashreinforcement', SashReinforcementController::class);
-});
+    //BOMMENU
+    Route::prefix('bill-of-material/menu')->group(function () {
+        Route::resource('frametype', FrameTypeController::class);
+        Route::resource('gridtype', GridTypeController::class);
+        Route::resource('glasstype', GlassTypeController::class);
+        Route::resource('lockcover', LockCoverController::class);
+        Route::resource('waterflow', WaterFlowController::class);
+        Route::resource('mullcap', MullCapController::class);
+        Route::resource('mesh', MeshController::class);
+        Route::resource('mullstack', MullStackController::class);
+        Route::resource('stop', StopController::class);
+        Route::resource('rollertrack', RollerTrackController::class);
+        Route::resource('doubletape', DoubleTapeController::class);
+        Route::resource('snapping', SnappingController::class);
+        Route::resource('gridpattern', GridPatternController::class);
+        Route::resource('locktype', LockTypeController::class);
+        Route::resource('spacer', SpacerController::class);
+        Route::resource('screen', ScreenController::class);
+        Route::resource('strikescrew', StrikeScrewController::class);
+        Route::resource('strike', StrikeController::class);
+        Route::resource('lockscrew', LockScrewController::class);
+        Route::resource('tensionspring', TensionSpringController::class);
+        Route::resource('pullers', PullersController::class);
+        Route::resource('corners', CornersController::class);
+        Route::resource('spline', SplineController::class);
+        Route::resource('warninglabel', WarningLabelController::class);
+        Route::resource('aluminumreinforcement', AluminumReinforcementController::class);
+        Route::resource('steelreinforcement', SteelReinforcementController::class);
+        Route::resource('reinforcementmaterial', ReinforcementMaterialController::class);
+        Route::resource('mullscrew', MullScrewController::class);
+        Route::resource('interlockreinforcement', InterlockReinforcementController::class);
+        Route::resource('rollers', RollersController::class);
+        Route::resource('interlock', InterlockController::class);
+        Route::resource('sash', SashController::class);
+        Route::resource('elitelabel', EliteLabelController::class);
+        Route::resource('settingblock', SettingBlockController::class);
+        Route::resource('nightlock', NightLockController::class);
+        Route::resource('antitheft', AntiTheftController::class);
+        Route::resource('ammalabel', AmmaLabelController::class);
+        Route::resource('mullreinforcement', MullReinforcementController::class);
+        Route::resource('sashreinforcement', SashReinforcementController::class);
+    });
 
-Route::prefix('bill-of-material/calculator')->group(function () {
-    Route::resource('calculator', CalculatorController::class);
-});
+    Route::prefix('bill-of-material/calculator')->group(function () {
+        Route::resource('calculator', CalculatorController::class);
+    });
 
-Route::prefix('bill-of-material/prices')->group(function () {
-    Route::resource('prices', PriceController::class);
-    Route::post('/prices/import', [PriceController::class, 'handleImports'])->name('price.import');
-    
-});
-
-
-//Configurator
-Route::get('inventory/configurator', [ConfiguratorController::class, 'index'])->name('inventory.configurator.index');
-Route::post('inventory/configurator', [ConfiguratorController::class, 'store'])->name('inventory.configurator.store');
-Route::get('inventory/configurator/{slug}', [ConfiguratorController::class, 'show'])->name('inventory.configurator.show');
+    Route::prefix('bill-of-material/prices')->group(function () {
+        Route::resource('prices', PriceController::class);
+        Route::post('/prices/import', [PriceController::class, 'handleImports'])->name('price.import');
+        
+    });
 
 
-//Executive
-Route::prefix('executives')->name('executives.')->group(function () {
+    //Configurator
+    Route::get('inventory/configurator', [ConfiguratorController::class, 'index'])->name('inventory.configurator.index');
+    Route::post('inventory/configurator', [ConfiguratorController::class, 'store'])->name('inventory.configurator.store');
+    Route::get('inventory/configurator/{slug}', [ConfiguratorController::class, 'show'])->name('inventory.configurator.show');
+
+
+    //Executive
+    Route::prefix('executives')->name('executives.')->group(function () {
     Route::resource('tiers', \App\Http\Controllers\ExecutiveTierController::class);
 
     Route::get('/customers', [ExecutiveCustomerController::class, 'index'])->name('customers.index');
@@ -830,8 +830,8 @@ Route::prefix('executives')->name('executives.')->group(function () {
     Route::get('formulas', [FormulaController::class, 'index'])->name('formulas.index');
     Route::post('formulas', [FormulaController::class, 'update'])->name('formulas.update');
     Route::get('raffle-draw', [RaffleDrawController::class, 'index'])->name('raffle.index');
-Route::post('raffle-draw/start', [RaffleDrawController::class, 'start'])->name('raffle.start');
-Route::post('raffle-draw/reset', [RaffleDrawController::class, 'reset'])->name('raffle.reset');
+    Route::post('raffle-draw/start', [RaffleDrawController::class, 'start'])->name('raffle.start');
+    Route::post('raffle-draw/reset', [RaffleDrawController::class, 'reset'])->name('raffle.reset');
 
     Route::get('/customers/{id}/edit', [ExecutiveCustomerController::class, 'edit'])->name('customers.edit');
     Route::post('/customers', [ExecutiveCustomerController::class, 'store'])->name('customers.store');
@@ -878,7 +878,7 @@ Route::get('/routes/auto', [RouteController::class, 'autoRouteView'])->name('rou
 
 Route::get('/routes/generate', [RouteController::class, 'generate'])->name('routes.generate');
 Route::post('/routes/optimize', [RouteController::class, 'optimize'])->name('routes.optimize');
-;  
+
 Route::post('/routes/reset', [RouteController::class, 'resetAssignments'])->name('routes.reset');
 Route::post('/sr/routes/reorder', [RouteController::class, 'reorderStops'])->name('routes.reorder');
 Route::post('/routes/reorder-stops', [RouteController::class, 'reorderStops'])->name('routes.reorder');

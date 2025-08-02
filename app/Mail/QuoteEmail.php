@@ -45,7 +45,12 @@ class QuoteEmail extends Mailable
     public function content()
     {
         return new Content(
-            view: 'view.name',
+            view: 'email.quotes.quote_email',
+            with: [
+                'quote' => $this->quote,
+                'name' => $this->quote->customer->name,
+                'url' => "#",
+            ]
         );
     }
 

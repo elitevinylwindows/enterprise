@@ -399,8 +399,10 @@ class QuoteController extends Controller
     public function send($id)
     {
         $quote = Quote::findOrFail($id);
-    
-        Mail::to($quote->customer->email)->send(new QuoteEmail($quote));
+
+        $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
+        Mail::to($quote->customer->email)
+            ->send((new QuoteEmail($quote))->attachData($pdf->output(), "Quote_{$quote->id}.pdf"));
 
         return back()->with('success', 'Quote emailed successfully.');
     }
