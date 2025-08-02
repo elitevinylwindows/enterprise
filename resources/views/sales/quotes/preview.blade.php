@@ -1,46 +1,97 @@
 <div class="modal-header">
-    <h5 class="modal-title">Purchase quote: {{ $quote->purchase_quote_id }}</h5>
-    <a href="" class="btn btn-sm btn-primary ms-auto">
+    <h5 class="modal-title">Quote: {{ $quote->quote_number }}</h5>
+    <a href="{{route('sales.quotes.pdf.preview', $quote->id)}}" target="_blank" class="btn btn-sm btn-primary ms-auto">
         <i class="fa fa-download"></i> Download PDF
+    </a>
+    <a href="{{route('sales.quotes.send', $quote->id)}}" class="btn btn-sm btn-primary ms-2">
+        <i class="fa fa-envelope"></i> Send Email
     </a>
 </div>
 
 <div class="modal-body">
-    <p><strong>quoteed By:</strong> {{ $quote->quoteed_by }}</p>
-    <p><strong>Department:</strong> {{ $quote->department }}</p>
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Quoted By:</strong> {{ $quote->entered_by }}</p>
+        </div>
+        <div class="col-md-6">
+            <p><strong>Customer:</strong> {{ $quote->customer_name }}</p>
+        </div>
+    </div>
 
-    @php
-        $firstProduct = $quote->items->first()->product ?? null;
-    @endphp
-    <p><strong>Supplier:</strong> {{ $firstProduct?->supplier->name ?? 'N/A' }}</p>
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Measurement Type:</strong> {{ $quote->measurement_type }}</p>
+        </div>
+        <div class="col-md-6">
+            <p><strong>Quote Date:</strong> {{ \Carbon\Carbon::parse($quote->entry_date)->format('M d, Y') }}</p>
+        </div>
+    </div>
 
-    <p><strong>quote Date:</strong> {{ \Carbon\Carbon::parse($quote->quote_date)->format('M d, Y') }}</p>
-    <p><strong>Expected Date:</strong> {{ \Carbon\Carbon::parse($quote->expected_date)->format('M d, Y') }}</p>
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Expected Date:</strong> {{ \Carbon\Carbon::parse($quote->expected_delivery)->format('M d, Y') }}</p>
+        </div>
+        <div class="col-md-6">
+            <p><strong>Valid Until:</strong> {{ \Carbon\Carbon::parse($quote->valid_until)->format('M d, Y') }}</p>
+        </div>
+    </div>
 
     <div class="table-responsive mt-4">
         <table class="table table-bordered table-striped">
             <thead class="table-light">
                 <tr>
-                    <th>#</th>
-                    <th>Product</th>
-                    <th>Description</th>
+                    <th style="width: 0%;">Item</th>
+                    <th style="width: 0%;">Glass</th>
+                    <th style="width: 0%;">Grid</th>
                     <th>Qty</th>
-                    <th>Unit Price</th>
+                    <th>Size</th>
+                    <th>Price</th>
                     <th>Total</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($quote->items as $index => $item)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $item->product->name ?? 'N/A' }}</td>
-                        <td>{{ $item->product->description ?? '-' }}</td>
-                        <td>{{ $item->qty }}</td>
-                        <td>${{ number_format($item->price, 2) }}</td>
-                        <td>${{ number_format($item->total, 2) }}</td>
-                    </tr>
+                <tr>
+                    <td style="width: 0%;">{{ $item->description ?? 'N/A' }}</td>
+                    <td style="width: 0%;">{{ $item->glass ?? 'N/A' }}</td>
+                    <td style="width: 0%;">{{ $item->grid ?? 'N/A' }}</td>
+                    <td>{{ $item->qty }}</td>
+                    <td>{{ $item->width }}" x {{ $item->height }}"</td>
+                    <td>${{ number_format($item->price, 2) }}</td>
+                    <td>${{ number_format($item->total, 2) }}</td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
+        <div class="row mt-4">
+            <div class="col-md-6 offset-md-6">
+                <table class="table">
+                    <tr>
+                        <th>Surcharge:</th>
+                        <td id="surcharge-amount">${{ number_format(0, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Subtotal:</th>
+                        <td id="subtotal-amount">
+                            ${{ number_format($quote->items->sum('total'), 2) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Tax:</th>
+                        @php
+                        $subtotal = $quote->items->sum('total');
+                        $surcharge = 0;
+                        $taxRate = 0.08;
+                        $tax = $subtotal * $taxRate;
+                        @endphp
+                        <td id="tax-amount">${{ number_format($tax, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Total:</th>
+                        <td><strong id="total-amount">${{ number_format($subtotal + $surcharge + $tax, 2) }}</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
 </div>

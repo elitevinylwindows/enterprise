@@ -2,6 +2,7 @@
 
 namespace App\Models\Sales;
 
+use App\Models\Master\Customers\Customer;
 use Illuminate\Database\Eloquent\Model;
 
 class Quote extends Model
@@ -12,6 +13,11 @@ class Quote extends Model
     public function configurations()
     {
         return $this->hasMany(\App\Models\Master\Series\SeriesType::class, 'series_id');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_number', 'customer_number'); 
     }
 
     public function items()
