@@ -54,11 +54,15 @@
             </select>
           </div>
 
-          <div class="col-md-6">
+          <div class="col-md-4">
             <label>Phone</label>
             <input type="text" name="phone" class="form-control">
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
+            <label>Email</label>
+            <input type="text" name="email" class="form-control">
+          </div>
+          <div class="col-md-4">
             <label>Website</label>
             <input type="text" name="website" class="form-control">
           </div>

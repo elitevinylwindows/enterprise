@@ -16,6 +16,7 @@ class Supplier extends Model
     'zip',
     'country',
     'phone',
+    'email',
     'website',
     'ein_number',
     'license_number',
