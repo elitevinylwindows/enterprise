@@ -97,5 +97,36 @@
 </div>
 
 <div class="modal-footer">
-    <button class="btn btn-primary" type="submit">Save Quote</button>
+    <button class="btn btn-primary" type="button" id="saveQuoteButton">Save Quote</button>
 </div>
+
+<script>
+    document.getElementById('saveQuoteButton').addEventListener('click', function() {
+        const formData = new FormData();
+        formData.append('surcharge', document.getElementById('surcharge').value);
+        formData.append('subtotal', document.getElementById('subtotal').value);
+        formData.append('tax', document.getElementById('tax').value);
+        formData.append('total', document.getElementById('total').value);
+
+        fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Quote saved successfully!');
+                // Optionally, you can redirect or update the UI
+                window.location.href = '{{ route('sales.quotes.index') }}';
+            } else {
+                alert('Error saving draft.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+</script>

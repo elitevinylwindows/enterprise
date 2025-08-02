@@ -67,8 +67,12 @@
                                     <td>${{ number_format($quote->total ?? 0, 2) }}</td>
                                     <td>{{ $quote->valid_until }}</td>
                                     <td>
-                                        @if($quote->status === 'active')
-                                            <span class="badge bg-success">Active</span>
+                                        @if($quote->status === 'approved')
+                                            <span class="badge bg-success">Approved</span>
+                                        @elseif($quote->status === 'rejected')
+                                            <span class="badge bg-danger">Rejected</span>
+                                        @elseif($quote->status === 'sent')
+                                            <span class="badge bg-success">Sent</span>
                                         @elseif($quote->status === 'draft')
                                             <span class="badge bg-secondary">Draft</span>
                                         @else

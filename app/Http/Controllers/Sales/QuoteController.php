@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\File;
 use App\Models\Sales\QuoteItem;
 use Illuminate\Support\Facades\View;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class QuoteController extends Controller
@@ -401,10 +402,19 @@ class QuoteController extends Controller
         $quote = Quote::findOrFail($id);
 
         $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
-        Mail::to($quote->customer->email)
-            ->send((new QuoteEmail($quote))->attachData($pdf->output(), "Quote_{$quote->id}.pdf"));
 
-        return back()->with('success', 'Quote emailed successfully.');
+        try {
+            Mail::to($quote->customer->email)
+            ->send(new QuoteEmail($quote, $pdf));
+            $quote->status = 'sent';
+            $quote->save();
+            return back()->with('success', 'Quote emailed successfully.');
+        } catch (\Exception $e) {
+            dd($e);
+            Log::error('Error sending quote email: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to send email. Please try again later.']);
+        }
+            
     }
 
     public function save(Request $request, $id)
@@ -610,5 +620,27 @@ class QuoteController extends Controller
         $quote = Quote::findOrFail($id);
         $pdf = PDF::loadView('sales.quotes.preview_pdf', compact('quote'));
         return $pdf->stream('quote-' . $quote->id . '.pdf');
+    }
+
+    public function updateStatus($id, $status)
+    {
+        $quote = Quote::findOrFail($id);
+        $quote->status = $status;
+        $quote->save();
+
+        return redirect()->route('sales.quotes.index')->with('success', 'Quote status updated successfully.');
+    }
+
+    public function saveDraft(Request $request, $id)
+    {
+        $quote = Quote::findOrFail($id);
+        $quote->status = 'draft';
+        $quote->surcharge = $request->surcharge ?? 0;
+        $quote->sub_total = $request->subtotal ?? 0;
+        $quote->tax = $request->tax ?? 0;
+        $quote->total = $request->total ?? 0;
+        $quote->save();
+
+        return response()->json(['success' => true, 'message' => 'Quote saved as draft successfully.']);
     }
 }

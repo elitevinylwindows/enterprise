@@ -6,7 +6,7 @@ use App\Models\Purchasing\PurchaseRequest;
 use App\Models\Purchasing\PurchaseRequestItem;
 use Illuminate\Support\Facades\Crypt;
 
-class ActionController extends Controller
+class PurchaseRequestController extends Controller
 {
 
 public function secureView($token)

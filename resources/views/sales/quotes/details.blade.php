@@ -151,19 +151,23 @@
                     <table class="table"  id="totalsTable">
                         <tr>
                             <th>Surcharge:</th>
-                            <td id="surcharge-amount">$0.00</td>
+                            <input type="hidden" name="surcharge" id="surcharge" value="{{ number_format($quote->surcharge, 2) }}">
+                            <td id="surcharge-amount">${{ number_format($quote->surcharge, 2) }}</td>
                         </tr>
                         <tr>
                             <th>Subtotal:</th>
-                            <td id="subtotal-amount">$0.00</td>
+                            <input type="hidden" name="subtotal" id="subtotal" value="{{ number_format($quote->sub_total, 2) }}">
+                            <td id="subtotal-amount">${{ number_format($quote->sub_total, 2) }}</td>
                         </tr>
                         <tr>
                             <th>Tax:</th>
-                            <td id="tax-amount">$0.00</td>
+                            <input type="hidden" name="tax" id="tax" value="{{ number_format($quote->tax, 2) }}">
+                            <td id="tax-amount">${{ number_format($quote->tax, 2) }}</td>
                         </tr>
                         <tr>
                             <th>Total:</th>
-                            <td><strong id="total-amount">$0.00</strong></td>
+                            <input type="hidden" name="total" id="total" value="{{ number_format($quote->total, 2) }}">
+                            <td><strong id="total-amount">${{ number_format($quote->total, 2) }}</strong></td>
                         </tr>
                     </table>
                 </div>
@@ -181,8 +185,8 @@
                 <a href="{{ route('sales.quotes.create') }}" class="btn btn-secondary">&larr; Previous</a>
 
                 <div class="d-flex gap-2">
-                    <a href="" class="btn btn-secondary">Save Draft</a>
-                    
+                    <button type="button" class="btn btn-secondary" id="saveDraftButton">Save Draft</button>
+
                     <a class="btn btn-secondary customModal text-white"
                         data-size="xl"
                         data-url="{{ route('sales.quotes.preview', $quote->id) }}"
@@ -1205,7 +1209,7 @@
         }
     }
 
-     function calculateTotals() {
+    function calculateTotals() {
         let subtotal = 0;
         document.querySelectorAll('.qty-input').forEach(function(input) {
             const qty = parseInt(input.value) || 0;
@@ -1228,10 +1232,43 @@
         const total = subtotal + surcharge + tax;
 
         document.getElementById('surcharge-amount').textContent = '$' + surcharge.toFixed(2);
+        document.getElementById('surcharge').value = surcharge.toFixed(2);
         document.getElementById('subtotal-amount').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('subtotal').value = subtotal.toFixed(2);
         document.getElementById('tax-amount').textContent = '$' + tax.toFixed(2);
+        document.getElementById('tax').value = tax.toFixed(2);
         document.getElementById('total-amount').textContent = '$' + total.toFixed(2);
+        document.getElementById('total').value = total.toFixed(2);
     }
+
+
+    // Save draft button click event
+    document.getElementById('saveDraftButton').addEventListener('click', function() {
+        const formData = new FormData();
+        formData.append('surcharge', document.getElementById('surcharge').value);
+        formData.append('subtotal', document.getElementById('subtotal').value);
+        formData.append('tax', document.getElementById('tax').value);
+        formData.append('total', document.getElementById('total').value);
+
+        fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Draft saved successfully!');
+            } else {
+                alert('Error saving draft.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
 
     // Listen for qty input changes
     document.addEventListener('input', function(e) {
