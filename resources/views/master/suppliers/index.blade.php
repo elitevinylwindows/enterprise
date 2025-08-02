@@ -31,6 +31,7 @@
         <th>Type</th>
         <th>Name</th>
         <th>Phone</th>
+        <th>Email</th>
         <th>City</th>
         <th>Country</th>
         <th>Status</th>
@@ -45,6 +46,7 @@
 <td>{{ ucfirst($supplier->supplier_type) }}</td>
 <td>{{ $supplier->name }}</td>
 <td>{{ $supplier->phone }}</td>
+<td>{{ $supplier->email }}</td>
 <td>{{ $supplier->city }}</td>
 <td>{{ $supplier->country }}</td>
 <td>{{ $supplier->status }}</td>

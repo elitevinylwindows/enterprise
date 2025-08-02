@@ -14,6 +14,7 @@ use App\Http\Controllers\Master\Suppliers\SupplierController;
 use App\Http\Controllers\CrudGenerator\CrudGeneratorController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Settings\ShippingSettingsController;
+use App\Http\Controllers\Supplier\PurchaseRequestController;
 
 
 use App\Http\Controllers\{
@@ -556,6 +557,13 @@ Route::middleware(['auth', 'XSS'])->group(function () {
     Route::post('/calendar/update-date', [CalendarController::class, 'updateDate'])->name('calendar.updateDate');
 
 
+//Supplier for PurchaseRequest Quotes
+Route::get('/supplier/request/secure-view/{token}', [\App\Http\Controllers\Supplier\PurchaseRequestController::class, 'secureView'])->name('supplier.purchase_request.view');
+Route::post('/supplier/request/respond/{id}', [\App\Http\Controllers\Supplier\PurchaseRequestController::class, 'submitResponse'])->name('supplier.purchase_request.response');
+
+
+
+
 
     //Template
     Route::resource('template', TemplateController::class);
@@ -620,6 +628,8 @@ Route::middleware(['auth', 'XSS'])->group(function () {
 
         Route::get('stock-alerts/batch-create-requests', [StockAlertController::class, 'createGroupedPurchaseRequests'])
         ->name('stock-alerts.batch_requests');
+
+Route::get('/inventory/products/by-location/{locationId}', [StockInController::class, 'productsByLocation']);
 
 
 
