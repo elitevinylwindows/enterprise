@@ -339,8 +339,9 @@ Route::prefix('sales')->name('sales.')->group(function () {
 
 
     Route::get('/quotes/{id}/preview', [QuoteController::class, 'preview'])->name('quotes.preview');
+    Route::get('/quotes/{id}/pdf/preview', [QuoteController::class, 'previewPDF'])->name('quotes.pdf.preview');
     Route::get('/quotes/{id}/download', [QuoteController::class, 'download'])->name('quotes.download');
-    Route::post('/quotes/{id}/send', [QuoteController::class, 'send'])->name('quotes.send');
+    Route::get('/quotes/{id}/send', [QuoteController::class, 'send'])->name('quotes.send');
     Route::post('/quotes/{id}/save', [QuoteController::class, 'save'])->name('quotes.save');
 
 
@@ -865,8 +866,8 @@ Route::prefix('sales')->name('sales.')->group(function () {
     Route::post('/quotes/check-price', [QuoteController::class, 'checkPrice'])->name('quotes.checkPrice');
     Route::post('quotes/schema/price', [QuoteController::class, 'getSchemaPrice'])->name('quotes.schema.price');
     Route::get('customers/{customer_number}', [QuoteController::class, 'getCustomer'])->name('customers.get');
-    Route::post('quotes/{id}/convert-to-order', [\App\Http\Controllers\Sales\QuoteController::class, 'convertToOrder'])->name('quotes.convertToOrder');
-
+    Route::post('quotes/{id}/convert-to-order', [QuoteController::class, 'convertToOrder'])->name('quotes.convertToOrder');
+    Route::get('quotes/{id}/show', [QuoteController::class, 'show'])->name('quotes.show');
 });
 
 

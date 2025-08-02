@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Sales;
 
 use App\Http\Controllers\Controller;
+use App\Mail\QuoteEmail;
 use Illuminate\Http\Request;
 use App\Models\Sales\Quote;
 use App\Models\Master\Series\Series;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\File;
 use App\Models\Sales\QuoteItem;
 use Illuminate\Support\Facades\View;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
 
 class QuoteController extends Controller
 {
@@ -383,9 +385,8 @@ class QuoteController extends Controller
 
     public function preview($id)
     {
-        $quote = Quote::with('items')->findOrFail($id);
-        $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
-        return $pdf->stream("Quote_{$id}.pdf");
+        $quote = Quote::with('items')->findOrFail($id); 
+        return view('sales.quotes.preview', compact('quote'));
     }
 
     public function download($id)
@@ -395,9 +396,12 @@ class QuoteController extends Controller
         return $pdf->download("Quote_{$id}.pdf");
     }
 
-    public function send(Request $request, $id)
+    public function send($id)
     {
-        // logic to email the quote PDF
+        $quote = Quote::findOrFail($id);
+    
+        Mail::to($quote->customer->email)->send(new QuoteEmail($quote));
+
         return back()->with('success', 'Quote emailed successfully.');
     }
 
@@ -518,7 +522,7 @@ class QuoteController extends Controller
     public function show($id)
     {
         $quote = Quote::findOrFail($id);
-        $seriesList = Series::pluck('name', 'id');
+        $seriesList = Series::pluck('series', 'id');
 
         $colorConfigurations = \App\Models\Master\Colors\ColorConfiguration::all();
         $exteriorColors = \App\Models\Master\Colors\ExteriorColor::all();
@@ -597,5 +601,12 @@ class QuoteController extends Controller
         $item->delete();
 
         return response()->json(['success' => true, 'message' => 'Item deleted successfully.']);
+    }
+
+    public function previewPDF($id)
+    {
+        $quote = Quote::findOrFail($id);
+        $pdf = PDF::loadView('sales.quotes.preview_pdf', compact('quote'));
+        return $pdf->stream('quote-' . $quote->id . '.pdf');
     }
 }

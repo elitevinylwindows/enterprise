@@ -182,8 +182,12 @@
 
                 <div class="d-flex gap-2">
                     <a href="" class="btn btn-secondary">Save Draft</a>
-                    <a href="javascript:void(0);" class="btn btn-primary" onclick="openQuotePreview({{ $quote->id }})">
-                        Continue &rarr;
+                    
+                    <a class="btn btn-secondary customModal text-white"
+                        data-size="xl"
+                        data-url="{{ route('sales.quotes.preview', $quote->id) }}"
+                        data-title="Quote Preview">
+                       Continue &rarr;
                     </a>
                 </div>
             </div>
@@ -426,33 +430,6 @@
                                 </div>
                             </div>
                         </div>
-
-
-
-
-
-                     <!-- Quote PDF Preview Modal -->
-<div class="modal fade" id="quotePreviewModal" tabindex="-1" aria-labelledby="quotePreviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Quote Preview</h5>
-                <a href="{{ route('sales.quotes.download', $quote->id) }}" target="_blank" class="btn btn-outline-primary btn-sm">Download PDF</a>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body" style="min-height: 80vh;">
-                <iframe src="{{ route('sales.quotes.preview', $quote->id) }}" width="100%" height="100%" style="min-height: 70vh;" frameborder="0"></iframe>
-            </div>
-
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-success">Send Quote</button>
-                <button type="button" class="btn btn-primary">Save Quote</button>
-            </div>
-        </div>
-    </div>
-</div>
-
                         <!-- Right Preview + Tabs -->
                         <div class="col-md-6">
                             <ul class="nav nav-pills justify-content-end mb-3" id="previewTabs" role="tablist">
@@ -538,6 +515,28 @@
     </div>
 </div>
 
+<!-- Quote PDF Preview Modal -->
+    <div class="modal fade" id="quotePreviewModal" tabindex="-1" aria-labelledby="quotePreviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Quote Preview</h5>
+                    <a href="{{ route('sales.quotes.download', $quote->id) }}" target="_blank" class="btn btn-outline-primary btn-sm">Download PDF</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+    
+                <div class="modal-body" style="min-height: 80vh;">
+                    
+                    
+                </div>
+    
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-success">Send Quote</button>
+                    <button type="button" class="btn btn-primary">Save Quote</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection
 
@@ -1194,11 +1193,16 @@
     });
 
     function openQuotePreview(quoteId) {
-        const pdfUrl = `/quotes/pdf/${quoteId}/preview`; // You can adjust route if different
-        document.getElementById('quotePdfIframe').src = pdfUrl;
-        document.getElementById('downloadQuoteBtn').href = pdfUrl + '?download=true';
-        const modal = new bootstrap.Modal(document.getElementById('quotePdfPreviewModal'));
-        modal.show();
+        // const pdfUrl = `/quotes/pdf/${quoteId}/preview`; // You can adjust route if different
+        // document.getElementById('quotePdfIframe').src = pdfUrl;
+        // document.getElementById('downloadQuoteBtn').href = pdfUrl + '?download=true';
+        const modalElement = document.getElementById('quotePreviewModal');
+        if (modalElement) {
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.show();
+        } else {
+            alert('Quote preview modal not found in the DOM.');
+        }
     }
 
      function calculateTotals() {
