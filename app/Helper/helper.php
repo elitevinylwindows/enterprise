@@ -10,6 +10,7 @@ use App\Models\HomePage;
 use App\Models\LoggedHistory;
 use App\Models\Notification;
 use App\Models\Page;
+use App\Models\Sales\Invoice;
 use App\Models\Sales\Order;
 use App\Models\Subscription;
 use App\Models\User;
@@ -1954,5 +1955,43 @@ if(!function_exists('quoteToOrder')) {
             Log::error('Error converting quote to order: ' . $e->getMessage());
             return null;
         }
+    }
+}
+
+if(!function_exists('quoteToInvoice')) {
+    function quoteToInvoice($quote, $order)
+    {
+            $invoice = Invoice::create([
+                'order_id' => $order->id,
+                'quote_id' => $quote->id,
+                'invoice_number' => generateInvoiceNumber(),
+                'work_order' => 'WO' . $order->id,
+                'due_date' => now()->addDays(14),
+                'entered_by' => auth()->user()->name,
+                'status' => 'Pending',
+                'quote_id' => $quote->id,
+                'order_id' => $order->id,
+                'customer_id' => $quote->customer?->id,
+                'invoice_date' => now(),
+                'total' => $quote->total,
+                'net_price' => $quote->sub_total,
+                'paid_amount' => 0,
+                'remaining_amount' => $quote->total,
+                'status' => 'Pending',
+                'notes' => null,
+                'payment_method' => null,
+                'gateway_response' => null,
+            ]);
+
+        return $invoice;
+    }
+}
+
+if(!function_exists('generateInvoiceNumber')) {
+    function generateInvoiceNumber()
+    {
+        $lastInvoice = Invoice::orderBy('id', 'desc')->first();
+        $nextId = $lastInvoice ? $lastInvoice->id + 1 : 1;
+        return 'INV-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
     }
 }

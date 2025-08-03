@@ -593,18 +593,26 @@ class QuoteController extends Controller
     public function updateStatus($id, $status)
     {
         $quote = Quote::findOrFail($id);
-        
-        if ($status === 'approved') {
-            $order = quoteToOrder($quote);
-            if (!$order) {
-                return redirect()->route('sales.quotes.index')->withErrors(['error' => 'Failed to convert quote to order.']);
+        try {
+            DB::beginTransaction();
+            if ($status === 'approved') {
+                $order = quoteToOrder($quote);
+                $invoice = quoteToInvoice($quote, $order);
+                if (!$order) {
+                    return redirect()->route('sales.quotes.index')->withErrors(['error' => 'Failed to convert quote to order.']);
+                }
             }
+
+            $quote->status = $status;
+            $quote->save();
+            DB::commit();
+            return redirect()->route('sales.quotes.index')->with('success', 'Quote status updated successfully.');
+        } catch (\Exception $e) {
+            dd($e);
+            DB::rollBack();
+            return redirect()->route('sales.quotes.index')->withErrors(['error' => 'Failed to update quote status.']);
         }
 
-        $quote->status = $status;
-        $quote->save();
-
-        return redirect()->route('sales.quotes.index')->with('success', 'Quote status updated successfully.');
     }
 
     public function saveDraft(Request $request, $id)
