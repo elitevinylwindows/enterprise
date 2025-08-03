@@ -567,39 +567,7 @@ class QuoteController extends Controller
     {
         $quote = \App\Models\Sales\Quote::with('items')->findOrFail($id);
 
-        // Create Order
-        $order = \App\Models\Sales\Order::create([
-            'quote_id'          => $quote->id,
-            'customer_id'       => $quote->customer_id,
-            'order_number'      => 'O' . str_pad(\App\Models\Sales\Order::max('id') + 1, 6, '0', STR_PAD_LEFT),
-            'invoice_date'      => now()->toDateString(),
-            'net_price'         => $quote->items->sum('total'),
-            'status'            => 'draft',
-            'notes'             => $quote->notes,
-            'paid_amount'       => 0,
-            'remaining_amount'  => $quote->items->sum('total'),
-            'approved_by'       => null,
-            'entered_by'        => auth()->user()->name,
-            'due_date'          => now()->addDays(14)->toDateString(),
-            'work_order_number' => 'WO' . str_pad(\App\Models\Sales\Order::max('id') + 1, 6, '0', STR_PAD_LEFT),
-        ]);
-
-        // Create Order Items from Quote Items
-        foreach ($quote->items as $item) {
-            $order->items()->create([
-                'description'     => $item->description,
-                'qty'             => $item->qty,
-                'price'           => $item->price,
-                'total'           => $item->total,
-                'glass'           => $item->glass,
-                'grid'            => $item->grid,
-                'item_comment'    => $item->item_comment,
-                'internal_note'   => $item->internal_note,
-                'checked_count'   => $item->checked_count,
-                'image'           => $item->image, // optional
-                // Add any other shared fields here
-            ]);
-        }
+        $order = quoteToOrder($quote);
 
         return redirect()->route('sales.orders.show', $order->id)->with('success', 'Quote converted to Order successfully.');
     }
@@ -625,6 +593,14 @@ class QuoteController extends Controller
     public function updateStatus($id, $status)
     {
         $quote = Quote::findOrFail($id);
+        
+        if ($status === 'approved') {
+            $order = quoteToOrder($quote);
+            if (!$order) {
+                return redirect()->route('sales.quotes.index')->withErrors(['error' => 'Failed to convert quote to order.']);
+            }
+        }
+
         $quote->status = $status;
         $quote->save();
 

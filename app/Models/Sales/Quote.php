@@ -22,7 +22,7 @@ class Quote extends Model
 
     public function items()
     {
-        return $this->hasMany(\App\Models\Sales\QuoteItem::class);
+        return $this->hasMany(QuoteItem::class);
     }
 
 }
