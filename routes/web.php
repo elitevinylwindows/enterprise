@@ -364,9 +364,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             // Invoices
             Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
             Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
-
-            // Settings
-            Route::get('settings', [\App\Http\Controllers\Sales\SettingController::class, 'index'])->name('settings.index');
         });
 
         //Supplier
@@ -622,12 +619,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         // Invoices
         Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
         Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
-
-
-
-
-        // Settings
-        Route::get('settings', [\App\Http\Controllers\Sales\SettingController::class, 'index'])->name('settings.index');
 
 
         //Supplier
