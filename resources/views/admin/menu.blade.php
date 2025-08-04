@@ -1153,8 +1153,8 @@
                 Gate::check('manage seo settings') ||
                 Gate::check('manage google recaptcha settings')
             )
-            <li class="pc-item {{ $routeName == 'settings.setting.index' ? 'active' : '' }}">
-                <a href="{{ route('settings.setting.index') }}" class="pc-link">
+            <li class="pc-item {{ $routeName == 'setting.index' ? 'active' : '' }}">
+                <a href="{{ route('setting.index') }}" class="pc-link">
                     <span class="pc-micon"><i class="ti ti-settings"></i></span>
                     <span class="pc-mtext">{{ __('Settings') }}</span>
                 </a>
