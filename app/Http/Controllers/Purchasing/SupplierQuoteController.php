@@ -101,6 +101,53 @@ public function approve(Request $request, $id)
     return view('purchasing.supplier_quotes.success', ['message' => 'Quote approved.']);
 }
 
+
+public function modifyAndApprove(Request $request, $id)
+{
+    $quote = SupplierQuote::with('purchaseRequest.items')->findOrFail($id);
+
+    $request->validate([
+        'price.*' => 'required|numeric|min:0',
+        'quote_file' => 'nullable|file|mimes:pdf,jpg,png,jpeg|max:2048',
+    ]);
+
+    DB::beginTransaction();
+    try {
+        foreach ($quote->purchaseRequest->items as $index => $item) {
+            if (isset($request->price[$item->id])) {
+                $item->price = $request->price[$item->id];
+                $item->total = $item->qty * $item->price;
+                $item->save();
+            }
+        }
+
+        if ($request->hasFile('quote_file')) {
+            $path = $request->file('quote_file')->store('supplier_quotes', 'public');
+            $quote->attachment = $path;
+        }
+
+        $quote->status = 'approved';
+        $quote->save();
+
+        // ✅ Also create the PO automatically
+        PurchaseOrder::create([
+            'purchase_request_id' => $quote->purchase_request_id,
+            'supplier_id' => $quote->supplier_id,
+            'status' => 'pending',
+            'order_date' => now(),
+            'attachment' => $quote->attachment,
+        ]);
+
+        DB::commit();
+
+        return redirect()->route('supplier.quote.view', $quote->secure_token)
+            ->with('success', 'Quote modified and approved successfully.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->with('error', 'Failed to process: ' . $e->getMessage());
+    }
+}
+
    public function cancel($id)
 {
     $pr = PurchaseRequest::findOrFail($id);

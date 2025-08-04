@@ -612,6 +612,242 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         });
 
 
+<<<<<<< HEAD
+=======
+    // Orders
+Route::get('orders', [\App\Http\Controllers\Sales\OrderController::class, 'index'])->name('orders.index');
+Route::get('orders/create', [\App\Http\Controllers\Sales\OrderController::class, 'create'])->name('orders.create');
+Route::get('orders/{id}/edit', [\App\Http\Controllers\Sales\OrderController::class, 'edit'])->name('orders.edit');
+Route::delete('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
+Route::post('orders/{id}/email', [\App\Http\Controllers\Sales\OrderController::class, 'email'])->name('orders.email');
+Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
+    Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
+    
+    // Invoices
+    Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
+
+
+
+
+    // Settings
+    Route::get('settings', [\App\Http\Controllers\Sales\SettingController::class, 'index'])->name('settings.index');
+});
+
+
+//Supplier
+Route::prefix('master/suppliers')->name('master.suppliers.')->group(function () {
+    Route::get('/', [SupplierController::class, 'index'])->name('index');
+    Route::post('/', [SupplierController::class, 'store'])->name('store');
+    Route::get('{id}/edit', [SupplierController::class, 'edit'])->name('edit');
+    Route::put('{id}', [SupplierController::class, 'update'])->name('update'); // ✅ THIS IS REQUIRED
+});
+
+
+
+
+
+
+//Crud Generator 
+Route::get('/crud-generator', [CrudGeneratorController::class, 'index'])->name('crud.index');
+Route::post('/crud-generator', [CrudGeneratorController::class, 'generate'])->name('crud.generate');
+
+//Menus
+Route::prefix('admin/menu')->name('menu.')->group(function () {
+    Route::get('/', [MenuController::class, 'index'])->name('index');
+    Route::get('/create', [MenuController::class, 'create'])->name('create');
+    Route::post('/store', [MenuController::class, 'store'])->name('store');
+    Route::get('/{id}/edit', [MenuController::class, 'edit'])->name('edit');
+    Route::put('/{id}/update', [MenuController::class, 'update'])->name('update');
+    Route::delete('/{id}', [MenuController::class, 'destroy'])->name('destroy');
+
+    // Add these two lines for reorder
+    Route::get('/reorder', [MenuController::class, 'reorder'])->name('reorder');
+    Route::post('/reorder/save', [MenuController::class, 'saveReorder'])->name('reorder.save');
+});
+
+
+
+// Library
+Route::prefix('master/library/configurations')->name('master.library.configurations.')->group(function () {
+    Route::get('/', [ConfigurationController::class, 'index'])->name('index');
+    Route::get('/{series}', [ConfigurationController::class, 'show'])->name('show');
+    Route::post('/{series}/add-category', [ConfigurationController::class, 'addCategory'])->name('addCategory');
+    Route::post('/{series}/{category}/upload', [ConfigurationController::class, 'uploadImage'])->name('uploadImage');
+    Route::delete('/{series}/{category}/{image}', [ConfigurationController::class, 'deleteImage'])->name('deleteImage');
+});
+Route::get('/library-image/{series}/{category}/{image}', function ($series, $category, $image) {
+    $path = public_path("config-thumbs/$series/$category/$image");
+
+    if (!file_exists($path)) {
+        abort(404, 'Image not found at: ' . $path);
+    }
+
+    return response()->file($path);
+})->where('image', '.*');
+
+
+Route::prefix('products')->name('products.')->group(function () {
+    Route::get('product-classes', [ProductClassesController::class, 'index'])->name('product_classes.index');
+    Route::get('basic-products', [BasicProductsController::class, 'index'])->name('basic_products.index');
+    Route::get('grille-patterns', [GrillePatternsController::class, 'index'])->name('grille_patterns.index');
+    Route::get('profile-records', [ProfileRecordsController::class, 'index'])->name('profile_records.index');
+    Route::get('corner-exchange', [CornerExchangeController::class, 'index'])->name('corner_exchange.index');
+    Route::get('profile-types', [ProfileTypesController::class, 'index'])->name('profile_types.index');
+    Route::get('sealing-assignment', [SealingAssignmentController::class, 'index'])->name('sealing_assignment.index');
+    Route::get('reinforcement-assignments', [ReinforcementAssignmentsController::class, 'index'])->name('reinforcement_assignments.index');
+    Route::get('hardware-types', [HardwareTypesController::class, 'index'])->name('hardware_types.index');
+    Route::get('system-color', [SystemColorController::class, 'index'])->name('system_color.index');
+});
+
+
+    
+Route::prefix('products/product-master')->name('product_master.')->group(function () {
+    Route::get('accessories', [AccessoriesController::class, 'index'])->name('accessories.index');
+    Route::get('glassinsert', [GlassInsertController::class, 'index'])->name('glassinsert.index');
+    Route::get('hardwarevariant', [HardwareVariantController::class, 'index'])->name('hardwarevariant.index');
+    Route::get('hardwareparts', [HardwarePartsController::class, 'index'])->name('hardwareparts.index');
+    Route::get('materials', [MaterialsController::class, 'index'])->name('materials.index');
+    Route::get('profiles', [ProfilesController::class, 'index'])->name('profiles.index');
+    Route::get('units', [UnitsController::class, 'index'])->name('units.index');
+});    
+    
+    
+    
+Route::prefix('master/prices')->name('master.prices.')->group(function () {
+    Route::get('matrice', [MatriceController::class, 'index'])->name('matrice.index');
+    Route::post('matrice/import', [MatriceController::class, 'import'])->name('matrice.import');
+    Route::post('matrice/check', [MatriceController::class, 'checkPrice'])->name('matrice.check'); 
+});
+
+
+Route::prefix('master/product_keys')->name('product_keys.')->group(function () {
+    Route::resource('producttypes', ProductTypeController::class);
+    Route::resource('productareas', ProductAreaController::class);
+    Route::resource('productsystems', ProductSystemController::class);
+    Route::resource('manufacturersystems', ManufacturerSystemController::class);
+    Route::resource('specialshapemacros', SpecialShapeMacroController::class);
+    Route::resource('shapecatalog', ShapeCatalogController::class);
+    Route::resource('drawingobjects', DrawingObjectController::class);
+});
+    
+    
+Route::prefix('color-options')->name('color-options.')->group(function () {
+    Route::resource('color-configurations', ColorConfigurationController::class);
+    Route::resource('exterior-colors', ExteriorColorController::class);
+    Route::resource('interior-colors', InteriorColorController::class);
+    Route::resource('laminate-colors', LaminateColorController::class);
+});
+    
+Route::prefix('grid-options')->name('grid-options.')->group(function () {
+ Route::resource('grid-types', GridTypeController::class);
+    Route::resource('grid-patterns', GridPatternController::class);
+    Route::resource('grid-profiles', GridProfileController::class);   
+});  
+    
+Route::prefix('glass-options')->name('glass-options.')->group(function () {
+    Route::resource('glass-types', GlassTypeController::class);
+    Route::resource('spacers', SpacerController::class);
+    Route::resource('tempered-options', TemperedOptionController::class);
+    Route::resource('special-glasses', SpecialGlassController::class);
+});     
+
+Route::prefix('frame-options')->name('frame-options.')->group(function () {
+Route::resource('frame-types', FrameTypeController::class);
+    Route::resource('retrofit-fin-types', RetrofitFinTypeController::class);
+}); 
+
+Route::prefix('other-options')->name('other-options.')->group(function () {
+    Route::resource('additional-options', AdditionalOptionController::class);
+}); 
+    
+    // Series routes
+Route::prefix('master')->name('master.')->group(function () {
+    Route::resource('series', SeriesController::class);
+    Route::resource('series-type', SeriesTypeController::class);
+});
+    
+//Prices  
+Route::prefix('master/prices')->name('prices.')->group(function () {
+    Route::get('productprices', [ProductPricesController::class, 'index'])->name('productprices.index');
+});
+Route::get('/series/{id}/types', [QuoteController::class, 'getSeriesTypes']);
+Route::get('/sales/series-types/{seriesId}', [QuoteController::class, 'getSeriesTypes']);
+
+Route::get('/sales/quotes/previous', [QuoteController::class, 'previous'])->name('sales.quotes.previous');
+Route::get('sales/settings', [SalesSettingsController::class, 'index'])->name('sales.settings.index');
+Route::post('sales/settings/update', [SalesSettingsController::class, 'update'])->name('sales.settings.update');
+Route::post('/sales/settings/save', [SalesSettingsController::class, 'save'])->name('sales.settings.save');
+Route::post('quotes/{id}/convert-to-order', [\App\Http\Controllers\Sales\QuoteController::class, 'convertToOrder'])->name('quotes.convertToOrder');
+
+//Invoices
+Route::prefix('sales')->name('sales.')->group(function () {
+    Route::resource('invoices', \App\Http\Controllers\Sales\InvoiceController::class);
+});
+
+
+
+Route::get('/master/prices/matrice/types/{seriesId}', [\App\Http\Controllers\Master\Prices\MatriceController::class, 'getTypes']);
+Route::post('/master/prices/matrice/import', [MatriceController::class, 'import'])->name('master.prices.matrice.import');
+Route::post('/master/prices/matrice/check', [MatriceController::class, 'checkPrice'])->name('master.prices.matrice.check');
+
+Route::prefix('master/prices/markup')->name('master.prices.markup.')->group(function () {
+    Route::get('/', [MarkupController::class, 'index'])->name('index');
+    Route::post('/', [MarkupController::class, 'store'])->name('store');
+    Route::put('/{id}', [MarkupController::class, 'update'])->name('update');
+    Route::post('/{id}/lock', [MarkupController::class, 'lock'])->name('lock');
+});
+
+
+// Orders
+Route::resource('orders', OrderController::class)->except(['index']);
+Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+Route::get('orders/import', [OrderController::class, 'import'])->name('orders.import');
+Route::post('/orders/import', [OrderController::class, 'handleImports'])->name('orders.import');
+//CIMs
+Route::resource('cims', CimController::class)->except(['index']);
+Route::get('cims/import', [CimController::class, 'import'])->name('cims.import');
+Route::post('/cims/import', [CimController::class, 'handleImports'])->name('cims.import');
+Route::get('/cims', [CimController::class, 'index'])->name('cims.index');
+
+
+// Carts
+Route::resource('cart', CartController::class)->except(['show', 'destroy']);
+Route::put('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
+Route::put('cart/{cart_barcode}', [CartController::class, 'update'])->name('cart.update');
+Route::get('deliveries/refresh-carts', [SrDeliveryController::class, 'refreshCartsForAll'])->name('sr.deliveries.refreshCarts');
+Route::get('/carts/create', [App\Http\Controllers\CartController::class, 'create'])->name('cart.create');
+
+//Calendar
+Route::get('/calendar/deliveries/{date}', [\App\Http\Controllers\CalendarController::class, 'deliveriesByDate'])->name('calendar.deliveries.byDate');
+Route::post('/calendar/store', [\App\Http\Controllers\SrDeliveryController::class, 'store'])->name('calendar.store');
+Route::get('/calendars/create', [\App\Http\Controllers\CalendarController::class, 'create'])->name('calendar.create');
+Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
+Route::get('/calendar/order-details/{order_number}', [\App\Http\Controllers\CalendarController::class, 'getOrderDetails']);
+Route::post('/calendar/update-date', [CalendarController::class, 'updateDate'])->name('calendar.updateDate');
+
+
+
+//Template
+Route::resource('template', TemplateController::class);
+Route::get('/send-template/{id}/{template_id}', [ActionController::class, 'sendTemplate'])->name('action.sendTemplate');
+
+//RingCentral
+Route::get('/ringcentral/connect', [RingCentralController::class, 'connect'])->name('ringcentral.connect');
+Route::get('/ringcentral/callback', [RingCentralController::class, 'callback'])->name('ringcentral.callback');
+Route::get('/rc/connect', [RingCentralController::class, 'connect'])->name('rc.connect');
+Route::get('/rc/callback', [RingCentralController::class, 'callback'])->name('rc.callback');
+Route::post('/delivery/{id}/call', [RingCentralController::class, 'callDeliveryContact'])->name('ringcentral.call');
+Route::get('/ringcentral/call/{id}', [RingCentralController::class, 'call'])->name('ringcentral.call');
+
+
+//Addons
+Route::prefix('master/sales/addons')->name('master.sales.addons.')->group(function () {
+    Route::get('/', [AddonController::class, 'index'])->name('index');
+    Route::post('/', [AddonController::class, 'store'])->name('store');
+    Route::delete('/{id}', [AddonController::class, 'destroy'])->name('destroy');
+});
+>>>>>>> tola
 
 
         // Inventory
@@ -676,7 +912,28 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::post('/settings/shipping/truncate', [ShippingSettingsController::class, 'truncateShippingData'])->name('settings.shipping.truncate');
 
 
+<<<<<<< HEAD
 
+=======
+// ✅ This one OUTSIDE the purchasing group
+Route::get('/supplier/pr-view/{token}', [PurchasingPurchaseRequestController::class, 'secureView'])
+    ->name('supplier.pr.view');
+
+// 👇 Everything else stays inside
+Route::prefix('purchasing')->name('purchasing.')->group(function () {
+    Route::get('purchase-requests/{id}/send-mail', [PurchasingPurchaseRequestController::class, 'sendToSupplier'])->name('purchase-requests.send-mail');
+    Route::resource('purchase-requests', PurchasingPurchaseRequestController::class);
+    Route::resource('supplier-quotes', SupplierQuoteController::class);
+    Route::resource('purchase-orders', PurchaseOrderController::class);
+    Route::resource('receiving', ReceivingController::class);
+    Route::resource('invoices', PurchaseInvoiceController::class);
+    Route::get('purchase-requests/{id}/download', [PurchasingPurchaseRequestController::class, 'download'])->name('purchase-requests.download');
+    Route::get('/supplier-quote/{token}', [SupplierQuoteController::class, 'supplierView'])->name('supplier.quote.view');
+    Route::post('/supplier-quote/{id}/approve', [SupplierQuoteController::class, 'approve'])->name('supplier.quote.approve');
+    Route::post('/supplier-quote/{id}/modify', [SupplierQuoteController::class, 'modifyAndApprove'])->name('supplier.quote.modify');
+    Route::post('/supplier-quote/{id}/cancel', [SupplierQuoteController::class, 'cancel'])->name('supplier.quote.cancel');
+});
+>>>>>>> tola
 
         // Trucks, Drivers, Routes
         Route::resource('trucks', TruckController::class);
@@ -684,6 +941,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
 
 
 
+<<<<<<< HEAD
         // Deliveries & Pickups
         Route::resource('deliveries', DeliveryController::class);
         Route::get('deliveries/fix-statuses', [SrDeliveryController::class, 'fixEmptyStatuses'])->name('sr.deliveries.fixStatuses');
@@ -702,6 +960,10 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::post('/calendar/get-shop', [CalendarController::class, 'getShopByCustomer'])->name('calendar.getShop');
         Route::post('/shop/contact', [SrDeliveryController::class, 'getShopByCustomer'])->name('shop.contact');
 
+=======
+Route::get('/settings/shipping', [ShippingSettingsController::class, 'index'])->name('settings.shipping');
+Route::post('/settings/shipping/truncate', [ShippingSettingsController::class, 'truncateShippingData'])->name('settings.shipping.truncate');
+>>>>>>> tola
 
 
         Route::get('/pickups', [PickupController::class, 'index'])->name('pickups.index');
