@@ -25,4 +25,9 @@ class Quote extends Model
         return $this->hasMany(QuoteItem::class);
     }
 
+    public function order()
+    {
+        return $this->hasOne(Order::class, 'quote_id', 'id');
+    }
+
 }

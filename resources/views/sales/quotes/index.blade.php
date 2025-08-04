@@ -118,11 +118,13 @@
 
                                         {{-- Orders --}}
 
-                                        <a class="avtar avtar-xs btn-link-info text-info"
+                                        <a class="avtar avtar-xs btn-link-success text-success"
                                            data-bs-toggle="tooltip"
                                            data-bs-original-title="Orders"
                                            href="{{ route('sales.orders.index', ['quote' => $quote->id]) }}">
-
+                                            <i data-feather="package"></i>
+                                        </a>
+                                        @if(!$quote->order)
                                         {{-- Manual Convert to Order --}}
                                         <a href="{{ route('sales.quotes.convertToOrder', ['id' => $quote->id]) }}"
                                             class="avtar avtar-xs btn-link-info text-info"
@@ -130,6 +132,7 @@
                                             data-bs-original-title="Convert to Order">
                                             <i data-feather="shopping-cart"></i>
                                         </a>
+                                        @endif
 
 
                                         {{-- Delete --}}
