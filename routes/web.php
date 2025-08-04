@@ -396,10 +396,6 @@ Route::prefix('master/suppliers')->name('master.suppliers.')->group(function () 
 });
 
 
-//Supplier for PurchaseRequest Quotes
-Route::get('/supplier/request/secure-view/{token}', [\App\Http\Controllers\Supplier\PurchaseRequestController::class, 'secureView'])->name('supplier.purchase_request.view');
-Route::post('/supplier/request/respond/{id}', [\App\Http\Controllers\Supplier\PurchaseRequestController::class, 'submitResponse'])->name('supplier.purchase_request.response');
-
 
 
 
@@ -675,25 +671,30 @@ Route::get('/inventory/products/by-location/{locationId}', [StockInController::c
 
 
 
-// Purchasing
+// ✅ This one OUTSIDE the purchasing group
+Route::get('/supplier/pr-view/{token}', [PurchasingPurchaseRequestController::class, 'secureView'])
+    ->name('supplier.pr.view');
+
+// 👇 Everything else stays inside
 Route::prefix('purchasing')->name('purchasing.')->group(function () {
+    Route::get('purchase-requests/{id}/send-mail', [PurchasingPurchaseRequestController::class, 'sendToSupplier'])->name('purchase-requests.send-mail');
     Route::resource('purchase-requests', PurchasingPurchaseRequestController::class);
     Route::resource('supplier-quotes', SupplierQuoteController::class);
     Route::resource('purchase-orders', PurchaseOrderController::class);
-    Route::resource('receiving', ReceivingController::class); // ← new
-    Route::resource('invoices', PurchaseInvoiceController::class); 
-    Route::get('purchase-requests/{id}/download', [PurchasingPurchaseRequestController::class, 'download'])
-        ->name('purchase-requests.download');
-
+    Route::resource('receiving', ReceivingController::class);
+    Route::resource('invoices', PurchaseInvoiceController::class);
+    Route::get('purchase-requests/{id}/download', [PurchasingPurchaseRequestController::class, 'download'])->name('purchase-requests.download');
+    Route::get('/supplier-quote/{token}', [SupplierQuoteController::class, 'supplierView'])->name('supplier.quote.view');
+    Route::post('/supplier-quote/{id}/approve', [SupplierQuoteController::class, 'approve'])->name('supplier.quote.approve');
+    Route::post('/supplier-quote/{id}/modify', [SupplierQuoteController::class, 'modifyAndApprove'])->name('supplier.quote.modify');
+    Route::post('/supplier-quote/{id}/cancel', [SupplierQuoteController::class, 'cancel'])->name('supplier.quote.cancel');
 });
 
 
 
 
-    Route::get('/settings/shipping', [ShippingSettingsController::class, 'index'])->name('settings.shipping');
-    Route::post('/settings/shipping/truncate', [ShippingSettingsController::class, 'truncateShippingData'])->name('settings.shipping.truncate');
-
-
+Route::get('/settings/shipping', [ShippingSettingsController::class, 'index'])->name('settings.shipping');
+Route::post('/settings/shipping/truncate', [ShippingSettingsController::class, 'truncateShippingData'])->name('settings.shipping.truncate');
 
 
 // Trucks, Drivers, Routes

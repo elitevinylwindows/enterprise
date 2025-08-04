@@ -14,6 +14,7 @@ class SupplierQuote extends Model
         'quote_date',
         'quote_reference',
         'total_amount',
+        'secure_token',
         'status',
         'attachment_path',
         'notes',
@@ -26,7 +27,7 @@ class SupplierQuote extends Model
 
     public function supplier()
     {
-        return $this->belongsTo(\App\Models\Inventory\Supplier::class, 'supplier_id');
+return $this->belongsTo(\App\Models\Master\Suppliers\Supplier::class, 'supplier_id');
     }
 
     public function purchaseOrder()

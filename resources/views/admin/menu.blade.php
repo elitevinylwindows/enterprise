@@ -307,13 +307,13 @@
         <li><a class="pc-link" href="{{ route('purchasing.purchase-orders.index') }}">Purchase Orders</a></li>
         @endif
 
-        @if (Gate::check('manage receiving'))
+       <!-- @if (Gate::check('manage receiving'))
         <li><a class="pc-link" href="{{ route('purchasing.receiving.index') }}">Receiving</a></li>
         @endif
 
         @if (Gate::check('manage purchase invoices'))
         <li><a class="pc-link" href="{{ route('purchasing.invoices.index') }}">Purchase Invoices</a></li>
-        @endif
+        @endif-->
     </ul>
 </li>
 @endif
