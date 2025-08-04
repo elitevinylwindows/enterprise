@@ -10,6 +10,8 @@ use App\Models\HomePage;
 use App\Models\LoggedHistory;
 use App\Models\Notification;
 use App\Models\Page;
+use App\Models\Sales\Invoice;
+use App\Models\Sales\Order;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Models\Visitor;
@@ -1879,5 +1881,117 @@ if (!function_exists('getMarkup')) {
         }
         
         return $price;
+    }
+}
+
+if(!function_exists('quoteToOrder')) {
+    function quoteToOrder($quote)
+    {
+        try {
+            DB::beginTransaction();
+            // Create Order
+            $order = Order::create([
+                'quote_id'          => $quote->id,
+                'customer_id'       => $quote->customer->id,
+                'order_number'      => 'O' . str_pad(Order::max('id') + 1, 6, '0', STR_PAD_LEFT),
+                'invoice_date'      => now()->toDateString(),
+                'net_price'         => $quote->items->sum('total'),
+                'surcharge'         => $quote->surcharge,
+                'sub_total'         => $quote->sub_total,
+                'tax'               => $quote->tax,
+                'total'             => $quote->total,
+                'status'            => 'draft',
+                'notes'             => $quote->notes,
+                'paid_amount'       => 0,
+                'remaining_amount'  => $quote->total,
+                'expected_delivery_date' => $quote->expected_delivery,
+                'approved_by'       => null,
+                'entered_by'        => auth()->user()->id,
+                'due_date'          => now()->addDays(14)->toDateString(),
+                'work_order_number' => 'WO' . str_pad(Order::max('id') + 1, 6, '0', STR_PAD_LEFT),
+            ]);
+
+            // Create Order Items from Quote Items
+            foreach ($quote->items as $item) {
+                $order->items()->create([
+                    'series_id' => $item->series_id,
+                    'series_type' => $item->series_type,
+                    'description' => $item->description,
+                    'width' => $item->width,
+                    'height' => $item->height,
+                    'glass' => $item->glass,
+                    'grid' => $item->grid,
+                    'qty' => $item->qty,
+                    'price' => $item->price,
+                    'total' => $item->total,
+                    'item_comment' => $item->item_comment,
+                    'internal_note' => $item->internal_note,
+                    'color_config' => $item->color_config,
+                    'color_exterior' => $item->color_exterior,
+                    'color_interior' => $item->color_interior,
+                    'frame_type' => $item->frame_type,
+                    'fin_type' => $item->fin_type,
+                    'glass_type' => $item->glass_type,
+                    'spacer' => $item->spacer,
+                    'tempered' => $item->tempered,
+                    'specialty_glass' => $item->specialty_glass,
+                    'grid_pattern' => $item->grid_pattern,
+                    'grid_profile' => $item->grid_profile,
+                    'retrofit_bottom_only' => $item->retrofit_bottom_only,
+                    'no_logo_lock' => $item->no_logo_lock,
+                    'double_lock' => $item->double_lock,
+                    'custom_lock_position' => $item->custom_lock_position,
+                    'custom_vent_latch' => $item->custom_vent_latch,
+                    'knocked_down' => $item->knocked_down,
+                    'checked_count' => $item->checked_count,
+                ]);
+            }
+            DB::commit();
+
+            return $order;
+        }  catch (\Exception $e) {
+            dd($e);
+            DB::rollBack();
+            Log::error('Error converting quote to order: ' . $e->getMessage());
+            return null;
+        }
+    }
+}
+
+if(!function_exists('quoteToInvoice')) {
+    function quoteToInvoice($quote, $order)
+    {
+            $invoice = Invoice::create([
+                'order_id' => $order->id,
+                'quote_id' => $quote->id,
+                'invoice_number' => generateInvoiceNumber(),
+                'work_order' => 'WO' . $order->id,
+                'due_date' => now()->addDays(14),
+                'entered_by' => auth()->user()->name,
+                'status' => 'Pending',
+                'quote_id' => $quote->id,
+                'order_id' => $order->id,
+                'customer_id' => $quote->customer?->id,
+                'invoice_date' => now(),
+                'total' => $quote->total,
+                'net_price' => $quote->sub_total,
+                'paid_amount' => 0,
+                'remaining_amount' => $quote->total,
+                'status' => 'Pending',
+                'notes' => null,
+                'payment_method' => null,
+                'gateway_response' => null,
+            ]);
+
+        return $invoice;
+    }
+}
+
+if(!function_exists('generateInvoiceNumber')) {
+    function generateInvoiceNumber()
+    {
+        $lastInvoice = Invoice::orderBy('id', 'desc')->first();
+        $nextId = $lastInvoice ? $lastInvoice->id + 1 : 1;
+        return 'INV-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
     }
 }

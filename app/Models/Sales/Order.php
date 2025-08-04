@@ -25,6 +25,7 @@ class Order extends Model
         'entered_by',
         'due_date',
         'work_order_number',
+        'expected_delivery_date',
     ];
 
     // Relationships
@@ -46,7 +47,7 @@ class Order extends Model
 
     public function items()
     {
-        return $this->hasMany(\App\Models\Sales\OrderItem::class);
+        return $this->hasMany(OrderItem::class);
     }
 
 }

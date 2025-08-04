@@ -2,6 +2,7 @@
 
 namespace App\Models\Sales;
 
+use App\Models\Master\Customers\Customer;
 use Illuminate\Database\Eloquent\Model;
 
 class Quote extends Model
@@ -14,9 +15,19 @@ class Quote extends Model
         return $this->hasMany(\App\Models\Master\Series\SeriesType::class, 'series_id');
     }
 
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_number', 'customer_number'); 
+    }
+
     public function items()
     {
-        return $this->hasMany(\App\Models\Sales\QuoteItem::class);
+        return $this->hasMany(QuoteItem::class);
+    }
+
+    public function order()
+    {
+        return $this->hasOne(Order::class, 'quote_id', 'id');
     }
 
 }

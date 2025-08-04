@@ -6,4 +6,4 @@
 .well-known
 .env
 /storage/framework/*
-node_modules
+/bootstrap/cache/*

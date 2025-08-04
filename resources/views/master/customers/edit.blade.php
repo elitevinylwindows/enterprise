@@ -20,6 +20,10 @@
               <input type="text" name="name" class="form-control" value="{{ $customer->customer_name }}" required>
             </div>
             <div class="col-md-6">
+              <label class="form-label">Customer Email</label>
+              <input type="text" name="email" class="form-control" value="{{ $customer->email }}" required>
+            </div>
+            <div class="col-md-6">
               <label class="form-label">Street</label>
               <input type="text" name="street" class="form-control" value="{{ $customer->street }}">
             </div>

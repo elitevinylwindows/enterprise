@@ -54,6 +54,7 @@
                                 <th><input type="checkbox" id="select-all"></th>
                                 <th>Customer #</th>
                                 <th>Customer Name</th>
+                                <th>Email</th>
                                 <th>Street</th>
                                 <th>City</th>
                                 <th>ZIP</th>
@@ -70,6 +71,7 @@
                                 <td><input type="checkbox" class="customer-checkbox" value="{{ $customer->id }}"></td>
                                 <td>{{ $customer->customer_number }}</td>
                                 <td>{{ $customer->customer_name }}</td>
+                                <td>{{ $customer->email }}</td>
                                 <td>{{ $customer->street }}</td>
                                 <td>{{ $customer->city }}</td>
                                 <td>{{ $customer->zip }}</td>
