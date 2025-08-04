@@ -564,8 +564,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
 
 
 
-
-
         //Template
         Route::resource('template', TemplateController::class);
         Route::get('/send-template/{id}/{template_id}', [ActionController::class, 'sendTemplate'])->name('action.sendTemplate');
@@ -612,25 +610,24 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         });
 
 
-    // Orders
-Route::get('orders', [\App\Http\Controllers\Sales\OrderController::class, 'index'])->name('orders.index');
-Route::get('orders/create', [\App\Http\Controllers\Sales\OrderController::class, 'create'])->name('orders.create');
-Route::get('orders/{id}/edit', [\App\Http\Controllers\Sales\OrderController::class, 'edit'])->name('orders.edit');
-Route::delete('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
-Route::post('orders/{id}/email', [\App\Http\Controllers\Sales\OrderController::class, 'email'])->name('orders.email');
-Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
-    Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
-    
-    // Invoices
-    Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
-    Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
+            // Orders
+        Route::get('orders', [\App\Http\Controllers\Sales\OrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/create', [\App\Http\Controllers\Sales\OrderController::class, 'create'])->name('orders.create');
+        Route::get('orders/{id}/edit', [\App\Http\Controllers\Sales\OrderController::class, 'edit'])->name('orders.edit');
+        Route::delete('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
+        Route::post('orders/{id}/email', [\App\Http\Controllers\Sales\OrderController::class, 'email'])->name('orders.email');
+        Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
+        Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
+        
+        // Invoices
+        Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
 
 
 
 
-    // Settings
-    Route::get('settings', [\App\Http\Controllers\Sales\SettingController::class, 'index'])->name('settings.index');
-});
+        // Settings
+        Route::get('settings', [\App\Http\Controllers\Sales\SettingController::class, 'index'])->name('settings.index');
 
 
         //Supplier
@@ -640,10 +637,6 @@ Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::cl
             Route::get('{id}/edit', [SupplierController::class, 'edit'])->name('edit');
             Route::put('{id}', [SupplierController::class, 'update'])->name('update'); // ✅ THIS IS REQUIRED
         });
-
-
-
-
 
 
         //Crud Generator 
@@ -674,6 +667,7 @@ Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::cl
             Route::post('/{series}/{category}/upload', [ConfigurationController::class, 'uploadImage'])->name('uploadImage');
             Route::delete('/{series}/{category}/{image}', [ConfigurationController::class, 'deleteImage'])->name('deleteImage');
         });
+
         Route::get('/library-image/{series}/{category}/{image}', function ($series, $category, $image) {
             $path = public_path("config-thumbs/$series/$category/$image");
 
@@ -769,6 +763,7 @@ Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::cl
         Route::prefix('master/prices')->name('prices.')->group(function () {
             Route::get('productprices', [ProductPricesController::class, 'index'])->name('productprices.index');
         });
+
         Route::get('/series/{id}/types', [QuoteController::class, 'getSeriesTypes']);
         Route::get('/sales/series-types/{seriesId}', [QuoteController::class, 'getSeriesTypes']);
 
@@ -888,8 +883,6 @@ Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::cl
             Route::post('/bom/import', [BomController::class, 'handleImports'])->name('bom.import');
         });
 
-
-
         Route::get('/settings/shipping', [ShippingSettingsController::class, 'index'])->name('settings.shipping');
         Route::post('/settings/shipping/truncate', [ShippingSettingsController::class, 'truncateShippingData'])->name('settings.shipping.truncate');
 
@@ -983,6 +976,7 @@ Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::cl
         Route::prefix('inventory/form-options')->name('form-options.')->group(function () {
             Route::put('groups/{group}', [FormOptionGroupController::class, 'update'])->name('groups.update');
         });
+
         Route::get('/form-options/create', [\App\Http\Controllers\FormOptionController::class, 'create'])->name('form-options.create');
         Route::post('/form-options', [\App\Http\Controllers\FormOptionController::class, 'store'])->name('form-options.store');
         Route::post('/form-options/store-option', [FormOptionController::class, 'storeOption'])->name('form-options.options.store');
@@ -1221,6 +1215,6 @@ Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::cl
 
         // Impersonate
         Route::impersonate();
-});
+    });
 
 Route::get('quote/request/{token}', [QuoteRequestController::class, 'secureView'])->name('quote.request.show');
