@@ -11,6 +11,10 @@ use App\Models\Purchasing\PurchaseRequest;
 use App\Models\Purchasing\PurchaseRequestItem;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PurchaseRequestToSupplierMail;
+use App\Models\Purchasing\SupplierQuote;
+
 
 
 class StockAlertController extends Controller
@@ -145,6 +149,9 @@ public function createGroupedPurchaseRequests()
     foreach ($grouped as $supplierId => $group) {
         if ($supplierId == 0) continue; // skip products without supplier
 
+        $supplier = $group->first()->product->supplier;
+        if (!$supplier || !$supplier->email) continue;
+
         $request = PurchaseRequest::create([
             'purchase_request_id' => 'PR-' . strtoupper(Str::random(6)),
             'requested_by' => auth()->user()->name,
@@ -163,27 +170,40 @@ public function createGroupedPurchaseRequests()
             $total = $price * $qty;
 
             DB::table('elitevw_purchasing_purchase_request_items')->insert([
-    'purchase_request_id' => $request->id,
-    'product_id' => $product->id,
-    'description' => $product->name ?? 'Unknown Product',
-    'qty' => $qty,
-    'price' => $price,
-    'total' => $total,
-    'created_at' => now(),
-    'updated_at' => now(),
-]);
+                'purchase_request_id' => $request->id,
+                'product_id' => $product->id,
+                'description' => $product->name ?? 'Unknown Product',
+                'qty' => $qty,
+                'price' => $price,
+                'total' => $total,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
-$alert->update([
-    'status' => 'Reordered', // ✅ match exactly what's in the DB column
-    'purchase_request_id' => $request->id,
-]);
-
-
+            $alert->update([
+                'status' => 'Reordered',
+                'purchase_request_id' => $request->id,
+            ]);
         }
+
+        // ✅ Send to supplier *once* per group
+        $supplierQuote = \App\Models\Purchasing\SupplierQuote::create([
+            'quote_number' => 'SQ-' . strtoupper(Str::random(6)),
+            'supplier_id' => $supplier->id,
+            'purchase_request_id' => $request->id,
+            'quote_date' => now(),
+            'secure_token' => \Str::uuid(),
+            'status' => 'pending'
+        ]);
+
+        \Mail::to($supplier->email)->send(
+            new \App\Mail\PurchaseRequestToSupplierMail($supplierQuote, $supplier->name)
+        );
     }
 
-    return redirect()->route('inventory.stock-alerts.index')->with('success', 'Grouped purchase requests created by supplier.');
+    return redirect()->route('inventory.stock-alerts.index')->with('success', 'Grouped purchase requests created and emailed to suppliers.');
 }
+
 
 
     public function destroy($id)

@@ -80,12 +80,12 @@
 
 
 
-<a class="avtar avtar-xs btn-link-warning text-secondary customModal"
-   data-size="lg"
-   data-url="{{ route('purchasing.purchase-requests.show', $request->id) }}"
-   data-title="Email">
+<a href="{{ route('purchasing.purchase-requests.send-mail', $request->id) }}"
+   class="avtar avtar-xs btn-link-warning text-secondary"
+   title="Send Email to Supplier">
     <i data-feather="mail"></i>
 </a>
+
 
 
 
