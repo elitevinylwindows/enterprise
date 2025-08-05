@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sales;
 
+use App\Helper\FirstServe;
 use App\Http\Controllers\Controller;
 use App\Mail\OrderMail;
 use App\Mail\QuoteEmail;
@@ -24,6 +25,7 @@ class QuoteController extends Controller
 {
     public function index(Request $request)
     {
+        
         $status = $request->get('status', 'all');
 
         $quotes = Quote::query();
@@ -300,37 +302,49 @@ class QuoteController extends Controller
 
     public function store(Request $request)
     {
-        $lastQuote = Quote::latest('id')->first();
-        $nextNumber = $lastQuote ? $lastQuote->id + 1 : 1;
-        $quoteNumber = 'Q' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+        try{
+            DB::beginTransaction();
+          
+            $lastQuote = Quote::latest('id')->first();
+            $nextNumber = $lastQuote ? $lastQuote->id + 1 : 1;
+            $quoteNumber = 'Q' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
-        $quote = Quote::create([
-            'quote_number'      => $quoteNumber,
-            'quote_number'      => $quoteNumber,
-            'customer_number'   => $request->customer_number,
-            'customer_name'     => $request->customer_name,
-            'order_type'        => $request->order_type,
-            'entry_date'        => $request->entry_date,
-            'expected_delivery' => $request->expected_delivery,
-            'valid_until'       => $request->valid_until,
-            'entered_by'        => $request->entered_by,
-            'region'            => $request->region,
-            'measurement_type'  => $request->measurement_type,
-            'po_number'         => $request->po_number,
-            'reference'         => $request->reference,
-            'contact'           => $request->contact,
-            'comment'           => $request->comment,
-            'notes'             => $request->notes,
-            'status'            => $request->status ?? 'draft',
-        ]);
+            $quote = Quote::create([
+                'quote_number'      => $quoteNumber,
+                'quote_number'      => $quoteNumber,
+                'customer_number'   => $request->customer_number,
+                'customer_name'     => $request->customer_name,
+                'order_type'        => $request->order_type,
+                'entry_date'        => $request->entry_date,
+                'expected_delivery' => $request->expected_delivery,
+                'valid_until'       => $request->valid_until,
+                'entered_by'        => $request->entered_by,
+                'region'            => $request->region,
+                'measurement_type'  => $request->measurement_type,
+                'po_number'         => $request->po_number,
+                'reference'         => $request->reference,
+                'contact'           => $request->contact,
+                'comment'           => $request->comment,
+                'notes'             => $request->notes,
+                'status'            => $request->status ?? 'draft',
+            ]);
+            
+           
 
-        session([
-            'quote_number'     => $quote->quote_number,
-            'customer_number'  => $quote->customer_number,
-            'customer_name'    => $quote->customer_name
-        ]);
+            session([
+                'quote_number'     => $quote->quote_number,
+                'customer_number'  => $quote->customer_number,
+                'customer_name'    => $quote->customer_name
+            ]);
 
-        return redirect()->route('sales.quotes.details', $quote->id);
+            DB::commit();
+            
+            return redirect()->route('sales.quotes.details', $quote->id);
+        } catch(\Exception $e) {
+            dd($e);
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to create quote. Please try again later.']);
+        }
     }
 
 
