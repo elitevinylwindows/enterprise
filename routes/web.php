@@ -89,6 +89,7 @@ use App\Http\Controllers\Master\Products\ProductMaster\{
 use App\Http\Controllers\Master\Prices\{
     ProductPricesController,
     MatriceController,
+    TaxCodeController,
     MarkupController
 };
 
@@ -214,6 +215,7 @@ use App\Http\Controllers\Purchasing\{
 };
 use App\Http\Controllers\Sales\Quotes\GridProfileController;
 use App\Http\Controllers\Supplier\QuoteRequestController;
+
 
     // Auth
     require __DIR__ . '/auth.php';
@@ -445,7 +447,8 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::prefix('master/prices')->name('master.prices.')->group(function () {
             Route::get('matrice', [MatriceController::class, 'index'])->name('matrice.index');
             Route::post('matrice/import', [MatriceController::class, 'import'])->name('matrice.import');
-            Route::post('matrice/check', [MatriceController::class, 'checkPrice'])->name('matrice.check'); 
+            Route::post('matrice/check', [MatriceController::class, 'checkPrice'])->name('matrice.check');
+            Route::resource('tax_codes', TaxCodeController::class); 
         });
 
 

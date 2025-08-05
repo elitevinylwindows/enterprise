@@ -816,7 +816,7 @@
                 <li><a class="pc-link" href="#">Calc Schemes</a></li>
                 <li><a class="pc-link" href="#">Calc Set</a></li>
                 <li><a class="pc-link" href="#">Commissions</a></li>
-                <li><a class="pc-link" href="#">Tax Codes</a></li>
+                <li><a class="pc-link" href="{{ route('master.prices.tax_codes.index') }}">Tax Codes</a></li>
                 <li><a class="pc-link" href="#">Tax Classes</a></li>
                 <li><a class="pc-link" href="#">Exchange Rules</a></li>
                 <li><a class="pc-link" href="#">Tax Rules</a></li>
