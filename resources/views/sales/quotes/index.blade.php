@@ -67,8 +67,12 @@
                                     <td>${{ number_format($quote->total ?? 0, 2) }}</td>
                                     <td>{{ $quote->valid_until }}</td>
                                     <td>
-                                        @if($quote->status === 'active')
-                                            <span class="badge bg-success">Active</span>
+                                        @if($quote->status === 'approved')
+                                            <span class="badge bg-success">Approved</span>
+                                        @elseif($quote->status === 'rejected')
+                                            <span class="badge bg-danger">Rejected</span>
+                                        @elseif($quote->status === 'sent')
+                                            <span class="badge bg-success">Sent</span>
                                         @elseif($quote->status === 'draft')
                                             <span class="badge bg-secondary">Draft</span>
                                         @else
@@ -114,11 +118,13 @@
 
                                         {{-- Orders --}}
 
-                                        <a class="avtar avtar-xs btn-link-info text-info"
+                                        <a class="avtar avtar-xs btn-link-success text-success"
                                            data-bs-toggle="tooltip"
                                            data-bs-original-title="Orders"
                                            href="{{ route('sales.orders.index', ['quote' => $quote->id]) }}">
-
+                                            <i data-feather="package"></i>
+                                        </a>
+                                        @if(!$quote->order)
                                         {{-- Manual Convert to Order --}}
                                         <a href="{{ route('sales.quotes.convertToOrder', ['id' => $quote->id]) }}"
                                             class="avtar avtar-xs btn-link-info text-info"
@@ -126,6 +132,7 @@
                                             data-bs-original-title="Convert to Order">
                                             <i data-feather="shopping-cart"></i>
                                         </a>
+                                        @endif
 
 
                                         {{-- Delete --}}

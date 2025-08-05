@@ -73,10 +73,10 @@
                             @foreach ($invoices as $invoice)
                                 <tr>
                                     <td>{{ $invoice->invoice_number }}</td>
-                                    <td>{{ $invoice->order_number }}</td>
-                                    <td>{{ $invoice->quote_number }}</td>
-                                    <td>{{ $invoice->customer_number }}</td>
-                                    <td>{{ $invoice->customer_name }}</td>
+                                    <td>{{ $invoice->order->order_number }}</td>
+                                    <td>{{ $invoice->quote->quote_number }}</td>
+                                    <td>{{ $invoice->customer->customer_number }}</td>
+                                    <td>{{ $invoice->customer->customer_name }}</td>
                                     <td>{{ $invoice->invoice_date }}</td>
                                     <td>${{ number_format($invoice->total ?? 0, 2) }}</td>
                                     <td>{{ $invoice->paid_amount }}</td>
@@ -111,7 +111,7 @@
                                            data-size="xl"
                                            data-url=""
                                            data-title="Send to Quickbooks">
-                                            <i class="fa-regular fa-share-from-square"> to QB</i>
+                                            <i data-feather="share"></i>
                                         </a>
 
 
@@ -121,7 +121,7 @@
                                            data-bs-original-title="Email"
                                            href="#"
                                            data-size="md"
-                                           data-url="{{ route('sales.invoices.email', $invoice->id) }}"
+                                           data-url=""
                                            data-title="Send Email">
                                             <i data-feather="mail"></i>
                                         </a>
@@ -134,7 +134,7 @@
                                            data-size="xl"
                                            data-url=""
                                            data-title="Payment">
-                                            <i class="fa-regular fa-credit-card"></i>
+                                            <i data-feather="credit-card"></i>
                                         </a>
 
                                         <!--{{-- Edit --}}

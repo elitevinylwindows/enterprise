@@ -69,14 +69,14 @@
                             @foreach ($orders as $order)
                                 <tr>
                                     <td>{{ $order->order_number }}</td>
-                                    <td>{{ $order->quote_number }}</td>
-                                    <td>{{ $order->customer_number }}</td>
-                                    <td>{{ $order->customer_name }}</td>
-                                    <td>{{ $order->entry_date }}</td>
-                                    <td>{{ $order->total_qty }}</td>
-                                    <td>{{ $order->subtotal }}</td>
-                                    <td>${{ number_format($order->total ?? 0, 2) }}</td>
-                                    <td>{{ $order->valid_until }}</td>
+                                    <td>{{ $order->quote->quote_number }}</td>
+                                    <td>{{ $order->customer->customer_number }}</td>
+                                    <td>{{ $order->customer->customer_name }}</td>
+                                    <td>{{ $order->created_at }}</td>
+                                    <td>{{ $order->items->sum('qty') }}</td>
+                                    <td>{{ $order->net_price }}</td>
+                                    <td>${{ number_format($order->remaining_amount ?? 0, 2) }}</td>
+                                    <td>{{ $order->expected_delivery_date }}</td>
                                     <td>
                                         @if($order->status === 'active')
                                             <span class="badge bg-success">Active</span>

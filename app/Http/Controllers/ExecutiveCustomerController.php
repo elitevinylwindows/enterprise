@@ -76,6 +76,7 @@ public function update(Request $request, $id)
         'loyalty_credit' => 'nullable|numeric',
         'total_spent' => 'nullable|numeric',
         'name' => 'required|string|max:255',
+        'email' => 'required|string|max:255',
         'tier_id' => 'nullable|integer|exists:elitevw_sr_tiers,id',
         'loyalty_credit' => 'nullable|numeric',
         'total_spent' => 'nullable|numeric',
@@ -89,6 +90,7 @@ public function update(Request $request, $id)
     $customer->update([
         'customer_name' => $request->name,
         'tier_id' => $request->tier_id,
+        'email' => $request->email,
         'loyalty_credit' => $request->loyalty_credit ?? 0,
         'total_spent' => $request->total_spent ?? 0,
         'status' => $request->status,

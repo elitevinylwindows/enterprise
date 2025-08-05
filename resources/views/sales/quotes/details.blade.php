@@ -118,14 +118,14 @@
 
                 <tbody>
                     @foreach ($quoteItems as $item)
-                    <tr>
+                    <tr data-id="{{ $item->id }}">
                         <td>{{ $item->description }}</td>
-                        <td><input type="number" name="qty[]" value="{{ $item->qty }}" class="form-control form-control-sm" style="width: 60px;"></td>
+                        <td><input type="number" name="qty[]" value="{{ $item->qty }}" class="form-control form-control-sm qty-input" style="width: 60px;" data-id="{{ $item->id }}" data-price="{{ $item->price }}"></td>
                         <td>{{ $item->width }}" x {{ $item->height }}"</td>
                         <td>{{ $item->glass }}</td>
                         <td>{{ $item->grid }}</td>
                         <td>${{ number_format($item->price, 2) }}</td>
-                        <td>${{ number_format($item->total, 2) }}</td>
+                        <td class="item-total" data-id="{{ $item->id }}">${{ number_format($item->total, 2) }}</td>
                         <td><img src="{{ $item->image_url ?? 'https://via.placeholder.com/40' }}" class="img-thumbnail" alt="Item"></td>
                         <td class="text-nowrap">
                             <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item" data-id="{{ $item->id }}">
@@ -148,22 +148,26 @@
             <!-- Totals -->
             <div class="row mt-4">
                 <div class="col-md-6 offset-md-6">
-                    <table class="table">
+                    <table class="table"  id="totalsTable">
                         <tr>
                             <th>Surcharge:</th>
-                            <td>$0.00</td>
+                            <input type="hidden" name="surcharge" id="surcharge" value="{{ number_format($quote->surcharge, 2) }}">
+                            <td id="surcharge-amount">${{ number_format($quote->surcharge, 2) }}</td>
                         </tr>
                         <tr>
                             <th>Subtotal:</th>
-                            <td>$0.00</td>
+                            <input type="hidden" name="subtotal" id="subtotal" value="{{ number_format($quote->sub_total, 2) }}">
+                            <td id="subtotal-amount">${{ number_format($quote->sub_total, 2) }}</td>
                         </tr>
                         <tr>
                             <th>Tax:</th>
-                            <td>$0.00</td>
+                            <input type="hidden" name="tax" id="tax" value="{{ number_format($quote->tax, 2) }}">
+                            <td id="tax-amount">${{ number_format($quote->tax, 2) }}</td>
                         </tr>
                         <tr>
                             <th>Total:</th>
-                            <td><strong>$0.00</strong></td>
+                            <input type="hidden" name="total" id="total" value="{{ number_format($quote->total, 2) }}">
+                            <td><strong id="total-amount">${{ number_format($quote->total, 2) }}</strong></td>
                         </tr>
                     </table>
                 </div>
@@ -180,15 +184,16 @@
             <div class="d-flex justify-content-between mt-4">
                 <a href="{{ route('sales.quotes.create') }}" class="btn btn-secondary">&larr; Previous</a>
 
-                <div class=class="d-flex gap-2">
-                    <a href="" class="btn btn-secondary">Save Draft</a>
-                   <a href="javascript:void(0);" class="btn btn-primary" onclick="openQuotePreview({{ $quote->id }})">
-    Continue &rarr;
-</a>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-secondary" id="saveDraftButton">Save Draft</button>
 
-
+                    <a class="btn btn-secondary customModal text-white"
+                        data-size="xl"
+                        data-url="{{ route('sales.quotes.preview', $quote->id) }}"
+                        data-title="Quote Preview">
+                       Continue &rarr;
+                    </a>
                 </div>
-
             </div>
         </div>
     </div>
@@ -201,6 +206,7 @@
             <form id="quoteItemForm" method="POST" action="{{ route('sales.quotes.storeItem', $quote->id) }}">
                 @csrf
                 <input type="hidden" name="quote_id" id="quoteId" value="{{ $quote->id }}">
+                <input type="hidden" name="item_id" id="itemId">
 
                 <!-- Hidden fields for JS-generated display values -->
                 <input type="hidden" name="description" id="description">
@@ -212,7 +218,7 @@
 
 
                 <div class="modal-header bg-white text-dark">
-                    <h5 class="mb-0">Add Quote Item</h5>
+                    <h5 class="mb-0" id="modalTitle">Add Quote Item</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -263,7 +269,7 @@
                                         <select class="form-control" name="color_config" id="colorConfigDropdown">
                                             <option value="">Select Configuration</option>
                                             @foreach($colorConfigurations as $config)
-                                            <option value="{{ $config->code }}">{{ $config->code }}</option>
+                                            <option value="{{ $config->code }}" data-id="{{ $config->id }}">{{ $config->code }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -273,10 +279,10 @@
                                         <select class="form-control" name="color_exterior" id="colorExteriorDropdown">
                                             <option value="">Select Exterior Color</option>
                                             @foreach($exteriorColors as $color)
-                                            <option value="{{ $color->code }}" data-group="regular">{{ $color->name }}</option>
+                                            <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
                                             @endforeach
                                             @foreach($laminateColors as $color)
-                                            <option value="{{ $color->code }}" data-group="laminate">{{ $color->name }}</option>
+                                            <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="laminate">{{ $color->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -286,10 +292,10 @@
                                         <select class="form-control" name="color_interior" id="colorInteriorDropdown">
                                             <option value="">Select Interior Color</option>
                                             @foreach($interiorColors as $color)
-                                            <option value="{{ $color->code }}" data-group="regular">{{ $color->name }}</option>
+                                            <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
                                             @endforeach
                                             @foreach($laminateColors as $color)
-                                            <option value="{{ $color->code }}" data-group="laminate">{{ $color->name }}</option>
+                                            <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="laminate">{{ $color->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -299,7 +305,6 @@
                                     <div class="mb-3">
                                         <label>Frame Type</label>
                                         <select class="form-control" name="frame_type" id="frame_type">
-                                            <option value="">Select Frame Type</option>
                                             <option value="Retrofit">Retrofit</option>
                                             <option value="Nailon">Nailon</option>
                                             <option value="Block">Block</option>
@@ -309,7 +314,6 @@
                                     <div class="mb-3">
                                         <label>Retrofit Fin Type</label>
                                         <select class="form-control" name="fin_type" required id="fin_type">
-                                            <option value="">Select Fin Type</option>
                                             <option value="Regular">Regular</option>
                                             <option value="Longfin">Longfin</option>
                                         </select>
@@ -430,37 +434,6 @@
                                 </div>
                             </div>
                         </div>
-
-
-
-
-
-                     <!-- Quote PDF Preview Modal -->
-<div class="modal fade" id="quotePreviewModal" tabindex="-1" aria-labelledby="quotePreviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Quote Preview</h5>
-                <a href="{{ route('sales.quotes.download', $quote->id) }}" target="_blank" class="btn btn-outline-primary btn-sm">Download PDF</a>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body" style="min-height: 80vh;">
-                <iframe src="{{ route('sales.quotes.preview', $quote->id) }}" width="100%" height="100%" style="min-height: 70vh;" frameborder="0"></iframe>
-            </div>
-
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-success">Send Quote</button>
-                <button type="button" class="btn btn-primary">Save Quote</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-
-
                         <!-- Right Preview + Tabs -->
                         <div class="col-md-6">
                             <ul class="nav nav-pills justify-content-end mb-3" id="previewTabs" role="tablist">
@@ -481,9 +454,7 @@
                                 <div class="tab-pane fade show active" id="preview-panel">
 
                                     <!-- SVG Preview Box -->
-                                    <div id="window-previewer" class="border rounded bg-light p-4 mb-3 text-center" style="height: 300px; position: relative;">
-                                        <!-- This gets dynamically replaced -->
-                                        <canvas id="windowCanvas" width="500" height="200"></canvas>
+                                    <div id="window-svg-preview" class="border rounded bg-light p-4 mb-3 text-center" style="height: 300px; position: relative;">
                                     </div>
 
                                     <!-- View Mode Buttons -->
@@ -548,20 +519,28 @@
     </div>
 </div>
 
-
-
-
-<!-- View Quote Item Modal -->
-<div class="modal fade" id="viewQuoteItemModal" tabindex="-1" aria-labelledby="viewQuoteItemLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content" id="viewQuoteItemModalContent">
-            <!-- AJAX-loaded content goes here -->
+<!-- Quote PDF Preview Modal -->
+    <div class="modal fade" id="quotePreviewModal" tabindex="-1" aria-labelledby="quotePreviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Quote Preview</h5>
+                    <a href="{{ route('sales.quotes.download', $quote->id) }}" target="_blank" class="btn btn-outline-primary btn-sm">Download PDF</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+    
+                <div class="modal-body" style="min-height: 80vh;">
+                    
+                    
+                </div>
+    
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-success">Send Quote</button>
+                    <button type="button" class="btn btn-primary">Save Quote</button>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-
-
-
 
 @endsection
 
@@ -603,6 +582,7 @@
         const width = form.querySelector('[name="width"]').value;
         const height = form.querySelector('[name="height"]').value;
         const series = document.getElementById('seriesSelect').selectedOptions[0] ?.text ?? '';
+        const series_id = document.getElementById('seriesSelect').value ?? '';
         const config = document.getElementById('seriesTypeSelect').value;
 
         const glassType = form.querySelector('[name="glass_type"]').value;
@@ -616,9 +596,14 @@
         const frameType = form.querySelector('[name="frame_type"]').value;
         const finType = form.querySelector('[name="fin_type"]').value;
 
-        const colorConfig = form.querySelector('[name="color_config"]').value;
+        const colorConfigDropdown = form.querySelector('[name="color_config"]');
+        const colorConfig = colorConfigDropdown.value;
+        const colorConfigId = colorConfigDropdown.selectedOptions[0]?.getAttribute('data-id') ?? '';
         const colorExt = form.querySelector('[name="color_exterior"]');
         const colorInt = form.querySelector('[name="color_interior"]');
+        const colorExtId = colorExt.selectedOptions[0]?.getAttribute('data-id') ?? '';
+        const colorIntId = colorInt.selectedOptions[0]?.getAttribute('data-id') ?? '';
+        const item_id = form.querySelector('[name="item_id"]').value;
         const laminateExtText = colorExt ?.selectedOptions[0] ?.text ?? '';
         const colorIntText = colorInt ?.selectedOptions[0] ?.text ?? '';
 
@@ -629,9 +614,11 @@
             colorDisplay = `${colorConfig}`;
         }
 
-        if (!series || !config || !width || !height) {
-            alert('Please select Series, Configuration, Width, and Height.');
-            return;
+        if(!item_id) {
+            if (!series || !config || !width || !height) {
+                alert('Please select Series, Configuration, Width, and Height.');
+                return;
+            }
         }
 
         const itemDesc = `${series}-${config} / ${colorDisplay} / ${frameType}-${finType}`;
@@ -640,38 +627,15 @@
         const glass = `${glassType}-${spacer} / ${tempered} / ${specialtyGLass}`;
         const grid = `${gridPattern} / ${gridProfile}`;
         const size = `${width}" x ${height}"`;
-        const price = '0.00';
+        const price = form.querySelector('[name="price"]').value;
         const total = (qty * parseFloat(price)).toFixed(2);
-
-        // 1. Append to table
-        const row = `
-        <tr>
-            <td>${itemDesc}</td>
-            <td><input type="number" name="qty[]" value="${qty}" class="form-control form-control-sm" style="width: 60px;"></td>
-            <td>${size}</td>
-            <td>${glass}</td>
-            <td>${grid}</td>
-            <td>$${price}</td>
-            <td>$${total}</td>
-            <td><img src="https://via.placeholder.com/40" class="img-thumbnail" alt="Item"></td>
-            <td class="text-nowrap">
-                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item">
-                    <i data-feather="eye"></i>
-                </a>
-                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item">
-                    <i data-feather="edit"></i>
-                </a>
-                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row">
-                    <i data-feather="trash-2"></i>
-                </a>
-            </td>
-        </tr>
-    `;
-        document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
-
-        // 2. Save to DB using FormData
-
+        const item_comment = form.querySelector('[name="item_comment"]').value;
+        const internal_note = form.querySelector('[name="internal_note"]').value;
+        
         const formData = new FormData();
+        formData.append('item_id', item_id);
+        formData.append('series_id', series_id);
+        formData.append('series_type', config);
         formData.append('description', itemDesc);
         formData.append('width', width);
         formData.append('height', height);
@@ -680,8 +644,26 @@
         formData.append('qty', qty);
         formData.append('price', price);
         formData.append('total', total);
-        formData.append('item_comment', '');
-        formData.append('internal_note', '');
+        formData.append('item_comment', item_comment);
+        formData.append('internal_note', internal_note);
+        formData.append('color_config', colorConfigId);
+        formData.append('color_exterior', colorExtId);
+        formData.append('color_interior', colorIntId);
+        formData.append('frame_type', frameType);
+        formData.append('fin_type', finType);
+        formData.append('glass_type', glassType);
+        formData.append('spacer', spacer);
+        formData.append('tempered', tempered);
+        formData.append('specialty_glass', specialtyGLass);
+        formData.append('grid_pattern', gridPattern);
+        formData.append('grid_profile', gridProfile);
+        formData.append('retrofit_bottom_only', form.querySelector('[name="retrofit_bottom_only"]').checked ? 1 : 0);
+        formData.append('no_logo_lock', form.querySelector('[name="no_logo_lock"]').checked ? 1 : 0);
+        formData.append('double_lock', form.querySelector('[name="double_lock"]').checked ? 1 : 0);
+        formData.append('custom_lock_position', form.querySelector('[name="custom_lock_position"]').checked ? 1 : 0);
+        formData.append('custom_vent_latch', form.querySelector('[name="custom_vent_latch"]').checked ? 1 : 0);
+        formData.append('knocked_down', form.querySelector('[name="knocked_down"]').checked ? 1 : 0);
+        
 
         const quoteId = document.getElementById('quoteId').value;
 
@@ -703,6 +685,41 @@
                         currentModalInstance.hide();
                     }
 
+                    const row = `
+                        <tr data-id="${data.item_id}">
+                            <td>${itemDesc}</td>
+                            <td><input type="number" name="qty[]" value="${qty}" min="1" class="form-control form-control-sm qty-input" style="width: 60px;" data-price="${price}" data-id="${data.item_id}"></td>
+                            <td>${size}</td>
+                            <td>${glass}</td>
+                            <td>${grid}</td>
+                            <td>$${price}</td>
+                            <td class="item-total" data-id="${data.item_id}">$${total}</td>
+                            <td><img src="https://via.placeholder.com/40" class="img-thumbnail" alt="Item"></td>
+                            <td class="text-nowrap">
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item" data-id="${data.item_id}">
+                                    <i data-feather="eye"></i>
+                                </a>
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item" data-id="${data.item_id}">
+                                    <i data-feather="edit"></i>
+                                </a>
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row" data-id="${data.item_id}">
+                                    <i data-feather="trash-2"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                            
+                    if(data.is_update == false) {
+                        document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
+                    } else {
+                        const existingRow = document.querySelector(`#quoteDetailsTable tbody tr[data-id="${data.item_id}"]`);
+                        if (existingRow) {
+                            existingRow.remove();
+                        }
+                   
+                        document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
+                    }
+                    calculateTotals();
                     console.log('Modal closed');
                 } else {
                     alert('Item failed to save.');
@@ -727,9 +744,173 @@
 
     // Delete row
     document.querySelector('#quoteDetailsTable tbody').addEventListener('click', function(e) {
+
         if (e.target.closest('.remove-row')) {
-            e.target.closest('tr').remove();
+            const row = e.target.closest('tr');
+            const itemId = row.getAttribute('data-id');
+            const quoteId = "{{ $quote->id }}";
+            if (!itemId) return;
+
+            if (!confirm('Are you sure you want to delete this item?')) return;
+            fetch(`/sales/quotes/${quoteId}/items/${itemId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    row.remove();
+                    calculateTotals();
+                } else {
+                    alert('Failed to delete item.');
+                }
+            })
+            .catch(() => alert('Server error'));
         }
+        
+    });
+
+    // open modal in view mode
+    document.querySelector('#quoteDetailsTable tbody').addEventListener('click', function(e) {
+        const viewBtn = e.target.closest('.view-quote-item');
+        // Only run if the actual button was clicked (not bubbling from table row)
+        if (viewBtn && viewBtn.classList.contains('view-quote-item')) {
+            const itemId = viewBtn.getAttribute('data-id');
+            if (!itemId) return; // Prevent API call if no itemId
+
+            const quoteId = "{{ $quote->id }}";
+            fetch(`/sales/quotes/view/${quoteId}/items/${itemId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success || !data.item) {
+                        alert('Failed to load item.');
+                        return;
+                    }
+                    const form = document.getElementById('quoteItemForm');
+                    // Populate fields
+                    form.querySelector('[name="qty"]').value = data.item.qty;
+                    form.querySelector('[name="width"]').value = data.item.width;
+                    form.querySelector('[name="height"]').value = data.item.height;
+                    form.querySelector('[name="item_comment"]').value = data.item.item_comment || '';
+                    form.querySelector('[name="color_config"]').value = data.item.color_config || '';
+                    form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                    form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                    form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
+                    form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
+                    form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
+                    form.querySelector('[name="spacer"]').value = data.item.spacer || '';
+                    form.querySelector('[name="tempered"]').value = data.item.tempered || '';
+                    form.querySelector('[name="specialty_glass"]').value = data.item.specialty_glass || '';
+                    form.querySelector('[name="grid_pattern"]').value = data.item.grid_pattern || '';
+                    form.querySelector('[name="grid_profile"]').value = data.item.grid_profile || '';
+                    form.querySelector('[name="internal_note"]').value = data.item.internal_note || '';
+                    form.querySelector('[name="retrofit_bottom_only"]').checked = !!data.item.retrofit_bottom_only;
+                    form.querySelector('[name="no_logo_lock"]').checked = !!data.item.no_logo_lock;
+                    form.querySelector('[name="double_lock"]').checked = !!data.item.double_lock;
+                    form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
+                    form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
+                    form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
+
+                    form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                    // Disable all fields
+                    Array.from(form.elements).forEach(el => {
+                        // Do not disable the btn-close button
+                        if (!(el.classList && el.classList.contains('btn-close'))) {
+                            el.disabled = true;
+                        }
+                    });
+                    // Hide add button
+                    document.getElementById('saveQuoteItem').style.display = 'none';
+                    // Show modal
+                    document.getElementById('modalTitle').textContent = 'View Quote Item';
+                    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+                    modal.show();
+                })
+                .catch(() => alert('Server error'));
+        }
+    });
+
+    document.querySelector('#quoteDetailsTable tbody').addEventListener('click', function(e) {
+        const editBtn = e.target.closest('.edit-quote-item');
+        // Only run if the actual button was clicked (not bubbling from table row)
+        if (editBtn && editBtn.classList.contains('edit-quote-item')) {
+            const itemId = editBtn.getAttribute('data-id');
+            if (!itemId) return; // Prevent API call if no itemId
+
+            const quoteId = "{{ $quote->id }}";
+            fetch(`/sales/quotes/view/${quoteId}/items/${itemId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success || !data.item) {
+                        alert('Failed to load item.');
+                        return;
+                    }
+                    const form = document.getElementById('quoteItemForm');
+                    // Populate fields
+                    form.querySelector('[name="item_id"]').value = data.item.id;
+                    form.querySelector('[name="qty"]').value = data.item.qty;
+                    form.querySelector('[name="width"]').value = data.item.width;
+                    form.querySelector('[name="height"]').value = data.item.height;
+                    form.querySelector('[name="item_comment"]').value = data.item.item_comment || '';
+                    form.querySelector('[name="color_config"]').value = data.item.color_config || '';
+                    form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                    form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                    form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
+                    form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
+                    form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
+                    form.querySelector('[name="spacer"]').value = data.item.spacer || '';
+                    form.querySelector('[name="tempered"]').value = data.item.tempered || '';
+                    form.querySelector('[name="specialty_glass"]').value = data.item.specialty_glass || '';
+                    form.querySelector('[name="grid_pattern"]').value = data.item.grid_pattern || '';
+                    form.querySelector('[name="grid_profile"]').value = data.item.grid_profile || '';
+                    form.querySelector('[name="internal_note"]').value = data.item.internal_note || '';
+                    form.querySelector('[name="retrofit_bottom_only"]').checked = !!data.item.retrofit_bottom_only;
+                    form.querySelector('[name="no_logo_lock"]').checked = !!data.item.no_logo_lock;
+                    form.querySelector('[name="double_lock"]').checked = !!data.item.double_lock;
+                    form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
+                    form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
+                    form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
+                    // Pre-select series_id (dropdown)
+                    const seriesSelect = $('#seriesSelect');
+                    seriesSelect.val(data.item.series_id ?? '');
+
+                    // Trigger change to load dependent series_type_id options
+                    document.getElementById('seriesSelect').dispatchEvent(new Event('change'));
+
+                    // Wait for the fetch to complete and then set the value
+                    setTimeout(() => {
+                        const seriesTypeSelect = document.getElementById('seriesTypeSelect');
+                        Array.from(seriesTypeSelect.options).forEach(opt => {
+                            if (opt.value == (data.item.series_type ?? '')) {
+                                seriesTypeSelect.value = opt.value;
+                            }
+                        });
+
+                        document.getElementById('seriesTypeSelect').dispatchEvent(new Event('change'));
+
+                    }, 1000);
+
+                    form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                    // Show modal
+                    document.getElementById('modalTitle').textContent = 'Edit Quote Item';
+                    document.getElementById('saveQuoteItem').textContent = 'Update Quote Item';
+                    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+                    modal.show();
+                })
+                .catch(() => alert('Server error'));
+        }
+    });
+
+    // When modal closes, re-enable fields and show add button
+    document.getElementById('addItemModal').addEventListener('hidden.bs.modal', function() {
+        const form = document.getElementById('quoteItemForm');
+        Array.from(form.elements).forEach(el => el.disabled = false);
+        document.getElementById('saveQuoteItem').style.display = '';
+        form.reset();
+        document.getElementById('modalTitle').textContent = 'Add Quote Item';
+        document.getElementById('globalTotalPrice').textContent = '0.00';
     });
 
 
@@ -737,7 +918,7 @@
     document.getElementById('colorConfigDropdown').addEventListener('change', function() {
         const value = this.value;
         const [exterior, interior] = value.split('-');
-
+        console.log(exterior, interior);
         const exteriorDropdown = document.getElementById('colorExteriorDropdown');
         const interiorDropdown = document.getElementById('colorInteriorDropdown');
 
@@ -890,25 +1071,6 @@
     $('input[name="width"], input[name="height"]').on('keyup', fetchBasePrice);
 
 
-    document.querySelectorAll('.view-quote-item').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const url = this.dataset.url;
-            const modalContent = document.getElementById('viewQuoteItemModalContent');
-
-            modalContent.innerHTML = '<div class="modal-body text-center p-4"><div class="spinner-border text-primary" role="status"></div></div>';
-
-            fetch(url)
-                .then(res => res.text())
-                .then(html => {
-                    modalContent.innerHTML = html;
-                })
-                .catch(err => {
-                    modalContent.innerHTML = '<div class="modal-body text-danger">Failed to load item.</div>';
-                    console.error(err);
-                });
-        });
-    });
-
     @if(isset($allConfigurations))
 
     const allConfigurations = @json($allConfigurations);
@@ -1033,15 +1195,92 @@
         const selectedFin = $(this).val();
         console.log('Selected finish type:', selectedFin);
     });
-</script>
-<script>
+
     function openQuotePreview(quoteId) {
-        const pdfUrl = `/quotes/pdf/${quoteId}/preview`; // You can adjust route if different
-        document.getElementById('quotePdfIframe').src = pdfUrl;
-        document.getElementById('downloadQuoteBtn').href = pdfUrl + '?download=true';
-        const modal = new bootstrap.Modal(document.getElementById('quotePdfPreviewModal'));
-        modal.show();
+        // const pdfUrl = `/quotes/pdf/${quoteId}/preview`; // You can adjust route if different
+        // document.getElementById('quotePdfIframe').src = pdfUrl;
+        // document.getElementById('downloadQuoteBtn').href = pdfUrl + '?download=true';
+        const modalElement = document.getElementById('quotePreviewModal');
+        if (modalElement) {
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.show();
+        } else {
+            alert('Quote preview modal not found in the DOM.');
+        }
     }
+
+    function calculateTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('.qty-input').forEach(function(input) {
+            const qty = parseInt(input.value) || 0;
+            const price = parseFloat(input.dataset.price) || 0;
+            const rowTotal = qty * price;
+            subtotal += rowTotal;
+
+            // Update row total
+            const id = input.dataset.id;
+            const totalCell = document.querySelector('.item-total[data-id="' + id + '"]');
+            if (totalCell) {
+                totalCell.textContent = '$' + rowTotal.toFixed(2);
+            }
+        });
+
+        // Example: Surcharge is 0, tax is 8%
+        const surcharge = 0;
+        const taxRate = 0.08;
+        const tax = subtotal * taxRate;
+        const total = subtotal + surcharge + tax;
+
+        document.getElementById('surcharge-amount').textContent = '$' + surcharge.toFixed(2);
+        document.getElementById('surcharge').value = surcharge.toFixed(2);
+        document.getElementById('subtotal-amount').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('subtotal').value = subtotal.toFixed(2);
+        document.getElementById('tax-amount').textContent = '$' + tax.toFixed(2);
+        document.getElementById('tax').value = tax.toFixed(2);
+        document.getElementById('total-amount').textContent = '$' + total.toFixed(2);
+        document.getElementById('total').value = total.toFixed(2);
+    }
+
+
+    // Save draft button click event
+    document.getElementById('saveDraftButton').addEventListener('click', function() {
+        const formData = new FormData();
+        formData.append('surcharge', document.getElementById('surcharge').value);
+        formData.append('subtotal', document.getElementById('subtotal').value);
+        formData.append('tax', document.getElementById('tax').value);
+        formData.append('total', document.getElementById('total').value);
+
+        fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Draft saved successfully!');
+                window.location.href = '{{ route('sales.quotes.index') }}';
+            } else {
+                alert('Error saving draft.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
+    // Listen for qty input changes
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('qty-input')) {
+            calculateTotals();
+        }
+    });
+
+    // Initial calculation on page load
+    document.addEventListener('DOMContentLoaded', calculateTotals);
+
 </script>
 
 @endpush

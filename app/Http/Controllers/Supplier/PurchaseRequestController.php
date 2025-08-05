@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\Inventory\SupplierQuote;
 
-
 class PurchaseRequestController extends Controller
 {
 

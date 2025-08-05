@@ -2,6 +2,7 @@
 
 namespace App\Models\Sales;
 
+use App\Models\Master\Customers\Customer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,18 +13,33 @@ class Invoice extends Model
     protected $table = 'elitevw_sales_invoices';
 
     protected $fillable = [
+        'invoice_number',
+        'quote_id',
+        'order_id',
         'customer_id',
         'invoice_date',
+        'total',
         'net_price',
-        'status',
-        'notes',
         'paid_amount',
         'remaining_amount',
+        'status',
+        'notes',
+        'payment_method',
+        'gateway_response',
     ];
 
     public function customer()
-{
-    return $this->belongsTo(\App\Models\Master\Customers\Customer::class, 'customer_id');
-}
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
+    public function quote()
+    {
+        return $this->belongsTo(Quote::class, 'quote_id');
+    }
 
 }
