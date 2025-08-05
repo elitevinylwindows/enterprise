@@ -877,7 +877,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::get('/settings/shipping', [ShippingSettingsController::class, 'index'])->name('settings.shipping');
         Route::post('/settings/shipping/truncate', [ShippingSettingsController::class, 'truncateShippingData'])->name('settings.shipping.truncate');
 
-
         // ✅ This one OUTSIDE the purchasing group
         Route::get('/supplier/pr-view/{token}', [PurchasingPurchaseRequestController::class, 'secureView'])
             ->name('supplier.pr.view');
@@ -921,6 +920,8 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::post('/calendar/get-shop', [CalendarController::class, 'getShopByCustomer'])->name('calendar.getShop');
         Route::post('/shop/contact', [SrDeliveryController::class, 'getShopByCustomer'])->name('shop.contact');
 
+        Route::get('/settings/shipping', [ShippingSettingsController::class, 'index'])->name('settings.shipping');
+        Route::post('/settings/shipping/truncate', [ShippingSettingsController::class, 'truncateShippingData'])->name('settings.shipping.truncate');
 
 
         Route::get('/pickups', [PickupController::class, 'index'])->name('pickups.index');
