@@ -35,6 +35,8 @@ class Customer extends Model
         'delivery_country',
         'delivery_phone',
         'delivery_fax',
+        'serve_customer_id',
+        'customer_name'
     ];
 
     public function tier()
