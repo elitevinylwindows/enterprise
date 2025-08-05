@@ -39,6 +39,11 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="card table-card">
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <div class="alert alert-danger">{{$error}}</div>
+                @endforeach
+            @endif
             <div class="card-header">
                 <div class="row align-items-center g-2">
                     <div class="col">
