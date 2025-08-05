@@ -60,7 +60,7 @@
                                            data-bs-original-title="Edit"
                                            href="#"
                                            data-size="md"
-                                           data-url="{{ route('master.tax-codes.edit', $tax->id) }}"
+                                           data-url="{{ route('master.prices.tax_codes.edit', $tax->id) }}"
                                            data-title="Edit Tax Code">
                                             <i data-feather="edit"></i>
                                         </a>
@@ -71,7 +71,7 @@
                                            data-bs-original-title="Delete"
                                            href="#"
                                            data-size="sm"
-                                           data-url="{{ route('master.tax-codes.destroy', $tax->id) }}"
+                                           data-url="{{ route('master.prices.tax_codes.destroy', $tax->id) }}"
                                            data-title="Delete Tax Code">
                                             <i data-feather="trash-2"></i>
                                         </a>

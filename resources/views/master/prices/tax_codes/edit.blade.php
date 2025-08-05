@@ -1,6 +1,6 @@
 <div class="modal fade" id="editTaxCodeModal{{ $taxCode->id }}" tabindex="-1" aria-labelledby="editTaxCodeLabel{{ $taxCode->id }}" aria-hidden="true">
   <div class="modal-dialog modal-md">
-    <form method="POST" action="{{ route('master.tax-codes.update', $taxCode->id) }}" id="taxCodeEditForm{{ $taxCode->id }}">
+    <form method="POST" action="{{ route('master.prices.tax_codes.update', $taxCode->id) }}" id="taxCodeEditForm{{ $taxCode->id }}">
       @csrf
       @method('PUT')
       <div class="modal-content">
