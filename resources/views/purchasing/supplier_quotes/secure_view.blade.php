@@ -1,15 +1,15 @@
-@extends('layouts.app')
+@extends('layouts.public')
 
 @section('page-title', 'Purchase Request - Supplier View')
 
 @section('content')
 <div class="container">
+    {{-- Header Card --}}
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5>Purchase Request #{{ $quote->purchaseRequest->purchase_request_id }}</h5>
             <span class="badge bg-warning text-dark">{{ ucfirst($quote->status) }}</span>
         </div>
-
         <div class="card-body">
             <p><strong>Supplier:</strong> {{ $quote->supplier->name }}</p>
             <p><strong>Request Date:</strong> {{ \Carbon\Carbon::parse($quote->purchaseRequest->request_date)->format('F d, Y') }}</p>
@@ -20,6 +20,7 @@
         </div>
     </div>
 
+    {{-- Item Table --}}
     <div class="card mb-4">
         <div class="card-header"><strong>Requested Items</strong></div>
         <div class="card-body table-responsive">
@@ -48,35 +49,55 @@
         </div>
     </div>
 
-    {{-- Upload PDF --}}
-    <form method="POST" action="{{ route('purchasing.supplier.quote.approve', $quote->id) }}" enctype="multipart/form-data" id="approveForm" class="d-none">
+    {{-- Modify and Approve --}}
+    <form action="{{ route('supplier.quote.modify', $quote->id) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <h5 class="mt-4 mb-2">Modify Prices (Optional)</h5>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Current Price</th>
+                    <th>New Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($quote->purchaseRequest->items as $item)
+                <tr>
+                    <td>{{ $item->description }}</td>
+                    <td>{{ $item->qty }}</td>
+                    <td>${{ number_format($item->price, 2) }}</td>
+                    <td>
+                        <input type="number" name="price[{{ $item->id }}]" step="0.01" class="form-control" value="{{ $item->price }}">
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <div class="mb-3">
+            <label>Attach Quote File (PDF or Image)</label>
+            <input type="file" name="quote_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+
+        <button type="submit" class="btn btn-warning">Modify & Approve</button>
+    </form>
+
+    {{-- Approve Only --}}
+    <form method="POST" action="{{ route('supplier.quote.approve', $quote->id) }}" enctype="multipart/form-data" class="mt-4">
         @csrf
         <div class="mb-3">
-            <label>Attach Quote (PDF)</label>
+            <label>Upload Quote File (PDF)</label>
             <input type="file" name="attachment" class="form-control" accept="application/pdf">
         </div>
+        <button type="submit" class="btn btn-success">Approve & Upload</button>
     </form>
 
-    <form method="POST" action="{{ route('purchasing.supplier.quote.modify', $quote->id) }}" enctype="multipart/form-data" id="modifyForm" class="d-none">
+    {{-- Cancel --}}
+    <form method="POST" action="{{ route('supplier.quote.cancel', $quote->id) }}" class="mt-4">
         @csrf
-        <div class="mb-3">
-            <label>Edit Prices and Upload PDF</label>
-            <input type="file" name="attachment" class="form-control" accept="application/pdf">
-            {{-- Optional: Dynamic pricing update fields here --}}
-        </div>
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this request?')">Cancel</button>
     </form>
-
-    <form method="POST" action="{{ route('purchasing.supplier.quote.cancel', $quote->id) }}" id="cancelForm" class="d-none">
-        @csrf
-    </form>
-
-    {{-- Action Buttons --}}
-    <div class="card">
-        <div class="card-body d-flex gap-2 justify-content-end">
-            <button type="submit" form="approveForm" class="btn btn-success">Approve & Upload</button>
-            <button type="submit" form="modifyForm" class="btn btn-warning">Modify & Upload</button>
-            <button type="submit" form="cancelForm" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this request?')">Cancel</button>
-        </div>
-    </div>
 </div>
 @endsection

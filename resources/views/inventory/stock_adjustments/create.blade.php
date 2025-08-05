@@ -4,7 +4,7 @@
         {!! Form::open(['route' => 'inventory.stock-adjustments.store', 'method' => 'post']) !!}
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{{ __('New Stock Adjustment') }}</h5>
+                <h5 class="modal-title" id="createStockAdjustmentModalLabel">{{ __('New Stock Adjustment') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
             </div>
 
@@ -14,7 +14,6 @@
                         {!! Form::label('date', __('Date'), ['class' => 'form-label']) !!}
                         {!! Form::date('date', \Carbon\Carbon::now(), ['class' => 'form-control']) !!}
                     </div>
-
                     <div class="form-group col-md-6">
                         {!! Form::label('reference_no', __('Reference No'), ['class' => 'form-label']) !!}
                         {!! Form::text('reference_no', 'ADJ-' . strtoupper(\Illuminate\Support\Str::random(6)), ['class' => 'form-control', 'readonly']) !!}

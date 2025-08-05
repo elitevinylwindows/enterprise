@@ -364,9 +364,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             // Invoices
             Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
             Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
-
-            // Settings
-            Route::get('settings', [\App\Http\Controllers\Sales\SettingController::class, 'index'])->name('settings.index');
         });
 
         //Supplier
@@ -622,12 +619,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         // Invoices
         Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
         Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
-
-
-
-
-        // Settings
-        Route::get('settings', [\App\Http\Controllers\Sales\SettingController::class, 'index'])->name('settings.index');
 
 
         //Supplier
@@ -886,7 +877,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::get('/settings/shipping', [ShippingSettingsController::class, 'index'])->name('settings.shipping');
         Route::post('/settings/shipping/truncate', [ShippingSettingsController::class, 'truncateShippingData'])->name('settings.shipping.truncate');
 
-
         // ✅ This one OUTSIDE the purchasing group
         Route::get('/supplier/pr-view/{token}', [PurchasingPurchaseRequestController::class, 'secureView'])
             ->name('supplier.pr.view');
@@ -930,6 +920,8 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::post('/calendar/get-shop', [CalendarController::class, 'getShopByCustomer'])->name('calendar.getShop');
         Route::post('/shop/contact', [SrDeliveryController::class, 'getShopByCustomer'])->name('shop.contact');
 
+        Route::get('/settings/shipping', [ShippingSettingsController::class, 'index'])->name('settings.shipping');
+        Route::post('/settings/shipping/truncate', [ShippingSettingsController::class, 'truncateShippingData'])->name('settings.shipping.truncate');
 
 
         Route::get('/pickups', [PickupController::class, 'index'])->name('pickups.index');
