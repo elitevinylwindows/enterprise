@@ -15,10 +15,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\Inventory\SupplierQuote;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> tola
 class PurchaseRequestController extends Controller
 {
 

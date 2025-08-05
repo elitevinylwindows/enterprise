@@ -1261,6 +1261,7 @@
         .then(data => {
             if (data.success) {
                 alert('Draft saved successfully!');
+                window.location.href = '{{ route('sales.quotes.index') }}';
             } else {
                 alert('Error saving draft.');
             }

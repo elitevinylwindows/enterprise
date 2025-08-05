@@ -1,25 +1,17 @@
-@extends('layouts.app')
+@extends('layouts.public')
 @section('page-title')
 {{ __('Secure Quote View') }}
 @endsection
 
 @section('breadcrumb')
-<li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-<li class="breadcrumb-item"><a href="{{ route('sales.quotes.index') }}">{{ __('Quotes') }}</a></li>
-<li class="breadcrumb-item active" aria-current="page">{{ __('Secure View') }}</li>
+
 @endsection
 
 @section('card-action-btn')
-<a href="{{ route('sales.quotes.index') }}" class="btn btn-primary">{{ __('Back to Quotes') }}</a>
 @endsection
 
 @section('content')
-<div class="row">
-    <div class="col-md-12">
-        <h4>{{ __('Quote Details') }}</h4>
-        <p>{{ __('Here you can view the details of the secure quote.') }}</p>
-    </div>
-</div>
+
 <div class="row">
     <div class="col-md-12 mt-4">
         <div class="card">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Sales;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderMail;
 use App\Mail\QuoteEmail;
 use Illuminate\Http\Request;
 use App\Models\Sales\Quote;
@@ -565,11 +566,21 @@ class QuoteController extends Controller
 
     public function convertToOrder(Request $request, $id)
     {
-        $quote = \App\Models\Sales\Quote::with('items')->findOrFail($id);
+        try {
+            DB::beginTransaction();
+            $quote = \App\Models\Sales\Quote::with('items')->findOrFail($id);
+            $order = quoteToOrder($quote);
+            
+            $mail = new OrderMail($order);
+            Mail::to($quote->customer->email)->send($mail);
 
-        $order = quoteToOrder($quote);
-
-        return redirect()->route('sales.orders.show', $order->id)->with('success', 'Quote converted to Order successfully.');
+            DB::commit();
+        return redirect()->route('sales.orders.index', $order->id)->with('success', 'Quote converted to Order successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error converting quote to order: ' . $e->getMessage());
+            return redirect()->route('sales.quotes.index')->withErrors(['error' => 'Failed to convert quote to order.']);
+        }
     }
 
     public function destroyItem($id, $itemId)
@@ -597,7 +608,12 @@ class QuoteController extends Controller
             DB::beginTransaction();
             if ($status === 'approved') {
                 $order = quoteToOrder($quote);
+                
+                $mail = new OrderMail($order);
+                Mail::to($quote->customer->email)->send($mail);
+
                 $invoice = quoteToInvoice($quote, $order);
+                
                 if (!$order) {
                     return redirect()->route('sales.quotes.index')->withErrors(['error' => 'Failed to convert quote to order.']);
                 }
