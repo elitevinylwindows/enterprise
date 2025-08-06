@@ -1,7 +1,9 @@
 <?php
 
+use App\Helper\FirstServe;
 use App\Mail\Common;
 use App\Mail\EmailVerification;
+use App\Mail\InvoiceMail;
 use App\Mail\TestMail;
 use App\Models\AuthPage;
 use App\Models\Custom;
@@ -1966,7 +1968,7 @@ if(!function_exists('quoteToInvoice')) {
                 'quote_id' => $quote->id,
                 'invoice_number' => generateInvoiceNumber(),
                 'work_order' => 'WO' . $order->id,
-                'due_date' => now()->addDays(14),
+                'due_date' => now()->addDays(14)->format('Y-m-d'),
                 'entered_by' => auth()->user()->name,
                 'status' => 'Pending',
                 'quote_id' => $quote->id,
@@ -1974,7 +1976,9 @@ if(!function_exists('quoteToInvoice')) {
                 'customer_id' => $quote->customer?->id,
                 'invoice_date' => now(),
                 'total' => $quote->total,
+                'tax' => $quote->tax,
                 'net_price' => $quote->sub_total,
+                'surcharge' => $quote->surcharge,
                 'paid_amount' => 0,
                 'remaining_amount' => $quote->total,
                 'status' => 'Pending',
@@ -1982,6 +1986,20 @@ if(!function_exists('quoteToInvoice')) {
                 'payment_method' => null,
                 'gateway_response' => null,
             ]);
+
+            $firstServe = new FirstServe();
+            $firstServeInvoice = $firstServe->createInvoice($invoice);
+
+            if($firstServeInvoice) {
+                $invoice->update([
+                    'gateway_response' => json_encode($firstServeInvoice),
+                    'serve_invoice_id' => $firstServeInvoice['id'],
+                    'payment_link' => $firstServeInvoice['payment_link'],
+                ]);
+
+                $mail = new InvoiceMail($invoice);
+                $mail->to($invoice->customer->email)->send($mail);
+            }
 
         return $invoice;
     }

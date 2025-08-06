@@ -150,9 +150,9 @@
                 <div class="col-md-6 offset-md-6">
                     <table class="table"  id="totalsTable">
                         <tr>
-                            <th>Surcharge:</th>
-                            <input type="hidden" name="surcharge" id="surcharge" value="{{ number_format($quote->surcharge, 2) }}">
-                            <td id="surcharge-amount">${{ number_format($quote->surcharge, 2) }}</td>
+                            <th>Discount:</th>
+                            <input type="hidden" name="discount" id="discount" value="{{ number_format($quote->discount, 2) }}">
+                            <td id="discount-amount">${{ number_format($quote->discount, 2) }}</td>
                         </tr>
                         <tr>
                             <th>Subtotal:</th>
@@ -163,6 +163,11 @@
                             <th>Tax:</th>
                             <input type="hidden" name="tax" id="tax" value="{{ number_format($quote->tax, 2) }}">
                             <td id="tax-amount">${{ number_format($quote->tax, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <th>Shipping:</th>
+                            <input type="hidden" name="shipping" id="shipping" value="{{ number_format($quote->shipping, 2) }}">
+                            <td id="shipping-amount">${{ number_format($quote->shipping, 2) }}</td>
                         </tr>
                         <tr>
                             <th>Total:</th>
@@ -628,6 +633,7 @@
         const grid = `${gridPattern} / ${gridProfile}`;
         const size = `${width}" x ${height}"`;
         const price = form.querySelector('[name="price"]').value;
+        const discount = $("#discount").val() || 0;
         const total = (qty * parseFloat(price)).toFixed(2);
         const item_comment = form.querySelector('[name="item_comment"]').value;
         const internal_note = form.querySelector('[name="internal_note"]').value;
@@ -643,6 +649,7 @@
         formData.append('grid', grid);
         formData.append('qty', qty);
         formData.append('price', price);
+        formData.append('discount', discount);
         formData.append('total', total);
         formData.append('item_comment', item_comment);
         formData.append('internal_note', internal_note);
@@ -725,7 +732,6 @@
                     alert('Item failed to save.');
                 }
             })
-            .catch(() => alert('Server error'));
 
 
         // 3. Hide modal
@@ -1058,9 +1064,16 @@
                 customer_number: "{{ $quote->customer_number ?? '' }}"
             }, function(res) {
                 const price = parseFloat(res.price ?? 0).toFixed(2);
+                const newDiscount = parseFloat(res.discount ?? 0);
+                // Get the current discount value from the input (or 0 if not set)
+                const currentDiscount = parseFloat($('input[name="discount"]').val() ?? 0);
+                const totalDiscount = (currentDiscount + newDiscount).toFixed(2);
+
                 $('#globalTotalPrice').text(price);
                 $('input[name="price"]').val(price);
                 $('input[name="total"]').val(price);
+                $('input[name="discount"]').val(totalDiscount);
+                $('#discount-amount').text("$" + totalDiscount);
             });
 
         }
@@ -1226,13 +1239,11 @@
         });
 
         // Example: Surcharge is 0, tax is 8%
-        const surcharge = 0;
         const taxRate = 0.08;
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
         const tax = subtotal * taxRate;
-        const total = subtotal + surcharge + tax;
+        const total = subtotal + tax + discount;
 
-        document.getElementById('surcharge-amount').textContent = '$' + surcharge.toFixed(2);
-        document.getElementById('surcharge').value = surcharge.toFixed(2);
         document.getElementById('subtotal-amount').textContent = '$' + subtotal.toFixed(2);
         document.getElementById('subtotal').value = subtotal.toFixed(2);
         document.getElementById('tax-amount').textContent = '$' + tax.toFixed(2);
@@ -1249,6 +1260,7 @@
         formData.append('subtotal', document.getElementById('subtotal').value);
         formData.append('tax', document.getElementById('tax').value);
         formData.append('total', document.getElementById('total').value);
+        formData.append('discount', document.getElementById('discount').value);
 
         fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
             method: 'POST',

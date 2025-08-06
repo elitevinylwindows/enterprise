@@ -106,6 +106,13 @@ class QuoteController extends Controller
             ->where('height', $request->height)
             ->value('price');
 
+        $price = getMarkup($request->series_id, $price);
+        $customer = Customer::where('customer_number', $request->customer_number)
+            ->first();
+        $percentage = $customer->tier?->percentage;
+        $discount = ($price * ($percentage / 100));
+        $price = $price - $discount;
+
         \Log::info('Checking price matrix', [
             'series_id' => $request->series_id,
             'series_type' => $request->series_type,
@@ -114,7 +121,7 @@ class QuoteController extends Controller
             'price_found' => $price
         ]);
 
-        return response()->json(['price' => $price]);
+        return response()->json(['price' => $price, 'discount' => $discount]);
     }
 
 
@@ -133,6 +140,7 @@ class QuoteController extends Controller
                 'qty' => 'required|numeric',
                 'price' => 'required|numeric',
                 'total' => 'required|numeric',
+                'discount' => 'required|numeric',
                 'item_comment' => 'nullable|string',
                 'internal_note' => 'nullable|string',
                 'color_config' => 'nullable|numeric',
@@ -171,6 +179,7 @@ class QuoteController extends Controller
                         'qty' => $request->qty,
                         'price' => $request->price,
                         'total' => $request->total,
+                        'discount' => $request->discount,
                         'item_comment' => $request->item_comment,
                         'internal_note' => $request->internal_note,
                         'color_config' => $request->color_config,
@@ -213,6 +222,7 @@ class QuoteController extends Controller
                     'glass' => $request->glass,
                     'grid' => $request->grid,
                     'qty' => $request->qty,
+                    'discount' => $request->discount,
                     'price' => $request->price,
                     'total' => $request->total,
                     'item_comment' => $request->item_comment,
@@ -638,8 +648,8 @@ class QuoteController extends Controller
             DB::commit();
             return redirect()->route('sales.quotes.index')->with('success', 'Quote status updated successfully.');
         } catch (\Exception $e) {
-            dd($e);
             DB::rollBack();
+            dd($e);
             return redirect()->route('sales.quotes.index')->withErrors(['error' => 'Failed to update quote status.']);
         }
 

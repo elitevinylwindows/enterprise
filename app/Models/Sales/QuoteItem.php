@@ -40,6 +40,7 @@ protected $fillable = [
     'knocked_down',
     'series_id',
     'series_type',
+    'discount'
 ];
 
 
