@@ -47,7 +47,7 @@ class TaxCodeController extends Controller
         $taxCode = TaxCode::findOrFail($id);
         $taxCode->update($request->only('code', 'city', 'description', 'rate'));
 
-        return redirect()->route('master.prices.tax-codes.index')->with('success', 'Tax code updated successfully.');
+        return redirect()->route('master.prices.tax_codes.index')->with('success', 'Tax code updated successfully.');
     }
 
     public function destroy($id)
@@ -55,6 +55,6 @@ class TaxCodeController extends Controller
         $taxCode = TaxCode::findOrFail($id);
         $taxCode->delete();
 
-        return redirect()->route('master.prices.tax-codes.index')->with('success', 'Tax code deleted successfully.');
+        return redirect()->route('master.prices.tax_codes.index')->with('success', 'Tax code deleted successfully.');
     }
 }

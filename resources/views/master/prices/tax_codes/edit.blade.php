@@ -1,7 +1,4 @@
-<div class="modal-header">
-    <h5 class="modal-title">Edit Tax Code</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-</div>
+
 
 <form action="{{ route('master.prices.tax_codes.update', $taxCode->id) }}" method="POST">
     @csrf
@@ -29,3 +26,7 @@
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
     </div>
 </form>
+
+
+
+
