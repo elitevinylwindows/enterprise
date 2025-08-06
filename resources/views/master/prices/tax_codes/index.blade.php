@@ -101,6 +101,7 @@
 
 @push('scripts')
 <script>
+    // Edit modal trigger
     $(document).on('click', '.customModal', function (e) {
         e.preventDefault();
         const url = $(this).data('url');
@@ -114,11 +115,13 @@
         });
     });
 
-    // Optionally initialize DataTables
+    // ✅ Safe DataTable init — prevent double initialization
     $(document).ready(function () {
-        $('#taxCodesTable').DataTable({
-            responsive: true
-        });
+        if (!$.fn.DataTable.isDataTable('#taxCodesTable')) {
+            $('#taxCodesTable').DataTable({
+                responsive: true
+            });
+        }
     });
 </script>
 @endpush
