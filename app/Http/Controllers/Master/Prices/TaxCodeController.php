@@ -25,7 +25,7 @@ class TaxCodeController extends Controller
 
         TaxCode::create($request->only('code', 'city', 'description', 'rate'));
 
-        return redirect()->route('master.prices.tax-codes.index')->with('success', 'Tax code added successfully.');
+        return redirect()->route('master.prices.tax_codes.index')->with('success', 'Tax code added successfully.');
     }
 
     public function edit($id)
