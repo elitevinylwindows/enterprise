@@ -89,6 +89,7 @@ use App\Http\Controllers\Master\Products\ProductMaster\{
 use App\Http\Controllers\Master\Prices\{
     ProductPricesController,
     MatriceController,
+    TaxCodeController,
     MarkupController
 };
 
@@ -214,6 +215,7 @@ use App\Http\Controllers\Purchasing\{
 };
 use App\Http\Controllers\Sales\Quotes\GridProfileController;
 use App\Http\Controllers\Supplier\QuoteRequestController;
+
 
     // Auth
     require __DIR__ . '/auth.php';
@@ -446,7 +448,8 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::prefix('master/prices')->name('master.prices.')->group(function () {
             Route::get('matrice', [MatriceController::class, 'index'])->name('matrice.index');
             Route::post('matrice/import', [MatriceController::class, 'import'])->name('matrice.import');
-            Route::post('matrice/check', [MatriceController::class, 'checkPrice'])->name('matrice.check'); 
+            Route::post('matrice/check', [MatriceController::class, 'checkPrice'])->name('matrice.check');
+            Route::resource('tax_codes', TaxCodeController::class); 
         });
 
 
@@ -878,6 +881,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::get('/settings/shipping', [ShippingSettingsController::class, 'index'])->name('settings.shipping');
         Route::post('/settings/shipping/truncate', [ShippingSettingsController::class, 'truncateShippingData'])->name('settings.shipping.truncate');
 
+
         // ✅ This one OUTSIDE the purchasing group
         Route::get('/supplier/pr-view/{token}', [PurchasingPurchaseRequestController::class, 'secureView'])
             ->name('supplier.pr.view');
@@ -921,8 +925,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::post('/calendar/get-shop', [CalendarController::class, 'getShopByCustomer'])->name('calendar.getShop');
         Route::post('/shop/contact', [SrDeliveryController::class, 'getShopByCustomer'])->name('shop.contact');
 
-        Route::get('/settings/shipping', [ShippingSettingsController::class, 'index'])->name('settings.shipping');
-        Route::post('/settings/shipping/truncate', [ShippingSettingsController::class, 'truncateShippingData'])->name('settings.shipping.truncate');
 
 
         Route::get('/pickups', [PickupController::class, 'index'])->name('pickups.index');

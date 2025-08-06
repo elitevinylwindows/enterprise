@@ -119,6 +119,7 @@
         .then(data => {
             if (data.success) {
                 alert('Quote saved successfully!');
+                // Optionally, you can redirect or update the UI
                 window.location.href = '{{ route('sales.quotes.index') }}';
             } else {
                 alert('Error saving draft.');
