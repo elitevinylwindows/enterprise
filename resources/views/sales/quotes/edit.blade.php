@@ -1210,6 +1210,17 @@
         console.log('Selected finish type:', selectedFin);
     });
 
+    $('#shipping').on('input focusout', function() {
+        const shippingCost = parseFloat($(this).val()) || 0;
+        const subtotal = parseFloat($('#subtotal').val()) || 0;
+        const tax = parseFloat($('#tax').val()) || 0;
+        const discount = parseFloat($('#discount').val()) || 0;
+
+        const total = subtotal + tax + shippingCost - discount;
+        $('#total-amount').text('$' + total.toFixed(2));
+        $('#total').val(total.toFixed(2));
+    });
+
     function openQuotePreview(quoteId) {
         // const pdfUrl = `/quotes/pdf/${quoteId}/preview`; // You can adjust route if different
         // document.getElementById('quotePdfIframe').src = pdfUrl;

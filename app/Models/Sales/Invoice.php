@@ -33,6 +33,8 @@ class Invoice extends Model
         'sub_total',
         'tax',
         'total',
+        'discount',
+        'shipping'
     ];
 
     public function customer()

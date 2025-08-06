@@ -12,17 +12,17 @@
 
 @section('content')
 <div class="container mt-4">
-    <div class="mb-3">
+    {{-- <div class="mb-3">
         <a href="{{ route('sales.quotes.create') }}" class="btn btn-primary">
             <i class="ti ti-edit"></i> Edit Quote Header (Card 1)
         </a>
-    </div>
+    </div> --}}
 
     <div class="card shadow">
         <div class="card-header bg-white">
             <h4 class="mb-0 text-dark">Start Quote</h4>
         </div>
-        @include('sales.quotes.partials.quote-steps', ['activeStep' => 1])
+        {{-- @include('sales.quotes.partials.quote-steps', ['activeStep' => 1]) --}}
 
         <div class="card-body">
             <form action="{{ route('sales.quotes.store') }}" method="POST">

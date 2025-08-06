@@ -154,3 +154,11 @@
 @endsection
 
 @include('sales.orders.create')
+
+@push('scripts')
+<script>
+     @if ($errors->any())
+            toastr.error("{{ $errors->first() }}");
+    @endif
+</script>
+@endpush

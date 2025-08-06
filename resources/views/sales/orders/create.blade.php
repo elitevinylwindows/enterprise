@@ -127,9 +127,10 @@
                     setValue('order_number', q.order_number ?? '');
                     setValue('customer_number', q.quote.customer_number);
                     setValue('customer_name', q.quote.customer_name);
-                    $('#subtotalDisplay').text(parseFloat(q.quote.sub_total).toFixed(2) ?? '');
-                    $('#taxDisplay').text(parseFloat(q.quote.tax).toFixed(2) ?? '');
-                    $('#totalDisplay').text(parseFloat(q.quote.total).toFixed(2) ?? '');
+                    $('#discountDisplay').text("$"+parseFloat(q.quote.discount).toFixed(2) ?? '');
+                    $('#subtotalDisplay').text("$"+parseFloat(q.quote.sub_total).toFixed(2) ?? '');
+                    $('#taxDisplay').text("$"+parseFloat(q.quote.tax).toFixed(2) ?? '');
+                    $('#totalDisplay').text("$"+parseFloat(q.quote.total).toFixed(2) ?? '');
                     $('#shipping').val(parseFloat(q.quote.shipping).toFixed(2) ?? '');
 
                     const tbody = document.querySelector('#quoteDetailsTable tbody');
@@ -147,7 +148,7 @@
 
                         const row = `
                           <tr data-id="${item.item_id}">
-                            <td>${itemDesc}</td>
+                            <td style="text-wrap:auto">${itemDesc}</td>
                             <td>${qty}</td>
                             <td>${size}</td>
                             <td>${glass}</td>
@@ -169,6 +170,17 @@
                 console.error(err);
                 alert('Error fetching quote');
             });
-    });
+    
+          $('#shipping').on('input focusout', function() {
+            const shippingCost = parseFloat($(this).val()) || 0;
+            const subtotal = parseFloat($('#subtotalDisplay').text().replace(/[^0-9.-]+/g,"")) || 0;
+            const tax = parseFloat($('#taxDisplay').text().replace(/[^0-9.-]+/g,"")) || 0;
+            const discount = parseFloat($('#discountDisplay').text().replace(/[^0-9.-]+/g,"")) || 0;
+
+            const total = subtotal + tax + shippingCost - discount;
+            $('#totalDisplay').text('$' + total.toFixed(2));
+        });
+        
+  });
 
 </script>

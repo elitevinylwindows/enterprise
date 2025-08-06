@@ -30,6 +30,8 @@ class Order extends Model
         'sub_total',
         'tax',
         'total',
+        'discount',
+        'shipping'
 
     ];
 

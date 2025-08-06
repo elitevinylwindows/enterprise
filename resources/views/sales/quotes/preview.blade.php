@@ -67,28 +67,26 @@
             <div class="col-md-6 offset-md-6">
                 <table class="table">
                     <tr>
-                        <th>Surcharge:</th>
-                        <td id="surcharge-amount">${{ number_format(0, 2) }}</td>
+                        <th>Discount:</th>
+                        <td id="discount-amount">${{ number_format($quote->discount, 2) }}</td>
                     </tr>
                     <tr>
                         <th>Subtotal:</th>
                         <td id="subtotal-amount">
-                            ${{ number_format($quote->items->sum('total'), 2) }}
+                            ${{ number_format($quote->sub_total, 2) }}
                         </td>
                     </tr>
                     <tr>
                         <th>Tax:</th>
-                        @php
-                        $subtotal = $quote->items->sum('total');
-                        $surcharge = 0;
-                        $taxRate = 0.08;
-                        $tax = $subtotal * $taxRate;
-                        @endphp
-                        <td id="tax-amount">${{ number_format($tax, 2) }}</td>
+                        <td id="tax-amount">${{ number_format($quote->tax, 2) }}</td>
+                    </tr>
+                     <tr>
+                        <th>Shipping:</th>
+                        <td id="shipping-amount">${{ number_format($quote->shipping, 2) }}</td>
                     </tr>
                     <tr>
                         <th>Total:</th>
-                        <td><strong id="total-amount">${{ number_format($subtotal + $surcharge + $tax, 2) }}</strong></td>
+                        <td><strong id="total-amount">${{ number_format($quote->total, 2) }}</strong></td>
                     </tr>
                 </table>
             </div>
@@ -103,10 +101,11 @@
 <script>
     document.getElementById('saveQuoteButton').addEventListener('click', function() {
         const formData = new FormData();
-        formData.append('surcharge', document.getElementById('surcharge').value);
-        formData.append('subtotal', document.getElementById('subtotal').value);
-        formData.append('tax', document.getElementById('tax').value);
-        formData.append('total', document.getElementById('total').value);
+        formData.append('discount', document.getElementById('discount-amount').innerText.replace(/[$,]/g, ''));
+        formData.append('subtotal', document.getElementById('subtotal-amount').innerText.replace(/[$,]/g, ''));
+        formData.append('tax', document.getElementById('tax-amount').innerText.replace(/[$,]/g, ''));
+        formData.append('shipping', document.getElementById('shipping-amount').innerText.replace(/[$,]/g, ''));
+        formData.append('total', document.getElementById('total-amount').innerText.replace(/[$,]/g, ''));
 
         fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
             method: 'POST',
@@ -118,11 +117,19 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Quote saved successfully!');
-                // Optionally, you can redirect or update the UI
+                toastr.success('Draft saved successfully!', 'Success', {
+                        timeOut: 3000
+                        , progressBar: true
+                        , closeButton: true
+                    });
                 window.location.href = '{{ route('sales.quotes.index') }}';
             } else {
                 alert('Error saving draft.');
+                toastr.error('Failed to save draft. Please try again.', 'Error', {
+                        timeOut: 3000
+                        , progressBar: true
+                        , closeButton: true
+                    });
             }
         })
         .catch(error => {

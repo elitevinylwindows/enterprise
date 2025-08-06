@@ -167,7 +167,7 @@
                         <tr>
                             <th>Shipping:</th>
                             <td>
-                                <input type="number" step="0.01" class="form-control w-25" name="shipping" id="shipping" value="{{ number_format($quote->shipping, 2) }}">
+                                <input type="number" step="0.01" class="form-control w-25" min="0" name="shipping" id="shipping" value="{{ number_format($quote->shipping, 2) }}">
                             </td>
                         </tr>
                         <tr>
@@ -1069,12 +1069,15 @@
                 // Get the current discount value from the input (or 0 if not set)
                 const currentDiscount = parseFloat($('input[name="discount"]').val() ?? 0);
                 const totalDiscount = (currentDiscount + newDiscount).toFixed(2);
+                const tax = parseFloat((res.subtotal/100) * ({{ $taxRate ?? 0 }} ?? 0) ).toFixed(2);
 
                 $('#globalTotalPrice').text(price);
                 $('input[name="price"]').val(price);
                 $('input[name="total"]').val(price);
                 $('input[name="discount"]').val(totalDiscount);
                 $('#discount-amount').text("$" + totalDiscount);
+                $('input[name="tax"]').val(tax);
+                $('#tax-amount').text("$" + tax);
             });
 
         }
@@ -1208,6 +1211,17 @@
     $('#fin_type').on('change', function() {
         const selectedFin = $(this).val();
         console.log('Selected finish type:', selectedFin);
+    });
+
+    $('#shipping').on('input focusout', function() {
+        const shippingCost = parseFloat($(this).val()) || 0;
+        const subtotal = parseFloat($('#subtotal').val()) || 0;
+        const tax = parseFloat($('#tax').val()) || 0;
+        const discount = parseFloat($('#discount').val()) || 0;
+
+        const total = subtotal + tax + shippingCost - discount;
+        $('#total-amount').text('$' + total.toFixed(2));
+        $('#total').val(total.toFixed(2));
     });
 
     function openQuotePreview(quoteId) {

@@ -11,6 +11,7 @@ use App\Models\Sales\Quote;
 use App\Models\Master\Series\Series;
 use App\Models\Master\Series\SeriesType;
 use App\Models\Master\Customers\Customer;
+use App\Models\Master\Prices\TaxCode;
 use App\Models\Sales\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
@@ -504,6 +505,14 @@ class QuoteController extends Controller
 
         $quoteItems = QuoteItem::where('quote_id', $quote->id)->get();
 
+        $taxCode = TaxCode::where('city', $quote->customer->city)->first();
+        
+        if ($taxCode) {
+            $taxRate = $taxCode->rate;
+        } else
+        {
+            $taxRate = 0; // Default tax rate if no code found
+        }
 
         return view('sales.quotes.details', compact(
             'quote',
@@ -513,7 +522,8 @@ class QuoteController extends Controller
             'interiorColors',
             'laminateColors',
             'allConfigurations',
-            'quoteItems'
+            'quoteItems',
+            'taxRate',
         ));
     }
 
@@ -684,7 +694,8 @@ class QuoteController extends Controller
     {
         $quote = Quote::findOrFail($id);
         $quote->status = 'draft';
-        $quote->surcharge = $request->surcharge ?? 0;
+        $quote->discount = $request->discount ?? 0;
+        $quote->shipping = $request->shipping ?? 0;
         $quote->sub_total = $request->subtotal ?? 0;
         $quote->tax = $request->tax ?? 0;
         $quote->total = $request->total ?? 0;
