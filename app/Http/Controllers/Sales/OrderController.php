@@ -67,7 +67,8 @@ class OrderController extends Controller
     public function destroy($id)
     {
         Order::findOrFail($id)->delete();
-        return redirect()->route('sales.orders.index')->with('success', 'Order deleted.');
+
+        return redirect()->route('sales.orders.index')->with('success', 'Order deleted successfully.');
     }
 
     public function getCustomer($customer_number)

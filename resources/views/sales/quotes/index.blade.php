@@ -1,20 +1,20 @@
 @extends('layouts.app')
 
 @section('page-title')
-    {{ __('Quotes') }}
+{{ __('Quotes') }}
 @endsection
 
 @section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ __('Quotes') }}</li>
+<li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ __('Quotes') }}</li>
 @endsection
 
 @section('content')
 <div class="mb-4"></div> {{-- Space after title --}}
 
-    
+
 <div class="mb-4"></div> {{-- Space --}}
-    
+
 
 
 <div class="row">
@@ -22,16 +22,16 @@
     <div class="col-md-2">
         <div class="card">
             <div class="list-group list-group-flush">
-<a href="{{ route('sales.quotes.index', ['status' => 'all']) }}" class="list-group-item">All Quotes</a>
-<a href="{{ route('sales.quotes.index', ['status' => 'draft']) }}" class="list-group-item">Draft Quotes</a>
-<a href="{{ route('sales.quotes.index', ['status' => 'deleted']) }}" class="list-group-item text-danger">Deleted</a>
+                <a href="{{ route('sales.quotes.index', ['status' => 'all']) }}" class="list-group-item">All Quotes</a>
+                <a href="{{ route('sales.quotes.index', ['status' => 'draft']) }}" class="list-group-item">Draft Quotes</a>
+                <a href="{{ route('sales.quotes.index', ['status' => 'deleted']) }}" class="list-group-item text-danger">Deleted</a>
 
             </div>
         </div>
     </div>
 
-  {{-- Main Content Card --}}
- <div class="col-sm-10">
+    {{-- Main Content Card --}}
+    <div class="col-sm-10">
         <div class="card table-card">
             <div class="card-header">
                 <div class="row align-items-center g-2">
@@ -58,95 +58,65 @@
                         </thead>
                         <tbody>
                             @foreach ($quotes as $quote)
-                                <tr>
-                                    <td>{{ $quote->quote_number }}</td>
-                                    <td>{{ $quote->customer_name }}</td>
-                                    <td>{{ $quote->entry_date }}</td>
-                                    <td>{{ $quote->po_number }}</td>
-                                    <td>{{ $quote->reference }}</td>
-                                    <td>${{ number_format($quote->total ?? 0, 2) }}</td>
-                                    <td>{{ $quote->valid_until }}</td>
-                                    <td>
-                                        @if($quote->status === 'approved')
-                                            <span class="badge bg-success">Approved</span>
-                                        @elseif($quote->status === 'rejected')
-                                            <span class="badge bg-danger">Rejected</span>
-                                        @elseif($quote->status === 'sent')
-                                            <span class="badge bg-success">Sent</span>
-                                        @elseif($quote->status === 'draft')
-                                            <span class="badge bg-secondary">Draft</span>
-                                        @else
-                                            <span class="badge bg-light text-muted">{{ ucfirst($quote->status) }}</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-nowrap">
-                                        {{-- View --}}
-                                        <a class="avtar avtar-xs btn-link-success text-success customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="View Summary"
-                                           href="#"
-                                           data-size="xl"
-                                           data-url=""
-                                           data-title="Quote Summary">
-                                            <i data-feather="eye"></i>
-                                        </a>
+                            <tr>
+                                <td>{{ $quote->quote_number }}</td>
+                                <td>{{ $quote->customer_name }}</td>
+                                <td>{{ $quote->entry_date }}</td>
+                                <td>{{ $quote->po_number }}</td>
+                                <td>{{ $quote->reference }}</td>
+                                <td>${{ number_format($quote->total ?? 0, 2) }}</td>
+                                <td>{{ $quote->valid_until }}</td>
+                                <td>
+                                    @if($quote->status === 'approved')
+                                    <span class="badge bg-success">Approved</span>
+                                    @elseif($quote->status === 'rejected')
+                                    <span class="badge bg-danger">Rejected</span>
+                                    @elseif($quote->status === 'sent')
+                                    <span class="badge bg-success">Sent</span>
+                                    @elseif($quote->status === 'draft')
+                                    <span class="badge bg-secondary">Draft</span>
+                                    @else
+                                    <span class="badge bg-light text-muted">{{ ucfirst($quote->status) }}</span>
+                                    @endif
+                                </td>
+                                <td class="text-nowrap">
+                                    {{-- View --}}
+                                    <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" data-bs-original-title="View Summary" href="#" data-size="xl" data-url="{{ route('sales.quotes.view', $quote->id) }}" data-title="Quote Summary">
+                                        <i data-feather="eye"></i>
+                                    </a>
 
-                                        {{-- Edit --}}
-                                        <a class="avtar avtar-xs btn-link-primary text-primary customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Edit"
-                                           href="#"
-                                           data-size="xl"
-                                           data-url="{{ route('sales.quotes.edit', $quote->id) }}"
-                                           data-title="Edit Quote">
-                                            <i data-feather="edit"></i>
-                                        </a>
+                                    {{-- Edit --}}
+                                    <a class="avtar avtar-xs btn-link-primary text-primary" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="{{ route('sales.quotes.edit', $quote->id) }}" data-title="Edit Quote">
+                                        <i data-feather="edit"></i>
+                                    </a>
 
-                                        {{-- Email --}}
-                                        <a class="avtar avtar-xs btn-link-warning text-warning customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Email"
-                                           href="#"
-                                           data-size="md"
-                                           data-url="{{ route('sales.quotes.email', $quote->id) }}"
-                                           data-title="Send Email">
-                                            <i data-feather="mail"></i>
-                                        </a>
+                                    {{-- Email --}}
+                                    <a class="avtar avtar-xs btn-link-warning text-warning emailButton" data-bs-toggle="tooltip" data-bs-original-title="Email" href="#" data-size="md" data-url="{{ route('sales.quotes.email', $quote->id) }}" data-title="Send Email">
+                                        <!-- Added ID for easier selection -->
+                                        <i data-feather="mail" id="emailIcon"></i>
+                                        <span class="spinner-border spinner-border-sm d-none" id="emailSpinner"></span>
+                                    </a>
+
+                                    {{-- Orders --}}
+
+                                    @if(!$quote->order)
+                                    {{-- Manual Convert to Order --}}
+                                    <a href="{{ route('sales.quotes.convertToOrder', ['id' => $quote->id]) }}" class="avtar avtar-xs btn-link-info text-info" data-bs-toggle="tooltip" data-bs-original-title="Convert to Order">
+                                        <i data-feather="shopping-cart"></i>
+                                    </a>
+                                    @endif
 
 
-                                        {{-- Manual Convert to Order --}}
-
-                                        {{-- Orders --}}
-
-                                        <a class="avtar avtar-xs btn-link-success text-success"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Orders"
-                                           href="{{ route('sales.orders.index', ['quote' => $quote->id]) }}">
-                                            <i data-feather="package"></i>
-                                        </a>
-                                        @if(!$quote->order)
-                                        {{-- Manual Convert to Order --}}
-                                        <a href="{{ route('sales.quotes.convertToOrder', ['id' => $quote->id]) }}"
-                                            class="avtar avtar-xs btn-link-info text-info"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-original-title="Convert to Order">
-                                            <i data-feather="shopping-cart"></i>
-                                        </a>
-                                        @endif
-
-
-                                        {{-- Delete --}}
-                                        <a class="avtar avtar-xs btn-link-danger text-danger customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Delete"
-                                           href="#"
-                                           data-size="md"
-                                           data-url="{{ route('sales.quotes.destroy', $quote->id) }}"
-                                           data-title="Delete Quote">
+                                    {{-- Delete --}}
+                                    <form action="{{ route('sales.quotes.destroy', $quote->id) }}" method="POST" style="display:inline;" class="delete-quote-form">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0 delete-quote-btn" data-bs-toggle="tooltip" data-bs-original-title="Delete">
                                             <i data-feather="trash-2"></i>
-                                        </a>
-                                    </td>
-                                </tr>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -159,4 +129,63 @@
 </div>
 @endsection
 
+@push('scripts')
 
+<script>
+    $(document).ready(function() {
+
+        // Add click handler for the email button
+        $('.emailButton').on('click', function(e) {
+            e.preventDefault();
+
+            const $button = $(this);
+            const $icon = $button.find('#emailIcon');
+            const $spinner = $button.find('.spinner-border');
+            const url = $button.data('url');
+
+            // Show spinner and hide icon
+            $icon.addClass('d-none');
+            $spinner.removeClass('d-none');
+            $button.prop('disabled', true);
+
+            $.ajax({
+                url: url
+                , type: 'GET'
+                , data: {
+                    _token: '{{ csrf_token() }}'
+                }
+                , success: function(response) {
+                    toastr.success('Email sent successfully!', 'Success', {
+                        timeOut: 3000
+                        , progressBar: true
+                        , closeButton: true
+                    });
+                }
+                , error: function(xhr) {
+                    toastr.error('Failed to send email. Please try again.', 'Error', {
+                        timeOut: 3000
+                        , progressBar: true
+                        , closeButton: true
+                    });
+                }
+                , complete: function() {
+                    // Always hide spinner and show icon when request is complete
+                    $spinner.addClass('d-none');
+                    $icon.removeClass('d-none');
+                    $button.prop('disabled', false);
+                }
+            });
+        });
+
+        // Delete quote with confirmation
+        $('.delete-quote-btn').on('click', function(e) {
+            e.preventDefault();
+            const $form = $(this).closest('form');
+            if (confirm('Are you sure you want to delete this quote?')) {
+            $form.submit();
+            }
+        });
+    });
+
+</script>
+@endpush

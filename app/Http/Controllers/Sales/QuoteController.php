@@ -11,6 +11,7 @@ use App\Models\Sales\Quote;
 use App\Models\Master\Series\Series;
 use App\Models\Master\Series\SeriesType;
 use App\Models\Master\Customers\Customer;
+use App\Models\Sales\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -448,6 +449,11 @@ class QuoteController extends Controller
         return back()->with('success', 'Quote saved successfully.');
     }
 
+    public function view($id)
+    {
+        $quote = Quote::findOrFail($id);
+        return view('sales.quotes.view', compact('quote'));
+    }
 
     public function details($id)
     {
@@ -579,13 +585,24 @@ class QuoteController extends Controller
     public function edit($id)
     {
         $quote = Quote::with('items')->findOrFail($id);
-        $seriesList = Series::pluck('name', 'id'); // or however you load it
+        $seriesList = DB::table('elitevw_master_series')->pluck('series', 'id');
 
-        return view('sales.quotes.details', [
-            'quote' => $quote,
-            'quoteItems' => $quote->items,
-            'seriesList' => $seriesList
-        ]);
+        $colorConfigurations = \App\Models\Master\Colors\ColorConfiguration::all();
+        $exteriorColors = \App\Models\Master\Colors\ExteriorColor::all();
+        $interiorColors = \App\Models\Master\Colors\InteriorColor::all();
+        $laminateColors = \App\Models\Master\Colors\LaminateColor::all();
+        $quoteItems = QuoteItem::where('quote_id', $quote->id)->get();
+
+        $rawSeries = \App\Models\Master\Series\Series::all();
+        return view('sales.quotes.edit', compact(
+            'quote',
+            'seriesList',
+            'colorConfigurations',
+            'exteriorColors',
+            'interiorColors',
+            'laminateColors',
+            'quoteItems'
+        ));
     }
 
     public function convertToOrder(Request $request, $id)
@@ -616,6 +633,14 @@ class QuoteController extends Controller
         $item->delete();
 
         return response()->json(['success' => true, 'message' => 'Item deleted successfully.']);
+    }
+
+    public function destroy($id)
+    {
+        $quote = Quote::findOrFail($id);
+        $quote->items()->delete(); // Delete all associated items
+        $quote->delete();
+        return redirect()->route('sales.quotes.index')->with('success', 'Quote deleted successfully.');
     }
 
     public function previewPDF($id)
@@ -666,5 +691,27 @@ class QuoteController extends Controller
         $quote->save();
 
         return response()->json(['success' => true, 'message' => 'Quote saved as draft successfully.']);
+    }
+
+    public function email($id)
+    {
+        $quote = Quote::findOrFail($id);
+        Mail::to($quote->customer->email)->send(new QuoteEmail($quote));
+
+        return response()->json(['success' => true, 'message' => 'Quote emailed successfully.']);
+    }
+    
+    public function fetchInfo($id)
+    {
+        try{
+            $quote = Quote::where('quote_number', $id)->with('items')->first();
+            $order = (Order::max('id') ?? 0) + 1;
+            $generatedOrderNumber = 'ORD-' . str_pad($order, 5, '0', STR_PAD_LEFT);
+
+            return response()->json(['success' => true, 'message' => 'Quote fetched successfully.', 'data' => ['quote' => $quote, 'order_number' => $generatedOrderNumber]]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching quote info: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to fetch quote info.'], 500);
+        }
     }
 }

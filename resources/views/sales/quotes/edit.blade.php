@@ -1272,7 +1272,7 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
+               if (data.success) {
                 toastr.success('Draft saved successfully!', 'Success', {
                         timeOut: 3000
                         , progressBar: true

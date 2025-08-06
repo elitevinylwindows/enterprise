@@ -338,7 +338,8 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             // Edit, delete, email, etc. - dynamic routes LAST
             Route::get('quotes/{id}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');
             Route::delete('quotes/{id}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
-            Route::post('quotes/{id}/email', [QuoteController::class, 'email'])->name('quotes.email');
+            Route::get('quotes/{id}/email', [QuoteController::class, 'email'])->name('quotes.email');
+            Route::get('quotes/{id}/view', [QuoteController::class, 'view'])->name('quotes.view');
 
 
             Route::get('/quotes/{id}/preview', [QuoteController::class, 'preview'])->name('quotes.preview');
@@ -356,7 +357,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('orders', [\App\Http\Controllers\Sales\OrderController::class, 'index'])->name('orders.index');
             Route::get('orders/create', [\App\Http\Controllers\Sales\OrderController::class, 'create'])->name('orders.create');
             Route::get('orders/{id}/edit', [\App\Http\Controllers\Sales\OrderController::class, 'edit'])->name('orders.edit');
-            Route::delete('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
+            Route::get('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
             Route::post('orders/{id}/email', [\App\Http\Controllers\Sales\OrderController::class, 'email'])->name('orders.email');
             Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
             Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
@@ -1100,6 +1101,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('quotes/{id}/show', [QuoteController::class, 'show'])->name('quotes.show');
             Route::get('quotes/{id}/status/{status}', [QuoteController::class, 'updateStatus'])->name('quotes.update.status');
             Route::post('quotes/{id}/save-draft', [QuoteController::class, 'saveDraft'])->name('quotes.save.draft');
+            Route::get('quotes/fetch-info/{id}', [QuoteController::class, 'fetchInfo']);
         });
 
 
