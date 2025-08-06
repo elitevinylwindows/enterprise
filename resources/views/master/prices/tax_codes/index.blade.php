@@ -57,7 +57,7 @@
                                         {{-- Edit --}}
                                         <a class="avtar avtar-xs btn-link-primary text-primary customModal"
                                            data-bs-toggle="tooltip"
-                                           data-bs-original-title="Edit"
+                                           title="Edit"
                                            href="#"
                                            data-size="md"
                                            data-url="{{ route('master.prices.tax_codes.edit', $tax->id) }}"
@@ -66,15 +66,13 @@
                                         </a>
 
                                         {{-- Delete --}}
-                                        <a class="avtar avtar-xs btn-link-danger text-danger customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Delete"
-                                           href="#"
-                                           data-size="sm"
-                                           data-url="{{ route('master.prices.tax_codes.destroy', $tax->id) }}"
-                                           data-title="Delete Tax Code">
-                                            <i data-feather="trash-2"></i>
-                                        </a>
+                                        <form action="{{ route('master.prices.tax_codes.destroy', $tax->id) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Are you sure you want to delete this tax code?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent" data-bs-toggle="tooltip" title="Delete">
+                                                <i data-feather="trash-2"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
@@ -87,4 +85,40 @@
 </div>
 @endsection
 
-@include('master.prices.tax_codes.create') {{-- Modal View --}}
+{{-- Create Modal --}}
+@include('master.prices.tax_codes.create')
+
+{{-- Dynamic Edit Modal Container --}}
+<div class="modal fade" id="dynamicEditModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content" id="dynamicEditContent">
+            <div class="modal-body text-center p-5">
+                <div class="spinner-border text-primary" role="status"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    $(document).on('click', '.customModal', function (e) {
+        e.preventDefault();
+        const url = $(this).data('url');
+        $('#dynamicEditModal').modal('show');
+        $('#dynamicEditContent').html('<div class="modal-body text-center p-5"><div class="spinner-border text-primary" role="status"></div></div>');
+
+        $.get(url, function (response) {
+            $('#dynamicEditContent').html(response);
+        }).fail(function () {
+            $('#dynamicEditContent').html('<div class="modal-body text-center p-5 text-danger">Failed to load content.</div>');
+        });
+    });
+
+    // Optionally initialize DataTables
+    $(document).ready(function () {
+        $('#taxCodesTable').DataTable({
+            responsive: true
+        });
+    });
+</script>
+@endpush
