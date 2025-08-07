@@ -118,7 +118,7 @@ class QuickBooksController extends Controller
         } else {
             $qboCustomer = $qboCustomer[0];
         }
-
+        Log::info('QuickBooks Customer: ' . $qboCustomer);
         // Create items if not exist
         $lineItems = [];
 
@@ -126,7 +126,8 @@ class QuickBooksController extends Controller
             $itemName = trim($orderItem->description);
 
             $qboItem = $dataService->Query("SELECT * FROM Item WHERE Name = '{$itemName}'");
-
+            Log::info('QuickBooks Item A: ' . $qboItem);
+            
             if (!$qboItem || empty($qboItem)) {
                 // Create item
                 $qboItem = $dataService->Add(Item::create([
@@ -138,6 +139,8 @@ class QuickBooksController extends Controller
                     ],
                     "UnitPrice" => $orderItem->price,
                 ]));
+                Log::info('QuickBooks Item B: ' . $qboItem);
+
             } else {
                 $qboItem = $qboItem[0];
             }
@@ -156,6 +159,9 @@ class QuickBooksController extends Controller
             ];
         }
 
+        Log::info('QuickBooks Line items: ' . json_encode($lineItems));
+
+
         // Build and send invoice
         $invoiceData = [
             "CustomerRef" => [
@@ -165,8 +171,11 @@ class QuickBooksController extends Controller
             "Line" => $lineItems,
         ];
 
+        Log::info('QuickBooks Invoice Data: ' . json_encode($invoiceData));
+
         $qbInvoice = Invoice::create($invoiceData);
         $createdInvoice = $dataService->Add($qbInvoice);
+        Log::info('QuickBooks Created Invoice: ' . json_encode($createdInvoice));
 
         if ($error = $dataService->getLastError()) {
             Log::error('QuickBooks Error: ' . $error->getResponseBody());
