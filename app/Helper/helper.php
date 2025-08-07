@@ -1997,8 +1997,8 @@ if(!function_exists('quoteToInvoice')) {
                     'payment_link' => $firstServeInvoice['payment_link'],
                 ]);
 
-                // $mail = new InvoiceMail($invoice);
-                // $mail->to($invoice->customer->email)->send($mail);
+                $mail = new InvoiceMail($invoice);
+                $mail->to($invoice->customer->email)->send($mail);
             }
 
         return $invoice;
