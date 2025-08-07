@@ -101,9 +101,6 @@ class QuickBooksController extends Controller
 
         $dataService->updateOAuth2Token($newAccessToken);
 
-        $accounts = $dataService->Query("SELECT * FROM Account WHERE AccountType='Income'");
-        dd($accounts);
-
         // Get or create customer
         $customerName = trim($invoice->customer->customer_name);
         $qboCustomer = $dataService->Query("SELECT * FROM Customer WHERE DisplayName = '{$customerName}'");
