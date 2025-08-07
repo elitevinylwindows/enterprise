@@ -27,19 +27,19 @@ class QuickBooksController extends Controller
         $accessToken = $OAuth2LoginHelper->exchangeAuthorizationCodeForToken($request->code, $request->realmId);
        
         $realmId = SalesSetting::updateorCreate([
-            'name' => 'quickbooks_realm_id',
+            'key' => 'quickbooks_realm_id',
         ], [
             'value' => $request->realmId,
         ]);
 
         $accessToken = SalesSetting::updateorCreate([
-            'name' => 'quickbooks_access_token',
+            'key' => 'quickbooks_access_token',
         ], [
             'value' => $accessToken->getAccessToken(),
         ]);
 
         $refreshToken = SalesSetting::updateorCreate([
-            'name' => 'quickbooks_refresh_token',
+            'key' => 'quickbooks_refresh_token',
         ], [
             'value' => $accessToken->getRefreshToken(),
         ]);
@@ -49,8 +49,8 @@ class QuickBooksController extends Controller
 
     public function getCustomers()
     {
-        $accessToken = SalesSetting::where('name', 'quickbooks_access_token')->value('value');
-        $realmId = SalesSetting::where('name', 'quickbooks_realm_id')->value('value');
+        $accessToken = SalesSetting::where('key', 'quickbooks_access_token')->value('value');
+        $realmId = SalesSetting::where('key', 'quickbooks_realm_id')->value('value');
 
         if (!$accessToken || !$realmId) {
             return redirect('/quickbooks/connect');
