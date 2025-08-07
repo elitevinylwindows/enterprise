@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use QuickBooksOnline\API\Facades\Customer;
 use QuickBooksOnline\API\Facades\Invoice;
+use QuickBooksOnline\API\Facades\Item;
 
 class QuickBooksController extends Controller
 {
@@ -86,7 +87,7 @@ class QuickBooksController extends Controller
 
         $dataService = QuickBooksService::initialize();
 
-        // Refresh token logic (optional, but good practice)
+        // Refresh token
         $oauth2LoginHelper = $dataService->getOAuth2LoginHelper();
         $newAccessToken = $oauth2LoginHelper->refreshAccessTokenWithRefreshToken($refreshToken);
 
@@ -100,40 +101,72 @@ class QuickBooksController extends Controller
 
         $dataService->updateOAuth2Token($newAccessToken);
 
-        // Get or create a customer in QuickBooks
-        $qboCustomers = $dataService->Query("SELECT * FROM Customer");
-        Log::info('List of Customers', ['customers' => $qboCustomers]);
+        $accounts = $dataService->Query("SELECT * FROM Account WHERE AccountType='Income'");
+        dd($accounts);
 
+        // Get or create customer
+        $customerName = trim($invoice->customer->customer_name);
+        $qboCustomer = $dataService->Query("SELECT * FROM Customer WHERE DisplayName = '{$customerName}'");
+
+        if (!$qboCustomer || empty($qboCustomer)) {
+            $qboCustomer = $dataService->Add(Customer::create([
+                "DisplayName" => $invoice->customer->customer_name,
+                "PrimaryEmailAddr" => [
+                    "Address" => $invoice->customer->email,
+                ],
+            ]));
+        } else {
+            $qboCustomer = $qboCustomer[0];
+        }
+
+        // Create items if not exist
         $lineItems = [];
 
-        // Build line items array
-        foreach ($invoice->order->items as $item) {
+        foreach ($invoice->order->items as $orderItem) {
+            $itemName = trim($orderItem->description);
+
+            $qboItem = $dataService->Query("SELECT * FROM Item WHERE Name = '{$itemName}'");
+
+            if (!$qboItem || empty($qboItem)) {
+                // Create item
+                $qboItem = $dataService->Add(Item::create([
+                    "Name" => $itemName,
+                    "Type" => "Service", // or "Inventory", "NonInventory"
+                    "IncomeAccountRef" => [
+                        "value" => "79", // Replace with your income account ID
+                        "name" => "Sales of Product Income"
+                    ],
+                    "UnitPrice" => $orderItem->price,
+                ]));
+            } else {
+                $qboItem = $qboItem[0];
+            }
+
             $lineItems[] = [
-                "Amount" => $item->total, // or $item->price * $item->quantity
+                "Amount" => $orderItem->total,
                 "DetailType" => "SalesItemLineDetail",
                 "SalesItemLineDetail" => [
                     "ItemRef" => [
-                        "value" => 0, // Use item's QuickBooks ID or fallback
-                        "name" => $item->description,
+                        "value" => $qboItem->Id,
+                        "name" => $qboItem->Name,
                     ],
-                    "Qty" => $item->qty,
+                    "Qty" => $orderItem->qty,
                 ],
-                "Description" => $item->description,
+                "Description" => $orderItem->description,
             ];
         }
 
+        // Build and send invoice
         $invoiceData = [
             "CustomerRef" => [
-                "value" => 1,
-                'name' => $invoice->customer->customer_name,
+                "value" => $qboCustomer->Id,
+                "name" => $qboCustomer->DisplayName,
             ],
             "Line" => $lineItems,
         ];
-        Log::info('QuickBooks Invoice Data Result C: ', ['result' => $invoiceData]);
 
-        $invoice = Invoice::create($invoiceData);
-
-        $dataService->Add($invoice);
+        $qbInvoice = Invoice::create($invoiceData);
+        $createdInvoice = $dataService->Add($qbInvoice);
 
         if ($error = $dataService->getLastError()) {
             Log::error('QuickBooks Error: ' . $error->getResponseBody());
