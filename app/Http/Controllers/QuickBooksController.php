@@ -100,7 +100,8 @@ class QuickBooksController extends Controller
         $dataService->updateOAuth2Token($newAccessToken);
 
         // Get or create a customer in QuickBooks
-        $qboCustomer = $dataService->Query("SELECT * FROM Customer WHERE PrimaryEmailAddr = ".$invoice->customer->email."");
+        $qboCustomer = $dataService->Query("SELECT * FROM Customer WHERE DisplayName = ".$invoice->customer->customer_name."");
+        Log::info('QuickBooks Customer Query Result A: ', ['result' => $qboCustomer]);
         if (empty($qboCustomer)) {
             $qboCustomer = $dataService->Add(Customer::create([
                 "DisplayName" => $invoice->customer->customer_name,
@@ -108,9 +109,14 @@ class QuickBooksController extends Controller
                     "Address" => $invoice->customer->email
                 ],
             ]));
+            
+            Log::info('QuickBooks Customer Query Result B: ', ['result' => $qboCustomer]);
+
         } else {
             $qboCustomer = $qboCustomer[0];
+            Log::info('QuickBooks Customer Query Result C: ', ['result' => $qboCustomer]);
         }
+
         $lineItems = [];
 
         // Create Invoice
@@ -119,6 +125,9 @@ class QuickBooksController extends Controller
                 "value" => $qboCustomer->Id
             ]
         ];
+
+        Log::info('QuickBooks Customer Query Result C: ', ['result' => $qboCustomer]);
+
         // Build line items array
         foreach ($invoice->order->items as $item) {
             $lineItems[] = [
@@ -141,6 +150,7 @@ class QuickBooksController extends Controller
             ],
             "Line" => $lineItems,
         ];
+        Log::info('QuickBooks Invoice Data Result C: ', ['result' => $invoiceData]);
 
         $invoice = Invoice::create($invoiceData);
 
