@@ -107,9 +107,9 @@
                                     </a>
 
                                     {{-- Send to QB --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success customModal"
-                                        data-bs-toggle="tooltip" data-bs-original-title="Send to QuickBooks" href="#"
-                                        data-size="xl" data-url="" data-title="Send to Quickbooks">
+                                    <a class="avtar avtar-xs btn-link-success text-success "
+                                        data-bs-toggle="tooltip" data-bs-original-title="Send to QuickBooks" href="{{route('sales.invoices.sendToQuickBooks', $invoice->id)}}"
+                                        data-title="Send to Quickbooks">
                                         <i data-feather="share"></i>
                                     </a>
 

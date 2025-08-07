@@ -31,7 +31,7 @@
                 <h5>{{ ucfirst(str_replace('_', ' ', request('selected', 'Settings'))) }} Settings</h5>
             </div>
             <div class="card-body">
-                {!! Form::open(['route' => 'sales.settings.save', 'method' => 'post']) !!}
+                {!! Form::open(['route' => 'sales.settings.update', 'method' => 'post']) !!}
                 {!! Form::hidden('section', request('selected')) !!}
 
                 @if (request('selected') === 'quickbooks')
