@@ -136,7 +136,7 @@ class QuickBooksController extends Controller
                     ],
                     "UnitPrice" => $orderItem->price,
                 ]));
-                Log::info('QuickBooks Item B: ' . $qboItem);
+                Log::info('QuickBooks Item B: ' . json_encode($qboItem));
 
             } else {
                 $qboItem = $qboItem[0];
