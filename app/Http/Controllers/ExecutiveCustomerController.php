@@ -141,9 +141,20 @@ class ExecutiveCustomerController extends Controller
             'customer_number' => $request->customer_number,
         ]);
 
+        if($customer->serve_customer_id) {
+            $firstServe = new FirstServe();
+            $serveCustomer =  $firstServe->updateCustomer($customer);
+        }
+        else {
+            $firstServe = new FirstServe();
+            $serveCustomer =  $firstServe->createCustomer($customer);
+        }
 
-        $firstServe = new FirstServe();
-        $serveCustomer =  $firstServe->updateCustomer($customer);
+        if($serveCustomer) {
+            $customer->update([
+                'serve_customer_id' => $serveCustomer['id'],
+            ]);
+        }
 
         return redirect()->route('executives.customers.index')->with('success', 'Customer updated successfully.');
     }
