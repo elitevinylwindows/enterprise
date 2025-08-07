@@ -20,7 +20,7 @@
     </div>
 </div>
 
-    
+
 <div class="mb-4"></div> {{-- Space --}}
 
 
@@ -93,7 +93,7 @@
                                            data-bs-original-title="View Summary"
                                            href="#"
                                            data-size="xl"
-                                           data-url=""
+                                           data-url="{{ route('sales.orders.show', $order->id) }}"
                                            data-title="Order Summary">
                                             <i data-feather="eye"></i>
                                         </a>

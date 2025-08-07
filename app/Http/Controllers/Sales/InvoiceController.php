@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sales;
 
+use App\Helper\FirstServe;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Sales\Invoice;
@@ -60,20 +61,45 @@ class InvoiceController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'customer_id' => 'required|exists:elitevw_master_customers,id',
-            'order_id' => 'nullable|exists:elitevw_sales_orders,id',
-            'quote_id' => 'nullable|exists:elitevw_sales_quotes,id',
-            'invoice_number' => 'required|string|unique:elitevw_sales_invoices,invoice_number,' . $id,
-            'invoice_date' => 'required|date',
-            'net_price' => 'required|numeric',
-            'paid_amount' => 'nullable|numeric',
-            'remaining_amount' => 'nullable|numeric',
-            'status' => 'required|string',
-            'notes' => 'nullable|string',
+            'required_payment_type' => 'required|string|in:percentage,fixed',
+            'required_payment_fixed' => 'nullable|numeric',
+            'required_payment_percentage' => 'nullable|numeric|min:0|max:100',
+            'discount' => 'nullable|numeric',
+            'sub_total' => 'required|numeric',
+            'tax' => 'nullable|numeric',
+            'shipping' => 'nullable|numeric',
+            'total' => 'required|numeric',
+            'due_date'  => 'nullable|date',
         ]);
 
         $invoice = Invoice::findOrFail($id);
+
         $invoice->update($request->all());
+
+        if($request->required_payment_type == 'percentage') {
+            $invoice->required_payment = ($invoice->sub_total * $request->required_payment_percentage) / 100;
+        } else {
+            $invoice->required_payment = $request->required_payment_fixed;
+        }
+
+        $invoice->save();
+
+        if($invoice->serve_invoice_id) {
+            $firstServe = new FirstServe();
+            $firstServe->updateInvoiceAmounts($invoice);
+        } else {
+            // If the invoice is not yet created in FirstServe, create it
+            $firstServe = new FirstServe();
+            $firstServeInvoice = $firstServe->createInvoice($invoice);
+
+            if($firstServeInvoice) {
+                $invoice->update([
+                    'gateway_response' => json_encode($firstServeInvoice),
+                    'serve_invoice_id' => $firstServeInvoice['id'],
+                    'payment_link' => $firstServeInvoice['payment_link'],
+                ]);
+            }
+        }
 
         return redirect()->route('sales.invoices.index')->with('success', 'Invoice updated successfully.');
     }

@@ -119,7 +119,7 @@
                 <tbody>
                     @foreach ($quoteItems as $item)
                     <tr data-id="{{ $item->id }}">
-                        <td>{{ $item->description }}</td>
+                        <td style="text-wrap:auto">{{ $item->description }}</td>
                         <td><input type="number" name="qty[]" value="{{ $item->qty }}" class="form-control form-control-sm qty-input" style="width: 60px;" data-id="{{ $item->id }}" data-price="{{ $item->price }}"></td>
                         <td>{{ $item->width }}" x {{ $item->height }}"</td>
                         <td>{{ $item->glass }}</td>
@@ -534,12 +534,12 @@
                     <a href="{{ route('sales.quotes.download', $quote->id) }}" target="_blank" class="btn btn-outline-primary btn-sm">Download PDF</a>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-    
+
                 <div class="modal-body" style="min-height: 80vh;">
-                    
-                    
+
+
                 </div>
-    
+
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-success">Send Quote</button>
                     <button type="button" class="btn btn-primary">Save Quote</button>
@@ -638,7 +638,7 @@
         const total = (qty * parseFloat(price)).toFixed(2);
         const item_comment = form.querySelector('[name="item_comment"]').value;
         const internal_note = form.querySelector('[name="internal_note"]').value;
-        
+
         const formData = new FormData();
         formData.append('item_id', item_id);
         formData.append('series_id', series_id);
@@ -671,7 +671,7 @@
         formData.append('custom_lock_position', form.querySelector('[name="custom_lock_position"]').checked ? 1 : 0);
         formData.append('custom_vent_latch', form.querySelector('[name="custom_vent_latch"]').checked ? 1 : 0);
         formData.append('knocked_down', form.querySelector('[name="knocked_down"]').checked ? 1 : 0);
-        
+
 
         const quoteId = document.getElementById('quoteId').value;
 
@@ -695,7 +695,7 @@
 
                     const row = `
                         <tr data-id="${data.item_id}">
-                            <td>${itemDesc}</td>
+                            <td style="text-wrap:auto">${itemDesc}</td>
                             <td><input type="number" name="qty[]" value="${qty}" min="1" class="form-control form-control-sm qty-input" style="width: 60px;" data-price="${price}" data-id="${data.item_id}"></td>
                             <td>${size}</td>
                             <td>${glass}</td>
@@ -716,7 +716,7 @@
                             </td>
                         </tr>
                     `;
-                            
+
                     if(data.is_update == false) {
                         document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
                     } else {
@@ -724,7 +724,7 @@
                         if (existingRow) {
                             existingRow.remove();
                         }
-                   
+
                         document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
                     }
                     calculateTotals();
@@ -776,7 +776,7 @@
             })
             .catch(() => alert('Server error'));
         }
-        
+
     });
 
     // open modal in view mode
@@ -1064,20 +1064,17 @@
                 , height: height,
                 customer_number: "{{ $quote->customer_number ?? '' }}"
             }, function(res) {
-                const price = parseFloat(res.price ?? 0).toFixed(2);
+               const price = parseFloat(res.price ?? 0).toFixed(2);
                 const newDiscount = parseFloat(res.discount ?? 0);
                 // Get the current discount value from the input (or 0 if not set)
                 const currentDiscount = parseFloat($('input[name="discount"]').val() ?? 0);
                 const totalDiscount = (currentDiscount + newDiscount).toFixed(2);
-                const tax = parseFloat((res.subtotal/100) * ({{ $taxRate ?? 0 }} ?? 0) ).toFixed(2);
 
                 $('#globalTotalPrice').text(price);
                 $('input[name="price"]').val(price);
                 $('input[name="total"]').val(price);
-                $('input[name="discount"]').val(totalDiscount);
+                $('input[name="discount"]').val(newDiscount);
                 $('#discount-amount').text("$" + totalDiscount);
-                $('input[name="tax"]').val(tax);
-                $('#tax-amount').text("$" + tax);
             });
 
         }
@@ -1145,7 +1142,7 @@
                                 <div class="col-md-3">
                                     <div class="card h-100 text-center config-card p-2">
                                         <input type="radio" name="configSelect" value="${conf.name}" class="form-check-input my-2">
-                                        <img src="/config-thumbs/${conf.series}/${conf.category}/${conf.image}" 
+                                        <img src="/config-thumbs/${conf.series}/${conf.category}/${conf.image}"
                                              class="card-img-top" alt="${conf.name}" style="height: 140px; object-fit: contain;">
                                         <div class="card-body p-2">
                                             <small>${conf.name}</small>
@@ -1196,7 +1193,7 @@
                 series_type: $('#seriesTypeSelect').val()
             },
             success: function(data) {
-                
+
                 const currentTotal = parseFloat($('#globalTotalPrice').text()) || 0;
                 $('#globalTotalPrice').text(currentTotal + data.price);
                 // You can update the UI or perform other actions based on the response
@@ -1253,15 +1250,14 @@
             }
         });
 
-        // Example: Surcharge is 0, tax is 8%
-        const taxRate = 0.08;
+        const taxRate = {{ $taxRate }};
         const discount = parseFloat(document.getElementById('discount').value) || 0;
-        const tax = subtotal * taxRate;
-        const total = subtotal + tax + discount;
-
+        const shipping = parseFloat(document.getElementById('shipping').value) || 0;
+        const tax =  subtotal * (taxRate / 100);
+        const total = (subtotal - discount) + tax + shipping;
         document.getElementById('subtotal-amount').textContent = '$' + subtotal.toFixed(2);
         document.getElementById('subtotal').value = subtotal.toFixed(2);
-        document.getElementById('tax-amount').textContent = '$' + tax.toFixed(2);
+        document.getElementById('tax-amount').textContent = '$' + tax.toFixed(2) + ' (' + taxRate.toFixed(2) + '%)';
         document.getElementById('tax').value = tax.toFixed(2);
         document.getElementById('total-amount').textContent = '$' + total.toFixed(2);
         document.getElementById('total').value = total.toFixed(2);

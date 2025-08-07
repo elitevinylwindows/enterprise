@@ -85,7 +85,7 @@
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span>Tax:</span>
-                                    <strong id="taxDisplay">$0.00</strong>
+                                    <strong id="taxDisplay">%0.00</strong>
                                 </li>
                                  <li class="list-group-item d-flex justify-content-between">
                                     <span>Shipping:</span>
@@ -129,7 +129,7 @@
                     setValue('customer_name', q.quote.customer_name);
                     $('#discountDisplay').text("$"+parseFloat(q.quote.discount).toFixed(2) ?? '');
                     $('#subtotalDisplay').text("$"+parseFloat(q.quote.sub_total).toFixed(2) ?? '');
-                    $('#taxDisplay').text("$"+parseFloat(q.quote.tax).toFixed(2) ?? '');
+                    $('#taxDisplay').text("%"+parseFloat(q.quote.tax).toFixed(2) ?? '');
                     $('#totalDisplay').text("$"+parseFloat(q.quote.total).toFixed(2) ?? '');
                     $('#shipping').val(parseFloat(q.quote.shipping).toFixed(2) ?? '');
 
@@ -170,7 +170,7 @@
                 console.error(err);
                 alert('Error fetching quote');
             });
-    
+
           $('#shipping').on('input focusout', function() {
             const shippingCost = parseFloat($(this).val()) || 0;
             const subtotal = parseFloat($('#subtotalDisplay').text().replace(/[^0-9.-]+/g,"")) || 0;
@@ -180,7 +180,7 @@
             const total = subtotal + tax + shippingCost - discount;
             $('#totalDisplay').text('$' + total.toFixed(2));
         });
-        
+
   });
 
 </script>

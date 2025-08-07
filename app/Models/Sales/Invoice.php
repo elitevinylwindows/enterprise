@@ -34,7 +34,10 @@ class Invoice extends Model
         'tax',
         'total',
         'discount',
-        'shipping'
+        'shipping',
+        'required_payment_type',
+        'required_payment',
+        'required_payment_percentage',
     ];
 
     public function customer()

@@ -52,7 +52,7 @@ use App\Http\Controllers\{
     CalendarController,
     ShopController,
     PlanRouteController,
-    LeadController, 
+    LeadController,
     FormOptionController,
     FormOptionGroupController,
     ConfiguratorController,
@@ -175,7 +175,7 @@ use App\Http\Controllers\Schemas\{
     PWUnitController,
     SLDUnitController,
     SWDUnitController,
-    
+
     GSCOHSUnitController,
     GSCOSHUnitController,
     GSCODHUnitController,
@@ -316,12 +316,12 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('{id}/history/show', [UserController::class, 'loggedHistoryShow'])->name('logged.history.show');
             Route::delete('{id}/history', [UserController::class, 'loggedHistoryDestroy'])->name('logged.history.destroy');
         });
-        
-        
-        //Sales    
+
+
+        //Sales
         Route::prefix('sales')->name('sales.')->group(function () {
             Route::get('dashboard', [\App\Http\Controllers\Sales\DashboardController::class, 'index'])->name('dashboard.index');
-            
+
             // Quotes
             // Quotes routes - static and specific routes FIRST
             Route::get('quotes', [QuoteController::class, 'index'])->name('quotes.index');
@@ -359,11 +359,13 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('orders', [\App\Http\Controllers\Sales\OrderController::class, 'index'])->name('orders.index');
             Route::get('orders/create', [\App\Http\Controllers\Sales\OrderController::class, 'create'])->name('orders.create');
             Route::get('orders/{id}/edit', [\App\Http\Controllers\Sales\OrderController::class, 'edit'])->name('orders.edit');
+            Route::put('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'update'])->name('orders.update');
             Route::get('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
             Route::post('orders/{id}/email', [\App\Http\Controllers\Sales\OrderController::class, 'email'])->name('orders.email');
+            Route::get('orders/{id}/show', [\App\Http\Controllers\Sales\OrderController::class, 'show'])->name('orders.show');
             Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
             Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
-            
+
             // Invoices
             Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
             Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
@@ -379,7 +381,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
 
 
 
-        //Crud Generator 
+        //Crud Generator
         Route::get('/crud-generator', [CrudGeneratorController::class, 'index'])->name('crud.index');
         Route::post('/crud-generator', [CrudGeneratorController::class, 'generate'])->name('crud.generate');
 
@@ -432,7 +434,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         });
 
 
-            
+
         Route::prefix('products/product-master')->name('product_master.')->group(function () {
             Route::get('accessories', [AccessoriesController::class, 'index'])->name('accessories.index');
             Route::get('glassinsert', [GlassInsertController::class, 'index'])->name('glassinsert.index');
@@ -441,15 +443,15 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('materials', [MaterialsController::class, 'index'])->name('materials.index');
             Route::get('profiles', [ProfilesController::class, 'index'])->name('profiles.index');
             Route::get('units', [UnitsController::class, 'index'])->name('units.index');
-        });    
-            
-            
-            
+        });
+
+
+
         Route::prefix('master/prices')->name('master.prices.')->group(function () {
             Route::get('matrice', [MatriceController::class, 'index'])->name('matrice.index');
             Route::post('matrice/import', [MatriceController::class, 'import'])->name('matrice.import');
             Route::post('matrice/check', [MatriceController::class, 'checkPrice'])->name('matrice.check');
-            Route::resource('tax_codes', TaxCodeController::class); 
+            Route::resource('tax_codes', TaxCodeController::class);
         });
 
 
@@ -462,44 +464,44 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::resource('shapecatalog', ShapeCatalogController::class);
             Route::resource('drawingobjects', DrawingObjectController::class);
         });
-            
-            
+
+
         Route::prefix('color-options')->name('color-options.')->group(function () {
             Route::resource('color-configurations', ColorConfigurationController::class);
             Route::resource('exterior-colors', ExteriorColorController::class);
             Route::resource('interior-colors', InteriorColorController::class);
             Route::resource('laminate-colors', LaminateColorController::class);
         });
-        
+
         Route::prefix('grid-options')->name('grid-options.')->group(function () {
             Route::resource('grid-types', GridTypeController::class);
             Route::resource('grid-patterns', GridPatternController::class);
-            Route::resource('grid-profiles', GridProfileController::class);   
-        });  
-            
+            Route::resource('grid-profiles', GridProfileController::class);
+        });
+
         Route::prefix('glass-options')->name('glass-options.')->group(function () {
             Route::resource('glass-types', GlassTypeController::class);
             Route::resource('spacers', SpacerController::class);
             Route::resource('tempered-options', TemperedOptionController::class);
             Route::resource('special-glasses', SpecialGlassController::class);
-        });     
+        });
 
         Route::prefix('frame-options')->name('frame-options.')->group(function () {
         Route::resource('frame-types', FrameTypeController::class);
             Route::resource('retrofit-fin-types', RetrofitFinTypeController::class);
-        }); 
+        });
 
         Route::prefix('other-options')->name('other-options.')->group(function () {
             Route::resource('additional-options', AdditionalOptionController::class);
-        }); 
-            
+        });
+
             // Series routes
         Route::prefix('master')->name('master.')->group(function () {
             Route::resource('series', SeriesController::class);
             Route::resource('series-type', SeriesTypeController::class);
         });
-            
-        //Prices  
+
+        //Prices
         Route::prefix('master/prices')->name('prices.')->group(function () {
             Route::get('productprices', [ProductPricesController::class, 'index'])->name('productprices.index');
         });
@@ -619,10 +621,12 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::post('orders/{id}/email', [\App\Http\Controllers\Sales\OrderController::class, 'email'])->name('orders.email');
         Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
         Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
-        
+
         // Invoices
-        Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
         Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
+        Route::get('/invoices/{id}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
+        Route::put('/invoices/{id}', [InvoiceController::class, 'update'])->name('invoices.update');
 
 
         //Supplier
@@ -634,7 +638,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         });
 
 
-        //Crud Generator 
+        //Crud Generator
         Route::get('/crud-generator', [CrudGeneratorController::class, 'index'])->name('crud.index');
         Route::post('/crud-generator', [CrudGeneratorController::class, 'generate'])->name('crud.generate');
 
@@ -688,7 +692,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         });
 
 
-            
+
         Route::prefix('products/product-master')->name('product_master.')->group(function () {
             Route::get('accessories', [AccessoriesController::class, 'index'])->name('accessories.index');
             Route::get('glassinsert', [GlassInsertController::class, 'index'])->name('glassinsert.index');
@@ -697,14 +701,14 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('materials', [MaterialsController::class, 'index'])->name('materials.index');
             Route::get('profiles', [ProfilesController::class, 'index'])->name('profiles.index');
             Route::get('units', [UnitsController::class, 'index'])->name('units.index');
-        });    
-            
-            
-            
+        });
+
+
+
         Route::prefix('master/prices')->name('master.prices.')->group(function () {
             Route::get('matrice', [MatriceController::class, 'index'])->name('matrice.index');
             Route::post('matrice/import', [MatriceController::class, 'import'])->name('matrice.import');
-            Route::post('matrice/check', [MatriceController::class, 'checkPrice'])->name('matrice.check'); 
+            Route::post('matrice/check', [MatriceController::class, 'checkPrice'])->name('matrice.check');
         });
 
 
@@ -717,44 +721,44 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::resource('shapecatalog', ShapeCatalogController::class);
             Route::resource('drawingobjects', DrawingObjectController::class);
         });
-            
-            
+
+
         Route::prefix('color-options')->name('color-options.')->group(function () {
             Route::resource('color-configurations', ColorConfigurationController::class);
             Route::resource('exterior-colors', ExteriorColorController::class);
             Route::resource('interior-colors', InteriorColorController::class);
             Route::resource('laminate-colors', LaminateColorController::class);
         });
-            
+
         Route::prefix('grid-options')->name('grid-options.')->group(function () {
         Route::resource('grid-types', GridTypeController::class);
             Route::resource('grid-patterns', GridPatternController::class);
-            Route::resource('grid-profiles', GridProfileController::class);   
-        });  
-            
+            Route::resource('grid-profiles', GridProfileController::class);
+        });
+
         Route::prefix('glass-options')->name('glass-options.')->group(function () {
             Route::resource('glass-types', GlassTypeController::class);
             Route::resource('spacers', SpacerController::class);
             Route::resource('tempered-options', TemperedOptionController::class);
             Route::resource('special-glasses', SpecialGlassController::class);
-        });     
+        });
 
         Route::prefix('frame-options')->name('frame-options.')->group(function () {
         Route::resource('frame-types', FrameTypeController::class);
             Route::resource('retrofit-fin-types', RetrofitFinTypeController::class);
-        }); 
+        });
 
         Route::prefix('other-options')->name('other-options.')->group(function () {
             Route::resource('additional-options', AdditionalOptionController::class);
-        }); 
-            
+        });
+
             // Series routes
         Route::prefix('master')->name('master.')->group(function () {
             Route::resource('series', SeriesController::class);
             Route::resource('series-type', SeriesTypeController::class);
         });
-            
-        //Prices  
+
+        //Prices
         Route::prefix('master/prices')->name('prices.')->group(function () {
             Route::get('productprices', [ProductPricesController::class, 'index'])->name('productprices.index');
         });
@@ -950,7 +954,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
 
 
 
-        //Leads & Kanban  
+        //Leads & Kanban
         Route::resource('leads', LeadController::class);
         Route::get('leads/import', [LeadController::class, 'import'])->name('leads.import');
         Route::post('/leads/import', [LeadController::class, 'handleImports'])->name('leads.import');
@@ -1043,7 +1047,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::prefix('bill-of-material/prices')->group(function () {
             Route::resource('prices', PriceController::class);
             Route::post('/prices/import', [PriceController::class, 'handleImports'])->name('price.import');
-            
+
         });
 
 
@@ -1107,7 +1111,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         });
 
 
-        //Route Maps         
+        //Route Maps
         Route::get('/routes', [RouteController::class, 'index'])->name('routes.index');
         Route::get('/route/map', [RouteController::class, 'index'])->name('route.map');
 
@@ -1135,10 +1139,10 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::post('/routes/plan/move-to-auto/{date}', [PlanRouteController::class, 'moveToAuto'])->name('routes.plan.moveToAuto'); // Optional
 
 
-        //Invoice Check    
+        //Invoice Check
         Route::get('/invoice-checker', [\App\Http\Controllers\InvoiceCheckerController::class, 'index'])->name('invoice.checker.index');
-            
-            
+
+
 
 
         // Static and specific routes FIRST

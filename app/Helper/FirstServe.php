@@ -20,7 +20,7 @@ class FirstServe
         } else {
             $this->baseURL = env('FIRST_SERVE_PRODUCTION_BASE_URL', 'https://api.mysfsgateway.com/api/v2');
         }
-        
+
         $this->apiKey = env('FIRST_SERVE_API_KEY');
         $this->apiSecret = env('FIRST_SERVE_API_PIN');
         $this->client = new Client();
@@ -102,35 +102,95 @@ class FirstServe
 
     public function createInvoice($invoice)
     {
+        $customerID = (int) $invoice->customer?->serve_customer_id ?: null;
+
+        if ($customerID === null) {
+            // If customer does not exist in FirstServe, create it
+            $firstServeCustomer = $this->createCustomer($invoice->customer);
+            if (isset($firstServeCustomer['id'])) {
+                $customerID = (int) $firstServeCustomer['id'];
+            } else {
+                Log::error("Failed to create customer in FirstServe: " . json_encode($firstServeCustomer));
+            }
+        }
+
+        $invoice->customer->serve_customer_id = $customerID;
+        $invoice->customer->save();
+
         $response = $this->client->post($this->baseURL.'/invoices', [
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic ' . base64_encode($this->apiKey . ':' . $this->apiSecret),
             ],
             'json' => [
-                'customer_id' => (int) $invoice->customer?->serve_customer_id ?: null,
+                'customer_id' => $customerID,
                 'date' => (string) date('Y-m-d'),
                 'number' => $invoice->invoice_number,
                 'due_date' => (string) $invoice->due_date ?: null,
                 'action' => 'charge',
                 'requirement' => [
-                    'value' => (float) $invoice->total,
-                    'type' => 'amount', //percent or amount
+                    'value' => $invoice->required_payment_type === 'percentage' ? (float) $invoice->required_payment_percentage : (float) $invoice->required_payment,
+                    'type' => $invoice->required_payment_type === 'percentage' ? 'percent' : 'amount', //percent or amount
                 ],
-                'products' => $invoice->order->items->map(function ($item) {
+                'discount' => [
+                    'value' => round((float) $invoice->discount ?: 0, 2),
+                    'type' => 'amount'
+                ],
+
+                'shipping' => [
+                    'value' => round((float) $invoice->shipping ?: 0, 2),
+                    'type' => 'amount'
+                ],
+
+                'products' => $invoice->order->items->map(function ($item) use ($invoice) {
+                    // Calculate per-item tax percentage
+                    $itemPrice = round($item->price);
+                    $totalItems = $invoice->order->items->count();
+                    $perItemTaxAmount = $totalItems > 0 ? ((float) $invoice->tax / $totalItems) : 0.0;
+                    $taxPercent = $itemPrice > 0 ? ($perItemTaxAmount / $itemPrice) * 100 : 0.0;
+
                     return [
                         'name' => $item->description,
                         'description' => $item->description,
-                        'price' => (float) $item->price,
+                        'price' => $itemPrice,
                         'quantity' => (float) $item->qty,
-                        'tax' => 0
+                        'tax' => round($taxPercent, 2),
                     ];
                 })->toArray(),
             ]
-        ]);        
+        ]);
 
         $invoice = $response->getBody()->getContents();
         Log::info("Invoice Created: " . $invoice);
+        return json_decode($invoice, true);
+    }
+
+    public function updateInvoiceAmounts($invoice)
+    {
+        $response = $this->client->patch($this->baseURL.'/invoices/'.$invoice->serve_invoice_id, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . base64_encode($this->apiKey . ':' . $this->apiSecret),
+            ],
+            'json' => [
+                'requirement' => [
+                    'value' => $invoice->required_payment_type === 'percentage' ? (float) $invoice->required_payment_percentage : (float) $invoice->required_payment,
+                    'type' => $invoice->required_payment_type === 'percentage' ? 'percent' : 'amount'
+                ],
+                'discount' => [
+                    'value' => round((float) $invoice->discount ?: 0, 2),
+                    'type' => 'amount'
+                ],
+                'shipping' => [
+                    'value' => round((float) $invoice->shipping ?: 0, 2),
+                    'type' => 'amount'
+                ],
+                'due_date' => (string) $invoice->due_date ?: null,
+            ]
+        ]);
+
+        $invoice = $response->getBody()->getContents();
+        Log::info("Invoice Updated: " . $invoice);
         return json_decode($invoice, true);
     }
 }
