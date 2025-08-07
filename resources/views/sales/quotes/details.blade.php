@@ -188,7 +188,7 @@
 
 
             <div class="d-flex justify-content-between mt-4">
-                <a href="{{ route('sales.quotes.create') }}" class="btn btn-secondary">&larr; Previous</a>
+                <a href="{{ route('sales.quotes.show', $quote->id) }}" class="btn btn-secondary">&larr; Previous</a>
 
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-secondary" id="saveDraftButton">Save Draft</button>
