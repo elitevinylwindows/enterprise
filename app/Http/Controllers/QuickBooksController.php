@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sales\SalesSetting;
 use App\Services\QuickBooksService;
 use Illuminate\Http\Request;
 
@@ -24,21 +25,32 @@ class QuickBooksController extends Controller
         $parseUrl = $request->fullUrl();
 
         $accessToken = $OAuth2LoginHelper->exchangeAuthorizationCodeForToken($request->code, $request->realmId);
-
-        // Save token and realmId in session or database
-        session([
-            'quickbooks_access_token' => $accessToken->getAccessToken(),
-            'quickbooks_refresh_token' => $accessToken->getRefreshToken(),
-            'quickbooks_realm_id' => $request->realmId,
+       
+        $realmId = SalesSetting::updateorCreate([
+            'name' => 'quickbooks_realm_id',
+        ], [
+            'value' => $request->realmId,
         ]);
 
-        return redirect('/quickbooks/customers');
+        $accessToken = SalesSetting::updateorCreate([
+            'name' => 'quickbooks_access_token',
+        ], [
+            'value' => $accessToken->getAccessToken(),
+        ]);
+
+        $refreshToken = SalesSetting::updateorCreate([
+            'name' => 'quickbooks_refresh_token',
+        ], [
+            'value' => $accessToken->getRefreshToken(),
+        ]);
+        
+        return redirect()->route('sales.settings.index')->with('success', 'QuickBooks connected successfully.');
     }
 
     public function getCustomers()
     {
-        $accessToken = session('quickbooks_access_token');
-        $realmId = session('quickbooks_realm_id');
+        $accessToken = SalesSetting::where('name', 'quickbooks_access_token')->value('value');
+        $realmId = SalesSetting::where('name', 'quickbooks_realm_id')->value('value');
 
         if (!$accessToken || !$realmId) {
             return redirect('/quickbooks/connect');

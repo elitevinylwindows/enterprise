@@ -45,7 +45,7 @@ class InvoiceMail extends Mailable
     public function content()
     {
         return new Content(
-            view: 'emails.invoice_email',
+            view: 'email.invoice_email',
             with: [
                 'invoice' => $this->invoice
             ]

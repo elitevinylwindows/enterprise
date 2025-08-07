@@ -1981,6 +1981,8 @@ if(!function_exists('quoteToInvoice')) {
                 'shipping' => $quote->shipping,
                 'paid_amount' => 0,
                 'remaining_amount' => $quote->total,
+                'required_payment' => $quote->total,
+                'required_payment_type' => 'fixed',
                 'status' => 'Pending',
                 'notes' => null,
                 'payment_method' => null,
@@ -1998,7 +2000,7 @@ if(!function_exists('quoteToInvoice')) {
                 ]);
 
                 $mail = new InvoiceMail($invoice);
-                $mail->to($invoice->customer->email)->send($mail);
+                Mail::to($order->customer->email)->send($mail);
             }
 
         return $invoice;
@@ -2008,7 +2010,7 @@ if(!function_exists('quoteToInvoice')) {
 if(!function_exists('generateInvoiceNumber')) {
     function generateInvoiceNumber()
     {
-        $lastInvoice = Invoice::max('id')+22;
+        $lastInvoice = Invoice::max('id')+27;
         $nextId = $lastInvoice ? $lastInvoice + 1 : 1;
         return 'INV-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
     }

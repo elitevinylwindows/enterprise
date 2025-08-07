@@ -739,11 +739,12 @@ class QuoteController extends Controller
     public function fetchInfo($id)
     {
         try{
-            $quote = Quote::where('quote_number', $id)->with(['items','customer'])->first();
+            $quote = Quote::where('quote_number', $id)->with(['items','customer', 'order'])->first();
             $order = (Order::max('id') ?? 0) + 1;
             $generatedOrderNumber = 'ORD-' . str_pad($order, 5, '0', STR_PAD_LEFT);
+            $generatedInvoiceNumber = generateInvoiceNumber();
 
-            return response()->json(['success' => true, 'message' => 'Quote fetched successfully.', 'data' => ['quote' => $quote, 'order_number' => $generatedOrderNumber]]);
+            return response()->json(['success' => true, 'message' => 'Quote fetched successfully.', 'data' => ['quote' => $quote, 'order_number' => $generatedOrderNumber, 'invoice_number' => $generatedInvoiceNumber]]);
         } catch (\Exception $e) {
             Log::error('Error fetching quote info: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Failed to fetch quote info.'], 500);

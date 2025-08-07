@@ -102,9 +102,7 @@
                                         <a class="avtar avtar-xs btn-link-warning text-warning customModal"
                                            data-bs-toggle="tooltip"
                                            data-bs-original-title="Email"
-                                           href="#"
-                                           data-size="md"
-                                           data-url="{{ route('sales.orders.email', $order->id) }}"
+                                           href="{{ route('sales.orders.email', $order->id) }}"
                                            data-title="Send Email">
                                             <i data-feather="mail"></i>
                                         </a>
@@ -157,8 +155,12 @@
 
 @push('scripts')
 <script>
-     @if ($errors->any())
-            toastr.error("{{ $errors->first() }}");
+    @if ($errors->any())
+        toastr.error("{{ $errors->first() }}");
+    @endif
+
+    @if(session('success'))
+        toastr.success("{{ session('success') }}");
     @endif
 </script>
 @endpush

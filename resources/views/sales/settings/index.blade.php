@@ -43,8 +43,23 @@
                         {!! Form::label('quickbooks_client_secret', 'Client Secret', ['class' => 'form-label']) !!}
                         {!! Form::text('quickbooks_client_secret', sales_setting('quickbooks_client_secret'), ['class' => 'form-control']) !!}
                     </div>
-
-                      <div class="form-group mb-3">
+                    
+                    <div class="form-group mb-3">
+                        {!! Form::label('quickbooks_realm_id', 'Realm ID', ['class' => 'form-label']) !!}
+                        {!! Form::text('quickbooks_realm_id', sales_setting('quickbooks_realm_id'), ['class' => 'form-control', 'disabled' => true]) !!}
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        {!! Form::label('quickbooks_access_token', 'Access Token', ['class' => 'form-label']) !!}
+                        {!! Form::text('quickbooks_access_token', sales_setting('quickbooks_access_token'), ['class' => 'form-control', 'disabled' => true]) !!}
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        {!! Form::label('quickbooks_refresh_token', 'Refresh Token', ['class' => 'form-label']) !!}
+                        {!! Form::text('quickbooks_refresh_token', sales_setting('quickbooks_refresh_token'), ['class' => 'form-control', 'disabled' => true]) !!}
+                    </div>
+                    
+                    <div class="form-group mb-3">
                         <a href="{{ route('quickbooks.connect') }}" class="btn btn-primary">
                             <i class="fab fa-quickbooks"></i> Connect to QuickBooks
                         </a>

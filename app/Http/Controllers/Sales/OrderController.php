@@ -101,7 +101,8 @@ class OrderController extends Controller
     public function destroy($id)
     {
         $order = Order::findOrFail($id);
-        $order->items()->delete(); // Delete associated items
+        $order->items()->delete();
+        $order->invoice()->delete();
         $order->delete();
 
         return redirect()->route('sales.orders.index')->with('success', 'Order deleted successfully.');
@@ -125,7 +126,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         Mail::to($order->customer->email)->send(new OrderMail($order));
 
-        return redirect()->back()->with('success', 'Order email sent successfully.');
+        return redirect()->route('sales.orders.index')->with('success', 'Order email sent successfully.');
     }
 
     public function show($id)
@@ -134,7 +135,7 @@ class OrderController extends Controller
         return view('sales.orders.show', compact('order'));
     }
 
-     public function convertToInvoice($orderID)
+    public function convertToInvoice($orderID)
     {
         try{
             DB::beginTransaction();
