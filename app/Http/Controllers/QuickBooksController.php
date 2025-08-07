@@ -26,20 +26,20 @@ class QuickBooksController extends Controller
 
         $accessToken = $OAuth2LoginHelper->exchangeAuthorizationCodeForToken($request->code, $request->realmId);
        
-        $realmId = SalesSetting::updateorCreate([
-            'name' => 'quickbooks_realm_id',
+        SalesSetting::updateorCreate([
+            'key' => 'quickbooks_realm_id',
         ], [
             'value' => $request->realmId,
         ]);
 
-        $accessToken = SalesSetting::updateorCreate([
-            'name' => 'quickbooks_access_token',
+        SalesSetting::updateorCreate([
+            'key' => 'quickbooks_access_token',
         ], [
             'value' => $accessToken->getAccessToken(),
         ]);
 
-        $refreshToken = SalesSetting::updateorCreate([
-            'name' => 'quickbooks_refresh_token',
+        SalesSetting::updateorCreate([
+            'key' => 'quickbooks_refresh_token',
         ], [
             'value' => $accessToken->getRefreshToken(),
         ]);
