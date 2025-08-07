@@ -123,8 +123,8 @@ class QuickBooksController extends Controller
             $itemName = trim($orderItem->description);
 
             $qboItem = $dataService->Query("SELECT * FROM Item WHERE Name = '{$itemName}'");
-            Log::info('QuickBooks Item A: ' . $qboItem);
-            
+            Log::info('QuickBooks Item A: ' . json_encode($qboItem));
+
             if (!$qboItem || empty($qboItem)) {
                 // Create item
                 $qboItem = $dataService->Add(Item::create([
