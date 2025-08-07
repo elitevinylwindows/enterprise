@@ -9,6 +9,7 @@ use App\Models\Sales\Invoice;
 use App\Models\Master\Customers\Customer;
 use App\Models\Sales\Order;
 use App\Models\Sales\Quote;
+use App\Services\QuickBooksService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -143,4 +144,6 @@ class InvoiceController extends Controller
             return response()->json(['error' => 'Customer not found'], 404);
         }
     }
+
+
 }

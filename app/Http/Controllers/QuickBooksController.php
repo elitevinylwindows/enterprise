@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sales\Invoice as SalesInvoice;
 use App\Models\Sales\SalesSetting;
 use App\Services\QuickBooksService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use QuickBooksOnline\API\Facades\Customer;
+use QuickBooksOnline\API\Facades\Invoice;
 
 class QuickBooksController extends Controller
 {
@@ -25,7 +29,7 @@ class QuickBooksController extends Controller
         $parseUrl = $request->fullUrl();
 
         $accessToken = $OAuth2LoginHelper->exchangeAuthorizationCodeForToken($request->code, $request->realmId);
-       
+
         SalesSetting::updateorCreate([
             'key' => 'quickbooks_realm_id',
         ], [
@@ -43,7 +47,7 @@ class QuickBooksController extends Controller
         ], [
             'value' => $accessToken->getRefreshToken(),
         ]);
-        
+
         return redirect()->route('sales.settings.index')->with('success', 'QuickBooks connected successfully.');
     }
 
@@ -67,4 +71,87 @@ class QuickBooksController extends Controller
 
         return view('quickbooks.customers', compact('customers'));
     }
+
+    public function sendInvoiceToQuickBooks($invoiceID)
+    {
+        $invoice = SalesInvoice::with(['customer', 'order.items'])->findOrFail($invoiceID);
+
+        $accessToken = SalesSetting::where('key', 'quickbooks_access_token')->value('value');
+        $refreshToken = SalesSetting::where('key', 'quickbooks_refresh_token')->value('value');
+        $realmId = SalesSetting::where('key', 'quickbooks_realm_id')->value('value');
+
+        if (!$accessToken || !$realmId || !$refreshToken) {
+            return redirect('/quickbooks/connect');
+        }
+
+        $dataService = QuickBooksService::initialize();
+
+        // Refresh token logic (optional, but good practice)
+        $oauth2LoginHelper = $dataService->getOAuth2LoginHelper();
+        $newAccessToken = $oauth2LoginHelper->refreshAccessTokenWithRefreshToken($refreshToken);
+
+        SalesSetting::updateOrCreate(['key' => 'quickbooks_access_token'], [
+            'value' => $newAccessToken->getAccessToken(),
+        ]);
+        SalesSetting::updateOrCreate(['key' => 'quickbooks_refresh_token'], [
+            'value' => $newAccessToken->getRefreshToken(),
+        ]);
+
+        $dataService->updateOAuth2Token($newAccessToken);
+
+        // Get or create a customer in QuickBooks
+        $qboCustomer = $dataService->Query("SELECT * FROM Customer WHERE PrimaryEmailAddr = ".$invoice->customer->email."");
+        if (empty($qboCustomer)) {
+            $qboCustomer = $dataService->Add(Customer::create([
+                "DisplayName" => $invoice->customer->customer_name,
+                "PrimaryEmailAddr" => [
+                    "Address" => $invoice->customer->email
+                ],
+            ]));
+        } else {
+            $qboCustomer = $qboCustomer[0];
+        }
+        $lineItems = [];
+
+        // Create Invoice
+        $invoiceData = [
+            "CustomerRef" => [
+                "value" => $qboCustomer->Id
+            ]
+        ];
+        // Build line items array
+        foreach ($invoice->order->items as $item) {
+            $lineItems[] = [
+                "Amount" => $item->total, // or $item->price * $item->quantity
+                "DetailType" => "SalesItemLineDetail",
+                "SalesItemLineDetail" => [
+                    "ItemRef" => [
+                        "value" => $item->quickbooks_item_id ?? "1", // Use item's QuickBooks ID or fallback
+                        "name" => $item->name,
+                    ],
+                    "Qty" => $item->quantity,
+                ],
+                "Description" => $item->description ?? $item->name,
+            ];
+        }
+
+        $invoiceData = [
+            "CustomerRef" => [
+                "value" => $qboCustomer->Id
+            ],
+            "Line" => $lineItems,
+        ];
+
+        $invoice = Invoice::create($invoiceData);
+
+        $dataService->Add($invoice);
+
+        if ($error = $dataService->getLastError()) {
+            Log::error('QuickBooks Error: ' . $error->getResponseBody());
+            return back()->with('error', 'QuickBooks Error: ' . $error->getResponseBody());
+        }
+
+        return back()->with('success', 'Invoice sent to QuickBooks successfully!');
+    }
+
 }

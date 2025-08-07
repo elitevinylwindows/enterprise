@@ -372,6 +372,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             // Invoices
             Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
             Route::get('/invoices/customer/{customer_number}', [\App\Http\Controllers\Sales\InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
+            Route::get('/invoices/{id}/sendto-quickbooks', [QuickBooksController::class, 'sendInvoiceToQuickBooks'])->name('invoices.sendToQuickBooks');
         });
 
         //Supplier
@@ -633,7 +634,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
         Route::get('/invoices/{id}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
         Route::put('/invoices/{id}', [InvoiceController::class, 'update'])->name('invoices.update');
-
 
         //Supplier
         Route::prefix('master/suppliers')->name('master.suppliers.')->group(function () {
