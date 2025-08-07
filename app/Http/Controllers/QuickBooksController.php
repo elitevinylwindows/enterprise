@@ -106,16 +106,6 @@ class QuickBooksController extends Controller
 
         $lineItems = [];
 
-        // Create Invoice
-        $invoiceData = [
-            "CustomerRef" => [
-                "value" => 1,
-                'name' => $invoice->customer->customer_name,
-            ]
-        ];
-
-        Log::info('QuickBooks Customer Query Result C: ', ['result' => $qboCustomer]);
-
         // Build line items array
         foreach ($invoice->order->items as $item) {
             $lineItems[] = [
@@ -134,7 +124,8 @@ class QuickBooksController extends Controller
 
         $invoiceData = [
             "CustomerRef" => [
-                "value" => $qboCustomer->Id
+                "value" => 1,
+                'name' => $invoice->customer->customer_name,
             ],
             "Line" => $lineItems,
         ];
