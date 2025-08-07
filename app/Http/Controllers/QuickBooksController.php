@@ -112,12 +112,12 @@ class QuickBooksController extends Controller
         if (!$qboCustomer || empty($qboCustomer)) {
             Log::info('Customer not found in QBO. Creating new customer.');
 
-            $qboCustomer = $dataService->Add(Customer::create([
+            $qboCustomer = Customer::create([
                 "DisplayName" => $invoice->customer->customer_name,
                 "PrimaryEmailAddr" => [
                     "Address" => $invoice->customer->email
                 ],
-            ]));
+            ]);
 
             Log::info('New Customer Created in QBO', ['customer' => $qboCustomer]);
         } else {
