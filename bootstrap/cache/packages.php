@@ -133,6 +133,13 @@
       0 => 'RachidLaasri\\LaravelInstaller\\Providers\\LaravelInstallerServiceProvider',
     ),
   ),
+  'rap2hpoutre/laravel-log-viewer' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Rap2hpoutre\\LaravelLogViewer\\LaravelLogViewerServiceProvider',
+    ),
+  ),
   'spatie/laravel-ignition' => 
   array (
     'providers' => 

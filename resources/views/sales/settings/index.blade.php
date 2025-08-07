@@ -36,12 +36,18 @@
 
                 @if (request('selected') === 'quickbooks')
                     <div class="form-group mb-3">
-                        {!! Form::label('quickbooks_api_key', 'API Key', ['class' => 'form-label']) !!}
-                        {!! Form::text('quickbooks_api_key', sales_setting('quickbooks_api_key'), ['class' => 'form-control']) !!}
+                        {!! Form::label('quickbooks_client_id', 'Client ID', ['class' => 'form-label']) !!}
+                        {!! Form::text('quickbooks_client_id', sales_setting('quickbooks_client_id'), ['class' => 'form-control']) !!}
                     </div>
                     <div class="form-group mb-3">
-                        {!! Form::label('quickbooks_company_id', 'Company ID', ['class' => 'form-label']) !!}
-                        {!! Form::text('quickbooks_company_id', sales_setting('quickbooks_company_id'), ['class' => 'form-control']) !!}
+                        {!! Form::label('quickbooks_client_secret', 'Client Secret', ['class' => 'form-label']) !!}
+                        {!! Form::text('quickbooks_client_secret', sales_setting('quickbooks_client_secret'), ['class' => 'form-control']) !!}
+                    </div>
+
+                      <div class="form-group mb-3">
+                        <a href="{{ route('quickbooks.connect') }}" class="btn btn-primary">
+                            <i class="fab fa-quickbooks"></i> Connect to QuickBooks
+                        </a>
                     </div>
 
                 @elseif (request('selected') === 'sales_admin')

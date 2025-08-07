@@ -59,6 +59,7 @@ use App\Http\Controllers\{
     ExecutiveCustomerController,
     ExecutiveTierController,
     FormulaController,
+    QuickBooksController,
     RaffleDrawController,
     WindowRenderController
 };
@@ -515,6 +516,11 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::post('sales/settings/update', [SalesSettingsController::class, 'update'])->name('sales.settings.update');
         Route::post('/sales/settings/save', [SalesSettingsController::class, 'save'])->name('sales.settings.save');
         Route::post('quotes/{id}/convert-to-order', [\App\Http\Controllers\Sales\QuoteController::class, 'convertToOrder'])->name('quotes.convertToOrder');
+
+        // quickbooks
+        Route::get('/quickbooks/connect', [QuickBooksController::class, 'connect'])->name('quickbooks.connect');
+        Route::get('/quickbooks/callback', [QuickBooksController::class, 'callback'])->name('quickbooks.callback');
+        Route::get('/quickbooks/customers', [QuickBooksController::class, 'getCustomers'])->name('quickbooks.customers');
 
         //Invoices
         Route::prefix('sales')->name('sales.')->group(function () {
