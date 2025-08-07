@@ -141,7 +141,7 @@ class ExecutiveCustomerController extends Controller
             'customer_number' => $request->customer_number,
         ]);
 
-        if($customer->serve_customer_id) {
+        if(isset($customer->serve_customer_id) && $customer->serve_customer_id) {
             $firstServe = new FirstServe();
             $serveCustomer =  $firstServe->updateCustomer($customer);
         }
