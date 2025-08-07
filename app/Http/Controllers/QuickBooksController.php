@@ -143,12 +143,12 @@ class QuickBooksController extends Controller
                 "DetailType" => "SalesItemLineDetail",
                 "SalesItemLineDetail" => [
                     "ItemRef" => [
-                        "value" => $item->quickbooks_item_id ?? "1", // Use item's QuickBooks ID or fallback
-                        "name" => $item->name,
+                        "value" => 0, // Use item's QuickBooks ID or fallback
+                        "name" => $item->description,
                     ],
-                    "Qty" => $item->quantity,
+                    "Qty" => $item->qty,
                 ],
-                "Description" => $item->description ?? $item->name,
+                "Description" => $item->description,
             ];
         }
 
