@@ -115,7 +115,7 @@ class QuickBooksController extends Controller
         } else {
             $qboCustomer = $qboCustomer[0];
         }
-        Log::info('QuickBooks Customer: ' . $qboCustomer);
+        Log::info('QuickBooks Customer: ' . json_encode($qboCustomer));
         // Create items if not exist
         $lineItems = [];
 
