@@ -129,7 +129,7 @@
                     setValue('customer_name', q.quote.customer_name);
                     $('#discountDisplay').text("$"+parseFloat(q.quote.discount).toFixed(2) ?? '');
                     $('#subtotalDisplay').text("$"+parseFloat(q.quote.sub_total).toFixed(2) ?? '');
-                    $('#taxDisplay').text("%"+parseFloat(q.quote.tax).toFixed(2) ?? '');
+                    $('#taxDisplay').text("$"+parseFloat(q.quote.tax).toFixed(2) ?? '');
                     $('#totalDisplay').text("$"+parseFloat(q.quote.total).toFixed(2) ?? '');
                     $('#shipping').val(parseFloat(q.quote.shipping).toFixed(2) ?? '');
 

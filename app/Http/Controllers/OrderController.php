@@ -6,6 +6,8 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Helper\OrderImportHelper;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -149,4 +151,5 @@ class OrderController extends Controller
             return null;
         }
     }
+
 }

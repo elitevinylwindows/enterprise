@@ -739,7 +739,7 @@ class QuoteController extends Controller
     public function fetchInfo($id)
     {
         try{
-            $quote = Quote::where('quote_number', $id)->with('items')->first();
+            $quote = Quote::where('quote_number', $id)->with(['items','customer'])->first();
             $order = (Order::max('id') ?? 0) + 1;
             $generatedOrderNumber = 'ORD-' . str_pad($order, 5, '0', STR_PAD_LEFT);
 

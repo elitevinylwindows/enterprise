@@ -133,4 +133,20 @@ class OrderController extends Controller
         $order = Order::with('items')->findOrFail($id);
         return view('sales.orders.show', compact('order'));
     }
+
+     public function convertToInvoice($orderID)
+    {
+        try{
+            DB::beginTransaction();
+            $order = Order::findOrFail($orderID);
+            $quote = $order->quote;
+            $invoice = quoteToInvoice($quote, $order);
+            DB::commit();
+            return redirect()->route('sales.invoices.index')->with('success', 'Order converted to invoice successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Failed to convert order to invoice: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to convert order to invoice: ' . $e->getMessage());
+        }
+    }
 }

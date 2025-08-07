@@ -13,22 +13,6 @@
           {{-- Row 1 --}}
           <div class="row mb-3">
             <div class="col-md-4">
-              <label>Invoice Number</label>
-              <input type="text" name="invoice_number" id="invoice_number" class="form-control" readonly>
-            </div>
-            <div class="col-md-4">
-              <label>Invoice Date</label>
-              <input type="date" name="invoice_date" class="form-control" value="{{ date('Y-m-d') }}">
-            </div>
-            <div class="col-md-4">
-              <label>Order Number</label>
-              <input type="text" name="order_number" id="order_number" class="form-control" readonly>
-            </div>
-          </div>
-
-          {{-- Row 2 --}}
-          <div class="row mb-3">
-            <div class="col-md-4">
               <label>Quote Number</label>
               <input type="text" name="quote_number" id="invoice_quote_number" class="form-control" placeholder="Enter Quote Number">
             </div>
@@ -39,6 +23,22 @@
             <div class="col-md-4">
               <label>Customer Name</label>
               <input type="text" name="customer_name" id="invoice_customer_name" class="form-control" readonly>
+            </div>
+          </div>
+
+          {{-- Row 2 --}}
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label>Invoice Number</label>
+              <input type="text" name="invoice_number" id="invoice_number" class="form-control" readonly>
+            </div>
+            <div class="col-md-4">
+              <label>Invoice Date</label>
+              <input type="date" name="invoice_date" class="form-control" value="{{ date('Y-m-d') }}">
+            </div>
+            <div class="col-md-4">
+              <label>Order Number</label>
+              <input type="text" name="order_number" id="order_number" class="form-control" readonly>
             </div>
           </div>
 

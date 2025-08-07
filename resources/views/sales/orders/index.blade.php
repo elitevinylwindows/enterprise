@@ -114,7 +114,7 @@
                                         <a class="avtar avtar-xs btn-link-info text-info"
                                            data-bs-toggle="tooltip"
                                            data-bs-original-title="Invoice"
-                                           href="{{ route('sales.orders.index', ['order' => $order->id]) }}">
+                                           href="{{ route('sales.orders.convertToInvoice', ['id' => $order->id]) }}">
                                             <i data-feather="file-text"></i>
                                         </a>
                                         @endif

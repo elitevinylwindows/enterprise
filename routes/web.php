@@ -366,9 +366,11 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
             Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
 
+            Route::get('orders/{id}/convert-to-invoice', [\App\Http\Controllers\Sales\OrderController::class, 'convertToInvoice'])->name('orders.convertToInvoice');
+
             // Invoices
             Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
-            Route::get('/invoices/customer/{customer_number}', [InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
+            Route::get('/invoices/customer/{customer_number}', [\App\Http\Controllers\Sales\InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
         });
 
         //Supplier
