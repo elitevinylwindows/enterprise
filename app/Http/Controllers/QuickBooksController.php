@@ -104,33 +104,13 @@ class QuickBooksController extends Controller
         $qboCustomers = $dataService->Query("SELECT * FROM Customer");
         Log::info('List of Customers', ['customers' => $qboCustomers]);
 
-       $customerName = trim($invoice->customer->customer_name);
-        Log::info('Customer Name Being Queried', ['name' => $customerName]);
-
-        $qboCustomer = $dataService->Query("SELECT * FROM Customer WHERE DisplayName = '{$customerName}'");
-
-        if (!$qboCustomer || empty($qboCustomer)) {
-            Log::info('Customer not found in QBO. Creating new customer.');
-
-            $qboCustomer = $dataService->Add(Customer::create([
-                "DisplayName" => $invoice->customer->customer_name,
-                "PrimaryEmailAddr" => [
-                    "Address" => $invoice->customer->email
-                ],
-            ]))->getCustomer();
-
-            Log::info('New Customer Created in QBO', ['customer' => $qboCustomer]);
-        } else {
-            $qboCustomer = $qboCustomer[0];
-            Log::info('Customer Found in QBO', ['customer' => $qboCustomer]);
-        }
-
         $lineItems = [];
 
         // Create Invoice
         $invoiceData = [
             "CustomerRef" => [
-                "value" => $qboCustomer->Id
+                "value" => 1,
+                'name' => $invoice->customer->customer_name,
             ]
         ];
 
