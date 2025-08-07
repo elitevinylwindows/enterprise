@@ -528,7 +528,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         });
 
 
-
         Route::get('/master/prices/matrice/types/{seriesId}', [\App\Http\Controllers\Master\Prices\MatriceController::class, 'getTypes']);
         Route::post('/master/prices/matrice/import', [MatriceController::class, 'import'])->name('master.prices.matrice.import');
         Route::post('/master/prices/matrice/check', [MatriceController::class, 'checkPrice'])->name('master.prices.matrice.check');
@@ -1225,3 +1224,4 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
     });
 
 Route::get('quote/request/{token}', [QuoteRequestController::class, 'secureView'])->name('quote.request.show');
+Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
