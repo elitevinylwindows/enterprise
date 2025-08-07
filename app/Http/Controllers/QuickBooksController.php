@@ -93,6 +93,7 @@ class QuickBooksController extends Controller
         SalesSetting::updateOrCreate(['key' => 'quickbooks_access_token'], [
             'value' => $newAccessToken->getAccessToken(),
         ]);
+
         SalesSetting::updateOrCreate(['key' => 'quickbooks_refresh_token'], [
             'value' => $newAccessToken->getRefreshToken(),
         ]);
@@ -100,22 +101,28 @@ class QuickBooksController extends Controller
         $dataService->updateOAuth2Token($newAccessToken);
 
         // Get or create a customer in QuickBooks
-        $customerName = addslashes($invoice->customer->customer_name);
+        $qboCustomers = $dataService->Query("SELECT * FROM Customer");
+        Log::info('List of Customers', ['customers' => $qboCustomers]);
+
+       $customerName = trim($invoice->customer->customer_name);
+        Log::info('Customer Name Being Queried', ['name' => $customerName]);
+
         $qboCustomer = $dataService->Query("SELECT * FROM Customer WHERE DisplayName = '{$customerName}'");
-        Log::info('QuickBooks Customer Query Result A: ', ['result' => $qboCustomer]);
-        if (empty($qboCustomer)) {
+
+        if (!$qboCustomer || empty($qboCustomer)) {
+            Log::info('Customer not found in QBO. Creating new customer.');
+
             $qboCustomer = $dataService->Add(Customer::create([
                 "DisplayName" => $invoice->customer->customer_name,
                 "PrimaryEmailAddr" => [
                     "Address" => $invoice->customer->email
                 ],
             ]));
-            
-            Log::info('QuickBooks Customer Query Result B: ', ['result' => $qboCustomer]);
 
+            Log::info('New Customer Created in QBO', ['customer' => $qboCustomer]);
         } else {
             $qboCustomer = $qboCustomer[0];
-            Log::info('QuickBooks Customer Query Result C: ', ['result' => $qboCustomer]);
+            Log::info('Customer Found in QBO', ['customer' => $qboCustomer]);
         }
 
         $lineItems = [];
