@@ -100,7 +100,8 @@ class QuickBooksController extends Controller
         $dataService->updateOAuth2Token($newAccessToken);
 
         // Get or create a customer in QuickBooks
-        $qboCustomer = $dataService->Query("SELECT * FROM Customer WHERE DisplayName = ".$invoice->customer->customer_name."");
+        $customerName = addslashes($invoice->customer->customer_name);
+        $qboCustomer = $dataService->Query("SELECT * FROM Customer WHERE DisplayName = '{$customerName}'");
         Log::info('QuickBooks Customer Query Result A: ', ['result' => $qboCustomer]);
         if (empty($qboCustomer)) {
             $qboCustomer = $dataService->Add(Customer::create([
