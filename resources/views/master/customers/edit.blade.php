@@ -12,7 +12,7 @@
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label">Name</label>
-                <input type="text" name="name" class="form-control" value="{{ $customer->name }}" required>
+                <input type="text" name="name" class="form-control" value="{{ $customer->customer_name }}" required>
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label">Email</label>
