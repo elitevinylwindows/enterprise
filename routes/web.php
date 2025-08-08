@@ -154,8 +154,8 @@ use App\Http\Controllers\Master\Series\{
 use App\Http\Controllers\Sales\{
     QuoteController,
     SalesSettingsController,
-    InvoiceController
-    QuickBooksController,
+    InvoiceController,
+    QuickBooksController
 };
 
 
