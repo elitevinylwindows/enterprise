@@ -4,9 +4,12 @@ namespace App\Models\Sales;
 
 use App\Models\Master\Customers\Customer;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Quote extends Model
 {
+    use SoftDeletes;
+    
     protected $table = 'elitevw_sales_quotes'; // use your actual table name
     protected $guarded = ['id']; // protect the id field from mass assignment
    
