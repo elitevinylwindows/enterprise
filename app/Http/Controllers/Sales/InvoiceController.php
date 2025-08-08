@@ -262,4 +262,22 @@ class InvoiceController extends Controller
         return redirect()->back()->with('success', 'Invoice queued for QuickBooks sync.');
     }
 
+
+    public function deleted()
+{
+    $invoices = Invoice::onlyTrashed()->get();
+    return view('sales.invoices.deleted', compact('invoices'));
+}
+
+public function restore($id)
+{
+    Invoice::withTrashed()->findOrFail($id)->restore();
+    return redirect()->route('sales.invoices.deleted')->with('success', 'Invoice restored successfully');
+}
+
+public function forceDelete($id)
+{
+    Invoice::withTrashed()->findOrFail($id)->forceDelete();
+    return redirect()->route('sales.invoices.deleted')->with('success', 'Invoice permanently deleted');
+}
 }

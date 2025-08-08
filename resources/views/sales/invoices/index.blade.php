@@ -24,7 +24,7 @@
             <div class="list-group list-group-flush">
                 <a href="{{ route('sales.invoices.index', ['status' => 'all']) }}" class="list-group-item">All Invoices</a>
                 <a href="{{ route('sales.invoices.index', ['status' => 'paid']) }}" class="list-group-item">Paid Invoices</a>
-                <a href="{{ route('sales.invoices.index', ['status' => 'deleted']) }}" class="list-group-item text-danger">Deleted</a>
+                <a href="{{ route('sales.invoices.deleted', ['status' => 'deleted']) }}" class="list-group-item text-danger">Deleted</a>
 
             </div>
         </div>

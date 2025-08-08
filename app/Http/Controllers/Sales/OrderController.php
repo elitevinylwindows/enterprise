@@ -150,4 +150,22 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Failed to convert order to invoice: ' . $e->getMessage());
         }
     }
+
+    public function deleted()
+{
+    $orders = Order::onlyTrashed()->get();
+    return view('sales.orders.deleted', compact('orders'));
+}
+
+public function restore($id)
+{
+    Order::withTrashed()->findOrFail($id)->restore();
+    return redirect()->route('sales.orders.deleted')->with('success', 'Order restored successfully');
+}
+
+public function forceDelete($id)
+{
+    Order::withTrashed()->findOrFail($id)->forceDelete();
+    return redirect()->route('sales.orders.deleted')->with('success', 'Order permanently deleted');
+}
 }

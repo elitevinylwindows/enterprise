@@ -833,4 +833,25 @@ class QuoteController extends Controller
             return back()->withErrors(['error' => 'Failed to edit quote. Please try again later.']);
         }
     }
+
+
+    public function deleted()
+{
+    $quotes = Quote::onlyTrashed()->get();
+    return view('sales.quotes.deleted', compact('quotes'));
+}
+
+public function restore($id)
+{
+    Quote::withTrashed()->findOrFail($id)->restore();
+    return redirect()->route('sales.quotes.deleted')->with('success', 'Quote restored successfully');
+}
+
+public function forceDelete($id)
+{
+    Quote::withTrashed()->findOrFail($id)->forceDelete();
+    return redirect()->route('sales.quotes.deleted')->with('success', 'Quote permanently deleted');
+}
+
+
 }

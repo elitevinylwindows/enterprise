@@ -24,7 +24,7 @@
             <div class="list-group list-group-flush">
                 <a href="{{ route('sales.orders.index', ['status' => 'all']) }}" class="list-group-item">All Orders</a>
                 <a href="{{ route('sales.orders.index', ['status' => 'modified']) }}" class="list-group-item">Modified Orders</a>
-                <a href="{{ route('sales.orders.index', ['status' => 'deleted']) }}" class="list-group-item text-danger">Deleted</a>
+                <a href="{{ route('sales.orders.deleted', ['status' => 'deleted']) }}" class="list-group-item text-danger">Deleted</a>
 
             </div>
         </div>
