@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
 @section('page-title')
-    {{ __('Invoices') }}
+{{ __('Invoices') }}
 @endsection
 
 @section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ __('Invoices') }}</li>
+<li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ __('Invoices') }}</li>
 @endsection
 
 @section('content')
 <div class="mb-4"></div> {{-- Space after title --}}
 
-    
+
 <div class="mb-4"></div> {{-- Space --}}
 
 
@@ -21,16 +21,19 @@
     <div class="col-md-2">
         <div class="card">
             <div class="list-group list-group-flush">
-<a href="{{ route('sales.invoices.index', ['status' => 'all']) }}" class="list-group-item">All Invoices</a>
-<a href="{{ route('sales.invoices.index', ['status' => 'paid']) }}" class="list-group-item">Paid Invoices</a>
-<a href="{{ route('sales.invoices.index', ['status' => 'balance']) }}" class="list-group-item text-danger">Balance</a>
+                <a href="{{ route('sales.invoices.index', ['status' => 'all']) }}" class="list-group-item">All
+                    Invoices</a>
+                <a href="{{ route('sales.invoices.index', ['status' => 'paid']) }}" class="list-group-item">Paid
+                    Invoices</a>
+                <a href="{{ route('sales.invoices.index', ['status' => 'balance']) }}"
+                    class="list-group-item text-danger">Balance</a>
 
             </div>
         </div>
     </div>
 
-  {{-- Main Content Card --}}
- <div class="col-sm-10">
+    {{-- Main Content Card --}}
+    <div class="col-sm-10">
         <div class="card table-card">
             <div class="card-header">
                 <div class="row align-items-center g-2">
@@ -38,16 +41,16 @@
                         <h5>{{ __('Invoice List') }}</h5>
                     </div>
                     <div class="row">
-    <div class="col-auto ms-auto">
-        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">
-    <i class="fas fa-circle-plus"></i> Create Invoice
-</a>
+                        <div class="col-auto ms-auto">
+                            <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#createInvoiceModal">
+                                <i class="fas fa-circle-plus"></i> Create Invoice
+                            </a>
 
-    </div>
-</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
 
 
             <div class="card-body pt-0">
@@ -64,6 +67,8 @@
                                 <th>{{ __('Total') }}</th>
                                 <th>{{ __('Paid Amount') }}</th>
                                 <th>{{ __('Remaining Amount') }}</th>
+                                <th>{{ __('Required Payment Type') }}</th>
+                                <th>{{ __('Required Payment') }}</th>
                                 <th>{{ __('Status') }}</th>
                                 <th>{{ __('Notes') }}</th>
                                 <th>{{ __('Action') }}</th>
@@ -71,60 +76,50 @@
                         </thead>
                         <tbody>
                             @foreach ($invoices as $invoice)
-                                <tr>
-                                    <td>{{ $invoice->invoice_number }}</td>
-                                    <td>{{ $invoice->order->order_number }}</td>
-                                    <td>{{ $invoice->quote->quote_number }}</td>
-                                    <td>{{ $invoice->customer->customer_number }}</td>
-                                    <td>{{ $invoice->customer->customer_name }}</td>
-                                    <td>{{ $invoice->invoice_date }}</td>
-                                    <td>${{ number_format($invoice->total ?? 0, 2) }}</td>
-                                    <td>{{ $invoice->paid_amount }}</td>
-                                    <td>{{ $invoice->remaining_amount }}</td>   
-                                    <td>
-                                        @if($invoice->status === 'active')
-                                            <span class="badge bg-success">Active</span>
-                                        @elseif($invoice->status === 'draft')
-                                            <span class="badge bg-secondary">Draft</span>
-                                        @else
-                                            <span class="badge bg-light text-muted">{{ ucfirst($invoice->status) }}</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $invoice->notes }}</td>
-                                    <td class="text-nowrap">
-                                        {{-- View --}}
-                                        <a class="avtar avtar-xs btn-link-success text-success customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="View Summary"
-                                           href="#"
-                                           data-size="xl"
-                                           data-url=""
-                                           data-title="Invoice Summary">
-                                            <i data-feather="eye"></i>
-                                        </a>
+                            <tr>
+                                <td>{{ $invoice->invoice_number }}</td>
+                                <td>{{ $invoice->order->order_number }}</td>
+                                <td>{{ $invoice->quote->quote_number }}</td>
+                                <td>{{ $invoice->customer->customer_number }}</td>
+                                <td>{{ $invoice->customer->customer_name }}</td>
+                                <td>{{ $invoice->invoice_date }}</td>
+                                <td>${{ number_format($invoice->total ?? 0, 2) }}</td>
+                                <td>{{ $invoice->paid_amount }}</td>
+                                <td>{{ $invoice->remaining_amount }}</td>
+                                <td>{{ $invoice->required_payment_type }}</td>
+                                <td>{{ $invoice->required_payment_type === 'percentage' ? "%".$invoice->required_payment_percentage. ' ($'.$invoice->required_payment.')' : "$".number_format($invoice->required_payment, 2) }}</td>
+                                <td>
+                                    @if($invoice->status === 'active')
+                                    <span class="badge bg-success">Active</span>
+                                    @elseif($invoice->status === 'draft')
+                                    <span class="badge bg-secondary">Draft</span>
+                                    @else
+                                    <span class="badge bg-light text-muted">{{ ucfirst($invoice->status) }}</span>
+                                    @endif
+                                </td>
+                                <td>{{ $invoice->notes }}</td>
+                                <td class="text-nowrap">
+                                    {{-- View --}}
+                                    <a class="avtar avtar-xs btn-link-success text-success customModal"
+                                        data-bs-toggle="tooltip" data-bs-original-title="View Summary" href="#"
+                                        data-size="xl" data-url="" data-title="Invoice Summary">
+                                        <i data-feather="eye"></i>
+                                    </a>
 
-                                        {{-- Send to QB --}}
-                                        <a class="avtar avtar-xs btn-link-success text-success customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Send to QuickBooks"
-                                           href="#"
-                                           data-size="xl"
-                                           data-url=""
-                                           data-title="Send to Quickbooks">
-                                            <i data-feather="share"></i>
-                                        </a>
+                                    {{-- Send to QB --}}
+                                    <a class="avtar avtar-xs btn-link-success text-success "
+                                        data-bs-toggle="tooltip" data-bs-original-title="Send to QuickBooks" href="{{route('sales.invoices.sendToQuickBooks', $invoice->id)}}"
+                                        data-title="Send to Quickbooks">
+                                        <i data-feather="share"></i>
+                                    </a>
 
 
-                                        {{-- Email --}}
-                                        <a class="avtar avtar-xs btn-link-warning text-warning customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Email"
-                                           href="#"
-                                           data-size="md"
-                                           data-url=""
-                                           data-title="Send Email">
-                                            <i data-feather="mail"></i>
-                                        </a>
+                                    {{-- Email --}}
+                                    <a class="avtar avtar-xs btn-link-warning text-warning customModal"
+                                        data-bs-toggle="tooltip" data-bs-original-title="Email" href="#" data-size="md"
+                                        data-url="" data-title="Send Email">
+                                        <i data-feather="mail"></i>
+                                    </a>
 
                                         {{-- Take Payment --}}
                                         <a class="avtar avtar-xs btn-link-success text-success customModal"
@@ -136,8 +131,14 @@
                                            data-title="Payment">
                                             <i data-feather="credit-card"></i>
                                         </a>
+                                    {{-- Take Payment --}}
+                                    <a class="avtar avtar-xs btn-link-success text-success customModal"
+                                        data-bs-toggle="tooltip" data-bs-original-title="Pay Invoice" href="#"
+                                        data-size="xl" data-url="" data-title="Pay Invoice">
+                                        <i data-feather="credit-card"></i>
+                                    </a>
 
-                                        <!--{{-- Edit --}}
+                                    {{-- Edit --}}
                                         <a class="avtar avtar-xs btn-link-primary text-primary customModal"
                                            data-bs-toggle="tooltip"
                                            data-bs-original-title="Edit"
@@ -147,9 +148,7 @@
                                            data-title="Edit Invoice">
                                             <i data-feather="edit"></i>
                                         </a>
-
-                                        
-
+                                        <!--
                                         {{-- Billing --}}
                                         <a class="avtar avtar-xs btn-link-info text-info"
                                            data-bs-toggle="tooltip"
@@ -168,8 +167,8 @@
                                            data-title="Delete Invoice">
                                             <i data-feather="trash-2"></i>
                                         </a>-->
-                                    </td>
-                                </tr>
+                                </td>
+                            </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -181,5 +180,3 @@
 @endsection
 
 @include('sales.invoices.create') {{-- Modal included after content --}}
-
-

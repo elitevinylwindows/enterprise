@@ -1,7 +1,9 @@
 <?php
 
+use App\Helper\FirstServe;
 use App\Mail\Common;
 use App\Mail\EmailVerification;
+use App\Mail\InvoiceMail;
 use App\Mail\TestMail;
 use App\Models\AuthPage;
 use App\Models\Custom;
@@ -1879,7 +1881,7 @@ if (!function_exists('getMarkup')) {
         if ($markup) {
             $price = round($price * (1 + $markup / 100), 2);
         }
-        
+
         return $price;
     }
 }
@@ -1893,10 +1895,11 @@ if(!function_exists('quoteToOrder')) {
             $order = Order::create([
                 'quote_id'          => $quote->id,
                 'customer_id'       => $quote->customer->id,
-                'order_number'      => 'O' . str_pad(Order::max('id') + 1, 6, '0', STR_PAD_LEFT),
+                'order_number'      => 'ORD-' . str_pad(Order::max('id') + 1, 5, '0', STR_PAD_LEFT),
                 'invoice_date'      => now()->toDateString(),
                 'net_price'         => $quote->items->sum('total'),
-                'surcharge'         => $quote->surcharge,
+                'discount'         => $quote->discount,
+                'shipping'         => $quote->shipping,
                 'sub_total'         => $quote->sub_total,
                 'tax'               => $quote->tax,
                 'total'             => $quote->total,
@@ -1966,22 +1969,39 @@ if(!function_exists('quoteToInvoice')) {
                 'quote_id' => $quote->id,
                 'invoice_number' => generateInvoiceNumber(),
                 'work_order' => 'WO' . $order->id,
-                'due_date' => now()->addDays(14),
+                'due_date' => now()->addDays(14)->format('Y-m-d'),
                 'entered_by' => auth()->user()->name,
                 'status' => 'Pending',
-                'quote_id' => $quote->id,
-                'order_id' => $order->id,
                 'customer_id' => $quote->customer?->id,
                 'invoice_date' => now(),
                 'total' => $quote->total,
-                'net_price' => $quote->sub_total,
+                'tax' => $quote->tax,
+                'sub_total' => $quote->sub_total,
+                'discount' => $quote->discount,
+                'shipping' => $quote->shipping,
                 'paid_amount' => 0,
                 'remaining_amount' => $quote->total,
+                'required_payment' => $quote->total,
+                'required_payment_type' => 'fixed',
                 'status' => 'Pending',
                 'notes' => null,
                 'payment_method' => null,
                 'gateway_response' => null,
             ]);
+
+            $firstServe = new FirstServe();
+            $firstServeInvoice = $firstServe->createInvoice($invoice);
+
+            if($firstServeInvoice) {
+                $invoice->update([
+                    'gateway_response' => json_encode($firstServeInvoice),
+                    'serve_invoice_id' => $firstServeInvoice['id'],
+                    'payment_link' => $firstServeInvoice['payment_link'],
+                ]);
+
+                $mail = new InvoiceMail($invoice);
+                Mail::to($order->customer->email)->send($mail);
+            }
 
         return $invoice;
     }
@@ -1990,8 +2010,8 @@ if(!function_exists('quoteToInvoice')) {
 if(!function_exists('generateInvoiceNumber')) {
     function generateInvoiceNumber()
     {
-        $lastInvoice = Invoice::orderBy('id', 'desc')->first();
-        $nextId = $lastInvoice ? $lastInvoice->id + 1 : 1;
+        $lastInvoice = Invoice::max('id')+27;
+        $nextId = $lastInvoice ? $lastInvoice + 1 : 1;
         return 'INV-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
     }
 }

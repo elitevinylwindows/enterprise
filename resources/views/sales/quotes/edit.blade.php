@@ -144,7 +144,6 @@
 
 
             </table>
-
             <!-- Totals -->
             <div class="row mt-4">
                 <div class="col-md-6 offset-md-6">
@@ -161,13 +160,13 @@
                         </tr>
                         <tr>
                             <th>Tax:</th>
-                            <input type="hidden" name="tax" id="tax" value="{{ number_format($quote->tax, 2) }}">
-                            <td id="tax-amount">${{ number_format($quote->tax, 2) }}</td>
+                            <input type="hidden" name="tax" id="tax" value="{{ $quote->tax }}">
+                            <td id="tax-amount">${{ number_format($quote->tax, 2) }} ({{ number_format($taxRate, 2) }}%)</td>
                         </tr>
                         <tr>
                             <th>Shipping:</th>
                             <td>
-                                <input type="number" step="0.01" class="form-control w-25" min="0" name="shipping" id="shipping" value="{{ number_format($quote->shipping, 2) }}">
+                                <input type="number" step="0.01" class="form-control w-25" name="shipping" id="shipping" value="{{ number_format($quote->shipping, 2) }}">
                             </td>
                         </tr>
                         <tr>
@@ -635,7 +634,9 @@
         const size = `${width}" x ${height}"`;
         const price = form.querySelector('[name="price"]').value;
         const discount = $("#discount").val() || 0;
+        const taxRate = {{ $taxRate }};
         const total = (qty * parseFloat(price)).toFixed(2);
+        const tax = (taxRate *(total / 100)).toFixed(2);
         const item_comment = form.querySelector('[name="item_comment"]').value;
         const internal_note = form.querySelector('[name="internal_note"]').value;
 
@@ -649,6 +650,7 @@
         formData.append('glass', glass);
         formData.append('grid', grid);
         formData.append('qty', qty);
+        formData.append('tax', tax);
         formData.append('price', price);
         formData.append('discount', discount);
         formData.append('total', total);
@@ -1064,7 +1066,7 @@
                 , height: height,
                 customer_number: "{{ $quote->customer_number ?? '' }}"
             }, function(res) {
-               const price = parseFloat(res.price ?? 0).toFixed(2);
+                const price = parseFloat(res.price ?? 0).toFixed(2);
                 const newDiscount = parseFloat(res.discount ?? 0);
                 // Get the current discount value from the input (or 0 if not set)
                 const currentDiscount = parseFloat($('input[name="discount"]').val() ?? 0);
@@ -1216,7 +1218,8 @@
         const tax = parseFloat($('#tax').val()) || 0;
         const discount = parseFloat($('#discount').val()) || 0;
 
-        const total = subtotal + tax + shippingCost - discount;
+        const total = (subtotal - discount) + tax + shippingCost;
+
         $('#total-amount').text('$' + total.toFixed(2));
         $('#total').val(total.toFixed(2));
     });
@@ -1250,6 +1253,7 @@
             }
         });
 
+        // Example: Surcharge is 0, tax is 8%
         const taxRate = {{ $taxRate }};
         const discount = parseFloat(document.getElementById('discount').value) || 0;
         const shipping = parseFloat(document.getElementById('shipping').value) || 0;
@@ -1282,7 +1286,7 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
+               if (data.success) {
                 toastr.success('Draft saved successfully!', 'Success', {
                         timeOut: 3000
                         , progressBar: true

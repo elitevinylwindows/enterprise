@@ -26,6 +26,13 @@ class Order extends Model
         'due_date',
         'work_order_number',
         'expected_delivery_date',
+        'surcharge',
+        'sub_total',
+        'tax',
+        'total',
+        'discount',
+        'shipping'
+
     ];
 
     // Relationships

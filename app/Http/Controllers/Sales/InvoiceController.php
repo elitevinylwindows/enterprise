@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\Sales;
 
+use App\Helper\FirstServe;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Sales\Invoice;
 use App\Models\Master\Customers\Customer;
 use App\Models\Sales\Order;
 use App\Models\Sales\Quote;
+use App\Services\QuickBooksService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class InvoiceController extends Controller
 {
@@ -29,22 +32,42 @@ class InvoiceController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'customer_id' => 'required|exists:elitevw_master_customers,id',
-            'order_id' => 'nullable|exists:elitevw_sales_orders,id',
-            'quote_id' => 'nullable|exists:elitevw_sales_quotes,id',
-            'invoice_number' => 'required|string|unique:elitevw_sales_invoices,invoice_number',
-            'invoice_date' => 'required|date',
-            'net_price' => 'required|numeric',
-            'paid_amount' => 'nullable|numeric',
-            'remaining_amount' => 'nullable|numeric',
-            'status' => 'required|string',
-            'notes' => 'nullable|string',
+        $validated = $request->validate([
+            'quote_number'      => 'required|string|max:50',
+            'customer_number'   => 'required|string|max:50',
+            'customer_name'     => 'required|string|max:255',
+            'invoice_number'    => 'required|string|max:50|unique:elitevw_sales_invoices,invoice_number',
+            'invoice_date'      => 'required|date',
+            'order_number'      => 'nullable|string|max:50',
+            'notes'             => 'nullable|string',
+            'status'            => 'required|string|max:50',
+            'billing_address'   => 'nullable|string|max:255',
+            'billing_city'      => 'nullable|string|max:100',
+            'billing_state'     => 'nullable|string|max:100',
+            'billing_zip'       => 'nullable|string|max:20',
+            'billing_phone'     => 'nullable|string|max:20',
+            'billing_email'     => 'nullable|email|max:255',
+            'delivery_address'  => 'nullable|string|max:255',
+            'delivery_city'     => 'nullable|string|max:100',
+            'delivery_state'    => 'nullable|string|max:100',
+            'delivery_zip'      => 'nullable|string|max:20',
+            'delivery_phone'    => 'nullable|string|max:20',
+            'delivery_email'    => 'nullable|email|max:255',
         ]);
 
-        Invoice::create($request->all());
-
-        return redirect()->route('sales.invoices.index')->with('success', 'Invoice created successfully.');
+        try{
+            DB::beginTransaction();
+            $quote = Quote::where('quote_number', $request->quote_number)->firstOrFail();
+            $order = Order::where('order_number', $request->order_number)->first();
+            $invoice = quoteToInvoice($quote, $order);
+            DB::commit();
+            return redirect()->route('sales.invoices.index')->with('success', 'Invoice created successfully.');
+        } catch (\Exception $e) {
+            dd($e);
+            Log::error('Error creating invoice: ' . $e->getMessage());
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to create invoice: ' . $e->getMessage());
+        }
     }
 
     public function edit($id)
@@ -60,20 +83,45 @@ class InvoiceController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'customer_id' => 'required|exists:elitevw_master_customers,id',
-            'order_id' => 'nullable|exists:elitevw_sales_orders,id',
-            'quote_id' => 'nullable|exists:elitevw_sales_quotes,id',
-            'invoice_number' => 'required|string|unique:elitevw_sales_invoices,invoice_number,' . $id,
-            'invoice_date' => 'required|date',
-            'net_price' => 'required|numeric',
-            'paid_amount' => 'nullable|numeric',
-            'remaining_amount' => 'nullable|numeric',
-            'status' => 'required|string',
-            'notes' => 'nullable|string',
+            'required_payment_type' => 'required|string|in:percentage,fixed',
+            'required_payment_fixed' => 'nullable|numeric',
+            'required_payment_percentage' => 'nullable|numeric|min:0|max:100',
+            'discount' => 'nullable|numeric',
+            'sub_total' => 'required|numeric',
+            'tax' => 'nullable|numeric',
+            'shipping' => 'nullable|numeric',
+            'total' => 'required|numeric',
+            'due_date'  => 'nullable|date',
         ]);
 
         $invoice = Invoice::findOrFail($id);
+
         $invoice->update($request->all());
+
+        if($request->required_payment_type == 'percentage') {
+            $invoice->required_payment = ($invoice->sub_total * $request->required_payment_percentage) / 100;
+        } else {
+            $invoice->required_payment = $request->required_payment_fixed;
+        }
+
+        $invoice->save();
+
+        if($invoice->serve_invoice_id) {
+            $firstServe = new FirstServe();
+            $firstServe->updateInvoiceAmounts($invoice);
+        } else {
+            // If the invoice is not yet created in FirstServe, create it
+            $firstServe = new FirstServe();
+            $firstServeInvoice = $firstServe->createInvoice($invoice);
+
+            if($firstServeInvoice) {
+                $invoice->update([
+                    'gateway_response' => json_encode($firstServeInvoice),
+                    'serve_invoice_id' => $firstServeInvoice['id'],
+                    'payment_link' => $firstServeInvoice['payment_link'],
+                ]);
+            }
+        }
 
         return redirect()->route('sales.invoices.index')->with('success', 'Invoice updated successfully.');
     }
@@ -106,4 +154,6 @@ class InvoiceController extends Controller
             return response()->json(['error' => 'Customer not found'], 404);
         }
     }
+
+
 }

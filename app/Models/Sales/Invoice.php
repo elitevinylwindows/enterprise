@@ -26,6 +26,18 @@ class Invoice extends Model
         'notes',
         'payment_method',
         'gateway_response',
+        'serve_invoice_id',
+        'due_date',
+        'payment_link',
+        'surcharge',
+        'sub_total',
+        'tax',
+        'total',
+        'discount',
+        'shipping',
+        'required_payment_type',
+        'required_payment',
+        'required_payment_percentage',
     ];
 
     public function customer()

@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Sales;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderMail;
 use Illuminate\Http\Request;
 use App\Models\Sales\Order;
 use App\Models\Master\Customers\Customer;
+use App\Models\Sales\Quote;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -24,24 +28,48 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'customer_id' => 'required|exists:elitevw_master_customers,id',
-            'invoice_date' => 'required|date',
-            'net_price' => 'required|numeric',
+
+        $validated = $request->validate([
+            'quote_number' => 'required|string|max:20',
+            'order_number' => 'required|string|max:20',
+            'entry_date' => 'required|date',
+            'delivery_date' => 'required|date|after_or_equal:entry_date',
             'status' => 'required|string',
             'notes' => 'nullable|string',
-            'paid_amount' => 'nullable|numeric',
-            'remaining_amount' => 'nullable|numeric',
+            'shipping' => 'required|numeric',
         ]);
 
-        Order::create($request->all());
+        try {
+            DB::beginTransaction();
+            $quote = Quote::where('quote_number', $request->quote_number)->firstOrFail();
+            $order = quoteToOrder($quote);
+            $order->expected_delivery_date = $request->delivery_date;
+            $order->shipping = $request->shipping;
+            $order->notes = $request->notes;
+            $order->status = $request->status;
+            $order->save();
+
+            $mail = new OrderMail($order);
+            Mail::to($quote->customer->email)->send($mail);
+
+            DB::commit();
+
+            return redirect()->route('sales.orders.index')->with('success', 'Order created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            dd($e);
+            // Log the error or handle it as needed
+            Log::error('Order creation failed: ' . $e->getMessage());
+            // Return an error response
+            return redirect()->back()->withErrors(['error' => 'Failed to create order: ' . $e->getMessage()]);
+        }
 
         return redirect()->route('sales.orders.index')->with('success', 'Order created successfully.');
     }
 
     public function edit($id)
     {
-        $order = Order::findOrFail($id); 
+        $order = Order::findOrFail($id);
         $customers = Customer::pluck('customer_name', 'id');
         return view('sales.orders.edit', compact('order', 'customers'));
     }
@@ -49,25 +77,35 @@ class OrderController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'customer_id' => 'required|exists:elitevw_master_customers,id',
-            'invoice_date' => 'required|date',
-            'net_price' => 'required|numeric',
+            'quote_number' => 'required|string|max:20',
+            'order_number' => 'required|string|max:20',
+            'entry_date' => 'required|date',
+            'delivery_date' => 'required|date|after_or_equal:entry_date',
             'status' => 'required|string',
             'notes' => 'nullable|string',
-            'paid_amount' => 'nullable|numeric',
-            'remaining_amount' => 'nullable|numeric',
+            'shipping' => 'required|numeric',
         ]);
-
-        $order = Order::findOrFail($id);
-        $order->update($request->all());
-
-        return redirect()->route('sales.orders.index')->with('success', 'Order updated successfully.');
+        try {
+            DB::beginTransaction();
+            $order = Order::findOrFail($id);
+            $order->update($request->all());
+            DB::commit();
+            return redirect()->route('sales.orders.index')->with('success', 'Order updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Order update failed: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Failed to update order: ' . $e->getMessage()]);
+        }
     }
 
     public function destroy($id)
     {
-        Order::findOrFail($id)->delete();
-        return redirect()->route('sales.orders.index')->with('success', 'Order deleted.');
+        $order = Order::findOrFail($id);
+        $order->items()->delete();
+        $order->invoice()->delete();
+        $order->delete();
+
+        return redirect()->route('sales.orders.index')->with('success', 'Order deleted successfully.');
     }
 
     public function getCustomer($customer_number)
@@ -80,6 +118,36 @@ class OrderController extends Controller
             return response()->json(['customer_name' => $customer->customer_name]);
         } else {
             return response()->json(['error' => 'Customer not found'], 404);
+        }
+    }
+
+    public function email($id)
+    {
+        $order = Order::findOrFail($id);
+        Mail::to($order->customer->email)->send(new OrderMail($order));
+
+        return redirect()->route('sales.orders.index')->with('success', 'Order email sent successfully.');
+    }
+
+    public function show($id)
+    {
+        $order = Order::with('items')->findOrFail($id);
+        return view('sales.orders.show', compact('order'));
+    }
+
+    public function convertToInvoice($orderID)
+    {
+        try{
+            DB::beginTransaction();
+            $order = Order::findOrFail($orderID);
+            $quote = $order->quote;
+            $invoice = quoteToInvoice($quote, $order);
+            DB::commit();
+            return redirect()->route('sales.invoices.index')->with('success', 'Order converted to invoice successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Failed to convert order to invoice: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to convert order to invoice: ' . $e->getMessage());
         }
     }
 }

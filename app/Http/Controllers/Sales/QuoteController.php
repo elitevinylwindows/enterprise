@@ -11,6 +11,8 @@ use App\Models\Sales\Quote;
 use App\Models\Master\Series\Series;
 use App\Models\Master\Series\SeriesType;
 use App\Models\Master\Customers\Customer;
+use App\Models\Master\Prices\TaxCode;
+use App\Models\Sales\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +27,7 @@ class QuoteController extends Controller
 {
     public function index(Request $request)
     {
-        
+
         $status = $request->get('status', 'all');
 
         $quotes = Quote::query();
@@ -106,6 +108,12 @@ class QuoteController extends Controller
             ->where('height', $request->height)
             ->value('price');
 
+        $price = getMarkup($request->series_id, $price);
+        $customer = Customer::where('customer_number', $request->customer_number)
+            ->first();
+        $percentage = $customer->tier?->percentage;
+        $discount = ($percentage * ($price / 100));
+
         \Log::info('Checking price matrix', [
             'series_id' => $request->series_id,
             'series_type' => $request->series_type,
@@ -114,7 +122,7 @@ class QuoteController extends Controller
             'price_found' => $price
         ]);
 
-        return response()->json(['price' => $price]);
+        return response()->json(['price' => $price, 'discount' => $discount]);
     }
 
 
@@ -133,6 +141,7 @@ class QuoteController extends Controller
                 'qty' => 'required|numeric',
                 'price' => 'required|numeric',
                 'total' => 'required|numeric',
+                'discount' => 'required|numeric',
                 'item_comment' => 'nullable|string',
                 'internal_note' => 'nullable|string',
                 'color_config' => 'nullable|numeric',
@@ -171,6 +180,7 @@ class QuoteController extends Controller
                         'qty' => $request->qty,
                         'price' => $request->price,
                         'total' => $request->total,
+                        'discount' => $request->discount,
                         'item_comment' => $request->item_comment,
                         'internal_note' => $request->internal_note,
                         'color_config' => $request->color_config,
@@ -198,6 +208,12 @@ class QuoteController extends Controller
                             $request->custom_vent_latch
                         ])->filter()->count(),
                     ]);
+
+                    $oldDiscount = $existingItem->quote->discount;
+
+                    $existingItem->quote->update([
+                        'discount' => $oldDiscount + $request->discount
+                    ]);
                 }
                 $item = $existingItem;
                 $isUpdate = true;
@@ -213,6 +229,7 @@ class QuoteController extends Controller
                     'glass' => $request->glass,
                     'grid' => $request->grid,
                     'qty' => $request->qty,
+                    'discount' => $request->discount,
                     'price' => $request->price,
                     'total' => $request->total,
                     'item_comment' => $request->item_comment,
@@ -241,6 +258,13 @@ class QuoteController extends Controller
                         $request->custom_lock_position,
                         $request->custom_vent_latch
                     ])->filter()->count(),
+                ]);
+
+                // Update the quote's discount with the previous value before this item was added/updated
+                $oldDiscount = $item->quote->discount;
+
+                $item->quote->update([
+                    'discount' => $oldDiscount + $request->discount
                 ]);
             }
 
@@ -304,7 +328,7 @@ class QuoteController extends Controller
     {
         try{
             DB::beginTransaction();
-          
+
             $lastQuote = Quote::latest('id')->first();
             $nextNumber = $lastQuote ? $lastQuote->id + 1 : 1;
             $quoteNumber = 'Q' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
@@ -328,8 +352,8 @@ class QuoteController extends Controller
                 'notes'             => $request->notes,
                 'status'            => $request->status ?? 'draft',
             ]);
-            
-           
+
+
 
             session([
                 'quote_number'     => $quote->quote_number,
@@ -338,7 +362,7 @@ class QuoteController extends Controller
             ]);
 
             DB::commit();
-            
+
             return redirect()->route('sales.quotes.details', $quote->id);
         } catch(\Exception $e) {
             dd($e);
@@ -401,7 +425,7 @@ class QuoteController extends Controller
 
     public function preview($id)
     {
-        $quote = Quote::with('items')->findOrFail($id); 
+        $quote = Quote::with('items')->findOrFail($id);
         return view('sales.quotes.preview', compact('quote'));
     }
 
@@ -429,7 +453,7 @@ class QuoteController extends Controller
             Log::error('Error sending quote email: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Failed to send email. Please try again later.']);
         }
-            
+
     }
 
     public function save(Request $request, $id)
@@ -438,6 +462,11 @@ class QuoteController extends Controller
         return back()->with('success', 'Quote saved successfully.');
     }
 
+    public function view($id)
+    {
+        $quote = Quote::findOrFail($id);
+        return view('sales.quotes.view', compact('quote'));
+    }
 
     public function details($id)
     {
@@ -488,6 +517,14 @@ class QuoteController extends Controller
 
         $quoteItems = QuoteItem::where('quote_id', $quote->id)->get();
 
+        $taxCode = TaxCode::where('city', $quote->customer->city)->first();
+
+        if ($taxCode) {
+            $taxRate = $taxCode->rate;
+        } else
+        {
+            $taxRate = 0; // Default tax rate if no code found
+        }
 
         return view('sales.quotes.details', compact(
             'quote',
@@ -497,7 +534,8 @@ class QuoteController extends Controller
             'interiorColors',
             'laminateColors',
             'allConfigurations',
-            'quoteItems'
+            'quoteItems',
+            'taxRate',
         ));
     }
 
@@ -569,13 +607,33 @@ class QuoteController extends Controller
     public function edit($id)
     {
         $quote = Quote::with('items')->findOrFail($id);
-        $seriesList = Series::pluck('name', 'id'); // or however you load it
+        $seriesList = DB::table('elitevw_master_series')->pluck('series', 'id');
 
-        return view('sales.quotes.details', [
-            'quote' => $quote,
-            'quoteItems' => $quote->items,
-            'seriesList' => $seriesList
-        ]);
+        $colorConfigurations = \App\Models\Master\Colors\ColorConfiguration::all();
+        $exteriorColors = \App\Models\Master\Colors\ExteriorColor::all();
+        $interiorColors = \App\Models\Master\Colors\InteriorColor::all();
+        $laminateColors = \App\Models\Master\Colors\LaminateColor::all();
+        $quoteItems = QuoteItem::where('quote_id', $quote->id)->get();
+
+        $rawSeries = \App\Models\Master\Series\Series::all();
+        $taxCode = TaxCode::where('city', $quote->customer->city)->first();
+
+        if ($taxCode) {
+            $taxRate = $taxCode->rate;
+        } else
+        {
+            $taxRate = 0; // Default tax rate if no code found
+        }
+        return view('sales.quotes.edit', compact(
+            'quote',
+            'seriesList',
+            'colorConfigurations',
+            'exteriorColors',
+            'interiorColors',
+            'laminateColors',
+            'quoteItems',
+            'taxRate'
+        ));
     }
 
     public function convertToOrder(Request $request, $id)
@@ -584,7 +642,7 @@ class QuoteController extends Controller
             DB::beginTransaction();
             $quote = \App\Models\Sales\Quote::with('items')->findOrFail($id);
             $order = quoteToOrder($quote);
-            
+
             $mail = new OrderMail($order);
             Mail::to($quote->customer->email)->send($mail);
 
@@ -603,9 +661,20 @@ class QuoteController extends Controller
         if(!$item) {
             return response()->json(['success' => false, 'message' => 'Item not found.'], 404);
         }
+        $item->quote->update([
+            'discount' => $item->quote->discount - $item->discount,
+        ]);
         $item->delete();
 
         return response()->json(['success' => true, 'message' => 'Item deleted successfully.']);
+    }
+
+    public function destroy($id)
+    {
+        $quote = Quote::findOrFail($id);
+        $quote->items()->delete(); // Delete all associated items
+        $quote->delete();
+        return redirect()->route('sales.quotes.index')->with('success', 'Quote deleted successfully.');
     }
 
     public function previewPDF($id)
@@ -622,12 +691,12 @@ class QuoteController extends Controller
             DB::beginTransaction();
             if ($status === 'approved') {
                 $order = quoteToOrder($quote);
-                
+
                 $mail = new OrderMail($order);
                 Mail::to($quote->customer->email)->send($mail);
 
                 $invoice = quoteToInvoice($quote, $order);
-                
+
                 if (!$order) {
                     return redirect()->route('sales.quotes.index')->withErrors(['error' => 'Failed to convert quote to order.']);
                 }
@@ -638,8 +707,8 @@ class QuoteController extends Controller
             DB::commit();
             return redirect()->route('sales.quotes.index')->with('success', 'Quote status updated successfully.');
         } catch (\Exception $e) {
-            dd($e);
             DB::rollBack();
+            dd($e);
             return redirect()->route('sales.quotes.index')->withErrors(['error' => 'Failed to update quote status.']);
         }
 
@@ -649,12 +718,36 @@ class QuoteController extends Controller
     {
         $quote = Quote::findOrFail($id);
         $quote->status = 'draft';
-        $quote->surcharge = $request->surcharge ?? 0;
+        $quote->discount = $request->discount ?? 0;
+        $quote->shipping = $request->shipping ?? 0;
         $quote->sub_total = $request->subtotal ?? 0;
         $quote->tax = $request->tax ?? 0;
         $quote->total = $request->total ?? 0;
         $quote->save();
 
         return response()->json(['success' => true, 'message' => 'Quote saved as draft successfully.']);
+    }
+
+    public function email($id)
+    {
+        $quote = Quote::findOrFail($id);
+        Mail::to($quote->customer->email)->send(new QuoteEmail($quote));
+
+        return response()->json(['success' => true, 'message' => 'Quote emailed successfully.']);
+    }
+
+    public function fetchInfo($id)
+    {
+        try{
+            $quote = Quote::where('quote_number', $id)->with(['items','customer', 'order'])->first();
+            $order = (Order::max('id') ?? 0) + 1;
+            $generatedOrderNumber = 'ORD-' . str_pad($order, 5, '0', STR_PAD_LEFT);
+            $generatedInvoiceNumber = generateInvoiceNumber();
+
+            return response()->json(['success' => true, 'message' => 'Quote fetched successfully.', 'data' => ['quote' => $quote, 'order_number' => $generatedOrderNumber, 'invoice_number' => $generatedInvoiceNumber]]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching quote info: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to fetch quote info.'], 500);
+        }
     }
 }

@@ -13,22 +13,6 @@
           {{-- Row 1 --}}
           <div class="row mb-3">
             <div class="col-md-4">
-              <label>Invoice Number</label>
-              <input type="text" name="invoice_number" id="invoice_number" class="form-control" readonly>
-            </div>
-            <div class="col-md-4">
-              <label>Invoice Date</label>
-              <input type="date" name="invoice_date" class="form-control" value="{{ date('Y-m-d') }}">
-            </div>
-            <div class="col-md-4">
-              <label>Order Number</label>
-              <input type="text" name="order_number" id="order_number" class="form-control" readonly>
-            </div>
-          </div>
-
-          {{-- Row 2 --}}
-          <div class="row mb-3">
-            <div class="col-md-4">
               <label>Quote Number</label>
               <input type="text" name="quote_number" id="invoice_quote_number" class="form-control" placeholder="Enter Quote Number">
             </div>
@@ -39,6 +23,22 @@
             <div class="col-md-4">
               <label>Customer Name</label>
               <input type="text" name="customer_name" id="invoice_customer_name" class="form-control" readonly>
+            </div>
+          </div>
+
+          {{-- Row 2 --}}
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label>Invoice Number</label>
+              <input type="text" name="invoice_number" id="invoice_number" class="form-control" readonly>
+            </div>
+            <div class="col-md-4">
+              <label>Invoice Date</label>
+              <input type="date" name="invoice_date" class="form-control" value="{{ date('Y-m-d') }}">
+            </div>
+            <div class="col-md-4">
+              <label>Order Number</label>
+              <input type="text" name="order_number" id="order_number" class="form-control" readonly>
             </div>
           </div>
 
@@ -122,12 +122,11 @@ document.getElementById('invoice_quote_number').addEventListener('change', funct
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                const q = data.quote;
-
+                const q = data.data.quote;
                 document.getElementById('invoice_customer_number').value = q.customer.customer_number;
                 document.getElementById('invoice_customer_name').value = q.customer.customer_name;
-                document.getElementById('order_number').value = q.order_number ?? '';
-                document.getElementById('invoice_number').value = q.generated_invoice_number ?? '';
+                document.getElementById('order_number').value = q.order.order_number ?? '';
+                document.getElementById('invoice_number').value = data.data.invoice_number ?? '';
 
                 document.getElementById('billing_address').value = q.customer.billing_address ?? '';
                 document.getElementById('billing_city').value = q.customer.billing_city ?? '';
@@ -143,7 +142,7 @@ document.getElementById('invoice_quote_number').addEventListener('change', funct
                 document.getElementById('delivery_phone').value = q.customer.phone ?? '';
                 document.getElementById('delivery_email').value = q.customer.email ?? '';
 
-                document.getElementById('subtotalDisplay').innerText = `$${parseFloat(q.subtotal || 0).toFixed(2)}`;
+                document.getElementById('subtotalDisplay').innerText = `$${parseFloat(q.sub_total || 0).toFixed(2)}`;
                 document.getElementById('taxDisplay').innerText = `$${parseFloat(q.tax || 0).toFixed(2)}`;
                 document.getElementById('totalDisplay').innerText = `$${parseFloat(q.total || 0).toFixed(2)}`;
             } else {

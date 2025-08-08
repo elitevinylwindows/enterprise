@@ -18,6 +18,7 @@ class Customer extends Model
         'tier_id',
         'loyalty_credit',
         'total_spent',
+        'serve_customer_id'
     ];
 
     public function tier()

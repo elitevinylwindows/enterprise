@@ -94,7 +94,6 @@ class ExecutiveCustomerController extends Controller
             DB::commit();
             return redirect()->route('executives.customers.index')->with('success', 'Customer added successfully.');
         } catch (\Exception $e) {
-            dd($e);
             DB::rollback();
             return redirect()->back()->with('error', 'Failed to add customer: ' . $e->getMessage());
         }
@@ -142,6 +141,20 @@ class ExecutiveCustomerController extends Controller
             'customer_number' => $request->customer_number,
         ]);
 
+        if(isset($customer->serve_customer_id) && $customer->serve_customer_id) {
+            $firstServe = new FirstServe();
+            $serveCustomer =  $firstServe->updateCustomer($customer);
+        }
+        else {
+            $firstServe = new FirstServe();
+            $serveCustomer =  $firstServe->createCustomer($customer);
+        }
+
+        if($serveCustomer) {
+            $customer->update([
+                'serve_customer_id' => $serveCustomer['id'],
+            ]);
+        }
 
         return redirect()->route('executives.customers.index')->with('success', 'Customer updated successfully.');
     }

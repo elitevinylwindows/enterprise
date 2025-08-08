@@ -20,7 +20,7 @@
     </div>
 </div>
 
-    
+
 <div class="mb-4"></div> {{-- Space --}}
 
 
@@ -93,7 +93,7 @@
                                            data-bs-original-title="View Summary"
                                            href="#"
                                            data-size="xl"
-                                           data-url=""
+                                           data-url="{{ route('sales.orders.show', $order->id) }}"
                                            data-title="Order Summary">
                                             <i data-feather="eye"></i>
                                         </a>
@@ -102,20 +102,20 @@
                                         <a class="avtar avtar-xs btn-link-warning text-warning customModal"
                                            data-bs-toggle="tooltip"
                                            data-bs-original-title="Email"
-                                           href="#"
-                                           data-size="md"
-                                           data-url="{{ route('sales.orders.email', $order->id) }}"
+                                           href="{{ route('sales.orders.email', $order->id) }}"
                                            data-title="Send Email">
                                             <i data-feather="mail"></i>
                                         </a>
 
+                                        @if(!$order->invoice)
                                         {{-- Convert to an Invoice --}}
                                         <a class="avtar avtar-xs btn-link-info text-info"
                                            data-bs-toggle="tooltip"
                                            data-bs-original-title="Invoice"
-                                           href="{{ route('sales.orders.index', ['order' => $order->id]) }}">
-                                            <i data-feather="shopping-cart"></i>
+                                           href="{{ route('sales.orders.convertToInvoice', ['id' => $order->id]) }}">
+                                            <i data-feather="file-text"></i>
                                         </a>
+                                        @endif
 
 
                                         {{-- Edit --}}
@@ -129,14 +129,11 @@
                                             <i data-feather="edit"></i>
                                         </a>
 
-                                
                                         {{-- Delete --}}
-                                        <a class="avtar avtar-xs btn-link-danger text-danger customModal"
+                                        <a class="avtar avtar-xs btn-link-danger text-danger"
                                            data-bs-toggle="tooltip"
                                            data-bs-original-title="Delete"
-                                           href="#"
-                                           data-size="md"
-                                           data-url="{{ route('sales.orders.destroy', $order->id) }}"
+                                           href="{{ route('sales.orders.destroy', $order->id) }}"
                                            data-title="Delete Order">
                                             <i data-feather="trash-2"></i>
                                         </a>
@@ -158,26 +155,12 @@
 
 @push('scripts')
 <script>
-document.getElementById('quote_number').addEventListener('blur', function () {
-    const quoteNumber = this.value;
-    if (!quoteNumber) return;
+    @if ($errors->any())
+        toastr.error("{{ $errors->first() }}");
+    @endif
 
-    fetch(`/sales/quotes/get-by-number/${quoteNumber}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('customerName').textContent = data.customer_name;
-                document.getElementById('deliveryDate').textContent = data.delivery_date;
-                document.getElementById('quote_id').value = data.quote_id;
-                document.getElementById('customer_id').value = data.customer_id;
-
-                document.getElementById('quoteDetailsPreview').style.display = 'block';
-                document.getElementById('submitOrderBtn').disabled = false;
-            } else {
-                alert('Quote not found.');
-                document.getElementById('submitOrderBtn').disabled = true;
-            }
-        });
-});
+    @if(session('success'))
+        toastr.success("{{ session('success') }}");
+    @endif
 </script>
 @endpush
