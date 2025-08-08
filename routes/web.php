@@ -769,8 +769,11 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
 
         //Invoices
         Route::prefix('sales')->name('sales.')->group(function () {
-            Route::resource('invoices', \App\Http\Controllers\Sales\InvoiceController::class);
-        });
+        Route::resource('invoices', \App\Http\Controllers\Sales\InvoiceController::class);
+
+        Route::get('invoices/{id}/payment', [\App\Http\Controllers\Sales\InvoiceController::class, 'payment'])
+        ->name('invoices.payment'); 
+});
 
 
 

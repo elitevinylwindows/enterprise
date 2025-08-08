@@ -84,6 +84,16 @@ class InvoiceController extends Controller
         return redirect()->route('sales.invoices.index')->with('success', 'Invoice deleted.');
     }
 
+
+
+    public function payment($id)
+{
+    $invoice = Invoice::findOrFail($id);
+    $total = $invoice->total ?? 0;
+
+    return view('sales.invoices.payment', compact('total', 'invoice'));
+}
+
     public function getCustomer($customer_number)
     {
         $customer = DB::table('elitevw_master_customers')

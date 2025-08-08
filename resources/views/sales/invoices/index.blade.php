@@ -130,7 +130,7 @@
                                         <a class="avtar avtar-xs btn-link-success text-success customModal"
                                            data-bs-toggle="tooltip"
                                            data-bs-original-title="View Summary"
-                                           href="#"
+                                           href="{{ route('sales.invoices.payment', $invoice->id) }}"
                                            data-size="xl"
                                            data-url=""
                                            data-title="Payment">
