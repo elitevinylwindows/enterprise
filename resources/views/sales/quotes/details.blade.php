@@ -947,6 +947,7 @@
     }
 
 // Window Preview Logic
+// Window Preview Logic
 function updateWindowPreview() {
     const config = document.getElementById('seriesTypeSelect').value;
     const width = document.querySelector('[name="width"]').value || 48;
@@ -957,19 +958,22 @@ function updateWindowPreview() {
     previewBox.innerHTML = '';
     
     // Fixed SVG dimensions (maintain aspect ratio in display)
-    const displayWidth = 300;
+    const displayWidth = 280;  // Slightly smaller to fit container
     const displayHeight = Math.round(displayWidth * (height/width));
     
     // Create SVG with proper window representation
     let svgContent = `
         <svg width="${displayWidth}" height="${displayHeight}" viewBox="0 0 ${displayWidth} ${displayHeight}" 
-             xmlns="http://www.w3.org/2000/svg" style="display: block;">
+             xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto;">
+             
+        <!-- Background -->
+        <rect x="0" y="0" width="${displayWidth}" height="${displayHeight}" fill="#f8f9fa"/>
     `;
     
-    // Window frame (using your brand color #a80000)
+    // Window frame (white as requested)
     svgContent += `
         <rect x="2" y="2" width="${displayWidth-4}" height="${displayHeight-4}" 
-              fill="none" stroke="#a80000" stroke-width="4" rx="2"/>
+              fill="none" stroke="#ffffff" stroke-width="4" rx="2"/>
     `;
     
     // For XO configuration (opens to right)
@@ -977,13 +981,13 @@ function updateWindowPreview() {
         // Left pane (fixed)
         svgContent += `
             <rect x="4" y="4" width="${displayWidth/2-6}" height="${displayHeight-8}" 
-                  fill="#f0f8ff" stroke="#6b6b6bff" stroke-width="0.5"/>
+                  fill="#f0f8ff" stroke="#ffffff" stroke-width="0.5"/>
         `;
         
         // Right pane (operable)
         svgContent += `
             <rect x="${displayWidth/2+2}" y="4" width="${displayWidth/2-6}" height="${displayHeight-8}" 
-                  fill="#e6f2ff" stroke="#5e5d5dff" stroke-width="0.5"/>
+                  fill="#e6f2ff" stroke="#ffffff" stroke-width="0.5"/>
                   
             <!-- Grid lines for operable pane -->
             <line x1="${displayWidth/2+2}" y1="${displayHeight/3}" x2="${displayWidth-4}" y2="${displayHeight/3}" 
@@ -1005,29 +1009,27 @@ function updateWindowPreview() {
                   stroke="#a80000" stroke-width="2"/>
         `;
     }
-    // Add other configuration cases here as needed
+    
+    // Configuration label (positioned below window)
+    svgContent += `
+        <text x="${displayWidth/2}" y="${displayHeight+20}" 
+              text-anchor="middle" font-family="Arial" font-size="12" fill="#333">
+            ${config} - ${width}" × ${height}"
+        </text>
+    `;
     
     svgContent += `</svg>`;
     
     previewBox.innerHTML = svgContent;
 }
 
-// Event listeners - separate for width/height
-document.querySelector('[name="width"]').addEventListener('input', function() {
-    // Only update width, don't touch height
-    updateWindowPreview();
-});
-
-document.querySelector('[name="height"]').addEventListener('input', function() {
-    // Only update height
-    updateWindowPreview();
-});
-
+// Event listeners
+document.querySelector('[name="width"]').addEventListener('input', updateWindowPreview);
+document.querySelector('[name="height"]').addEventListener('input', updateWindowPreview);
 document.getElementById('seriesTypeSelect').addEventListener('change', updateWindowPreview);
 
 // Initial preview
 updateWindowPreview();
-
 
 
     
