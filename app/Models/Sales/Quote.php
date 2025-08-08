@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Quote extends Model
 {
     use SoftDeletes;
-    
+
+    protected $dates = ['deleted_at'];
     protected $table = 'elitevw_sales_quotes'; // use your actual table name
     protected $guarded = ['id']; // protect the id field from mass assignment
    
