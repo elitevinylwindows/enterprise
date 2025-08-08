@@ -946,7 +946,7 @@
         });
     }
 
-    // Window preview logic
+// Window Preview Logic
 function updateWindowPreview() {
     const config = document.getElementById('seriesTypeSelect').value;
     const width = document.querySelector('[name="width"]').value || 48;
@@ -956,78 +956,77 @@ function updateWindowPreview() {
     // Clear previous content
     previewBox.innerHTML = '';
     
-    // Create SVG dimensions (fixed aspect ratio)
-    const svgWidth = 300;
-    const svgHeight = Math.round(svgWidth * (height/width));
+    // Fixed SVG dimensions (maintain aspect ratio in display)
+    const displayWidth = 300;
+    const displayHeight = Math.round(displayWidth * (height/width));
     
-    // Create SVG with XO configuration
+    // Create SVG with proper window representation
     let svgContent = `
-        <svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" 
-             xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto;">
+        <svg width="${displayWidth}" height="${displayHeight}" viewBox="0 0 ${displayWidth} ${displayHeight}" 
+             xmlns="http://www.w3.org/2000/svg" style="display: block;">
     `;
     
-    // Window frame (red border)
+    // Window frame (using your brand color #a80000)
     svgContent += `
-        <rect x="5" y="5" width="${svgWidth-10}" height="${svgHeight-10}" 
-              fill="none" stroke="#a80000" stroke-width="10" rx="3"/>
+        <rect x="2" y="2" width="${displayWidth-4}" height="${displayHeight-4}" 
+              fill="none" stroke="#a80000" stroke-width="4" rx="2"/>
     `;
     
-    // Window divider (vertical line in middle)
-    svgContent += `
-        <line x1="${svgWidth/2}" y1="5" x2="${svgWidth/2}" y2="${svgHeight-5}" 
-              stroke="#a80000" stroke-width="2"/>
-    `;
-    
-    // Left pane (fixed)
-    svgContent += `
-        <rect x="10" y="10" width="${svgWidth/2-15}" height="${svgHeight-20}" 
-              fill="#f0f8ff" stroke="#a80000" stroke-width="1"/>
-    `;
-    
-    // Right pane (operable - XO)
-    svgContent += `
-        <rect x="${svgWidth/2+5}" y="10" width="${svgWidth/2-15}" height="${svgHeight-20}" 
-              fill="#e0f0ff" stroke="#a80000" stroke-width="1"/>
+    // For XO configuration (opens to right)
+    if (config.includes('XO')) {
+        // Left pane (fixed)
+        svgContent += `
+            <rect x="4" y="4" width="${displayWidth/2-6}" height="${displayHeight-8}" 
+                  fill="#f0f8ff" stroke="#6b6b6bff" stroke-width="0.5"/>
+        `;
         
-        <!-- Grid lines for operable pane -->
-        <line x1="${svgWidth/2+5}" y1="${svgHeight/3}" x2="${svgWidth-10}" y2="${svgHeight/3}" 
-              stroke="#99cbee" stroke-width="1" stroke-dasharray="5,3"/>
-        <line x1="${svgWidth/2+5}" y1="${svgHeight*2/3}" x2="${svgWidth-10}" y2="${svgHeight*2/3}" 
-              stroke="#99cbee" stroke-width="1" stroke-dasharray="5,3"/>
-        <line x1="${svgWidth/2+svgWidth/6}" y1="10" x2="${svgWidth/2+svgWidth/6}" y2="${svgHeight-10}" 
-              stroke="#99cbee" stroke-width="1" stroke-dasharray="5,3"/>
+        // Right pane (operable)
+        svgContent += `
+            <rect x="${displayWidth/2+2}" y="4" width="${displayWidth/2-6}" height="${displayHeight-8}" 
+                  fill="#e6f2ff" stroke="#5e5d5dff" stroke-width="0.5"/>
+                  
+            <!-- Grid lines for operable pane -->
+            <line x1="${displayWidth/2+2}" y1="${displayHeight/3}" x2="${displayWidth-4}" y2="${displayHeight/3}" 
+                  stroke="#99cbee" stroke-width="0.5" stroke-dasharray="3,2"/>
+            <line x1="${displayWidth/2+2}" y1="${displayHeight*2/3}" x2="${displayWidth-4}" y2="${displayHeight*2/3}" 
+                  stroke="#99cbee" stroke-width="0.5" stroke-dasharray="3,2"/>
+            <line x1="${displayWidth/2+displayWidth/6}" y1="4" x2="${displayWidth/2+displayWidth/6}" y2="${displayHeight-4}" 
+                  stroke="#99cbee" stroke-width="0.5" stroke-dasharray="3,2"/>
+            
+            <!-- Opening direction arrow -->
+            <path d="M${displayWidth/2+25},${displayHeight/2} L${displayWidth/2+10},${displayHeight/2-10} 
+                    L${displayWidth/2+10},${displayHeight/2+10} Z" 
+                  fill="#a80000"/>
+        `;
         
-        <!-- Opening direction arrow -->
-        <path d="M${svgWidth/2+30},${svgHeight/2} L${svgWidth/2+10},${svgHeight/2-15} 
-                L${svgWidth/2+10},${svgHeight/2+15} Z" 
-              fill="#a80000"/>
-    `;
-    
-    // Window label
-    svgContent += `
-        <text x="${svgWidth/2}" y="${svgHeight-15}" text-anchor="middle" 
-              font-family="Arial" font-size="12" fill="#a80000">
-            ${config} – ${width}" × ${height}"
-        </text>
-    `;
+        // Divider between panes
+        svgContent += `
+            <line x1="${displayWidth/2}" y1="4" x2="${displayWidth/2}" y2="${displayHeight-4}" 
+                  stroke="#a80000" stroke-width="2"/>
+        `;
+    }
+    // Add other configuration cases here as needed
     
     svgContent += `</svg>`;
     
     previewBox.innerHTML = svgContent;
 }
 
-// Event listeners for inputs
-document.getElementById('seriesTypeSelect').addEventListener('change', updateWindowPreview);
+// Event listeners - separate for width/height
 document.querySelector('[name="width"]').addEventListener('input', function() {
+    // Only update width, don't touch height
     updateWindowPreview();
-    document.querySelector('[name="height"]').value = this.value; // Keep square by default
 });
-document.querySelector('[name="height"]').addEventListener('input', updateWindowPreview);
+
+document.querySelector('[name="height"]').addEventListener('input', function() {
+    // Only update height
+    updateWindowPreview();
+});
+
+document.getElementById('seriesTypeSelect').addEventListener('change', updateWindowPreview);
 
 // Initial preview
 updateWindowPreview();
-
-
 
 
 
