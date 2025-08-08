@@ -10,6 +10,9 @@
 <li class="breadcrumb-item active" aria-current="page">{{ __('Customers') }}</li>
 @endsection
 
+<div class="mb-4"></div> {{-- Space --}}
+
+
 @section('content')
 <!-- Card 1: Header and Actions -->
 <div class="card mb-4">
