@@ -34,10 +34,6 @@
 @endif
 @endsection
 
-
-
-
-
 @section('content')
 <div class="row">
     <div class="col-sm-12">
@@ -85,11 +81,17 @@
                                 <td>${{ number_format($customer->loyalty_credit, 2) }}</td>
                                 <td>${{ number_format($customer->total_spent, 2) }}</td>
                                 <td>
-                                    <a href="{{ route('master.customers.edit', $customer->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                    <button type="button" class="btn btn-sm btn-primary edit-customer" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editCustomerModal"
+                                        data-id="{{ $customer->id }}"
+                                        data-url="{{ route('master.customers.edit', $customer->id) }}">
+                                        Edit
+                                    </button>
                                     <form action="{{ route('master.customers.destroy', $customer->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn btn-sm btn-primary" onclick="return confirm('Are you sure?')">Delete</button>
+                                        <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
                                     </form>
                                 </td>
                             </tr>
@@ -101,25 +103,26 @@
         </div>
     </div>
 </div>
-@endsection
 
 <!-- Add Customer Modal -->
 <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            @include('master.customers.create') {{-- or inline form --}}
+            @include('master.customers.create')
         </div>
     </div>
 </div>
 
-<!-- Add Customer Modal -->
+<!-- Edit Customer Modal (empty, will be loaded dynamically) -->
 <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            @include('master.customers.edit') {{-- or inline form --}}
+            <!-- Content will be loaded via AJAX -->
         </div>
     </div>
 </div>
+@endsection
+
 @push('scripts')
 <script>
     document.getElementById('select-all').addEventListener('click', function() {
@@ -127,5 +130,31 @@
         document.querySelectorAll('.customer-checkbox').forEach(cb => cb.checked = checked);
     });
 
+    // Handle edit button clicks
+    document.querySelectorAll('.edit-customer').forEach(button => {
+        button.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            const modal = document.querySelector('#editCustomerModal .modal-content');
+            
+            // Show loading state
+            modal.innerHTML = '<div class="text-center p-5"><i class="fa fa-spinner fa-spin fa-3x"></i></div>';
+            
+            // Load the edit form via AJAX
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    modal.innerHTML = html;
+                })
+                .catch(error => {
+                    modal.innerHTML = '<div class="alert alert-danger">Failed to load form</div>';
+                    console.error('Error:', error);
+                });
+        });
+    });
+
+    // Ensure modal is cleared when closed
+    document.getElementById('editCustomerModal').addEventListener('hidden.bs.modal', function () {
+        this.querySelector('.modal-content').innerHTML = '';
+    });
 </script>
 @endpush
