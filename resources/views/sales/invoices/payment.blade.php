@@ -43,11 +43,11 @@
               <div class="row g-3 mt-1" id="ipmPercentRow">
                   <div class="col-md-6">
                       <label class="form-label">Percentage Value (%)</label>
-                      <input type="number" class="form-control" max="100" id="ipmPercentValue" step="0.01" placeholder="e.g. 15">
+                      <input type="number" class="form-control" name="percentage" max="100" id="ipmPercentValue" value="0" step="0.01" placeholder="e.g. 15">
                   </div>
                   <div class="col-md-6">
                       <label class="form-label">Calculated Amount ($)</label>
-                      <input type="text" class="form-control" id="ipmPercentCalculated" readonly>
+                      <input type="text" class="form-control" name="amount_calculated" id="ipmPercentCalculated" value="0" readonly>
                   </div>
               </div>
 
@@ -55,7 +55,7 @@
               <div class="row g-3 mt-1 d-none" id="ipmAmountRow">
                   <div class="col-md-6">
                       <label class="form-label">Enter Amount ($)</label>
-                      <input type="number" class="form-control" id="ipmAmountValue" step="0.01" placeholder="e.g. 250.00">
+                      <input type="number" class="form-control" id="ipmAmountValue" name="fixed_amount" step="0.01" placeholder="e.g. 250.00">
                   </div>
               </div>
 
