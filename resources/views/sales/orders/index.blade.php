@@ -20,20 +20,21 @@
 <div class="row">
     {{-- Taskbar Card --}}
     <div class="col-md-2">
-        <div class="card">
-            <div class="list-group list-group-flush">
-    <a href="{{ route('sales.orders.index', ['status' => 'all']) }}" 
-       class="list-group-item {{ $status === 'all' ? 'bg-#a80000 text-white' : '' }}">
-       All Orders
-    </a>
-    <a href="{{ route('sales.orders.index', ['status' => 'modified']) }}" 
-       class="list-group-item {{ $status === 'modified' ? 'bg-#a80000 text-white' : '' }}">
-       Modified Orders
-    </a>
-    <a href="{{ route('sales.orders.index', ['status' => 'deleted']) }}" 
-       class="list-group-item text-danger {{ $status === 'deleted' ? 'bg-#a80000 text-white' : '' }}">
-       Deleted
-    </a>
+  <div class="card">
+    <div class="list-group list-group-flush">
+        <a href="{{ route('sales.orders.index', ['status' => 'all']) }}" 
+           class="list-group-item {{ $status === 'all' ? 'active' : '' }}">
+           All Orders
+        </a>
+        <a href="{{ route('sales.orders.index', ['status' => 'modified']) }}" 
+           class="list-group-item {{ $status === 'modified' ? 'active' : '' }}">
+           Modified Orders
+        </a>
+        <a href="{{ route('sales.orders.index', ['status' => 'deleted']) }}" 
+           class="list-group-item {{ $status === 'deleted' ? 'active' : '' }}">
+           Deleted
+        </a>
+    </div>
 </div>
         </div>
     </div>
