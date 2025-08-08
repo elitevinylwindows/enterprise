@@ -6,7 +6,7 @@
 
 @section('breadcrumb')
 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-<li class="breadcrumb-item active" aria-current="page">{{ __('Invoices') }}</li>
+<li class="breadcrumb-item active" aria-current="page">{{ __('Orders') }}</li>
 @endsection
 
 @section('content')
@@ -16,17 +16,15 @@
 <div class="mb-4"></div> {{-- Space --}}
 
 
+
 <div class="row">
     {{-- Taskbar Card --}}
     <div class="col-md-2">
         <div class="card">
             <div class="list-group list-group-flush">
-                <a href="{{ route('sales.invoices.index', ['status' => 'all']) }}" class="list-group-item">All
-                    Invoices</a>
-                <a href="{{ route('sales.invoices.index', ['status' => 'paid']) }}" class="list-group-item">Paid
-                    Invoices</a>
-                <a href="{{ route('sales.invoices.index', ['status' => 'balance']) }}"
-                    class="list-group-item text-danger">Balance</a>
+                <a href="{{ route('sales.invoices.index', ['status' => 'all']) }}" class="list-group-item">All Invoices</a>
+                <a href="{{ route('sales.invoices.index', ['status' => 'paid']) }}" class="list-group-item">Paid Invoices</a>
+                <a href="{{ route('sales.invoices.index', ['status' => 'deleted']) }}" class="list-group-item text-danger">Deleted</a>
 
             </div>
         </div>
@@ -38,24 +36,13 @@
             <div class="card-header">
                 <div class="row align-items-center g-2">
                     <div class="col">
-                        <h5>{{ __('Invoice List') }}</h5>
+                        <h5>{{ __('Invoices List') }}</h5>
                     </div>
-                 <!--    <div class="row">
-                        <div class="col-auto ms-auto">
-                            <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#createInvoiceModal">
-                                <i class="fas fa-circle-plus"></i> Create Invoice
-                            </a>
-
-                        </div>
-                    </div>-->
                 </div>
             </div>
-
-
             <div class="card-body pt-0">
                 <div class="dt-responsive table-responsive">
-                    <table class="table table-hover advance-datatable" id="invoicesTable">
+                    <table class="table table-hover advance-datatable" id="quotesTable">
                         <thead class="table-light">
                             <tr>
                                 <th>{{ __('Invoice #') }}</th>
@@ -175,7 +162,97 @@
             </div> <!-- card-body -->
         </div> <!-- card -->
     </div> <!-- col -->
+
+
 </div>
 @endsection
 
-@include('sales.invoices.create') {{-- Modal included after content --}}
+@push('scripts')
+
+<script>
+    $(document).ready(function() {
+
+        // Add click handler for the email button
+        $('.emailButton').on('click', function(e) {
+            e.preventDefault();
+
+            const $button = $(this);
+            const $icon = $button.find('#emailIcon');
+            const $spinner = $button.find('.spinner-border');
+            const url = $button.data('url');
+
+            // Show spinner and hide icon
+            $icon.addClass('d-none');
+            $spinner.removeClass('d-none');
+            $button.prop('disabled', true);
+
+            $.ajax({
+                url: url
+                , type: 'GET'
+                , data: {
+                    _token: '{{ csrf_token() }}'
+                }
+                , success: function(response) {
+                    toastr.success('Email sent successfully!', 'Success', {
+                        timeOut: 3000
+                        , progressBar: true
+                        , closeButton: true
+                    });
+                }
+                , error: function(xhr) {
+                    toastr.error('Failed to send email. Please try again.', 'Error', {
+                        timeOut: 3000
+                        , progressBar: true
+                        , closeButton: true
+                    });
+                }
+                , complete: function() {
+                    // Always hide spinner and show icon when request is complete
+                    $spinner.addClass('d-none');
+                    $icon.removeClass('d-none');
+                    $button.prop('disabled', false);
+                }
+            });
+        });
+
+        // Delete quote with confirmation
+        $('.delete-quote-btn').on('click', function(e) {
+            e.preventDefault();
+            const $form = $(this).closest('form');
+            if (confirm('Are you sure you want to delete this quote?')) {
+            $form.submit();
+            }
+        });
+    });
+
+</script>
+@endpush
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
