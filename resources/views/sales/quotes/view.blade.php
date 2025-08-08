@@ -61,8 +61,12 @@
             <div class="col-md-6 offset-md-6">
                 <table class="table">
                     <tr>
-                        <th>Surcharge:</th>
-                        <td id="surcharge-amount">${{ number_format(0, 2) }}</td>
+                        <th>Discount:</th>
+                        <td id="discount">${{ number_format(0, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Shipping:</th>
+                        <td id="shipping">${{ number_format(0, 2) }}</td>
                     </tr>
                     <tr>
                         <th>Subtotal:</th>
