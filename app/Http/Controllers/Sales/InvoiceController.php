@@ -15,11 +15,22 @@ use Illuminate\Support\Facades\Log;
 
 class InvoiceController extends Controller
 {
-    public function index()
-    {
-        $invoices = Invoice::with(['customer', 'order', 'quote'])->get(); // include relations
-        return view('sales.invoices.index', compact('invoices'));
-    }
+    public function index(Request $request)
+{
+    $status = $request->get('status', 'all');
+    
+    $invoices = Invoice::with(['customer', 'order', 'quote'])
+        ->when($status === 'deleted', function($query) {
+            return $query->onlyTrashed();
+        })
+        ->when($status === 'paid', function($query) {
+            return $query->where('payment_status', 'paid');
+        })
+        ->latest()
+        ->get();
+
+    return view('sales.invoices.index', compact('invoices', 'status'));
+}
 
     public function create()
     {
@@ -263,21 +274,17 @@ class InvoiceController extends Controller
     }
 
 
-    public function deleted()
-{
-    $invoices = Invoice::onlyTrashed()->get();
-    return view('sales.invoices.deleted', compact('invoices'));
-}
-
 public function restore($id)
 {
     Invoice::withTrashed()->findOrFail($id)->restore();
-    return redirect()->route('sales.invoices.deleted')->with('success', 'Invoice restored successfully');
+    return redirect()->route('sales.invoices.index', ['status' => 'deleted'])
+        ->with('success', 'Invoice restored successfully');
 }
 
 public function forceDelete($id)
 {
     Invoice::withTrashed()->findOrFail($id)->forceDelete();
-    return redirect()->route('sales.invoices.deleted')->with('success', 'Invoice permanently deleted');
+    return redirect()->route('sales.invoices.index', ['status' => 'deleted'])
+        ->with('success', 'Invoice permanently deleted');
 }
 }

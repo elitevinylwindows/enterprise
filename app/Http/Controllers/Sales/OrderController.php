@@ -14,11 +14,19 @@ use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
-    public function index()
-    {
-        $orders = Order::with('customer')->get();
-        return view('sales.orders.index', compact('orders'));
-    }
+    public function index(Request $request)
+{
+    $status = $request->get('status', 'all');
+    
+    $orders = Order::with('customer')
+        ->when($status === 'deleted', function($query) {
+            return $query->onlyTrashed();
+        })
+        ->latest()
+        ->get();
+
+    return view('sales.orders.index', compact('orders', 'status'));
+}
 
     public function create()
     {
@@ -151,21 +159,17 @@ class OrderController extends Controller
         }
     }
 
-    public function deleted()
-{
-    $orders = Order::onlyTrashed()->get();
-    return view('sales.orders.deleted', compact('orders'));
-}
-
 public function restore($id)
 {
     Order::withTrashed()->findOrFail($id)->restore();
-    return redirect()->route('sales.orders.deleted')->with('success', 'Order restored successfully');
+    return redirect()->route('sales.orders.index', ['status' => 'deleted'])
+        ->with('success', 'Order restored successfully');
 }
 
 public function forceDelete($id)
 {
     Order::withTrashed()->findOrFail($id)->forceDelete();
-    return redirect()->route('sales.orders.deleted')->with('success', 'Order permanently deleted');
+    return redirect()->route('sales.orders.index', ['status' => 'deleted'])
+        ->with('success', 'Order permanently deleted');
 }
 }

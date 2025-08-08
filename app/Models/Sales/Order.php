@@ -11,6 +11,7 @@ class Order extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $dates = ['deleted_at'];
     protected $table = 'elitevw_sales_orders';
 
     protected $fillable = [

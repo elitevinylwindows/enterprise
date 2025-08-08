@@ -22,11 +22,19 @@
     <div class="col-md-2">
         <div class="card">
             <div class="list-group list-group-flush">
-                <a href="{{ route('sales.invoices.index', ['status' => 'all']) }}" class="list-group-item">All Invoices</a>
-                <a href="{{ route('sales.invoices.index', ['status' => 'paid']) }}" class="list-group-item">Paid Invoices</a>
-                <a href="{{ route('sales.invoices.deleted', ['status' => 'deleted']) }}" class="list-group-item text-danger">Deleted</a>
-
-            </div>
+    <a href="{{ route('sales.invoices.index', ['status' => 'all']) }}" 
+       class="list-group-item {{ $status === 'all' ? 'active' : '' }}">
+       All Invoices
+    </a>
+    <a href="{{ route('sales.invoices.index', ['status' => 'paid']) }}" 
+       class="list-group-item {{ $status === 'paid' ? 'active' : '' }}">
+       Paid Invoices
+    </a>
+    <a href="{{ route('sales.invoices.index', ['status' => 'deleted']) }}" 
+       class="list-group-item text-danger {{ $status === 'deleted' ? 'active' : '' }}">
+       Deleted
+    </a>
+</div>
         </div>
     </div>
 
@@ -67,99 +75,107 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($invoices as $invoice)
-                            <tr>
-                                <td>{{ $invoice->invoice_number }}</td>
-                                <td>{{ $invoice->order->order_number }}</td>
-                                <td>{{ $invoice->quote->quote_number }}</td>
-                                <td>{{ $invoice->customer->customer_number }}</td>
-                                <td>{{ $invoice->customer->customer_name }}</td>
-                                <td>{{ $invoice->invoice_date }}</td>
-                                <td>${{ number_format($invoice->total ?? 0, 2) }}</td>
-                                <td>{{ $invoice->paid_amount }}</td>
-                                <td>{{ $invoice->remaining_amount }}</td>
-                                <td>{{ $invoice->required_payment_type }}</td>
-                                <td>{{ $invoice->required_payment_type === 'percentage' ? "%".$invoice->required_payment_percentage. ' ($'.$invoice->required_payment.')' : "$".number_format($invoice->required_payment, 2) }}</td>
-                                <td>
-                                    @if($invoice->status === 'active')
-                                    <span class="badge bg-success">Active</span>
-                                    @elseif($invoice->status === 'draft')
-                                    <span class="badge bg-secondary">Draft</span>
-                                    @else
-                                    <span class="badge bg-light text-muted">{{ ucfirst($invoice->status) }}</span>
-                                    @endif
-                                </td>
+    @foreach ($invoices as $invoice)
+    <tr>
+        <td>{{ $invoice->invoice_number }}</td>
+        <td>{{ $invoice->order->order_number ?? 'N/A' }}</td>
+        <td>{{ $invoice->quote->quote_number ?? 'N/A' }}</td>
+        <td>{{ $invoice->customer->customer_number ?? 'N/A' }}</td>
+        <td>{{ $invoice->customer->customer_name ?? 'N/A' }}</td>
+        <td>{{ $invoice->invoice_date }}</td>
+        <td>${{ number_format($invoice->total ?? 0, 2) }}</td>
+        <td>{{ $invoice->paid_amount }}</td>
+        <td>{{ $invoice->remaining_amount }}</td>
+        <td>{{ $invoice->required_payment_type }}</td>
+        <td>{{ $invoice->required_payment_type === 'percentage' ? "%".$invoice->required_payment_percentage. ' ($'.$invoice->required_payment.')' : "$".number_format($invoice->required_payment, 2) }}</td>
+        <td>
+            @if($status === 'deleted')
+                <span class="badge bg-danger">Deleted</span>
+            @else
+                @if($invoice->status === 'active')
+                <span class="badge bg-success">Active</span>
+                @elseif($invoice->status === 'draft')
+                <span class="badge bg-secondary">Draft</span>
+                @else
+                <span class="badge bg-light text-muted">{{ ucfirst($invoice->status) }}</span>
+                @endif
+            @endif
+        </td>
+        <td>{{ $invoice->quote->notes ?? '' }}</td>
+        <td class="text-nowrap">
+            @if($status === 'deleted')
+                {{-- Restore Button --}}
+                <form action="{{ route('sales.invoices.restore', $invoice->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="avtar avtar-xs btn-link-success text-success border-0 bg-transparent p-0" 
+                            data-bs-toggle="tooltip" data-bs-original-title="Restore">
+                        <i data-feather="rotate-ccw"></i>
+                    </button>
+                </form>
+                
+                {{-- Permanent Delete Button --}}
+                <form action="{{ route('sales.invoices.force-delete', $invoice->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0" 
+                            data-bs-toggle="tooltip" data-bs-original-title="Delete Permanently"
+                            onclick="return confirm('Permanently delete this invoice?')">
+                        <i data-feather="trash-2"></i>
+                    </button>
+                </form>
+            @else
+                {{-- Original Action Buttons --}}
+                {{-- View --}}
+                <a class="avtar avtar-xs btn-link-success text-success customModal"
+                    data-bs-toggle="tooltip" data-bs-original-title="View Summary" href="#"
+                    data-size="xl" data-url="{{ route('sales.invoices.show', $invoice->id) }}" 
+                    data-title="Invoice Summary">
+                    <i data-feather="eye"></i>
+                </a>
 
-                                <td>{{ $invoice->quote->notes }}</td>
+                {{-- Send to QB --}}
+                <a class="avtar avtar-xs btn-link-success text-success"
+                    data-bs-toggle="tooltip" data-bs-original-title="Send to QuickBooks" 
+                    href="{{ route('sales.invoices.sendToQuickBooks', $invoice->id) }}"
+                    data-title="Send to Quickbooks">
+                    <i data-feather="share"></i>
+                </a>
 
-                                <td class="text-nowrap">
-                                    {{-- View --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success customModal"
-                                        data-bs-toggle="tooltip" data-bs-original-title="View Summary" href="#"
-                                        data-size="xl" data-url="{{ route('sales.invoices.show', $invoice->id) }}" data-title="Invoice Summary">
-                                        <i data-feather="eye"></i>
-                                    </a>
+                {{-- Email --}}
+                <a class="avtar avtar-xs btn-link-warning text-warning customModal"
+                    data-bs-toggle="tooltip" data-bs-original-title="Email" href="#" 
+                    data-size="md" data-url="" data-title="Send Email">
+                    <i data-feather="mail"></i>
+                </a>
 
-                                    {{-- Send to QB --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success "
-                                        data-bs-toggle="tooltip" data-bs-original-title="Send to QuickBooks" href="{{route('sales.invoices.sendToQuickBooks', $invoice->id)}}"
-                                        data-title="Send to Quickbooks">
-                                        <i data-feather="share"></i>
-                                    </a>
+                {{-- Take Payment --}}
+                <a class="avtar avtar-xs btn-link-success text-success customModal"
+                    data-bs-toggle="tooltip"
+                    title="Make Payment"
+                    href="#"
+                    data-size="lg"
+                    data-url="{{ route('sales.invoices.payment', $invoice->id) }}"
+                    data-title="Invoice Payment">
+                    <i data-feather="credit-card"></i>
+                </a>
+
+                {{-- Edit --}}
+                <a class="avtar avtar-xs btn-link-primary text-primary customModal"
+                   data-bs-toggle="tooltip"
+                   data-bs-original-title="Edit"
+                   href="#"
+                   data-size="xl"
+                   data-url="{{ route('sales.invoices.edit', $invoice->id) }}"
+                   data-title="Edit Invoice">
+                    <i data-feather="edit"></i>
+                </a>
+            @endif
+        </td>
+    </tr>
+    @endforeach
+</tbody>
 
 
-                                    {{-- Email --}}
-                                    <a class="avtar avtar-xs btn-link-warning text-warning customModal"
-                                        data-bs-toggle="tooltip" data-bs-original-title="Email" href="#" data-size="md"
-                                        data-url="" data-title="Send Email">
-                                        <i data-feather="mail"></i>
-                                    </a>
-
-                                        {{-- Take Payment --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success customModal"
-                                        data-bs-toggle="tooltip"
-                                        title="Make Payment"
-                                        href="#"
-                                        data-size="lg"
-                                        data-url="{{ route('sales.invoices.payment', $invoice->id) }}"
-                                        data-title="Invoice Payment">
-                                        <i data-feather="credit-card"></i>
-                                    </a>
-
-
-                                    {{-- Edit --}}
-                                        <a class="avtar avtar-xs btn-link-primary text-primary customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Edit"
-                                           href="#"
-                                           data-size="xl"
-                                           data-url="{{ route('sales.invoices.edit', $invoice->id) }}"
-                                           data-title="Edit Invoice">
-                                            <i data-feather="edit"></i>
-                                        </a>
-                                        <!--
-                                        {{-- Billing --}}
-                                        <a class="avtar avtar-xs btn-link-info text-info"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Billing"
-                                           href="{{ route('sales.invoices.index', ['billing' => $invoice->id]) }}">
-                                            <i data-feather="shopping-cart"></i>
-                                        </a>
-
-                                        {{-- Delete --}}
-                                        <a class="avtar avtar-xs btn-link-danger text-danger customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Delete"
-                                           href="#"
-                                           data-size="md"
-                                           data-url="{{ route('sales.invoices.destroy', $invoice->id) }}"
-                                           data-title="Delete Invoice">
-                                            <i data-feather="trash-2"></i>
-                                        </a>-->
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
                     </table>
                 </div> <!-- table-responsive -->
             </div> <!-- card-body -->
