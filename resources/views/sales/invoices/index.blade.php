@@ -40,14 +40,14 @@
                     </div>
 <div class="col-auto ms-auto">
         <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createOrderModal">
-            <i class="fas fa-circle-plus"></i> Create Order
+            <i class="fa-solid fa-paper-plane"></i> Send to Quickbooks
         </a>
     </div>
                 </div>
             </div>
             <div class="card-body pt-0">
                 <div class="dt-responsive table-responsive">
-                    <table class="table table-hover advance-datatable" id="quotesTable">
+                    <table class="table table-hover advance-datatable" id="invoicesTable">
                         <thead class="table-light">
                             <tr>
                                 <th>{{ __('Invoice #') }}</th>
