@@ -36,13 +36,13 @@
             <div class="card-header">
                 <div class="row align-items-center g-2">
                     <div class="col">
-                        <h5>{{ __('Invoice List') }}</h5>
+                        <h5>{{ __('Orders List') }}</h5>
                     </div>
                 </div>
             </div>
             <div class="card-body pt-0">
                 <div class="dt-responsive table-responsive">
-                    <table class="table table-hover advance-datatable" id="quotesTable">
+                    <table class="table table-hover advance-datatable" id="ordersTable">
                         <thead class="table-light">
                             <tr>
                                 <th>Order #</th>
