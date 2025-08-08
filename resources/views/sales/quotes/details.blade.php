@@ -947,27 +947,39 @@
     }
 
 // Window Preview Logic
-// Window Preview Logic
 function updateWindowPreview() {
     const config = document.getElementById('seriesTypeSelect').value;
-    const width = document.querySelector('[name="width"]').value || 48;
-    const height = document.querySelector('[name="height"]').value || 48;
+    const width = parseFloat(document.querySelector('[name="width"]').value) || 48;
+    const height = parseFloat(document.querySelector('[name="height"]').value) || 48;
     const previewBox = document.getElementById('window-svg-preview');
 
     // Clear previous content
     previewBox.innerHTML = '';
     
-    // Fixed SVG dimensions (maintain aspect ratio in display)
-    const displayWidth = 280;  // Slightly smaller to fit container
-    const displayHeight = Math.round(displayWidth * (height/width));
+    // Fixed SVG container dimensions
+    const containerWidth = 280;
+    const containerHeight = 280;
+    
+    // Calculate display dimensions maintaining aspect ratio
+    let displayWidth, displayHeight;
+    if (width > height) {
+        displayWidth = containerWidth;
+        displayHeight = Math.round(containerWidth * (height/width));
+    } else {
+        displayHeight = containerHeight;
+        displayWidth = Math.round(containerHeight * (width/height));
+    }
     
     // Create SVG with proper window representation
     let svgContent = `
-        <svg width="${displayWidth}" height="${displayHeight}" viewBox="0 0 ${displayWidth} ${displayHeight}" 
+        <svg width="${containerWidth}" height="${containerHeight}" viewBox="0 0 ${containerWidth} ${containerHeight}" 
              xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto;">
              
-        <!-- Background -->
-        <rect x="0" y="0" width="${displayWidth}" height="${displayHeight}" fill="#f8f9fa"/>
+        <!-- Background container -->
+        <rect x="0" y="0" width="${containerWidth}" height="${containerHeight}" fill="#f8f9fa"/>
+        
+        <!-- Window centered in container -->
+        <g transform="translate(${(containerWidth-displayWidth)/2}, ${(containerHeight-displayHeight)/2})">
     `;
     
     // Window frame (white as requested)
@@ -1010,9 +1022,11 @@ function updateWindowPreview() {
         `;
     }
     
+    svgContent += `</g>`;
+    
     // Configuration label (positioned below window)
     svgContent += `
-        <text x="${displayWidth/2}" y="${displayHeight+20}" 
+        <text x="${containerWidth/2}" y="${containerHeight-10}" 
               text-anchor="middle" font-family="Arial" font-size="12" fill="#333">
             ${config} - ${width}" × ${height}"
         </text>
@@ -1022,15 +1036,6 @@ function updateWindowPreview() {
     
     previewBox.innerHTML = svgContent;
 }
-
-// Event listeners
-document.querySelector('[name="width"]').addEventListener('input', updateWindowPreview);
-document.querySelector('[name="height"]').addEventListener('input', updateWindowPreview);
-document.getElementById('seriesTypeSelect').addEventListener('change', updateWindowPreview);
-
-// Initial preview
-updateWindowPreview();
-
 
     
     // Modal cleanup
