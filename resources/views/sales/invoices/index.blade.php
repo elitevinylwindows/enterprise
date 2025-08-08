@@ -60,7 +60,6 @@
                                 <th>{{ __('Paid Amount') }}</th>
                                 <th>{{ __('Balance') }}</th>
                                 <th>{{ __('Payment Type') }}</th>
-                                <th>{{ __('Required Payment') }}</th>
                                 <th>{{ __('Status') }}</th>
                                 <th>{{ __('PO') }}</th>
                                 <th>{{ __('Action') }}</th>
@@ -78,8 +77,7 @@
                                 <td>${{ number_format($invoice->total ?? 0, 2) }}</td>
                                 <td>{{ $invoice->paid_amount }}</td>
                                 <td>{{ $invoice->remaining_amount }}</td>
-                                <td>{{ $invoice->required_payment_type }}</td>
-                                <td>{{ $invoice->required_payment_type === 'percentage' ? "%".$invoice->required_payment_percentage. ' ($'.$invoice->required_payment.')' : "$".number_format($invoice->required_payment, 2) }}</td>
+                                <td>{{ ucfirst($invoice->payment_type) }}</td>
                                 <td>
                                     @if($invoice->status === 'active')
                                     <span class="badge bg-success">Active</span>
@@ -175,6 +173,24 @@
 <script>
     $(document).ready(function() {
 
+    @if($errors->any())
+        @foreach($errors->all() as $error)
+            toastr.error('{{ $error }}', 'Error', {
+                timeOut: 3000,
+                progressBar: true,
+                closeButton: true
+            });
+        @endforeach
+    @endif
+
+    
+    @if(session('error'))
+        toastr.error('{{ session('error') }}', 'Error', {
+            timeOut: 3000,
+            progressBar: true,
+            closeButton: true
+        });
+    @endif
         // Add click handler for the email button
         $('.emailButton').on('click', function(e) {
             e.preventDefault();
