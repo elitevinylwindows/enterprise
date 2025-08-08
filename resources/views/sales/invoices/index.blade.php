@@ -123,14 +123,15 @@
 
                                         {{-- Take Payment --}}
                                         <a class="avtar avtar-xs btn-link-success text-success customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="View Summary"
-                                           href="{{ route('sales.invoices.payment', $invoice->id) }}"
-                                           data-size="xl"
-                                           data-url=""
-                                           data-title="Payment">
-                                            <i data-feather="credit-card"></i>
-                                        </a>
+   data-bs-toggle="tooltip"
+   title="Make Payment"
+   href="#"
+   data-size="lg"
+   data-url="{{ route('sales.invoices.payment', $invoice->id) }}"
+   data-title="Invoice Payment">
+    <i data-feather="credit-card"></i>
+</a>
+
                                     {{-- Take Payment --}}
                                     <a class="avtar avtar-xs btn-link-success text-success customModal"
                                         data-bs-toggle="tooltip" data-bs-original-title="Pay Invoice" href="#"
