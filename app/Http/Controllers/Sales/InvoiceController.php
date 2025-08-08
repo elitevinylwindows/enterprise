@@ -149,6 +149,71 @@ class InvoiceController extends Controller
         return view('sales.invoices.payment', compact('total', 'invoice'));
     }
 
+    public function pay(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'ipm_deposit_type'   => 'required|in:percent,fixed',
+            'ipm_deposit_method' => 'required|in:card,cash,bank', // adjust allowed methods as needed
+            'deposit_card_number' => [
+                'nullable',
+                'required_if:ipm_deposit_method,card',
+                'regex:/^\d{4}\s\d{4}\s\d{4}\s\d{4}$/', // 16 digits with spaces every 4
+            ],
+            'deposit_card_cvv' => [
+                'nullable',
+                'required_if:ipm_deposit_method,card',
+                'digits_between:3,4',
+            ],
+            'deposit_card_expiry' => [
+                'nullable',
+                'required_if:ipm_deposit_method,card',
+                'regex:/^(0[1-9]|1[0-2])\/\d{2}$/', // MM/YY format
+            ],
+            'deposit_card_zip' => [
+                'nullable',
+                'required_if:ipm_deposit_method,card',
+                'regex:/^\d{5}(-\d{1,4})?$/', // ZIP or ZIP+4
+            ],
+            'payment_amount'   => 'required|array',
+            'payment_amount.*' => 'nullable|numeric|min:0.01', // allow null for some indexes
+            'ipm_payment_method_*' => 'in:card,cash,bank', // adjust allowed methods
+            'payment_card_number' => 'array',
+            'payment_card_number.*' => [
+                'nullable',
+                'regex:/^\d{4}\s\d{4}\s\d{4}\s\d{4}$/',
+            ],
+            'payment_card_cvv' => 'array',
+            'payment_card_cvv.*' => [
+                'nullable',
+                'digits_between:3,4',
+            ],
+            'payment_card_expiry' => 'array',
+            'payment_card_expiry.*' => [
+                'nullable',
+                'regex:/^(0[1-9]|1[0-2])\/\d{2}$/',
+            ],
+            'payment_card_zip' => 'array',
+            'payment_card_zip.*' => [
+                'nullable',
+                'regex:/^\d{5}(-\d{1,4})?$/',
+            ],
+        ], [
+            // Custom messages
+            'deposit_card_number.regex' => 'Deposit card number must be in format XXXX XXXX XXXX XXXX.',
+            'deposit_card_expiry.regex' => 'Deposit card expiry must be in MM/YY format.',
+            'deposit_card_zip.regex'    => 'Deposit ZIP must be valid (12345 or 12345-6789).',
+            'payment_card_number.*.regex' => 'Card number must be in format XXXX XXXX XXXX XXXX.',
+            'payment_card_expiry.*.regex' => 'Card expiry must be in MM/YY format.',
+            'payment_card_zip.*.regex'    => 'ZIP must be valid (12345 or 12345-6789).',
+        ]);
+
+        
+        try{
+        }catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Payment failed: ' . $e->getMessage());
+        }
+    }
+
     public function getCustomer($customer_number)
     {
         $customer = DB::table('elitevw_master_customers')

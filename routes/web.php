@@ -788,6 +788,8 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
 
         Route::get('invoices/{id}/payment', [\App\Http\Controllers\Sales\InvoiceController::class, 'payment'])
         ->name('invoices.payment'); 
+        Route::post('invoices/{id}/payment', [\App\Http\Controllers\Sales\InvoiceController::class, 'pay'])
+        ->name('invoices.payment.post');
 });
 
 
