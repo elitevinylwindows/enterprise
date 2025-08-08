@@ -948,11 +948,11 @@
     }
 
     // Window preview logic
-    // Enhanced Window preview logic
+   // Enhanced Window preview logic with proper SVG handling
 function updateWindowPreview() {
     const series = document.getElementById('seriesSelect').selectedOptions[0]?.text?.toLowerCase();
     const config = document.getElementById('seriesTypeSelect').value;
-    const width = document.querySelector('[name="width"]').value || 48;
+    const width = document.querySelector('[name="width"]').value || 60;
     const height = document.querySelector('[name="height"]').value || 48;
     const previewBox = document.getElementById('window-svg-preview');
 
@@ -961,48 +961,37 @@ function updateWindowPreview() {
         fetch(url)
             .then(res => res.text())
             .then(svg => {
-                // Clear previous content
+                // Clear and prepare container
                 previewBox.innerHTML = '';
                 
-                // Create container for SVG with enhanced styling
-                const container = document.createElement('div');
-                container.style.position = 'relative';
-                container.style.width = '100%';
-                container.style.height = '100%';
-                container.style.display = 'flex';
-                container.style.alignItems = 'center';
-                container.style.justifyContent = 'center';
+                // Create wrapper for proper centering
+                const wrapper = document.createElement('div');
+                wrapper.style.display = 'flex';
+                wrapper.style.justifyContent = 'center';
+                wrapper.style.alignItems = 'center';
+                wrapper.style.height = '100%';
+                wrapper.style.overflow = 'visible';
                 
                 // Add the rendered SVG
-                container.innerHTML = svg;
+                wrapper.innerHTML = svg;
+                previewBox.appendChild(wrapper);
                 
-                // Add dimension label
-                const dimensionLabel = document.createElement('div');
-                dimensionLabel.style.position = 'absolute';
-                dimensionLabel.style.bottom = '8px';
-                dimensionLabel.style.right = '8px';
-                dimensionLabel.style.background = 'rgba(0,0,0,0.7)';
-                dimensionLabel.style.color = 'white';
-                dimensionLabel.style.padding = '2px 6px';
-                dimensionLabel.style.borderRadius = '3px';
-                dimensionLabel.style.fontSize = '12px';
-                dimensionLabel.textContent = `${width}" × ${height}"`;
-                
-                container.appendChild(dimensionLabel);
-                previewBox.appendChild(container);
-                
-                // Apply scaling to fit the preview area
-                const svgElement = container.querySelector('svg');
+                // Get the SVG element
+                const svgElement = wrapper.querySelector('svg');
                 if (svgElement) {
-                    const maxWidth = previewBox.clientWidth * 0.8;
-                    const maxHeight = previewBox.clientHeight * 0.8;
+                    // Remove any inline border/background
+                    svgElement.style.border = 'none';
+                    svgElement.style.background = 'transparent';
+                    
+                    // Scale to fit while maintaining aspect ratio
+                    const containerWidth = previewBox.clientWidth;
+                    const containerHeight = previewBox.clientHeight;
                     const svgWidth = svgElement.width.baseVal.value;
                     const svgHeight = svgElement.height.baseVal.value;
                     
                     const scale = Math.min(
-                        maxWidth / svgWidth,
-                        maxHeight / svgHeight,
-                        1.5 // Maximum scale factor
+                        containerWidth * 0.9 / svgWidth,
+                        containerHeight * 0.9 / svgHeight
                     );
                     
                     svgElement.style.transform = `scale(${scale})`;
@@ -1010,68 +999,128 @@ function updateWindowPreview() {
                 }
             })
             .catch(() => {
-                // Fallback to visual representation when SVG is unavailable
-                createVisualWindowPreview(previewBox, width, height);
+                // Fallback to component-based rendering if API fails
+                renderWindowComponent(previewBox, config, width, height);
             });
     } else {
-        // Default placeholder when required info is missing
-        previewBox.innerHTML = `<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);">
-            <p style="font-size:24px; margin:0;">CLCL</p>
-            <p style="font-size:18px; text-align:right; margin:0;">ARG</p>
-        </div>`;
+        // Default placeholder
+        previewBox.innerHTML = `
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
+                <p style="font-size:24px; margin:0; color:#a80000;">CLCL</p>
+                <p style="font-size:18px; margin:0; color:#a80000;">ARG</p>
+            </div>
+        `;
     }
 }
 
-// Fallback function to create visual window preview
-function createVisualWindowPreview(container, width, height) {
-    const displayWidth = Math.min(width * 4, container.clientWidth * 0.8);
-    const displayHeight = Math.min(height * 4, container.clientHeight * 0.8);
+// Fallback rendering using the same logic as your blade component
+function renderWindowComponent(container, config, width, height) {
+    const codeParts = config.split('-');
+    const segments = codeParts.filter(p => !['T1', 'B1'].includes(p));
+    const hasTop = codeParts.includes('T1');
+    const hasBottom = codeParts.includes('B1');
+    const paneCount = segments.length;
     
+    const svgWidth = 300;
+    const svgHeight = 250;
+    const paneWidth = svgWidth / paneCount;
+    const paneY = hasTop ? 50 : 0;
+    const paneHeight = svgHeight - (hasTop ? 50 : 0) - (hasBottom ? 50 : 0);
+    
+    let svgContent = `
+        <svg width="${svgWidth}" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+    `;
+    
+    // Top segment
+    if (hasTop) {
+        svgContent += `
+            <rect x="0" y="0" width="${svgWidth}" height="50" fill="#cce6f6" />
+            <line x1="0" y1="50" x2="${svgWidth}" y2="50" stroke="#000" stroke-width="1" />
+        `;
+    }
+    
+    // Main panes
+    segments.forEach((pane, i) => {
+        const x = i * paneWidth;
+        const isX = pane === 'XO' || pane === 'X';
+        const fill = isX ? '#cce6f6' : '#e0e0e0';
+        const arrowDir = pane === 'XO' ? 'right' : (pane === 'X' ? 'left' : null);
+        
+        svgContent += `
+            <rect x="${x}" y="${paneY}" width="${paneWidth}" height="${paneHeight}" 
+                  fill="${fill}" stroke="#000" stroke-width="1"/>
+        `;
+        
+        // Decorative grid for X panes
+        if (isX) {
+            for (let g = 1; g < 4; g++) {
+                svgContent += `
+                    <line x1="${x + g * (paneWidth / 4)}" y1="${paneY}" 
+                          x2="${x + g * (paneWidth / 4)}" y2="${paneY + paneHeight}" 
+                          stroke="#99cbee" stroke-width="0.5" />
+                `;
+            }
+            for (let g = 1; g < 4; g++) {
+                svgContent += `
+                    <line x1="${x}" y1="${paneY + g * (paneHeight / 4)}" 
+                          x2="${x + paneWidth}" y2="${paneY + g * (paneHeight / 4)}" 
+                          stroke="#99cbee" stroke-width="0.5" />
+                `;
+            }
+            
+            // Arrow direction
+            if (arrowDir) {
+                const arrowX = arrowDir === 'right' ? x + paneWidth - 20 : x + 20;
+                const yMid = paneY + paneHeight / 2;
+                const yUp = yMid - 10;
+                const yDown = yMid + 10;
+                const xArrow = arrowDir === 'right' ? arrowX + 10 : arrowX - 10;
+                
+                svgContent += `
+                    <polygon points="${arrowX},${yMid} ${arrowX},${yUp} ${xArrow},${yMid} ${arrowX},${yDown}" 
+                             fill="#a80000" />
+                `;
+            }
+        }
+    });
+    
+    // Bottom segment
+    if (hasBottom) {
+        svgContent += `
+            <line x1="0" y1="${svgHeight - 50}" x2="${svgWidth}" y2="${svgHeight - 50}" stroke="#000" stroke-width="1" />
+            <rect x="0" y="${svgHeight - 50}" width="${svgWidth}" height="50" fill="#cce6f6" />
+        `;
+    }
+    
+    // Label
+    svgContent += `
+        <text x="10" y="${svgHeight - 10}" font-size="12" fill="#555">
+            ${config} — ${width}" x ${height}"
+        </text>
+    `;
+    
+    svgContent += `</svg>`;
+    
+    // Center the SVG in the container
     container.innerHTML = `
-        <div style="
-            width: ${displayWidth}px;
-            height: ${displayHeight}px;
-            border: 12px solid #ffffffff;
-            border-radius: 4px;
-            background: linear-gradient(135deg, #e6f2ff, #cce0ff);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            position: relative;
-            margin: auto;
-            overflow: hidden;
-        ">
-            <div style="
-                position: absolute;
-                top: 0; left: 0; right: 0; bottom: 0;
-                background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
-            "></div>
-            
-            <div style="
-                position: absolute;
-                top: 0; left: 50%; width: 2px; height: 100%;
-                background: #a80000;
-                transform: translateX(-50%);
-            "></div>
-            <div style="
-                position: absolute;
-                left: 0; top: 50%; width: 100%; height: 2px;
-                background: #a80000;
-                transform: translateY(-50%);
-            "></div>
-            
-            <div style="
-                position: absolute;
-                bottom: 8px; right: 8px;
-                background: rgba(0,0,0,0.7);
-                color: white;
-                padding: 2px 6px;
-                border-radius: 3px;
-                font-size: 12px;
-            ">${width}" × ${height}"</div>
+        <div style="display:flex; justify-content:center; align-items:center; height:100%;">
+            ${svgContent}
         </div>
     `;
+    
+    // Scale to fit
+    const svgElement = container.querySelector('svg');
+    if (svgElement) {
+        const scale = Math.min(
+            container.clientWidth * 0.9 / svgWidth,
+            container.clientHeight * 0.9 / svgHeight
+        );
+        svgElement.style.transform = `scale(${scale})`;
+        svgElement.style.transformOrigin = 'center center';
+    }
 }
 
-// Watch inputs for preview (unchanged)
+// Event listeners (unchanged)
 document.getElementById('seriesSelect').addEventListener('change', updateWindowPreview);
 document.getElementById('seriesTypeSelect').addEventListener('change', updateWindowPreview);
 document.querySelector('[name="width"]').addEventListener('input', updateWindowPreview);
@@ -1079,6 +1128,11 @@ document.querySelector('[name="height"]').addEventListener('input', updateWindow
 
 // Initial preview
 updateWindowPreview();
+
+
+
+
+
 
     // Modal cleanup
     document.addEventListener('hidden.bs.modal', function(event) {
