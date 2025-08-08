@@ -19,7 +19,7 @@
     {{-- Addresses --}}
     <div class="row">
         <div class="col-md-6">
-            <h6>Billing Address</h6>
+            <h6><strong>Billing Address</strong></h6>
             {{ $invoice->customer->billing_address ?? $invoice->customer->address }}<br>
             {{ $invoice->customer->billing_city ?? $invoice->customer->city }},
             {{ $invoice->customer->billing_state ?? $invoice->customer->state }},
@@ -27,7 +27,7 @@
             {{ $invoice->customer->phone }}
         </div>
         <div class="col-md-6">
-            <h6>Delivery Address</h6>
+            <h6><strong>Delivery Address</strong></h6>
             {{ $invoice->customer->delivery_address ?? $invoice->customer->address }}<br>
             {{ $invoice->customer->delivery_city ?? $invoice->customer->city }},
             {{ $invoice->customer->delivery_state ?? $invoice->customer->state }},

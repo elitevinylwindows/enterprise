@@ -176,7 +176,7 @@ class InvoiceController extends Controller
             'invoice_number' => $invoice->invoice_number, // Match your DB field
             'date' => $invoice->invoice_date,
             'items' => $invoice->items->map(function ($item) {
-                return [
+                return [    
                     'name' => $item->name,
                     'quantity' => $item->quantity,
                     'rate' => $item->price,
