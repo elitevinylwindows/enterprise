@@ -947,88 +947,89 @@
     }
 
 // Window Preview Logic
+// Window Preview Logic
 function updateWindowPreview() {
     const config = document.getElementById('seriesTypeSelect').value;
-    const width = parseFloat(document.querySelector('[name="width"]').value) || 48;
-    const height = parseFloat(document.querySelector('[name="height"]').value) || 48;
+    const widthInput = parseFloat(document.querySelector('[name="width"]').value) || 48;
+    const heightInput = parseFloat(document.querySelector('[name="height"]').value) || 48;
     const previewBox = document.getElementById('window-svg-preview');
 
-    // Clear previous content
+    // Clear previous content and ensure container is visible
     previewBox.innerHTML = '';
+    previewBox.style.display = 'block';
+    previewBox.style.width = '300px';
+    previewBox.style.height = '300px';
+    previewBox.style.backgroundColor = '#f8f9fa'; // Fallback background
     
-    // Fixed SVG container dimensions
-    const containerWidth = 280;
-    const containerHeight = 280;
+    // Calculate aspect ratio and display dimensions
+    const aspectRatio = widthInput / heightInput;
+    const maxSize = 280; // Max width/height of the window within container
     
-    // Calculate display dimensions maintaining aspect ratio
     let displayWidth, displayHeight;
-    if (width > height) {
-        displayWidth = containerWidth;
-        displayHeight = Math.round(containerWidth * (height/width));
-    } else {
-        displayHeight = containerHeight;
-        displayWidth = Math.round(containerHeight * (width/height));
+    if (aspectRatio > 1) { // Wider than tall
+        displayWidth = maxSize;
+        displayHeight = maxSize / aspectRatio;
+    } else { // Taller than wide or square
+        displayHeight = maxSize;
+        displayWidth = maxSize * aspectRatio;
     }
-    
+
     // Create SVG with proper window representation
     let svgContent = `
-        <svg width="${containerWidth}" height="${containerHeight}" viewBox="0 0 ${containerWidth} ${containerHeight}" 
-             xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto;">
+        <svg width="100%" height="100%" viewBox="0 0 300 300" 
+             xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
              
-        <!-- Background container -->
-        <rect x="0" y="0" width="${containerWidth}" height="${containerHeight}" fill="#f8f9fa"/>
+        <!-- Background -->
+        <rect x="0" y="0" width="300" height="300" fill="#f8f9fa"/>
         
         <!-- Window centered in container -->
-        <g transform="translate(${(containerWidth-displayWidth)/2}, ${(containerHeight-displayHeight)/2})">
-    `;
-    
-    // Window frame (white as requested)
-    svgContent += `
-        <rect x="2" y="2" width="${displayWidth-4}" height="${displayHeight-4}" 
-              fill="none" stroke="#ffffff" stroke-width="4" rx="2"/>
+        <g transform="translate(${(300 - displayWidth) / 2}, ${(300 - displayHeight) / 2})">
+            <!-- Window frame -->
+            <rect x="0" y="0" width="${displayWidth}" height="${displayHeight}" 
+                  fill="#ffffff" stroke="#cccccc" stroke-width="1"/>
     `;
     
     // For XO configuration (opens to right)
     if (config.includes('XO')) {
         // Left pane (fixed)
         svgContent += `
-            <rect x="4" y="4" width="${displayWidth/2-6}" height="${displayHeight-8}" 
+            <rect x="2" y="2" width="${displayWidth/2-3}" height="${displayHeight-4}" 
                   fill="#f0f8ff" stroke="#ffffff" stroke-width="0.5"/>
         `;
         
         // Right pane (operable)
         svgContent += `
-            <rect x="${displayWidth/2+2}" y="4" width="${displayWidth/2-6}" height="${displayHeight-8}" 
+            <rect x="${displayWidth/2+1}" y="2" width="${displayWidth/2-3}" height="${displayHeight-4}" 
                   fill="#e6f2ff" stroke="#ffffff" stroke-width="0.5"/>
                   
             <!-- Grid lines for operable pane -->
-            <line x1="${displayWidth/2+2}" y1="${displayHeight/3}" x2="${displayWidth-4}" y2="${displayHeight/3}" 
+            <line x1="${displayWidth/2+1}" y1="${displayHeight/3}" x2="${displayWidth-2}" y2="${displayHeight/3}" 
                   stroke="#99cbee" stroke-width="0.5" stroke-dasharray="3,2"/>
-            <line x1="${displayWidth/2+2}" y1="${displayHeight*2/3}" x2="${displayWidth-4}" y2="${displayHeight*2/3}" 
+            <line x1="${displayWidth/2+1}" y1="${displayHeight*2/3}" x2="${displayWidth-2}" y2="${displayHeight*2/3}" 
                   stroke="#99cbee" stroke-width="0.5" stroke-dasharray="3,2"/>
-            <line x1="${displayWidth/2+displayWidth/6}" y1="4" x2="${displayWidth/2+displayWidth/6}" y2="${displayHeight-4}" 
+            <line x1="${displayWidth/2+displayWidth/6}" y1="2" x2="${displayWidth/2+displayWidth/6}" y2="${displayHeight-2}" 
                   stroke="#99cbee" stroke-width="0.5" stroke-dasharray="3,2"/>
             
             <!-- Opening direction arrow -->
-            <path d="M${displayWidth/2+25},${displayHeight/2} L${displayWidth/2+10},${displayHeight/2-10} 
-                    L${displayWidth/2+10},${displayHeight/2+10} Z" 
+            <path d="M${displayWidth/2+20},${displayHeight/2} L${displayWidth/2+5},${displayHeight/2-10} 
+                    L${displayWidth/2+5},${displayHeight/2+10} Z" 
                   fill="#a80000"/>
         `;
         
         // Divider between panes
         svgContent += `
-            <line x1="${displayWidth/2}" y1="4" x2="${displayWidth/2}" y2="${displayHeight-4}" 
-                  stroke="#a80000" stroke-width="2"/>
+            <line x1="${displayWidth/2}" y1="2" x2="${displayWidth/2}" y2="${displayHeight-2}" 
+                  stroke="#a80000" stroke-width="1.5"/>
         `;
     }
     
-    svgContent += `</g>`;
-    
-    // Configuration label (positioned below window)
     svgContent += `
-        <text x="${containerWidth/2}" y="${containerHeight-10}" 
+        </g>
+        
+        <!-- Configuration label -->
+        <text x="150" y="290" 
               text-anchor="middle" font-family="Arial" font-size="12" fill="#333">
-            ${config} - ${width}" × ${height}"
+            ${config} - ${widthInput}" × ${heightInput}"
         </text>
     `;
     
@@ -1036,6 +1037,17 @@ function updateWindowPreview() {
     
     previewBox.innerHTML = svgContent;
 }
+
+// Make sure the preview container exists in your HTML:
+// <div id="window-svg-preview" style="width:300px; height:300px; border:1px solid #ddd;"></div>
+
+// Event listeners
+document.querySelector('[name="width"]').addEventListener('input', updateWindowPreview);
+document.querySelector('[name="height"]').addEventListener('input', updateWindowPreview);
+document.getElementById('seriesTypeSelect').addEventListener('change', updateWindowPreview);
+
+// Initial preview
+updateWindowPreview();
 
     
     // Modal cleanup
