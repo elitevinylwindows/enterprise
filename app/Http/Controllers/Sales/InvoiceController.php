@@ -138,6 +138,15 @@ public function show($id)
         return view('sales.invoices.show', compact('invoice'));
     }
 
+
+     public function email($id)
+    {
+        $invoice = Order::findOrFail($id);
+        Mail::to($invoice->customer->email)->send(new InvoiceMail($invoice));
+
+        return redirect()->route('sales.invoices.index')->with('success', 'Invoice email sent successfully.');
+    }
+
     public function payment($id)
 {
     $invoice = Invoice::findOrFail($id);

@@ -97,7 +97,7 @@
                                     <span class="badge bg-light text-muted">{{ ucfirst($invoice->status) }}</span>
                                     @endif
                                 </td>
-                                <td>{{ $invoice->notes }}</td>
+                                <td>{{ $invoice->quote->notes }}</td>
                                 <td class="text-nowrap">
                                     {{-- View --}}
                                     <a class="avtar avtar-xs btn-link-success text-success customModal"
