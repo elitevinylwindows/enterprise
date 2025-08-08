@@ -132,7 +132,11 @@ class InvoiceController extends Controller
         return redirect()->route('sales.invoices.index')->with('success', 'Invoice deleted.');
     }
 
-
+public function show($id)
+    {
+        $invoice = Invoice::with('items')->findOrFail($id);
+        return view('sales.invoices.show', compact('invoice'));
+    }
 
     public function payment($id)
 {
