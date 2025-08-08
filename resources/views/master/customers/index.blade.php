@@ -10,10 +10,10 @@
 <li class="breadcrumb-item active" aria-current="page">{{ __('Customers') }}</li>
 @endsection
 
-<div class="mb-4"></div> {{-- Space --}}
-
-
 @section('content')
+<!-- Spacer between breadcrumb and first card -->
+<div class="mb-4"></div>
+
 <!-- Card 1: Header and Actions -->
 <div class="card mb-4">
     <div class="card-body">
@@ -36,7 +36,7 @@
                         Show All
                     </a>
                 @else
-                    <a href="{{ route('master.customers.index', ['status' => 'active']) }}" class="btn btn-outline-primary">
+                    <a href="{{ route('master.customers.index', ['status' => 'active']) }}" class="btn btn-light">
                         Show Active
                     </a>
                 @endif
@@ -44,6 +44,9 @@
         </div>
     </div>
 </div>
+
+<!-- Spacer between action card and table card -->
+<div class="mb-4"></div>
 
 <!-- Card 2: Customers Table -->
 <div class="card">
