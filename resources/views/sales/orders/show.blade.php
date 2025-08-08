@@ -6,9 +6,9 @@
     {{-- Company Info --}}
     <div class="mb-3">
         <strong>Elite Vinyl Windows</strong><br>
-        1234 Company Address, CA 90000<br>
-        Tel: (123) 456-7890 | Fax: (123) 456-7891<br>
-        Website: www.elitevw.com
+        4231 Liberty Blvd, CA 90280<br>
+        Tel: (562) 945-7700 | Fax: (562) 800-7064<br>
+        Website: www.elitevinylwindows.com
     </div>
 
     {{-- Header Details --}}
@@ -55,7 +55,6 @@
                     <th>Color</th>
                     <th>Glass</th>
                     <th>Grid</th>
-                    <th>Pattern</th>
                     <th>Qty</th>
                     <th>Total</th>
                 </tr>
@@ -70,7 +69,6 @@
                     <td>{{ $item->color ?? '-' }}</td>
                     <td>{{ $item->glass ?? '-' }}</td>
                     <td>{{ $item->grid ?? '-' }}</td>
-                    <td>{{ $item->grid_pattern ?? '-' }}</td>
                     <td>{{ $item->qty }}</td>
                     <td>${{ number_format($item->total, 2) }}</td>
                 </tr>
@@ -82,6 +80,7 @@
     {{-- Totals --}}
     <div class="text-end mt-4">
         <p><strong>Total Qty:</strong> {{ $order->quote->items->sum('qty') }}</p>
+        <p><strong>Shipping:</strong> ${{ number_format($order->shipping, 2) }}</p>
         <p><strong>Subtotal:</strong> ${{ number_format($order->subtotal, 2) }}</p>
         <p><strong>Tax:</strong> ${{ number_format($order->tax, 2) }}</p>
         <h5><strong>Total:</strong> ${{ number_format($order->total, 2) }}</h5>

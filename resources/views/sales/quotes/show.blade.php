@@ -10,12 +10,13 @@
             <div class="modal-body p-4">
                 <!-- Company Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h4 class="fw-bold">Elite Vinyl Windows</h4>
-                        <p class="mb-0">123 Business Ave, Los Angeles, CA</p>
-                        <p class="mb-0">Phone: (888) 123-4567 | Fax: (888) 987-6543</p>
-                        <p class="mb-0">Website: www.elitevw.com</p>
-                    </div>
+                     {{-- Company Info --}}
+    <div class="mb-3">
+        <strong>Elite Vinyl Windows</strong><br>
+        4231 Liberty Blvd, CA 90280<br>
+        Tel: (562) 945-7700 | Fax: (562) 800-7064<br>
+        Website: www.elitevinylwindows.com
+    </div>
                     <div>
                         <a href="{{ route('sales.orders.download', $order->id) }}" class="btn btn-outline-primary me-2">Download PDF</a>
                         <a href="#" class="btn btn-success">Send Order</a>
