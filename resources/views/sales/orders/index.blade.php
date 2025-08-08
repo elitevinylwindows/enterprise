@@ -20,14 +20,22 @@
 <div class="row">
     {{-- Taskbar Card --}}
     <div class="col-md-2">
-        <div class="card">
-            <div class="list-group list-group-flush">
-                <a href="{{ route('sales.orders.index', ['status' => 'all']) }}" class="list-group-item">All Orders</a>
-                <a href="{{ route('sales.orders.index', ['status' => 'modified']) }}" class="list-group-item">Modified Orders</a>
-                <a href="{{ route('sales.orders.index', ['status' => 'deleted']) }}" class="list-group-item text-danger">Deleted</a>
-
-            </div>
-        </div>
+  <div class="card">
+    <div class="list-group list-group-flush">
+        <a href="{{ route('sales.orders.index', ['status' => 'all']) }}" 
+           class="list-group-item {{ $status === 'all' ? 'active' : '' }}">
+           All Orders
+        </a>
+        <a href="{{ route('sales.orders.index', ['status' => 'modified']) }}" 
+           class="list-group-item {{ $status === 'modified' ? 'active' : '' }}">
+           Modified Orders
+        </a>
+        <a href="{{ route('sales.orders.index', ['status' => 'deleted']) }}" 
+           class="list-group-item {{ $status === 'deleted' ? 'active' : '' }}">
+           Deleted
+        </a>
+    </div>
+</div>
     </div>
 
     {{-- Main Content Card --}}
@@ -59,81 +67,111 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($orders as $order)
-                            <tr>
-                                    <td>{{ $order->order_number }}</td>
-                                    <td>{{ $order->quote->quote_number }}</td>
-                                    <td>{{ $order->customer->customer_number }}</td>
-                                    <td>{{ $order->customer->customer_name }}</td>
-                                    <td>{{ $order->created_at }}</td>
-                                    <td>{{ $order->items->sum('qty') }}</td>
-                                    <td>{{ $order->net_price }}</td>
-                                    <td>${{ number_format($order->remaining_amount ?? 0, 2) }}</td>
-                                    <td>{{ $order->expected_delivery_date }}</td>
-                                    <td>
-                                        @if($order->status === 'active')
-                                            <span class="badge bg-success">Active</span>
-                                        @elseif($order->status === 'draft')
-                                            <span class="badge bg-secondary">Draft</span>
-                                        @else
-                                            <span class="badge bg-light text-muted">{{ ucfirst($order->status) }}</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-nowrap">
-                                        {{-- View --}}
-                                        <a class="avtar avtar-xs btn-link-success text-success customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="View Order"
-                                           href="#"
-                                           data-size="xl"
-                                           data-url="{{ route('sales.orders.show', $order->id) }}"
-                                           data-title="Order Summary">
-                                            <i data-feather="eye"></i>
-                                        </a>
+    @foreach ($orders as $order)
+    <tr>
+        <td>{{ $order->order_number }}</td>
+        <td>{{ $order->quote->quote_number ?? 'N/A' }}</td>
+        <td>{{ $order->customer->customer_number ?? 'N/A' }}</td>
+        <td>{{ $order->customer->customer_name ?? 'N/A' }}</td>
+        <td>{{ $order->created_at->format('m/d/Y') }}</td>
+        <td>{{ $order->items->sum('qty') }}</td>
+        <td>${{ number_format($order->net_price ?? 0, 2) }}</td>
+        <td>${{ number_format($order->remaining_amount ?? 0, 2) }}</td>
+        <td>{{ $order->expected_delivery_date }}</td>
+        <td>
+            @if($status === 'deleted')
+                <span class="badge bg-danger">Deleted</span>
+            @else
+                @if($order->status === 'active')
+                    <span class="badge bg-success">Active</span>
+                @elseif($order->status === 'draft')
+                    <span class="badge bg-secondary">Draft</span>
+                @else
+                    <span class="badge bg-light text-muted">{{ ucfirst($order->status) }}</span>
+                @endif
+            @endif
+        </td>
+        <td class="text-nowrap">
+            @if($status === 'deleted')
+                {{-- Restore Button --}}
+                <form action="{{ route('sales.orders.restore', $order->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="avtar avtar-xs btn-link-success text-success border-0 bg-transparent p-0" 
+                            data-bs-toggle="tooltip" data-bs-original-title="Restore Order">
+                        <i data-feather="rotate-ccw"></i>
+                    </button>
+                </form>
+                
+                {{-- Permanent Delete Button --}}
+                <form action="{{ route('sales.orders.force-delete', $order->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0" 
+                            data-bs-toggle="tooltip" data-bs-original-title="Delete Permanently"
+                            onclick="return confirm('Permanently delete this order?')">
+                        <i data-feather="trash-2"></i>
+                    </button>
+                </form>
+            @else
+                {{-- View --}}
+                <a class="avtar avtar-xs btn-link-success text-success customModal"
+                   data-bs-toggle="tooltip"
+                   data-bs-original-title="View Order"
+                   href="#"
+                   data-size="xl"
+                   data-url="{{ route('sales.orders.show', $order->id) }}"
+                   data-title="Order Summary">
+                    <i data-feather="eye"></i>
+                </a>
 
-                                        {{-- Email --}}
-                                        <a class="avtar avtar-xs btn-link-warning text-warning customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Email"
-                                           href="{{ route('sales.orders.email', $order->id) }}"
-                                           data-title="Send Email">
-                                            <i data-feather="mail"></i>
-                                        </a>
+                {{-- Email --}}
+                <a class="avtar avtar-xs btn-link-warning text-warning customModal"
+                   data-bs-toggle="tooltip"
+                   data-bs-original-title="Email"
+                   href="{{ route('sales.orders.email', $order->id) }}"
+                   data-title="Send Email">
+                    <i data-feather="mail"></i>
+                </a>
 
-                                        @if(!$order->invoice)
-                                        {{-- Convert to an Invoice --}}
-                                        <a class="avtar avtar-xs btn-link-info text-info"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Invoice"
-                                           href="{{ route('sales.orders.convertToInvoice', ['id' => $order->id]) }}">
-                                            <i data-feather="file-text"></i>
-                                        </a>
-                                        @endif
+                @if(!$order->invoice)
+                {{-- Convert to Invoice --}}
+                <a class="avtar avtar-xs btn-link-info text-info"
+                   data-bs-toggle="tooltip"
+                   data-bs-original-title="Convert to Invoice"
+                   href="{{ route('sales.orders.convertToInvoice', ['id' => $order->id]) }}">
+                    <i data-feather="file-text"></i>
+                </a>
+                @endif
+
+                {{-- Edit --}}
+                <a class="avtar avtar-xs btn-link-primary text-primary customModal"
+                   data-bs-toggle="tooltip"
+                   data-bs-original-title="Edit"
+                   href="#"
+                   data-size="xl"
+                   data-url="{{ route('sales.orders.edit', $order->id) }}"
+                   data-title="Edit Order">
+                    <i data-feather="edit"></i>
+                </a>
+
+                {{-- Delete --}}
+                <form action="{{ route('sales.orders.destroy', $order->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0"
+                            data-bs-toggle="tooltip" data-bs-original-title="Delete"
+                            onclick="return confirm('Delete this order?')">
+                        <i data-feather="trash-2"></i>
+                    </button>
+                </form>
+            @endif
+        </td>
+    </tr>
+    @endforeach
+</tbody>
 
 
-                                        {{-- Edit --}}
-                                        <a class="avtar avtar-xs btn-link-primary text-primary customModal"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Edit"
-                                           href="#"
-                                           data-size="xl"
-                                           data-url="{{ route('sales.orders.edit', $order->id) }}"
-                                           data-title="Edit Order">
-                                            <i data-feather="edit"></i>
-                                        </a>
 
-                                        {{-- Delete --}}
-                                        <a class="avtar avtar-xs btn-link-danger text-danger"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-original-title="Delete"
-                                           href="{{ route('sales.orders.destroy', $order->id) }}"
-                                           data-title="Delete Order">
-                                            <i data-feather="trash-2"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
                     </table>
                 </div> <!-- table-responsive -->
             </div> <!-- card-body -->

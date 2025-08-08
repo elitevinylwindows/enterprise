@@ -5,11 +5,14 @@ namespace App\Models\Sales;
 use App\Models\Master\Customers\Customer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Invoice extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
+    protected $dates = ['deleted_at'];
     protected $table = 'elitevw_sales_invoices';
 
     protected $fillable = [

@@ -330,6 +330,10 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::post('quotes', [QuoteController::class, 'store'])->name('quotes.store');
             Route::get('quotes/customer/{customer_number}', [QuoteController::class, 'getCustomer'])->name('quotes.getCustomer');
             Route::get('quotes/{id}/details', [QuoteController::class, 'details'])->name('quotes.details');
+            Route::get('quotes/deleted', [QuoteController::class, 'deleted'])->name('quotes.deleted');
+            Route::post('quotes/{id}/restore', [QuoteController::class, 'restore'])->name('quotes.restore');
+            Route::delete('quotes/{id}/force-delete', [QuoteController::class, 'forceDelete'])->name('quotes.force-delete');
+
 
             // Item routes - static before dynamic
             Route::get('quotes/view/{id}/items/{itemId}', [QuoteController::class, 'getItem'])->name('quotes.items.view');
@@ -366,6 +370,10 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('orders/{id}/show', [\App\Http\Controllers\Sales\OrderController::class, 'show'])->name('orders.show');
             Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
             Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
+            Route::get('orders/deleted', [OrderController::class, 'deleted'])->name('orders.deleted');
+            Route::post('orders/{id}/restore', [OrderController::class, 'restore'])->name('orders.restore');
+            Route::delete('orders/{id}/force-delete', [OrderController::class, 'forceDelete'])->name('orders.force-delete');
+
 
             Route::get('orders/{id}/convert-to-invoice', [\App\Http\Controllers\Sales\OrderController::class, 'convertToInvoice'])->name('orders.convertToInvoice');
 
@@ -375,7 +383,11 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('/invoices/customer/{customer_number}', [\App\Http\Controllers\Sales\InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
             Route::get('/invoices/{id}/sendto-quickbooks', [QuickBooksController::class, 'sendInvoiceToQuickBooks'])->name('invoices.sendToQuickBooks');
             Route::get('invoices/{id}/show', [\App\Http\Controllers\Sales\InvoiceController::class, 'show'])->name('invoices.show');
-       
+            Route::get('invoices/deleted', [InvoiceController::class, 'deleted'])->name('invoices.deleted');
+            Route::post('invoices/{id}/restore', [InvoiceController::class, 'restore'])->name('invoices.restore');
+            Route::delete('invoices/{id}/force-delete', [InvoiceController::class, 'forceDelete'])->name('invoices.force-delete');
+
+
        Route::get('/quickbooks/wsdl', [QuickBooksController::class, 'wsdl']);
         Route::any('/quickbooks/endpoint', [QuickBooksController::class, 'handleWebConnector']);
        

@@ -21,12 +21,20 @@
     {{-- Taskbar Card --}}
     <div class="col-md-2">
         <div class="card">
-            <div class="list-group list-group-flush">
-                <a href="{{ route('sales.quotes.index', ['status' => 'all']) }}" class="list-group-item">All Quotes</a>
-                <a href="{{ route('sales.quotes.index', ['status' => 'draft']) }}" class="list-group-item">Draft Quotes</a>
-                <a href="{{ route('sales.quotes.index', ['status' => 'deleted']) }}" class="list-group-item text-danger">Deleted</a>
-
-            </div>
+    <div class="list-group list-group-flush">
+    <a href="{{ route('sales.quotes.index', ['status' => 'all']) }}" 
+       class="list-group-item {{ $status === 'all' ? 'active' : '' }}">
+       All Quotes
+    </a>
+    <a href="{{ route('sales.quotes.index', ['status' => 'draft']) }}" 
+       class="list-group-item {{ $status === 'draft' ? 'active' : '' }}">
+       Draft Quotes
+    </a>
+    <a href="{{ route('sales.quotes.index', ['status' => 'deleted']) }}" 
+       class="list-group-item text-danger {{ $status === 'deleted' ? 'active' : '' }}">
+       Deleted
+    </a>
+</div>
         </div>
     </div>
 
@@ -57,68 +65,88 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($quotes as $quote)
-                            <tr>
-                                <td>{{ $quote->quote_number }}</td>
-                                <td>{{ $quote->customer_name }}</td>
-                                <td>{{ $quote->entry_date }}</td>
-                                <td>{{ $quote->po_number }}</td>
-                                <td>{{ $quote->reference }}</td>
-                                <td>${{ number_format($quote->total ?? 0, 2) }}</td>
-                                <td>{{ $quote->valid_until }}</td>
-                                <td>
-                                    @if($quote->status === 'approved')
-                                    <span class="badge bg-success">Approved</span>
-                                    @elseif($quote->status === 'rejected')
-                                    <span class="badge bg-danger">Rejected</span>
-                                    @elseif($quote->status === 'sent')
-                                    <span class="badge bg-success">Sent</span>
-                                    @elseif($quote->status === 'draft')
-                                    <span class="badge bg-secondary">Draft</span>
-                                    @else
-                                    <span class="badge bg-light text-muted">{{ ucfirst($quote->status) }}</span>
-                                    @endif
-                                </td>
-                                <td class="text-nowrap">
-                                    {{-- View --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" data-bs-original-title="View Summary" href="#" data-size="xl" data-url="{{ route('sales.quotes.view', $quote->id) }}" data-title="Quote Summary">
-                                        <i data-feather="eye"></i>
-                                    </a>
+    @foreach ($quotes as $quote)
+    <tr>
+        <td>{{ $quote->quote_number }}</td>
+        <td>{{ $quote->customer_name }}</td>
+        <td>{{ $quote->entry_date }}</td>
+        <td>{{ $quote->po_number }}</td>
+        <td>{{ $quote->reference }}</td>
+        <td>${{ number_format($quote->total ?? 0, 2) }}</td>
+        <td>{{ $quote->valid_until }}</td>
+        <td>
+            @if($quote->status === 'approved')
+            <span class="badge bg-success">Approved</span>
+            @elseif($quote->status === 'rejected')
+            <span class="badge bg-danger">Rejected</span>
+            @elseif($quote->status === 'sent')
+            <span class="badge bg-success">Sent</span>
+            @elseif($quote->status === 'draft')
+            <span class="badge bg-secondary">Draft</span>
+            @else
+            <span class="badge bg-light text-muted">{{ ucfirst($quote->status) }}</span>
+            @endif
+        </td>
+        <td class="text-nowrap">
+            @if($status === 'deleted')
+                {{-- Restore Button --}}
+                <form action="{{ route('sales.quotes.restore', $quote->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="avtar avtar-xs btn-link-success text-success border-0 bg-transparent p-0" data-bs-toggle="tooltip" data-bs-original-title="Restore">
+                        <i data-feather="rotate-ccw"></i>
+                    </button>
+                </form>
+                
+                {{-- Permanent Delete Button --}}
+                <form action="{{ route('sales.quotes.force-delete', $quote->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0" 
+                            data-bs-toggle="tooltip" data-bs-original-title="Delete Permanently"
+                            onclick="return confirm('Permanently delete this quote?')">
+                        <i data-feather="trash-2"></i>
+                    </button>
+                </form>
+            @else
+                {{-- Original Action Buttons --}}
+                <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" data-bs-original-title="View Summary" href="#" data-size="xl" data-url="{{ route('sales.quotes.view', $quote->id) }}" data-title="Quote Summary">
+                    <i data-feather="eye"></i>
+                </a>
 
-                                    {{-- Edit --}}
-                                    <a class="avtar avtar-xs btn-link-primary text-primary" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="{{ route('sales.quotes.edit', $quote->id) }}" data-title="Edit Quote">
-                                        <i data-feather="edit"></i>
-                                    </a>
+                {{-- Edit --}}
+                <a class="avtar avtar-xs btn-link-primary text-primary" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="{{ route('sales.quotes.edit', $quote->id) }}" data-title="Edit Quote">
+                    <i data-feather="edit"></i>
+                </a>
 
-                                    {{-- Email --}}
-                                    <a class="avtar avtar-xs btn-link-warning text-warning emailButton" data-bs-toggle="tooltip" data-bs-original-title="Email" href="#" data-size="md" data-url="{{ route('sales.quotes.email', $quote->id) }}" data-title="Send Email">
-                                        <!-- Added ID for easier selection -->
-                                        <i data-feather="mail" id="emailIcon"></i>
-                                        <span class="spinner-border spinner-border-sm d-none" id="emailSpinner"></span>
-                                    </a>
+                {{-- Email --}}
+                <a class="avtar avtar-xs btn-link-warning text-warning emailButton" data-bs-toggle="tooltip" data-bs-original-title="Email" href="#" data-size="md" data-url="{{ route('sales.quotes.email', $quote->id) }}" data-title="Send Email">
+                    <i data-feather="mail" id="emailIcon"></i>
+                    <span class="spinner-border spinner-border-sm d-none" id="emailSpinner"></span>
+                </a>
 
-                                    {{-- Orders --}}
+                {{-- Orders --}}
+                @if(!$quote->order)
+                <a href="{{ route('sales.quotes.convertToOrder', ['id' => $quote->id]) }}" class="avtar avtar-xs btn-link-info text-info" data-bs-toggle="tooltip" data-bs-original-title="Convert to Order">
+                    <i data-feather="shopping-cart"></i>
+                </a>
+                @endif
 
-                                    @if(!$quote->order)
-                                    {{-- Manual Convert to Order --}}
-                                    <a href="{{ route('sales.quotes.convertToOrder', ['id' => $quote->id]) }}" class="avtar avtar-xs btn-link-info text-info" data-bs-toggle="tooltip" data-bs-original-title="Convert to Order">
-                                        <i data-feather="shopping-cart"></i>
-                                    </a>
-                                    @endif
+                {{-- Delete --}}
+                <form action="{{ route('sales.quotes.destroy', $quote->id) }}" method="POST" style="display:inline;" class="delete-quote-form">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0 delete-quote-btn" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                        <i data-feather="trash-2"></i>
+                    </button>
+                </form>
+            @endif
+        </td>
+    </tr>
+    @endforeach
+</tbody>
 
 
-                                    {{-- Delete --}}
-                                    <form action="{{ route('sales.quotes.destroy', $quote->id) }}" method="POST" style="display:inline;" class="delete-quote-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0 delete-quote-btn" data-bs-toggle="tooltip" data-bs-original-title="Delete">
-                                            <i data-feather="trash-2"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
+
                     </table>
                 </div> <!-- table-responsive -->
             </div> <!-- card-body -->

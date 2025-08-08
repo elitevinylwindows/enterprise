@@ -55,6 +55,7 @@
                     <th>Item</th>
                     <th>Qty</th>
                     <th>Size</th>
+                    <th>Color</th>
                     <th>Glass</th>
                     <th>Grid</th>
                     <th>Price</th>
@@ -67,6 +68,7 @@
                     <td style="text-wrap:auto">{{ $item->description ?? 'N/A' }}</td>
                     <td>{{ $item->qty }}</td>
                     <td>{{ $item->size }}"</td>
+                    <td>{{ $item->color }}"</td>
                     <td>{{ $item->glass ?? 'N/A' }}</td>
                     <td>{{ $item->grid ?? 'N/A' }}</td>
                     <td>${{ number_format($item->price, 2) }}</td>
