@@ -1,6 +1,4 @@
-<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+
             <form method="POST" action="{{ route('master.customers.update', $customer->id) }}">
                 @csrf
                 @method('PUT')
@@ -104,6 +102,4 @@
                     <button type="submit" class="btn btn-primary">Update Customer</button>
                 </div>
             </form>
-        </div>
-    </div>
-</div>
+   
