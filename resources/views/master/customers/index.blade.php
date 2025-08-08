@@ -81,11 +81,10 @@
                                 <td>${{ number_format($customer->loyalty_credit, 2) }}</td>
                                 <td>${{ number_format($customer->total_spent, 2) }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-primary edit-customer" 
+                                    <button type="button" class="btn btn-sm btn-primary" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#editCustomerModal"
-                                        data-id="{{ $customer->id }}"
-                                        data-url="{{ route('master.customers.edit', $customer->id) }}">
+                                        data-id="{{ $customer->id }}">
                                         Edit
                                     </button>
                                     <form action="{{ route('master.customers.destroy', $customer->id) }}" method="POST" class="d-inline">
@@ -113,11 +112,11 @@
     </div>
 </div>
 
-<!-- Edit Customer Modal (empty, will be loaded dynamically) -->
+<!-- Edit Customer Modal -->
 <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <!-- Content will be loaded via AJAX -->
+            <!-- Content will be loaded via JavaScript -->
         </div>
     </div>
 </div>
@@ -130,31 +129,51 @@
         document.querySelectorAll('.customer-checkbox').forEach(cb => cb.checked = checked);
     });
 
-    // Handle edit button clicks
-    document.querySelectorAll('.edit-customer').forEach(button => {
-        button.addEventListener('click', function() {
-            const url = this.getAttribute('data-url');
-            const modal = document.querySelector('#editCustomerModal .modal-content');
+    // Initialize edit modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const editModal = document.getElementById('editCustomerModal');
+        
+        editModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const customerId = button.getAttribute('data-id');
+            const modalContent = this.querySelector('.modal-content');
             
             // Show loading state
-            modal.innerHTML = '<div class="text-center p-5"><i class="fa fa-spinner fa-spin fa-3x"></i></div>';
+            modalContent.innerHTML = `
+                <div class="modal-header">
+                    <h5 class="modal-title">Loading...</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `;
             
-            // Load the edit form via AJAX
-            fetch(url)
+            // Load the edit form
+            fetch(`/master/customers/${customerId}/edit`)
                 .then(response => response.text())
                 .then(html => {
-                    modal.innerHTML = html;
+                    modalContent.innerHTML = html;
                 })
                 .catch(error => {
-                    modal.innerHTML = '<div class="alert alert-danger">Failed to load form</div>';
-                    console.error('Error:', error);
+                    modalContent.innerHTML = `
+                        <div class="modal-header">
+                            <h5 class="modal-title">Error</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-danger">Failed to load customer data. Please try again.</div>
+                        </div>
+                    `;
                 });
         });
-    });
-
-    // Ensure modal is cleared when closed
-    document.getElementById('editCustomerModal').addEventListener('hidden.bs.modal', function () {
-        this.querySelector('.modal-content').innerHTML = '';
+        
+        // Clear modal when closed
+        editModal.addEventListener('hidden.bs.modal', function() {
+            this.querySelector('.modal-content').innerHTML = '';
+        });
     });
 </script>
 @endpush
