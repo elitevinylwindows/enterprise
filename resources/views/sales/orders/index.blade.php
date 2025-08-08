@@ -90,7 +90,7 @@
                                         {{-- View --}}
                                         <a class="avtar avtar-xs btn-link-success text-success customModal"
                                            data-bs-toggle="tooltip"
-                                           data-bs-original-title="View Summary"
+                                           data-bs-original-title="View Order"
                                            href="#"
                                            data-size="xl"
                                            data-url="{{ route('sales.orders.show', $order->id) }}"
