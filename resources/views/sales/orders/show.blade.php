@@ -82,6 +82,7 @@
         <p><strong>Total Qty:</strong> {{ $order->quote->items->sum('qty') }}</p>
         <p><strong>Shipping:</strong> ${{ number_format($order->shipping, 2) }}</p>
         <p><strong>Subtotal:</strong> ${{ number_format($order->subtotal, 2) }}</p>
+        <p><strong>Discount:</strong> ${{ number_format($invoice->discount, 2) }}</p>
         <p><strong>Tax:</strong> ${{ number_format($order->tax, 2) }}</p>
         <h5><strong>Total:</strong> ${{ number_format($order->total, 2) }}</h5>
     </div>
