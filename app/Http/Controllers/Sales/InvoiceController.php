@@ -55,7 +55,7 @@ class InvoiceController extends Controller
             'delivery_email'    => 'nullable|email|max:255',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
             $quote = Quote::where('quote_number', $request->quote_number)->firstOrFail();
             $order = Order::where('order_number', $request->order_number)->first();
@@ -98,7 +98,7 @@ class InvoiceController extends Controller
 
         $invoice->update($request->all());
 
-        if($request->required_payment_type == 'percentage') {
+        if ($request->required_payment_type == 'percentage') {
             $invoice->required_payment = ($invoice->sub_total * $request->required_payment_percentage) / 100;
         } else {
             $invoice->required_payment = $request->required_payment_fixed;
@@ -106,7 +106,7 @@ class InvoiceController extends Controller
 
         $invoice->save();
 
-        if($invoice->serve_invoice_id) {
+        if ($invoice->serve_invoice_id) {
             $firstServe = new FirstServe();
             $firstServe->updateInvoiceAmounts($invoice);
         } else {
@@ -114,7 +114,7 @@ class InvoiceController extends Controller
             $firstServe = new FirstServe();
             $firstServeInvoice = $firstServe->createInvoice($invoice);
 
-            if($firstServeInvoice) {
+            if ($firstServeInvoice) {
                 $invoice->update([
                     'gateway_response' => json_encode($firstServeInvoice),
                     'serve_invoice_id' => $firstServeInvoice['id'],
@@ -133,7 +133,7 @@ class InvoiceController extends Controller
     }
 
 
-     public function email($id)
+    public function email($id)
     {
         $invoice = Order::findOrFail($id);
         Mail::to($invoice->customer->email)->send(new InvoiceMail($invoice));
@@ -142,12 +142,12 @@ class InvoiceController extends Controller
     }
 
     public function payment($id)
-{
-    $invoice = Invoice::findOrFail($id);
-    $total = $invoice->total ?? 0;
+    {
+        $invoice = Invoice::findOrFail($id);
+        $total = $invoice->total ?? 0;
 
-    return view('sales.invoices.payment', compact('total', 'invoice'));
-}
+        return view('sales.invoices.payment', compact('total', 'invoice'));
+    }
 
     public function getCustomer($customer_number)
     {
@@ -168,33 +168,33 @@ class InvoiceController extends Controller
         return view('sales.invoices.show', compact('invoice'));
     }
 
-public function syncToQuickbooks(Invoice $invoice)
-{
-    // Get invoice data
-    $invoiceData = [
-        'customer_name' => $invoice->customer->name,
-        'invoice_number' => $invoice->invoice_number, // Match your DB field
-        'date' => $invoice->invoice_date,
-        'items' => $invoice->items->map(function ($item) {
-            return [
-                'name' => $item->name,
-                'quantity' => $item->quantity,
-                'rate' => $item->price,
-            ];
-        }),
-    ];
+    public function syncToQuickbooks(Invoice $invoice)
+    {
+        // Get invoice data
+        $invoiceData = [
+            'customer_name' => $invoice->customer->name,
+            'invoice_number' => $invoice->invoice_number, // Match your DB field
+            'date' => $invoice->invoice_date,
+            'items' => $invoice->items->map(function ($item) {
+                return [
+                    'name' => $item->name,
+                    'quantity' => $item->quantity,
+                    'rate' => $item->price,
+                ];
+            }),
+        ];
 
-    // Delegate QBXML generation
-    $qbxml = app(QuickBooksService::class)->generateInvoiceQBXML($invoiceData);
+        // Delegate QBXML generation
+        $qbxml = app(QuickBooksService::class)->generateInvoiceQBXML($invoiceData);
 
-    // Queue the request with company file context
-    QuickBooksQueue::create([
-        'qb_action' => 'InvoiceAdd',
-        'qbxml' => $qbxml,
-        'company_file' => 'YourCompanyFile.QBW', // Optional: Store the target QB file
-    ]);
+        // Queue the request with company file context
+        QuickBooksQueue::create([
+            'qb_action' => 'InvoiceAdd',
+            'qbxml' => $qbxml,
+            'company_file' => 'YourCompanyFile.QBW', // Optional: Store the target QB file
+        ]);
 
-    return redirect()->back()->with('success', 'Invoice queued for QuickBooks sync.');
-}
+        return redirect()->back()->with('success', 'Invoice queued for QuickBooks sync.');
+    }
 
 }
