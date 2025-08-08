@@ -101,10 +101,14 @@
                                 <td class="text-nowrap">
                                     {{-- View --}}
                                     <a class="avtar avtar-xs btn-link-success text-success customModal"
-                                        data-bs-toggle="tooltip" data-bs-original-title="View Invoice" href="#"
-                                        data-size="xl" data-url="{{ route('sales.invoices.show', $invoice->id) }}" data-title="Invoice Summary">
-                                        <i data-feather="eye"></i>
-                                    </a>
+                                           data-bs-toggle="tooltip"
+                                           data-bs-original-title="View Invoice"
+                                           href="#"
+                                           data-size="xl"
+                                           data-url="{{ route('sales.invoices.show', $invoice->id) }}"
+                                           data-title="Invoice Summary">
+                                            <i data-feather="eye"></i>
+</a>
 
                                     {{-- Send to QB --}}
                                     <a class="avtar avtar-xs btn-link-success text-success "
