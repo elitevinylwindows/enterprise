@@ -132,6 +132,29 @@ class InvoiceController extends Controller
         return redirect()->route('sales.invoices.index')->with('success', 'Invoice deleted.');
     }
 
+public function show($id)
+    {
+        $invoice = Invoice::with('items')->findOrFail($id);
+        return view('sales.invoices.show', compact('invoice'));
+    }
+
+
+     public function email($id)
+    {
+        $invoice = Order::findOrFail($id);
+        Mail::to($invoice->customer->email)->send(new InvoiceMail($invoice));
+
+        return redirect()->route('sales.invoices.index')->with('success', 'Invoice email sent successfully.');
+    }
+
+    public function payment($id)
+{
+    $invoice = Invoice::findOrFail($id);
+    $total = $invoice->total ?? 0;
+
+    return view('sales.invoices.payment', compact('total', 'invoice'));
+}
+
     public function getCustomer($customer_number)
     {
         $customer = DB::table('elitevw_master_customers')
@@ -150,5 +173,34 @@ class InvoiceController extends Controller
         $invoice = Invoice::with(['customer', 'order', 'quote'])->findOrFail($id);
         return view('sales.invoices.show', compact('invoice'));
     }
+
+public function syncToQuickbooks(Invoice $invoice)
+{
+    // Get invoice data
+    $invoiceData = [
+        'customer_name' => $invoice->customer->name,
+        'invoice_number' => $invoice->invoice_number, // Match your DB field
+        'date' => $invoice->invoice_date,
+        'items' => $invoice->items->map(function ($item) {
+            return [
+                'name' => $item->name,
+                'quantity' => $item->quantity,
+                'rate' => $item->price,
+            ];
+        }),
+    ];
+
+    // Delegate QBXML generation
+    $qbxml = app(QuickBooksService::class)->generateInvoiceQBXML($invoiceData);
+
+    // Queue the request with company file context
+    QuickBooksQueue::create([
+        'qb_action' => 'InvoiceAdd',
+        'qbxml' => $qbxml,
+        'company_file' => 'YourCompanyFile.QBW', // Optional: Store the target QB file
+    ]);
+
+    return redirect()->back()->with('success', 'Invoice queued for QuickBooks sync.');
+}
 
 }

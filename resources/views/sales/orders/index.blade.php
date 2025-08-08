@@ -1,27 +1,20 @@
 @extends('layouts.app')
 
 @section('page-title')
-    {{ __('Orders') }}
+{{ __('Orders') }}
 @endsection
 
 @section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ __('Orders') }}</li>
+<li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ __('Orders') }}</li>
 @endsection
 
 @section('content')
 <div class="mb-4"></div> {{-- Space after title --}}
 
-<div class="row">
-    <div class="col-auto ms-auto">
-        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createOrderModal">
-            <i class="fas fa-circle-plus"></i> Create Order
-        </a>
-    </div>
-</div>
-
 
 <div class="mb-4"></div> {{-- Space --}}
+
 
 
 <div class="row">
@@ -29,16 +22,16 @@
     <div class="col-md-2">
         <div class="card">
             <div class="list-group list-group-flush">
-<a href="{{ route('sales.orders.index', ['status' => 'all']) }}" class="list-group-item">All Orders</a>
-<a href="{{ route('sales.orders.index', ['status' => 'modified']) }}" class="list-group-item">Modified Orders</a>
-<a href="{{ route('sales.orders.index', ['status' => 'deleted']) }}" class="list-group-item text-danger">Cancelled/Deleted</a>
+                <a href="{{ route('sales.orders.index', ['status' => 'all']) }}" class="list-group-item">All Orders</a>
+                <a href="{{ route('sales.orders.index', ['status' => 'modified']) }}" class="list-group-item">Modified Orders</a>
+                <a href="{{ route('sales.orders.index', ['status' => 'deleted']) }}" class="list-group-item text-danger">Deleted</a>
 
             </div>
         </div>
     </div>
 
-  {{-- Main Content Card --}}
- <div class="col-sm-10">
+    {{-- Main Content Card --}}
+    <div class="col-sm-10">
         <div class="card table-card">
             <div class="card-header">
                 <div class="row align-items-center g-2">
@@ -67,7 +60,7 @@
                         </thead>
                         <tbody>
                             @foreach ($orders as $order)
-                                <tr>
+                            <tr>
                                     <td>{{ $order->order_number }}</td>
                                     <td>{{ $order->quote->quote_number }}</td>
                                     <td>{{ $order->customer->customer_number }}</td>
@@ -90,7 +83,7 @@
                                         {{-- View --}}
                                         <a class="avtar avtar-xs btn-link-success text-success customModal"
                                            data-bs-toggle="tooltip"
-                                           data-bs-original-title="View Summary"
+                                           data-bs-original-title="View Order"
                                            href="#"
                                            data-size="xl"
                                            data-url="{{ route('sales.orders.show', $order->id) }}"
@@ -151,16 +144,65 @@
 </div>
 @endsection
 
-@include('sales.orders.create')
-
 @push('scripts')
-<script>
-    @if ($errors->any())
-        toastr.error("{{ $errors->first() }}");
-    @endif
 
-    @if(session('success'))
-        toastr.success("{{ session('success') }}");
-    @endif
+<script>
+    $(document).ready(function() {
+
+        // Add click handler for the email button
+        $('.emailButton').on('click', function(e) {
+            e.preventDefault();
+
+            const $button = $(this);
+            const $icon = $button.find('#emailIcon');
+            const $spinner = $button.find('.spinner-border');
+            const url = $button.data('url');
+
+            // Show spinner and hide icon
+            $icon.addClass('d-none');
+            $spinner.removeClass('d-none');
+            $button.prop('disabled', true);
+
+            $.ajax({
+                url: url
+                , type: 'GET'
+                , data: {
+                    _token: '{{ csrf_token() }}'
+                }
+                , success: function(response) {
+                    toastr.success('Email sent successfully!', 'Success', {
+                        timeOut: 3000
+                        , progressBar: true
+                        , closeButton: true
+                    });
+                }
+                , error: function(xhr) {
+                    toastr.error('Failed to send email. Please try again.', 'Error', {
+                        timeOut: 3000
+                        , progressBar: true
+                        , closeButton: true
+                    });
+                }
+                , complete: function() {
+                    // Always hide spinner and show icon when request is complete
+                    $spinner.addClass('d-none');
+                    $icon.removeClass('d-none');
+                    $button.prop('disabled', false);
+                }
+            });
+        });
+
+        // Delete quote with confirmation
+        $('.delete-quote-btn').on('click', function(e) {
+            e.preventDefault();
+            const $form = $(this).closest('form');
+            if (confirm('Are you sure you want to delete this quote?')) {
+            $form.submit();
+            }
+        });
+    });
+
 </script>
 @endpush
+
+

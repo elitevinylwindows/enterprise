@@ -59,7 +59,6 @@ use App\Http\Controllers\{
     ExecutiveCustomerController,
     ExecutiveTierController,
     FormulaController,
-    QuickBooksController,
     RaffleDrawController,
     WindowRenderController
 };
@@ -154,7 +153,8 @@ use App\Http\Controllers\Master\Series\{
 use App\Http\Controllers\Sales\{
     QuoteController,
     SalesSettingsController,
-    InvoiceController
+    InvoiceController,
+    QuickBooksController
 };
 
 
@@ -374,6 +374,11 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('invoices/show/{id}', [\App\Http\Controllers\Sales\InvoiceController::class, 'show'])->name('invoices.show');
             Route::get('/invoices/customer/{customer_number}', [\App\Http\Controllers\Sales\InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
             Route::get('/invoices/{id}/sendto-quickbooks', [QuickBooksController::class, 'sendInvoiceToQuickBooks'])->name('invoices.sendToQuickBooks');
+            Route::get('invoices/{id}/show', [\App\Http\Controllers\Sales\InvoiceController::class, 'show'])->name('invoices.show');
+       
+       Route::get('/quickbooks/wsdl', [QuickBooksController::class, 'wsdl']);
+        Route::any('/quickbooks/endpoint', [QuickBooksController::class, 'handleWebConnector']);
+       
         });
 
         //Supplier
@@ -779,8 +784,11 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
 
         //Invoices
         Route::prefix('sales')->name('sales.')->group(function () {
-            Route::resource('invoices', \App\Http\Controllers\Sales\InvoiceController::class);
-        });
+        Route::resource('invoices', \App\Http\Controllers\Sales\InvoiceController::class);
+
+        Route::get('invoices/{id}/payment', [\App\Http\Controllers\Sales\InvoiceController::class, 'payment'])
+        ->name('invoices.payment'); 
+});
 
 
 
