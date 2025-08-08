@@ -27,20 +27,20 @@
             </form>
 
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-                    <i class="ti ti-plus me-1"></i> Add Customer
-                </button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+        <i class="ti ti-plus me-1"></i> Add Customer
+    </button>
 
-                @if(request()->get('status') === 'active')
-                    <a href="{{ route('master.customers.index') }}" class="btn btn-outline-secondary">
-                        Show All
-                    </a>
-                @else
-                    <a href="{{ route('master.customers.index', ['status' => 'active']) }}" class="btn btn-light">
-                        Show Active
-                    </a>
-                @endif
-            </div>
+    @if(request()->get('status') === 'active')
+        <a href="{{ route('master.customers.index') }}" class="btn bg-white text-dark shadow-none">
+            Show All
+        </a>
+    @else
+        <a href="{{ route('master.customers.index', ['status' => 'active']) }}" class="btn bg-white text-dark shadow-none">
+            Show Active
+        </a>
+    @endif
+</div>
         </div>
     </div>
 </div>
