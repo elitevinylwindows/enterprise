@@ -36,7 +36,6 @@
         </a>
     </div>
 </div>
-        </div>
     </div>
 
     {{-- Main Content Card --}}
