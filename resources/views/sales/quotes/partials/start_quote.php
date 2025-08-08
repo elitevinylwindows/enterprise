@@ -61,15 +61,11 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label>PO #</label>
-                    <input type="text" name="po_number" class="form-control">
-                </div>
-                <div class="col-md-2 mb-3">
+                <div class="col-md-6 mb-3">
                     <label>Reference</label>
                     <input type="text" name="reference" class="form-control">
                 </div>
-                <div class="col-md-2 mb-3">
+                <div class="col-md-6 mb-3">
                     <label>Contact</label>
                     <input type="text" name="contact" class="form-control">
                 </div>

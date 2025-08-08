@@ -6,12 +6,12 @@
 
 @section('breadcrumb')
 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-<li class="breadcrumb-item">{{ __('Executives') }}</li>
+<li class="breadcrumb-item">{{ __('Master') }}</li>
 <li class="breadcrumb-item active" aria-current="page">{{ __('Customers') }}</li>
 @endsection
 
 @section('card-action-btn')
-<form action="{{ route('executives.customers.import') }}" method="POST" enctype="multipart/form-data" class="d-inline-block me-2">
+<form action="{{ route('master.customers.import') }}" method="POST" enctype="multipart/form-data" class="d-inline-block me-2">
     @csrf
     <input type="file" name="import_file" accept=".csv,.xls,.xlsx" required class="form-control d-inline-block w-auto">
     <button type="submit" class="btn btn-md btn-primary">
@@ -23,12 +23,12 @@
     <i class="ti ti-plus"></i> Add Customer
 </button>
 
-<a href="{{ route('executives.customers.index', ['status' => 'active']) }}" class="btn btn-primary btn-md me-2">
+<a href="{{ route('master.customers.index', ['status' => 'active']) }}" class="btn btn-primary btn-md me-2">
     Show Only Active Users
 </a>
 
 @if(request()->get('status') === 'active')
-<a href="{{ route('executives.customers.index') }}" class="btn btn-primary btn-md">
+<a href="{{ route('master.customers.index') }}" class="btn btn-primary btn-md">
     Show All Users
 </a>
 @endif
@@ -85,8 +85,8 @@
                                 <td>${{ number_format($customer->loyalty_credit, 2) }}</td>
                                 <td>${{ number_format($customer->total_spent, 2) }}</td>
                                 <td>
-                                    <a href="{{ route('executives.customers.edit', $customer->id) }}" class="btn btn-sm btn-primary">Edit</a>
-                                    <form action="{{ route('executives.customers.destroy', $customer->id) }}" method="POST" class="d-inline">
+                                    <a href="{{ route('master.customers.edit', $customer->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                    <form action="{{ route('master.customers.destroy', $customer->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button class="btn btn-sm btn-primary" onclick="return confirm('Are you sure?')">Delete</button>
@@ -107,11 +107,19 @@
 <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            @include('executives.customers.create') {{-- or inline form --}}
+            @include('master.customers.create') {{-- or inline form --}}
         </div>
     </div>
 </div>
 
+<!-- Add Customer Modal -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            @include('master.customers.edit') {{-- or inline form --}}
+        </div>
+    </div>
+</div>
 @push('scripts')
 <script>
     document.getElementById('select-all').addEventListener('click', function() {
