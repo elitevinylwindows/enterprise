@@ -578,10 +578,37 @@ class QuoteController extends Controller
     }
 
 
-    public function previous()
+    public function previous($id)
     {
-        session(['returning_from_details' => true]);
-        return redirect()->route('sales.quotes.create');
+        $quote = Quote::findOrFail($id);
+        // Series dropdown
+        $seriesList = Series::pluck('series', 'id');
+
+        // All config thumbnails grouped by category
+        $allConfigurations = Series::with(['configurations' => function ($query) {
+            $query->select('id', 'series_id', 'series_type', 'category', 'image');
+        }])->get()->mapWithKeys(function ($series) {
+            return [$series->id => $series->configurations->map(function ($conf) use ($series) {
+                return [
+                    'name' => $conf->series_type,
+                    'category' => $conf->category,
+                    'image' => $conf->image,
+                    'series' => $series->name,
+                ];
+            })];
+        })->toArray();
+
+        return view('sales.quotes.edit_initial', [
+            'quote' => $quote,
+            'customerNumber' => session('customer_number'),
+            'customerName' => session('customer_name'),
+            'entryDate' => now()->toDateString(),
+            'expectedDelivery' => now()->addDays(14)->toDateString(),
+            'validUntil' => now()->addDays(30)->toDateString(),
+            'enteredBy' => auth()->user()?->name ?? 'System',
+            'seriesList' => $seriesList,
+            'allConfigurations' => $allConfigurations,
+        ]);
     }
 
     public function show($id)
@@ -748,6 +775,62 @@ class QuoteController extends Controller
         } catch (\Exception $e) {
             Log::error('Error fetching quote info: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Failed to fetch quote info.'], 500);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+                'customer_number'   => 'required|string',
+                'customer_name'     => 'required|string',
+                'order_type'        => 'required|string',
+                'entry_date'        => 'required|date',
+                'expected_delivery' => 'required|date',
+                'valid_until'       => 'required|date',
+                'entered_by'        => 'required|string',
+                'region'            => 'nullable|string',
+                'measurement_type'  => 'nullable|string',
+                'po_number'         => 'nullable|string',
+                'reference'         => 'nullable|string',
+                'contact'           => 'nullable|string',
+                'comment'           => 'nullable|string',
+                'notes'             => 'nullable|string',
+            ]);
+
+           try{
+            DB::beginTransaction();
+            $quote = Quote::findOrFail($id);
+
+            $quote->update([
+                'customer_number'   => $request->customer_number,
+                'customer_name'     => $request->customer_name,
+                'order_type'        => $request->order_type,
+                'entry_date'        => $request->entry_date,
+                'expected_delivery' => $request->expected_delivery,
+                'valid_until'       => $request->valid_until,
+                'entered_by'        => $request->entered_by,
+                'region'            => $request->region,
+                'measurement_type'  => $request->measurement_type,
+                'po_number'         => $request->po_number,
+                'reference'         => $request->reference,
+                'contact'           => $request->contact,
+                'comment'           => $request->comment,
+                'notes'             => $request->notes,
+                'status'            => $request->status ?? 'draft',
+            ]);
+
+            session([
+                'quote_number'     => $quote->quote_number,
+                'customer_number'  => $quote->customer_number,
+                'customer_name'    => $quote->customer_name
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('sales.quotes.details', $quote->id);
+        } catch(\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to edit quote. Please try again later.']);
         }
     }
 }

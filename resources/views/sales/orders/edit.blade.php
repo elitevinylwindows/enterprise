@@ -85,6 +85,10 @@
                         <strong id="discountDisplay">${{ number_format($order->discount, 2) }}</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
+                        <span>Shipping:</span>
+                        <input type="number" step="0.01" value="{{ number_format($order->shipping, 2) }}" class="form-control w-25" name="shipping" id="shipping">
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
                         <span>Subtotal:</span>
                         <strong id="subtotalDisplay">${{ number_format($order->subtotal, 2) }}</strong>
                     </li>
@@ -92,10 +96,7 @@
                         <span>Tax:</span>
                         <strong id="taxDisplay">%{{ number_format($order->tax, 2) }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <span>Shipping:</span>
-                        <input type="number" step="0.01" value="{{ number_format($order->shipping, 2) }}" class="form-control w-25" name="shipping" id="shipping">
-                    </li>
+
                     <li class="list-group-item d-flex justify-content-between">
                         <span>Total:</span>
                         <strong id="totalDisplay">${{ number_format($order->total, 2) }}</strong>

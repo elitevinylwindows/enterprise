@@ -44,7 +44,7 @@
     </div>
 
     {{-- Order Notes --}}
-    <div class="mt-4 mb-2"><strong>Order Notes:</strong> {{ $invoice->order->notes ?? '-' }}</div>
+    <div class="mt-4 mb-2"><strong>Quote Notes:</strong> {{ $invoice->order->quote->notes ?? '-' }}</div>
 
     {{-- Items Table --}}
     <div class="table-responsive">

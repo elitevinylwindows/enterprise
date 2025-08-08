@@ -155,6 +155,12 @@
                             <td id="discount-amount">${{ number_format($quote->discount, 2) }}</td>
                         </tr>
                         <tr>
+                            <th>Shipping:</th>
+                            <td>
+                                <input type="number" step="0.01" class="form-control w-25" min="0" name="shipping" id="shipping" value="{{ number_format($quote->shipping, 2) }}">
+                            </td>
+                        </tr>
+                        <tr>
                             <th>Subtotal:</th>
                             <input type="hidden" name="subtotal" id="subtotal" value="{{ number_format($quote->sub_total, 2) }}">
                             <td id="subtotal-amount">${{ number_format($quote->sub_total, 2) }}</td>
@@ -164,12 +170,7 @@
                             <input type="hidden" name="tax" id="tax" value="{{ number_format($quote->tax, 2) }}">
                             <td id="tax-amount">${{ number_format($quote->tax, 2) }}</td>
                         </tr>
-                        <tr>
-                            <th>Shipping:</th>
-                            <td>
-                                <input type="number" step="0.01" class="form-control w-25" min="0" name="shipping" id="shipping" value="{{ number_format($quote->shipping, 2) }}">
-                            </td>
-                        </tr>
+
                         <tr>
                             <th>Total:</th>
                             <input type="hidden" name="total" id="total" value="{{ number_format($quote->total, 2) }}">
@@ -188,7 +189,7 @@
 
 
             <div class="d-flex justify-content-between mt-4">
-                <a href="{{ route('sales.quotes.show', $quote->id) }}" class="btn btn-secondary">&larr; Previous</a>
+                <a href="{{ route('sales.quotes.previous', $quote->id) }}" class="btn btn-secondary">&larr; Previous</a>
 
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-secondary" id="saveDraftButton">Save Draft</button>

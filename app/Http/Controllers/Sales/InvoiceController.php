@@ -55,7 +55,7 @@ class InvoiceController extends Controller
             'delivery_email'    => 'nullable|email|max:255',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
             $quote = Quote::where('quote_number', $request->quote_number)->firstOrFail();
             $order = Order::where('order_number', $request->order_number)->first();
@@ -98,7 +98,7 @@ class InvoiceController extends Controller
 
         $invoice->update($request->all());
 
-        if($request->required_payment_type == 'percentage') {
+        if ($request->required_payment_type == 'percentage') {
             $invoice->required_payment = ($invoice->sub_total * $request->required_payment_percentage) / 100;
         } else {
             $invoice->required_payment = $request->required_payment_fixed;
@@ -106,7 +106,7 @@ class InvoiceController extends Controller
 
         $invoice->save();
 
-        if($invoice->serve_invoice_id) {
+        if ($invoice->serve_invoice_id) {
             $firstServe = new FirstServe();
             $firstServe->updateInvoiceAmounts($invoice);
         } else {
@@ -114,7 +114,7 @@ class InvoiceController extends Controller
             $firstServe = new FirstServe();
             $firstServeInvoice = $firstServe->createInvoice($invoice);
 
-            if($firstServeInvoice) {
+            if ($firstServeInvoice) {
                 $invoice->update([
                     'gateway_response' => json_encode($firstServeInvoice),
                     'serve_invoice_id' => $firstServeInvoice['id'],
@@ -132,14 +132,8 @@ class InvoiceController extends Controller
         return redirect()->route('sales.invoices.index')->with('success', 'Invoice deleted.');
     }
 
-public function show($id)
-    {
-        $invoice = Invoice::with('items')->findOrFail($id);
-        return view('sales.invoices.show', compact('invoice'));
-    }
 
-
-     public function email($id)
+    public function email($id)
     {
         $invoice = Order::findOrFail($id);
         Mail::to($invoice->customer->email)->send(new InvoiceMail($invoice));
@@ -148,12 +142,77 @@ public function show($id)
     }
 
     public function payment($id)
-{
-    $invoice = Invoice::findOrFail($id);
-    $total = $invoice->total ?? 0;
+    {
+        $invoice = Invoice::findOrFail($id);
+        $total = $invoice->total ?? 0;
 
-    return view('sales.invoices.payment', compact('total', 'invoice'));
-}
+        return view('sales.invoices.payment', compact('total', 'invoice'));
+    }
+
+    public function pay(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'ipm_deposit_type'   => 'required|in:percent,fixed',
+            'ipm_deposit_method' => 'required|in:card,cash,bank', // adjust allowed methods as needed
+            'deposit_card_number' => [
+                'nullable',
+                'required_if:ipm_deposit_method,card',
+                'regex:/^\d{4}\s\d{4}\s\d{4}\s\d{4}$/', // 16 digits with spaces every 4
+            ],
+            'deposit_card_cvv' => [
+                'nullable',
+                'required_if:ipm_deposit_method,card',
+                'digits_between:3,4',
+            ],
+            'deposit_card_expiry' => [
+                'nullable',
+                'required_if:ipm_deposit_method,card',
+                'regex:/^(0[1-9]|1[0-2])\/\d{2}$/', // MM/YY format
+            ],
+            'deposit_card_zip' => [
+                'nullable',
+                'required_if:ipm_deposit_method,card',
+                'regex:/^\d{5}(-\d{1,4})?$/', // ZIP or ZIP+4
+            ],
+            'payment_amount'   => 'required|array',
+            'payment_amount.*' => 'nullable|numeric|min:0.01', // allow null for some indexes
+            'ipm_payment_method_*' => 'in:card,cash,bank', // adjust allowed methods
+            'payment_card_number' => 'array',
+            'payment_card_number.*' => [
+                'nullable',
+                'regex:/^\d{4}\s\d{4}\s\d{4}\s\d{4}$/',
+            ],
+            'payment_card_cvv' => 'array',
+            'payment_card_cvv.*' => [
+                'nullable',
+                'digits_between:3,4',
+            ],
+            'payment_card_expiry' => 'array',
+            'payment_card_expiry.*' => [
+                'nullable',
+                'regex:/^(0[1-9]|1[0-2])\/\d{2}$/',
+            ],
+            'payment_card_zip' => 'array',
+            'payment_card_zip.*' => [
+                'nullable',
+                'regex:/^\d{5}(-\d{1,4})?$/',
+            ],
+        ], [
+            // Custom messages
+            'deposit_card_number.regex' => 'Deposit card number must be in format XXXX XXXX XXXX XXXX.',
+            'deposit_card_expiry.regex' => 'Deposit card expiry must be in MM/YY format.',
+            'deposit_card_zip.regex'    => 'Deposit ZIP must be valid (12345 or 12345-6789).',
+            'payment_card_number.*.regex' => 'Card number must be in format XXXX XXXX XXXX XXXX.',
+            'payment_card_expiry.*.regex' => 'Card expiry must be in MM/YY format.',
+            'payment_card_zip.*.regex'    => 'ZIP must be valid (12345 or 12345-6789).',
+        ]);
+
+        
+        try{
+        }catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Payment failed: ' . $e->getMessage());
+        }
+    }
 
     public function getCustomer($customer_number)
     {
@@ -168,34 +227,39 @@ public function show($id)
         }
     }
 
+    public function show($id)
+    {
+        $invoice = Invoice::with(['customer', 'order', 'quote'])->findOrFail($id);
+        return view('sales.invoices.show', compact('invoice'));
+    }
 
-public function syncToQuickbooks(Invoice $invoice)
-{
-    // Get invoice data
-    $invoiceData = [
-        'customer_name' => $invoice->customer->name,
-        'invoice_number' => $invoice->invoice_number, // Match your DB field
-        'date' => $invoice->invoice_date,
-        'items' => $invoice->items->map(function ($item) {
-            return [
-                'name' => $item->name,
-                'quantity' => $item->quantity,
-                'rate' => $item->price,
-            ];
-        }),
-    ];
+    public function syncToQuickbooks(Invoice $invoice)
+    {
+        // Get invoice data
+        $invoiceData = [
+            'customer_name' => $invoice->customer->name,
+            'invoice_number' => $invoice->invoice_number, // Match your DB field
+            'date' => $invoice->invoice_date,
+            'items' => $invoice->items->map(function ($item) {
+                return [    
+                    'name' => $item->name,
+                    'quantity' => $item->quantity,
+                    'rate' => $item->price,
+                ];
+            }),
+        ];
 
-    // Delegate QBXML generation
-    $qbxml = app(QuickBooksService::class)->generateInvoiceQBXML($invoiceData);
+        // Delegate QBXML generation
+        $qbxml = app(QuickBooksService::class)->generateInvoiceQBXML($invoiceData);
 
-    // Queue the request with company file context
-    QuickBooksQueue::create([
-        'qb_action' => 'InvoiceAdd',
-        'qbxml' => $qbxml,
-        'company_file' => 'YourCompanyFile.QBW', // Optional: Store the target QB file
-    ]);
+        // Queue the request with company file context
+        QuickBooksQueue::create([
+            'qb_action' => 'InvoiceAdd',
+            'qbxml' => $qbxml,
+            'company_file' => 'YourCompanyFile.QBW', // Optional: Store the target QB file
+        ]);
 
-    return redirect()->back()->with('success', 'Invoice queued for QuickBooks sync.');
-}
+        return redirect()->back()->with('success', 'Invoice queued for QuickBooks sync.');
+    }
 
 }

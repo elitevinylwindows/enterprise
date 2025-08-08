@@ -1,27 +1,30 @@
 
-  <div class="modal-body">
+<form id="invoicePaymentForm" method="POST" action="{{ route('sales.invoices.payment.post', $invoice->id) }}">
+  <div id="invoicePaymentModal" class="modal-body">
+      @csrf
       @php $totalAmount = $invoice->total ?? 0; @endphp
 
       <div class="d-flex justify-content-between align-items-center mb-3">
-          <div><strong>Invoice #{{ $invoice->id }}</strong></div>
+          <div><strong>Invoice #{{ $invoice->invoice_number }}</strong></div>
           <div><strong>Total:</strong> $<span id="ipmTotal" data-total="{{ $totalAmount }}">{{ number_format($totalAmount, 2) }}</span></div>
       </div>
 
       {{-- Tabs --}}
       <ul class="nav nav-tabs" role="tablist">
           <li class="nav-item" role="presentation">
-              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#ipmDeposit" type="button" role="tab">Deposit</button>
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#ipmDeposit" type="button" role="tab" onclick="document.getElementById('ipmTabType').value='deposit'">Deposit</button>
           </li>
           <li class="nav-item" role="presentation">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ipmPayments" type="button" role="tab">Payments</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ipmPayments" type="button" role="tab" onclick="document.getElementById('ipmTabType').value='payments'">Payments</button>
           </li>
+          <input type="hidden" name="ipm_tab_type" id="ipmTabType" value="deposit">
       </ul>
 
       <div class="tab-content mt-3">
 
           {{-- ========== DEPOSIT TAB ========== --}}
           <div class="tab-pane fade show active" id="ipmDeposit" role="tabpanel">
-              {{-- Row: Deposit Type (inline) --}}
+              {{-- Row: Deposit Tye (inline) --}}
               <div class="row g-3 align-items-center">
                   <div class="col-12">
                       <label class="form-label me-3">Deposit Type</label>
@@ -40,7 +43,7 @@
               <div class="row g-3 mt-1" id="ipmPercentRow">
                   <div class="col-md-6">
                       <label class="form-label">Percentage Value (%)</label>
-                      <input type="number" class="form-control" id="ipmPercentValue" step="0.01" placeholder="e.g. 15">
+                      <input type="number" class="form-control" max="100" id="ipmPercentValue" step="0.01" placeholder="e.g. 15">
                   </div>
                   <div class="col-md-6">
                       <label class="form-label">Calculated Amount ($)</label>
@@ -90,16 +93,16 @@
                           <div class="col-md-8">
                               <label class="form-label d-block">Payment Method</label>
                               <div class="form-check form-check-inline">
-                                  <input class="form-check-input ipm-payment-method" type="radio" name="ipm_payment_method_0" value="card" checked>
-                                  <label class="form-check-label">Card</label>
+                                  <input class="form-check-input ipm-payment-method" id="ipmPaymentMethodCard_0" type="radio" name="ipm_payment_method_0" value="card" checked>
+                                  <label class="form-check-label" for="ipmPaymentMethodCard_0">Card</label>
                               </div>
                               <div class="form-check form-check-inline">
-                                  <input class="form-check-input ipm-payment-method" type="radio" name="ipm_payment_method_0" value="echeck">
-                                  <label class="form-check-label">E‑Check</label>
+                                  <input class="form-check-input ipm-payment-method" id="ipmPaymentMethodEcheck_0" type="radio" name="ipm_payment_method_0" value="echeck">
+                                  <label class="form-check-label" for="ipmPaymentMethodEcheck_0">E‑Check</label>
                               </div>
                               <div class="form-check form-check-inline">
-                                  <input class="form-check-input ipm-payment-method" type="radio" name="ipm_payment_method_0" value="cash">
-                                  <label class="form-check-label">Cash</label>
+                                  <input class="form-check-input ipm-payment-method" id="ipmPaymentMethodCash_0" type="radio" name="ipm_payment_method_0" value="cash">
+                                  <label class="form-check-label" for="ipmPaymentMethodCash_0">Cash</label>
                               </div>
                           </div>
                       </div>
@@ -115,15 +118,14 @@
   </div>
 
   <div class="modal-footer">
-      <button type="button" class="btn btn-primary">Save</button>
+      <button type="submit" class="btn btn-primary">Save</button>
       <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
   </div>
-</div>
+</form>
 
-@push('scripts')
 <script>
 (function(){
-  const root = document.getElementById('invoicePaymentModal');
+  const root = document.getElementById('invoicePaymentForm');
   if (!root) return;
 
   // -------- Helpers
@@ -174,19 +176,19 @@
         <div class="row g-2">
           <div class="col-md-6">
             <label class="form-label">Card Number</label>
-            <input type="text" name="deposit_card_number" class="form-control" autocomplete="cc-number" inputmode="numeric" placeholder="4111 1111 1111 1111">
+            <input type="text" name="deposit_card_number" class="form-control card-number" autocomplete="cc-number" inputmode="numeric" placeholder="4111 1111 1111 1111">
           </div>
           <div class="col-md-3">
             <label class="form-label">CVV</label>
-            <input type="text" name="deposit_card_cvv" class="form-control" inputmode="numeric" maxlength="4" placeholder="123">
+            <input type="text" name="deposit_card_cvv" class="form-control card-cvv" inputmode="numeric" maxlength="4" placeholder="123">
           </div>
           <div class="col-md-3">
             <label class="form-label">Expiry (MM/YY)</label>
-            <input type="text" name="deposit_card_expiry" class="form-control" placeholder="08/27" autocomplete="cc-exp">
+            <input type="text" name="deposit_card_expiry" class="form-control card-expiry" placeholder="08/27" autocomplete="cc-exp">
           </div>
           <div class="col-md-4 mt-2">
             <label class="form-label">ZIP</label>
-            <input type="text" name="deposit_card_zip" class="form-control" inputmode="numeric" placeholder="90210">
+            <input type="text" name="deposit_card_zip" class="form-control card-zip" inputmode="numeric" placeholder="90210">
           </div>
         </div>`;
     } else if (method === 'echeck'){
@@ -213,7 +215,7 @@
 
   depMethodRadios.forEach(r => r.addEventListener('change', updateDepositMethodUI));
   updateDepositMethodUI(); // init
-
+        
   // -------- Payments tab: dynamic rows + delegated method switching
   const paymentsList = $('#ipmPaymentsList');
   const addBtn = $('#ipmAddPayment');
@@ -224,19 +226,19 @@
         <div class="row g-2">
           <div class="col-md-6">
             <label class="form-label">Card Number</label>
-            <input type="text" name="payment_card_number[]" class="form-control" autocomplete="cc-number" inputmode="numeric">
+            <input type="text" name="payment_card_number[]" class="form-control card-number" placeholder="4111 1111 1111 1111" autocomplete="cc-number" inputmode="numeric">
           </div>
           <div class="col-md-3">
             <label class="form-label">CVV</label>
-            <input type="text" name="payment_card_cvv[]" class="form-control" inputmode="numeric" maxlength="4">
+            <input type="text" name="payment_card_cvv[]" class="form-control card-cvv" placeholder="123" inputmode="numeric" maxlength="4">
           </div>
           <div class="col-md-3">
             <label class="form-label">Expiry (MM/YY)</label>
-            <input type="text" name="payment_card_expiry[]" class="form-control" autocomplete="cc-exp">
+            <input type="text" name="payment_card_expiry[]" class="form-control card-expiry" placeholder="08/27" autocomplete="cc-exp" maxlength="5">
           </div>
           <div class="col-md-4 mt-2">
             <label class="form-label">ZIP</label>
-            <input type="text" name="payment_card_zip[]" class="form-control" inputmode="numeric">
+            <input type="text" name="payment_card_zip[]" class="form-control card-zip" placeholder="12345" inputmode="numeric">
           </div>
         </div>`;
     } else if (method === 'echeck'){
@@ -285,16 +287,16 @@
         <div class="col-md-8">
           <label class="form-label d-block">Payment Method</label>
           <div class="form-check form-check-inline">
-            <input class="form-check-input ipm-payment-method" type="radio" name="ipm_payment_method_${index}" value="card" checked>
-            <label class="form-check-label">Card</label>
+            <input class="form-check-input ipm-payment-method" id="ipmPaymentMethodCard_${index}" type="radio" name="ipm_payment_method_${index}" value="card" checked>
+            <label class="form-check-label" for="ipmPaymentMethodCard_${index}">Card</label>
           </div>
           <div class="form-check form-check-inline">
-            <input class="form-check-input ipm-payment-method" type="radio" name="ipm_payment_method_${index}" value="echeck">
-            <label class="form-check-label">E‑Check</label>
+            <input class="form-check-input ipm-payment-method" id="ipmPaymentMethodEcheck_${index}" type="radio" name="ipm_payment_method_${index}" value="echeck">
+            <label class="form-check-label" for="ipmPaymentMethodEcheck_${index}">E‑Check</label>
           </div>
           <div class="form-check form-check-inline">
-            <input class="form-check-input ipm-payment-method" type="radio" name="ipm_payment_method_${index}" value="cash">
-            <label class="form-check-label">Cash</label>
+            <input class="form-check-input ipm-payment-method" id="ipmPaymentMethodCash_${index}" type="radio" name="ipm_payment_method_${index}" value="cash">
+            <label class="form-check-label" for="ipmPaymentMethodCash_${index}">Cash</label>
           </div>
         </div>
       </div>
@@ -304,7 +306,29 @@
     // default render card fields
     wrapper.querySelector('.ipm-payment-method-fields').innerHTML = paymentFieldsHTML('card');
   });
-
 })();
+
+ $(document).on('input', '.card-number', function () {
+      let v = $(this).val().replace(/\D/g, '').slice(0, 16);
+      $(this).val(v.replace(/(.{4})/g, '$1 ').trim());
+  });
+
+  // CVV: only digits, max 4
+  $(document).on('input', '.card-cvv', function () {
+      $(this).val($(this).val().replace(/\D/g, '').slice(0, 4));
+  });
+
+  // Expiry: auto-insert slash, MM/YY
+  $(document).on('input', '.card-expiry', function () {
+      let v = $(this).val().replace(/\D/g, '').slice(0, 4);
+      if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2);
+      $(this).val(v);
+  });
+
+  // ZIP: only digits and dash, max 10 (ZIP+4 format)
+  $(document).on('input', '.card-zip', function () {
+      let v = $(this).val().replace(/[^\d\-]/g, '');
+      v = v.replace(/^(\d{5})(\d{0,4}).*/, (m, a, b) => b ? a + '-' + b : a);
+      $(this).val(v.slice(0, 10));
+  });
 </script>
-@endpush
