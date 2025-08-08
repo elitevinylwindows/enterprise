@@ -1,259 +1,316 @@
 {{-- resources/views/sales/invoices/payment.blade.php --}}
-<div class="modal-header">
-    <h5 class="modal-title">Invoice Payment</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-</div>
+<div id="invoicePaymentModal" class="invoice-payment">
+  <div class="modal-header">
+      <h5 class="modal-title">Invoice Payment</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  </div>
 
-<div class="modal-body">
-    @php
-        $totalAmount = $invoice->total ?? 0; // pass $invoice from controller
-    @endphp
+  <div class="modal-body">
+      @php $totalAmount = $invoice->total ?? 0; @endphp
 
-    <div class="text-end mb-3">
-        <strong>Total:</strong> $<span id="invoiceTotal">{{ number_format($totalAmount, 2) }}</span>
-    </div>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+          <div><strong>Invoice #{{ $invoice->id }}</strong></div>
+          <div><strong>Total:</strong> $<span id="ipmTotal" data-total="{{ $totalAmount }}">{{ number_format($totalAmount, 2) }}</span></div>
+      </div>
 
-    {{-- Nav Tabs --}}
-    <ul class="nav nav-tabs" id="paymentTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="deposit-tab" data-bs-toggle="tab" data-bs-target="#deposit" type="button" role="tab">Deposit</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">Payments</button>
-        </li>
-    </ul>
+      {{-- Tabs --}}
+      <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item" role="presentation">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#ipmDeposit" type="button" role="tab">Deposit</button>
+          </li>
+          <li class="nav-item" role="presentation">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ipmPayments" type="button" role="tab">Payments</button>
+          </li>
+      </ul>
 
-    <div class="tab-content mt-3">
-        {{-- Deposit Tab --}}
-        <div class="tab-pane fade show active" id="deposit" role="tabpanel">
-            <form id="depositForm">
-                {{-- Percentage or Amount --}}
-                <label class="form-label">Deposit Type</label>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="deposit_type" value="percentage" checked>
-                    <label class="form-check-label">Percentage</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="deposit_type" value="amount">
-                    <label class="form-check-label">Amount</label>
-                </div>
+      <div class="tab-content mt-3">
 
-                {{-- Value input --}}
-                <div class="mt-3">
-                    <label class="form-label" id="depositValueLabel">Percentage Value (%)</label>
-                    <input type="number" class="form-control" name="deposit_value" id="depositValue" placeholder="Enter value">
-                </div>
+          {{-- ========== DEPOSIT TAB ========== --}}
+          <div class="tab-pane fade show active" id="ipmDeposit" role="tabpanel">
+              {{-- Row: Deposit Type (inline) --}}
+              <div class="row g-3 align-items-center">
+                  <div class="col-12">
+                      <label class="form-label me-3">Deposit Type</label>
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="ipm_deposit_type" id="ipmDepTypePercent" value="percent" checked>
+                          <label class="form-check-label" for="ipmDepTypePercent">Percentage (%)</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="ipm_deposit_type" id="ipmDepTypeAmount" value="amount">
+                          <label class="form-check-label" for="ipmDepTypeAmount">Amount ($)</label>
+                      </div>
+                  </div>
+              </div>
 
-                {{-- Calculated Amount (only for %) --}}
-                <div class="mt-3" id="calculatedAmountGroup">
-                    <label class="form-label">Calculated Amount</label>
-                    <input type="text" class="form-control" id="calculatedAmount" readonly>
-                </div>
+              {{-- Row: Percentage input + Calculated (side by side) --}}
+              <div class="row g-3 mt-1" id="ipmPercentRow">
+                  <div class="col-md-6">
+                      <label class="form-label">Percentage Value (%)</label>
+                      <input type="number" class="form-control" id="ipmPercentValue" step="0.01" placeholder="e.g. 15">
+                  </div>
+                  <div class="col-md-6">
+                      <label class="form-label">Calculated Amount ($)</label>
+                      <input type="text" class="form-control" id="ipmPercentCalculated" readonly>
+                  </div>
+              </div>
 
-                {{-- Payment Method --}}
-                <div class="mt-4">
-                    <label class="form-label">Payment Method</label><br>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="deposit_payment_method" value="card" checked>
-                        <label class="form-check-label">Card</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="deposit_payment_method" value="echeck">
-                        <label class="form-check-label">E-Check</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="deposit_payment_method" value="cash">
-                        <label class="form-check-label">Cash</label>
-                    </div>
-                </div>
+              {{-- Row: Amount input only --}}
+              <div class="row g-3 mt-1 d-none" id="ipmAmountRow">
+                  <div class="col-md-6">
+                      <label class="form-label">Enter Amount ($)</label>
+                      <input type="number" class="form-control" id="ipmAmountValue" step="0.01" placeholder="e.g. 250.00">
+                  </div>
+              </div>
 
-                {{-- Method Fields --}}
-                <div id="depositMethodFields" class="mt-3"></div>
-            </form>
-        </div>
+              {{-- Payment Method --}}
+              <div class="mt-4">
+                  <label class="form-label me-3">Payment Method</label>
+                  <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="ipm_deposit_method" id="ipmDepMethodCard" value="card" checked>
+                      <label class="form-check-label" for="ipmDepMethodCard">Card</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="ipm_deposit_method" id="ipmDepMethodEcheck" value="echeck">
+                      <label class="form-check-label" for="ipmDepMethodEcheck">E‑Check</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="ipm_deposit_method" id="ipmDepMethodCash" value="cash">
+                      <label class="form-check-label" for="ipmDepMethodCash">Cash</label>
+                  </div>
+              </div>
 
-        {{-- Payments Tab --}}
-        <div class="tab-pane fade" id="payments" role="tabpanel">
-            <div id="paymentsList">
-                {{-- Single Payment Row Template --}}
-                <div class="payment-row border rounded p-3 mb-3">
-                    <div class="mb-2">
-                        <label class="form-label">Payment Amount</label>
-                        <input type="number" class="form-control" name="payment_amount[]" placeholder="Enter amount">
-                    </div>
+              {{-- Deposit method dynamic fields --}}
+              <div id="ipmDepositMethodFields" class="mt-3"></div>
+          </div>
 
-                    {{-- Payment Method --}}
-                    <div class="mb-2">
-                        <label class="form-label">Payment Method</label><br>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input payment-method-radio" type="radio" name="payment_method_row0" value="card" checked>
-                            <label class="form-check-label">Card</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input payment-method-radio" type="radio" name="payment_method_row0" value="echeck">
-                            <label class="form-check-label">E-Check</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input payment-method-radio" type="radio" name="payment_method_row0" value="cash">
-                            <label class="form-check-label">Cash</label>
-                        </div>
-                    </div>
+          {{-- ========== PAYMENTS TAB ========== --}}
+          <div class="tab-pane fade" id="ipmPayments" role="tabpanel">
+              <div id="ipmPaymentsList">
+                  {{-- One payment row (template instance 0) --}}
+                  <div class="ipm-payment-row border rounded p-3 mb-3" data-index="0">
+                      <div class="row g-3">
+                          <div class="col-md-4">
+                              <label class="form-label">Payment Amount</label>
+                              <input type="number" class="form-control" name="payment_amount[]" step="0.01">
+                          </div>
+                          <div class="col-md-8">
+                              <label class="form-label d-block">Payment Method</label>
+                              <div class="form-check form-check-inline">
+                                  <input class="form-check-input ipm-payment-method" type="radio" name="ipm_payment_method_0" value="card" checked>
+                                  <label class="form-check-label">Card</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                  <input class="form-check-input ipm-payment-method" type="radio" name="ipm_payment_method_0" value="echeck">
+                                  <label class="form-check-label">E‑Check</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                  <input class="form-check-input ipm-payment-method" type="radio" name="ipm_payment_method_0" value="cash">
+                                  <label class="form-check-label">Cash</label>
+                              </div>
+                          </div>
+                      </div>
 
-                    <div class="payment-method-fields"></div>
-                </div>
-            </div>
+                      <div class="ipm-payment-method-fields mt-3"></div>
+                  </div>
+              </div>
 
-            <button type="button" id="addPaymentRow" class="btn btn-sm btn-secondary">Add Payment</button>
-        </div>
-    </div>
-</div>
+              <button type="button" class="btn btn-sm btn-secondary" id="ipmAddPayment">+ Add Payment</button>
+          </div>
 
-<div class="modal-footer">
-    <button type="submit" class="btn btn-primary">Save Payment</button>
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+      </div>
+  </div>
+
+  <div class="modal-footer">
+      <button type="button" class="btn btn-primary">Save</button>
+      <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+  </div>
 </div>
 
 @push('scripts')
 <script>
 (function(){
-    const total = parseFloat(document.getElementById('invoiceTotal').textContent.replace(/,/g, ''));
+  const root = document.getElementById('invoicePaymentModal');
+  if (!root) return;
 
-    // ===== Deposit tab logic =====
-    const depositTypeRadios = document.querySelectorAll('input[name="deposit_type"]');
-    const depositValue = document.getElementById('depositValue');
-    const depositValueLabel = document.getElementById('depositValueLabel');
-    const calculatedAmountGroup = document.getElementById('calculatedAmountGroup');
-    const calculatedAmount = document.getElementById('calculatedAmount');
+  // -------- Helpers
+  const total = Number(document.getElementById('ipmTotal').dataset.total) || 0;
+  const $ = (sel, ctx = root) => ctx.querySelector(sel);
+  const $$ = (sel, ctx = root) => Array.from(ctx.querySelectorAll(sel));
 
-    function updateDepositFields(){
-        const type = document.querySelector('input[name="deposit_type"]:checked').value;
-        if(type === 'percentage'){
-            depositValueLabel.textContent = 'Percentage Value (%)';
-            calculatedAmountGroup.style.display = 'block';
-            calculateAmount();
-        } else {
-            depositValueLabel.textContent = 'Amount ($)';
-            calculatedAmountGroup.style.display = 'none';
-        }
+  function money(n){ return (isNaN(n) ? 0 : Number(n)).toFixed(2); }
+
+  // -------- Deposit: type toggle
+  const depTypeRadios = $$('input[name="ipm_deposit_type"]');
+  const percentRow = $('#ipmPercentRow');
+  const amountRow  = $('#ipmAmountRow');
+  const percentVal = $('#ipmPercentValue');
+  const percentCalc = $('#ipmPercentCalculated');
+  const amountVal = $('#ipmAmountValue');
+
+  function updateDepositTypeUI(){
+    const type = depTypeRadios.find(r => r.checked)?.value;
+    if (type === 'percent'){
+      percentRow.classList.remove('d-none');
+      amountRow.classList.add('d-none');
+      // recalc immediately
+      recalcPercent();
+    } else {
+      percentRow.classList.add('d-none');
+      amountRow.classList.remove('d-none');
     }
-    function calculateAmount(){
-        const val = parseFloat(depositValue.value) || 0;
-        const amt = (val / 100) * total;
-        calculatedAmount.value = amt.toFixed(2);
+  }
+
+  function recalcPercent(){
+    const p = Number(percentVal.value) || 0;
+    const amount = total * (p / 100);
+    percentCalc.value = money(amount);
+  }
+
+  depTypeRadios.forEach(r => r.addEventListener('change', updateDepositTypeUI));
+  percentVal.addEventListener('input', recalcPercent);
+  updateDepositTypeUI(); // init
+
+  // -------- Deposit: payment method fields
+  const depMethodRadios = $$('input[name="ipm_deposit_method"]');
+  const depFields = $('#ipmDepositMethodFields');
+
+  function renderDepositMethodFields(method){
+    if (method === 'card'){
+      depFields.innerHTML = `
+        <div class="row g-2">
+          <div class="col-md-6">
+            <label class="form-label">Card Number</label>
+            <input type="text" name="deposit_card_number" class="form-control" autocomplete="cc-number" inputmode="numeric" placeholder="4111 1111 1111 1111">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">CVV</label>
+            <input type="text" name="deposit_card_cvv" class="form-control" inputmode="numeric" maxlength="4" placeholder="123">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Expiry (MM/YY)</label>
+            <input type="text" name="deposit_card_expiry" class="form-control" placeholder="08/27" autocomplete="cc-exp">
+          </div>
+          <div class="col-md-4 mt-2">
+            <label class="form-label">ZIP</label>
+            <input type="text" name="deposit_card_zip" class="form-control" inputmode="numeric" placeholder="90210">
+          </div>
+        </div>`;
+    } else if (method === 'echeck'){
+      depFields.innerHTML = `
+        <div class="row g-2">
+          <div class="col-md-6">
+            <label class="form-label">Account Number</label>
+            <input type="text" name="deposit_bank_account" class="form-control" inputmode="numeric" placeholder="##########">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Routing Number</label>
+            <input type="text" name="deposit_bank_routing" class="form-control" inputmode="numeric" placeholder="#########">
+          </div>
+        </div>`;
+    } else {
+      depFields.innerHTML = `<div class="alert alert-secondary mb-0">Cash selected — no additional details required.</div>`;
     }
-    depositTypeRadios.forEach(r => r.addEventListener('change', updateDepositFields));
-    depositValue.addEventListener('input', calculateAmount);
-    updateDepositFields();
+  }
 
-    // ===== Payment Method logic for Deposit =====
-    const depositMethodRadios = document.querySelectorAll('input[name="deposit_payment_method"]');
-    const depositMethodFields = document.getElementById('depositMethodFields');
+  function updateDepositMethodUI(){
+    const method = depMethodRadios.find(r => r.checked)?.value || 'card';
+    renderDepositMethodFields(method);
+  }
 
-    function renderDepositMethodFields(method){
-        if(method === 'card'){
-            depositMethodFields.innerHTML = `
-                <div class="row g-2">
-                    <div class="col-md-6">
-                        <label class="form-label">Card Number</label>
-                        <input type="text" class="form-control" name="deposit_card_number">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">CVV</label>
-                        <input type="text" class="form-control" name="deposit_card_cvv">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Expiry</label>
-                        <input type="text" class="form-control" name="deposit_card_expiry">
-                    </div>
-                    <div class="col-md-4 mt-2">
-                        <label class="form-label">ZIP</label>
-                        <input type="text" class="form-control" name="deposit_card_zip">
-                    </div>
-                </div>
-            `;
-        } else if(method === 'echeck'){
-            depositMethodFields.innerHTML = `
-                <div class="row g-2">
-                    <div class="col-md-6">
-                        <label class="form-label">Account Number</label>
-                        <input type="text" class="form-control" name="deposit_bank_account">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Routing Number</label>
-                        <input type="text" class="form-control" name="deposit_bank_routing">
-                    </div>
-                </div>
-            `;
-        } else {
-            depositMethodFields.innerHTML = `<div class="alert alert-secondary mb-0">No additional fields for Cash</div>`;
-        }
+  depMethodRadios.forEach(r => r.addEventListener('change', updateDepositMethodUI));
+  updateDepositMethodUI(); // init
+
+  // -------- Payments tab: dynamic rows + delegated method switching
+  const paymentsList = $('#ipmPaymentsList');
+  const addBtn = $('#ipmAddPayment');
+
+  function paymentFieldsHTML(method){
+    if (method === 'card'){
+      return `
+        <div class="row g-2">
+          <div class="col-md-6">
+            <label class="form-label">Card Number</label>
+            <input type="text" name="payment_card_number[]" class="form-control" autocomplete="cc-number" inputmode="numeric">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">CVV</label>
+            <input type="text" name="payment_card_cvv[]" class="form-control" inputmode="numeric" maxlength="4">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Expiry (MM/YY)</label>
+            <input type="text" name="payment_card_expiry[]" class="form-control" autocomplete="cc-exp">
+          </div>
+          <div class="col-md-4 mt-2">
+            <label class="form-label">ZIP</label>
+            <input type="text" name="payment_card_zip[]" class="form-control" inputmode="numeric">
+          </div>
+        </div>`;
+    } else if (method === 'echeck'){
+      return `
+        <div class="row g-2">
+          <div class="col-md-6">
+            <label class="form-label">Account Number</label>
+            <input type="text" name="payment_bank_account[]" class="form-control" inputmode="numeric">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Routing Number</label>
+            <input type="text" name="payment_bank_routing[]" class="form-control" inputmode="numeric">
+          </div>
+        </div>`;
+    } else {
+      return `<div class="alert alert-secondary mb-0">Cash selected — no additional details required.</div>`;
     }
-    depositMethodRadios.forEach(r => r.addEventListener('change', e => renderDepositMethodFields(e.target.value)));
-    renderDepositMethodFields('card');
+  }
 
-    // ===== Payments tab logic =====
-    const paymentsList = document.getElementById('paymentsList');
-    const addPaymentRowBtn = document.getElementById('addPaymentRow');
+  // initialize first row fields
+  const firstRow = paymentsList.querySelector('.ipm-payment-row');
+  if (firstRow){
+    firstRow.querySelector('.ipm-payment-method-fields').innerHTML = paymentFieldsHTML('card');
+  }
 
-    function renderPaymentMethodFields(container, method){
-        if(method === 'card'){
-            container.innerHTML = `
-                <div class="row g-2">
-                    <div class="col-md-6">
-                        <label class="form-label">Card Number</label>
-                        <input type="text" class="form-control" name="payment_card_number[]">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">CVV</label>
-                        <input type="text" class="form-control" name="payment_card_cvv[]">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Expiry</label>
-                        <input type="text" class="form-control" name="payment_card_expiry[]">
-                    </div>
-                    <div class="col-md-4 mt-2">
-                        <label class="form-label">ZIP</label>
-                        <input type="text" class="form-control" name="payment_card_zip[]">
-                    </div>
-                </div>
-            `;
-        } else if(method === 'echeck'){
-            container.innerHTML = `
-                <div class="row g-2">
-                    <div class="col-md-6">
-                        <label class="form-label">Account Number</label>
-                        <input type="text" class="form-control" name="payment_bank_account[]">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Routing Number</label>
-                        <input type="text" class="form-control" name="payment_bank_routing[]">
-                    </div>
-                </div>
-            `;
-        } else {
-            container.innerHTML = `<div class="alert alert-secondary mb-0">No additional fields for Cash</div>`;
-        }
-    }
+  // Delegated change handler for payment method radios in Payments tab
+  paymentsList.addEventListener('change', function(e){
+    if (!e.target.classList.contains('ipm-payment-method')) return;
+    const row = e.target.closest('.ipm-payment-row');
+    const fields = row.querySelector('.ipm-payment-method-fields');
+    fields.innerHTML = paymentFieldsHTML(e.target.value);
+  });
 
-    function bindPaymentRow(row, index){
-        const radios = row.querySelectorAll('.payment-method-radio');
-        const methodFields = row.querySelector('.payment-method-fields');
-        radios.forEach(r => r.addEventListener('change', e => renderPaymentMethodFields(methodFields, e.target.value)));
-        renderPaymentMethodFields(methodFields, 'card');
-    }
+  // Add new payment row
+  addBtn.addEventListener('click', function(){
+    const index = paymentsList.querySelectorAll('.ipm-payment-row').length;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'ipm-payment-row border rounded p-3 mb-3';
+    wrapper.dataset.index = String(index);
+    wrapper.innerHTML = `
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Payment Amount</label>
+          <input type="number" class="form-control" name="payment_amount[]" step="0.01">
+        </div>
+        <div class="col-md-8">
+          <label class="form-label d-block">Payment Method</label>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input ipm-payment-method" type="radio" name="ipm_payment_method_${index}" value="card" checked>
+            <label class="form-check-label">Card</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input ipm-payment-method" type="radio" name="ipm_payment_method_${index}" value="echeck">
+            <label class="form-check-label">E‑Check</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input ipm-payment-method" type="radio" name="ipm_payment_method_${index}" value="cash">
+            <label class="form-check-label">Cash</label>
+          </div>
+        </div>
+      </div>
+      <div class="ipm-payment-method-fields mt-3"></div>
+    `;
+    paymentsList.appendChild(wrapper);
+    // default render card fields
+    wrapper.querySelector('.ipm-payment-method-fields').innerHTML = paymentFieldsHTML('card');
+  });
 
-    addPaymentRowBtn.addEventListener('click', () => {
-        const index = paymentsList.querySelectorAll('.payment-row').length;
-        const clone = paymentsList.querySelector('.payment-row').cloneNode(true);
-        // Update radio names for uniqueness
-        clone.querySelectorAll('.payment-method-radio').forEach(r => {
-            r.name = `payment_method_row${index}`;
-        });
-        paymentsList.appendChild(clone);
-        bindPaymentRow(clone, index);
-    });
-
-    bindPaymentRow(paymentsList.querySelector('.payment-row'), 0);
 })();
 </script>
 @endpush
