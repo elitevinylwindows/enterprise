@@ -460,8 +460,7 @@
                                 <div class="tab-pane fade show active" id="preview-panel">
 
                                     <!-- SVG Preview Box -->
-                                    <div id="window-svg-preview" class="border rounded bg-light p-4 mb-3 text-center" style="height: 300px; position: relative;">
-                                    </div>
+                                    <div id="window-svg-preview" style="height: 300px; display: flex; align-items: center;"></div>
 
                                     <!-- View Mode Buttons -->
                                     <div class="btn-group mb-3 w-100" role="group">
@@ -948,182 +947,81 @@
     }
 
     // Window preview logic
-   // Enhanced Window preview logic with proper SVG handling
 function updateWindowPreview() {
-    const series = document.getElementById('seriesSelect').selectedOptions[0]?.text?.toLowerCase();
     const config = document.getElementById('seriesTypeSelect').value;
-    const width = document.querySelector('[name="width"]').value || 60;
+    const width = document.querySelector('[name="width"]').value || 48;
     const height = document.querySelector('[name="height"]').value || 48;
     const previewBox = document.getElementById('window-svg-preview');
 
-    if (series && config && width && height) {
-        const url = `/window/render/${series}/${config}?width=${width}&height=${height}`;
-        fetch(url)
-            .then(res => res.text())
-            .then(svg => {
-                // Clear and prepare container
-                previewBox.innerHTML = '';
-                
-                // Create wrapper for proper centering
-                const wrapper = document.createElement('div');
-                wrapper.style.display = 'flex';
-                wrapper.style.justifyContent = 'center';
-                wrapper.style.alignItems = 'center';
-                wrapper.style.height = '100%';
-                wrapper.style.overflow = 'visible';
-                
-                // Add the rendered SVG
-                wrapper.innerHTML = svg;
-                previewBox.appendChild(wrapper);
-                
-                // Get the SVG element
-                const svgElement = wrapper.querySelector('svg');
-                if (svgElement) {
-                    // Remove any inline border/background
-                    svgElement.style.border = 'none';
-                    svgElement.style.background = 'transparent';
-                    
-                    // Scale to fit while maintaining aspect ratio
-                    const containerWidth = previewBox.clientWidth;
-                    const containerHeight = previewBox.clientHeight;
-                    const svgWidth = svgElement.width.baseVal.value;
-                    const svgHeight = svgElement.height.baseVal.value;
-                    
-                    const scale = Math.min(
-                        containerWidth * 0.9 / svgWidth,
-                        containerHeight * 0.9 / svgHeight
-                    );
-                    
-                    svgElement.style.transform = `scale(${scale})`;
-                    svgElement.style.transformOrigin = 'center center';
-                }
-            })
-            .catch(() => {
-                // Fallback to component-based rendering if API fails
-                renderWindowComponent(previewBox, config, width, height);
-            });
-    } else {
-        // Default placeholder
-        previewBox.innerHTML = `
-            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
-                <p style="font-size:24px; margin:0; color:#a80000;">CLCL</p>
-                <p style="font-size:18px; margin:0; color:#a80000;">ARG</p>
-            </div>
-        `;
-    }
-}
-
-// Fallback rendering using the same logic as your blade component
-function renderWindowComponent(container, config, width, height) {
-    const codeParts = config.split('-');
-    const segments = codeParts.filter(p => !['T1', 'B1'].includes(p));
-    const hasTop = codeParts.includes('T1');
-    const hasBottom = codeParts.includes('B1');
-    const paneCount = segments.length;
+    // Clear previous content
+    previewBox.innerHTML = '';
     
+    // Create SVG dimensions (fixed aspect ratio)
     const svgWidth = 300;
-    const svgHeight = 250;
-    const paneWidth = svgWidth / paneCount;
-    const paneY = hasTop ? 50 : 0;
-    const paneHeight = svgHeight - (hasTop ? 50 : 0) - (hasBottom ? 50 : 0);
+    const svgHeight = Math.round(svgWidth * (height/width));
     
+    // Create SVG with XO configuration
     let svgContent = `
-        <svg width="${svgWidth}" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+        <svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" 
+             xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto;">
     `;
     
-    // Top segment
-    if (hasTop) {
-        svgContent += `
-            <rect x="0" y="0" width="${svgWidth}" height="50" fill="#cce6f6" />
-            <line x1="0" y1="50" x2="${svgWidth}" y2="50" stroke="#000" stroke-width="1" />
-        `;
-    }
-    
-    // Main panes
-    segments.forEach((pane, i) => {
-        const x = i * paneWidth;
-        const isX = pane === 'XO' || pane === 'X';
-        const fill = isX ? '#cce6f6' : '#e0e0e0';
-        const arrowDir = pane === 'XO' ? 'right' : (pane === 'X' ? 'left' : null);
-        
-        svgContent += `
-            <rect x="${x}" y="${paneY}" width="${paneWidth}" height="${paneHeight}" 
-                  fill="${fill}" stroke="#000" stroke-width="1"/>
-        `;
-        
-        // Decorative grid for X panes
-        if (isX) {
-            for (let g = 1; g < 4; g++) {
-                svgContent += `
-                    <line x1="${x + g * (paneWidth / 4)}" y1="${paneY}" 
-                          x2="${x + g * (paneWidth / 4)}" y2="${paneY + paneHeight}" 
-                          stroke="#99cbee" stroke-width="0.5" />
-                `;
-            }
-            for (let g = 1; g < 4; g++) {
-                svgContent += `
-                    <line x1="${x}" y1="${paneY + g * (paneHeight / 4)}" 
-                          x2="${x + paneWidth}" y2="${paneY + g * (paneHeight / 4)}" 
-                          stroke="#99cbee" stroke-width="0.5" />
-                `;
-            }
-            
-            // Arrow direction
-            if (arrowDir) {
-                const arrowX = arrowDir === 'right' ? x + paneWidth - 20 : x + 20;
-                const yMid = paneY + paneHeight / 2;
-                const yUp = yMid - 10;
-                const yDown = yMid + 10;
-                const xArrow = arrowDir === 'right' ? arrowX + 10 : arrowX - 10;
-                
-                svgContent += `
-                    <polygon points="${arrowX},${yMid} ${arrowX},${yUp} ${xArrow},${yMid} ${arrowX},${yDown}" 
-                             fill="#a80000" />
-                `;
-            }
-        }
-    });
-    
-    // Bottom segment
-    if (hasBottom) {
-        svgContent += `
-            <line x1="0" y1="${svgHeight - 50}" x2="${svgWidth}" y2="${svgHeight - 50}" stroke="#000" stroke-width="1" />
-            <rect x="0" y="${svgHeight - 50}" width="${svgWidth}" height="50" fill="#cce6f6" />
-        `;
-    }
-    
-    // Label
+    // Window frame (red border)
     svgContent += `
-        <text x="10" y="${svgHeight - 10}" font-size="12" fill="#555">
-            ${config} — ${width}" x ${height}"
+        <rect x="5" y="5" width="${svgWidth-10}" height="${svgHeight-10}" 
+              fill="none" stroke="#a80000" stroke-width="10" rx="3"/>
+    `;
+    
+    // Window divider (vertical line in middle)
+    svgContent += `
+        <line x1="${svgWidth/2}" y1="5" x2="${svgWidth/2}" y2="${svgHeight-5}" 
+              stroke="#a80000" stroke-width="2"/>
+    `;
+    
+    // Left pane (fixed)
+    svgContent += `
+        <rect x="10" y="10" width="${svgWidth/2-15}" height="${svgHeight-20}" 
+              fill="#f0f8ff" stroke="#a80000" stroke-width="1"/>
+    `;
+    
+    // Right pane (operable - XO)
+    svgContent += `
+        <rect x="${svgWidth/2+5}" y="10" width="${svgWidth/2-15}" height="${svgHeight-20}" 
+              fill="#e0f0ff" stroke="#a80000" stroke-width="1"/>
+        
+        <!-- Grid lines for operable pane -->
+        <line x1="${svgWidth/2+5}" y1="${svgHeight/3}" x2="${svgWidth-10}" y2="${svgHeight/3}" 
+              stroke="#99cbee" stroke-width="1" stroke-dasharray="5,3"/>
+        <line x1="${svgWidth/2+5}" y1="${svgHeight*2/3}" x2="${svgWidth-10}" y2="${svgHeight*2/3}" 
+              stroke="#99cbee" stroke-width="1" stroke-dasharray="5,3"/>
+        <line x1="${svgWidth/2+svgWidth/6}" y1="10" x2="${svgWidth/2+svgWidth/6}" y2="${svgHeight-10}" 
+              stroke="#99cbee" stroke-width="1" stroke-dasharray="5,3"/>
+        
+        <!-- Opening direction arrow -->
+        <path d="M${svgWidth/2+30},${svgHeight/2} L${svgWidth/2+10},${svgHeight/2-15} 
+                L${svgWidth/2+10},${svgHeight/2+15} Z" 
+              fill="#a80000"/>
+    `;
+    
+    // Window label
+    svgContent += `
+        <text x="${svgWidth/2}" y="${svgHeight-15}" text-anchor="middle" 
+              font-family="Arial" font-size="12" fill="#a80000">
+            ${config} – ${width}" × ${height}"
         </text>
     `;
     
     svgContent += `</svg>`;
     
-    // Center the SVG in the container
-    container.innerHTML = `
-        <div style="display:flex; justify-content:center; align-items:center; height:100%;">
-            ${svgContent}
-        </div>
-    `;
-    
-    // Scale to fit
-    const svgElement = container.querySelector('svg');
-    if (svgElement) {
-        const scale = Math.min(
-            container.clientWidth * 0.9 / svgWidth,
-            container.clientHeight * 0.9 / svgHeight
-        );
-        svgElement.style.transform = `scale(${scale})`;
-        svgElement.style.transformOrigin = 'center center';
-    }
+    previewBox.innerHTML = svgContent;
 }
 
-// Event listeners (unchanged)
-document.getElementById('seriesSelect').addEventListener('change', updateWindowPreview);
+// Event listeners for inputs
 document.getElementById('seriesTypeSelect').addEventListener('change', updateWindowPreview);
-document.querySelector('[name="width"]').addEventListener('input', updateWindowPreview);
+document.querySelector('[name="width"]').addEventListener('input', function() {
+    updateWindowPreview();
+    document.querySelector('[name="height"]').value = this.value; // Keep square by default
+});
 document.querySelector('[name="height"]').addEventListener('input', updateWindowPreview);
 
 // Initial preview
@@ -1133,7 +1031,7 @@ updateWindowPreview();
 
 
 
-
+    
     // Modal cleanup
     document.addEventListener('hidden.bs.modal', function(event) {
         document.body.classList.remove('modal-open');
