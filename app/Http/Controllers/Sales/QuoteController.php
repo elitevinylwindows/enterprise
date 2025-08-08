@@ -25,21 +25,22 @@ use Illuminate\Support\Facades\Mail;
 
 class QuoteController extends Controller
 {
-    public function index(Request $request)
-    {
+public function index(Request $request)
+{
+    $status = $request->get('status', 'all');
 
-        $status = $request->get('status', 'all');
+    $quotes = Quote::query();
 
-        $quotes = Quote::query();
-
-        if ($status !== 'all') {
-            $quotes->where('status', $status);
-        }
-
-        $quotes = $quotes->latest()->get();
-
-        return view('sales.quotes.index', compact('quotes', 'status'));
+    if ($status === 'deleted') {
+        $quotes->onlyTrashed(); // Get only soft-deleted quotes
+    } elseif ($status !== 'all') {
+        $quotes->where('status', $status); // Filter by status for non-deleted
     }
+
+    $quotes = $quotes->latest()->get();
+
+    return view('sales.quotes.index', compact('quotes', 'status'));
+}
 
 
 
@@ -835,12 +836,7 @@ class QuoteController extends Controller
     }
 
 
-    public function deleted()
-{
-    $quotes = Quote::onlyTrashed()->get();
-    return view('sales.quotes.deleted', compact('quotes'));
-}
-
+  
 public function restore($id)
 {
     Quote::withTrashed()->findOrFail($id)->restore();

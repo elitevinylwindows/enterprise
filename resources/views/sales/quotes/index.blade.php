@@ -21,12 +21,20 @@
     {{-- Taskbar Card --}}
     <div class="col-md-2">
         <div class="card">
-            <div class="list-group list-group-flush">
-                <a href="{{ route('sales.quotes.index', ['status' => 'all']) }}" class="list-group-item">All Quotes</a>
-                <a href="{{ route('sales.quotes.index', ['status' => 'draft']) }}" class="list-group-item">Draft Quotes</a>
-                <a href="{{ route('sales.quotes.deleted', ['status' => 'deleted']) }}" class="list-group-item text-danger">Deleted</a>
-
-            </div>
+    <div class="list-group list-group-flush">
+    <a href="{{ route('sales.quotes.index', ['status' => 'all']) }}" 
+       class="list-group-item {{ $status === 'all' ? 'active' : '' }}">
+       All Quotes
+    </a>
+    <a href="{{ route('sales.quotes.index', ['status' => 'draft']) }}" 
+       class="list-group-item {{ $status === 'draft' ? 'active' : '' }}">
+       Draft Quotes
+    </a>
+    <a href="{{ route('sales.quotes.index', ['status' => 'deleted']) }}" 
+       class="list-group-item text-danger {{ $status === 'deleted' ? 'active' : '' }}">
+       Deleted
+    </a>
+</div>
         </div>
     </div>
 
