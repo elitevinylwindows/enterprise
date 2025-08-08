@@ -38,6 +38,11 @@
                     <div class="col">
                         <h5>{{ __('Invoices List') }}</h5>
                     </div>
+<div class="col-auto ms-auto">
+        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createOrderModal">
+            <i class="fas fa-circle-plus"></i> Create Order
+        </a>
+    </div>
                 </div>
             </div>
             <div class="card-body pt-0">
@@ -53,11 +58,11 @@
                                 <th>{{ __('Invoice Date') }}</th>
                                 <th>{{ __('Total') }}</th>
                                 <th>{{ __('Paid Amount') }}</th>
-                                <th>{{ __('Remaining Amount') }}</th>
-                                <th>{{ __('Required Payment Type') }}</th>
+                                <th>{{ __('Balance') }}</th>
+                                <th>{{ __('Payment Type') }}</th>
                                 <th>{{ __('Required Payment') }}</th>
                                 <th>{{ __('Status') }}</th>
-                                <th>{{ __('Notes') }}</th>
+                                <th>{{ __('PO') }}</th>
                                 <th>{{ __('Action') }}</th>
                             </tr>
                         </thead>
@@ -84,7 +89,9 @@
                                     <span class="badge bg-light text-muted">{{ ucfirst($invoice->status) }}</span>
                                     @endif
                                 </td>
+                                
                                 <td>{{ $invoice->quote->notes }}</td>
+                                
                                 <td class="text-nowrap">
                                     {{-- View --}}
                                     <a class="avtar avtar-xs btn-link-success text-success customModal"
