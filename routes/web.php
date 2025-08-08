@@ -373,6 +373,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
             Route::get('/invoices/customer/{customer_number}', [\App\Http\Controllers\Sales\InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
             Route::get('/invoices/{id}/sendto-quickbooks', [QuickBooksController::class, 'sendInvoiceToQuickBooks'])->name('invoices.sendToQuickBooks');
+            Route::get('invoices/{id}/show', [\App\Http\Controllers\Sales\InvoiceController::class, 'show'])->name('invoices.show');
         });
 
         //Supplier
