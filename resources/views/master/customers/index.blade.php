@@ -73,26 +73,38 @@
                                 <td>{{ $customer->city }}</td>
                                 <td>{{ $customer->zip }}</td>
                                 <td>
-                                    <span class="badge bg-{{ $customer->status === 'active' ? 'success' : 'secondary' }}">
+                                    <span class="badge bg-{{ $customer->status === 'active' ? 'warning' : 'secondary' }}">
                                         {{ ucfirst($customer->status) }}
                                     </span>
                                 </td>
                                 <td>{{ $customer->tier?->name }}</td>
                                 <td>${{ number_format($customer->loyalty_credit, 2) }}</td>
                                 <td>${{ number_format($customer->total_spent, 2) }}</td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-primary" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#editCustomerModal"
-                                        data-id="{{ $customer->id }}">
-                                        Edit
-                                    </button>
-                                    <form action="{{ route('master.customers.destroy', $customer->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
-                                    </form>
-                                </td>
+                                <td class="text-nowrap">
+    {{-- Edit --}}
+    <a class="avtar avtar-xs btn-link-primary text-primary customModal"
+       data-bs-toggle="tooltip"
+       data-bs-original-title="Edit Customer"
+       href="#"
+       data-size="xl"
+       data-url="{{ route('master.customers.edit', $customer->id) }}"
+       data-title="Edit Customer">
+        <i data-feather="edit"></i>
+    </a>
+
+    {{-- Delete --}}
+    <form action="{{ route('master.customers.destroy', $customer->id) }}" method="POST" class="d-inline">
+        @csrf
+        @method('DELETE')
+        <a class="avtar avtar-xs btn-link-danger text-danger delete-confirm"
+           data-bs-toggle="tooltip"
+           data-bs-original-title="Delete Customer"
+           href="#"
+           onclick="event.preventDefault(); if(confirm('Are you sure?')) { this.closest('form').submit(); }">
+            <i data-feather="trash-2"></i>
+        </a>
+    </form>
+</td>
                             </tr>
                             @endforeach
                         </tbody>
