@@ -155,6 +155,7 @@ use App\Http\Controllers\Sales\{
     QuoteController,
     SalesSettingsController,
     InvoiceController
+    QuickBooksController,
 };
 
 
@@ -374,6 +375,10 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('/invoices/customer/{customer_number}', [\App\Http\Controllers\Sales\InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
             Route::get('/invoices/{id}/sendto-quickbooks', [QuickBooksController::class, 'sendInvoiceToQuickBooks'])->name('invoices.sendToQuickBooks');
             Route::get('invoices/{id}/show', [\App\Http\Controllers\Sales\InvoiceController::class, 'show'])->name('invoices.show');
+       
+       Route::get('/quickbooks/wsdl', [QuickBooksController::class, 'wsdl']);
+        Route::any('/quickbooks/endpoint', [QuickBooksController::class, 'handleWebConnector']);
+       
         });
 
         //Supplier

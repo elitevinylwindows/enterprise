@@ -29,4 +29,7 @@ class QuickBooksService
 
         return $dataService;
     }
+
+    public function generateInvoiceQBXML(array $data) { /* ... */ }
+
 }

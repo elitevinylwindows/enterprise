@@ -169,4 +169,33 @@ public function show($id)
     }
 
 
+public function syncToQuickbooks(Invoice $invoice)
+{
+    // Get invoice data
+    $invoiceData = [
+        'customer_name' => $invoice->customer->name,
+        'invoice_number' => $invoice->invoice_number, // Match your DB field
+        'date' => $invoice->invoice_date,
+        'items' => $invoice->items->map(function ($item) {
+            return [
+                'name' => $item->name,
+                'quantity' => $item->quantity,
+                'rate' => $item->price,
+            ];
+        }),
+    ];
+
+    // Delegate QBXML generation
+    $qbxml = app(QuickBooksService::class)->generateInvoiceQBXML($invoiceData);
+
+    // Queue the request with company file context
+    QuickBooksQueue::create([
+        'qb_action' => 'InvoiceAdd',
+        'qbxml' => $qbxml,
+        'company_file' => 'YourCompanyFile.QBW', // Optional: Store the target QB file
+    ]);
+
+    return redirect()->back()->with('success', 'Invoice queued for QuickBooks sync.');
+}
+
 }
