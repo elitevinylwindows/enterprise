@@ -59,7 +59,6 @@ use App\Http\Controllers\{
     ExecutiveCustomerController,
     ExecutiveTierController,
     FormulaController,
-    QuickBooksController,
     RaffleDrawController,
     WindowRenderController
 };
