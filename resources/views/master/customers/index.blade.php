@@ -13,18 +13,6 @@
 @section('content')
 <!-- Card 1: Header and Actions -->
 <div class="card mb-4">
-    <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">{{ __('Customers Management') }}</h5>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-                    <li class="breadcrumb-item">{{ __('Master') }}</li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ __('Customers') }}</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
     <div class="card-body">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
             <form action="{{ route('master.customers.import') }}" method="POST" enctype="multipart/form-data" class="d-flex flex-grow-1 gap-2">
