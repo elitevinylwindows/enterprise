@@ -40,7 +40,7 @@
                     <div class="col">
                         <h5>{{ __('Invoice List') }}</h5>
                     </div>
-                    <div class="row">
+                 <!--    <div class="row">
                         <div class="col-auto ms-auto">
                             <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#createInvoiceModal">
@@ -48,7 +48,7 @@
                             </a>
 
                         </div>
-                    </div>
+                    </div>-->
                 </div>
             </div>
 
@@ -122,22 +122,16 @@
                                     </a>
 
                                         {{-- Take Payment --}}
-                                        <a class="avtar avtar-xs btn-link-success text-success customModal"
-   data-bs-toggle="tooltip"
-   title="Make Payment"
-   href="#"
-   data-size="lg"
-   data-url="{{ route('sales.invoices.payment', $invoice->id) }}"
-   data-title="Invoice Payment">
-    <i data-feather="credit-card"></i>
-</a>
-
-                                    {{-- Take Payment --}}
                                     <a class="avtar avtar-xs btn-link-success text-success customModal"
-                                        data-bs-toggle="tooltip" data-bs-original-title="Pay Invoice" href="#"
-                                        data-size="xl" data-url="" data-title="Pay Invoice">
+                                        data-bs-toggle="tooltip"
+                                        title="Make Payment"
+                                        href="#"
+                                        data-size="lg"
+                                        data-url="{{ route('sales.invoices.payment', $invoice->id) }}"
+                                        data-title="Invoice Payment">
                                         <i data-feather="credit-card"></i>
                                     </a>
+
 
                                     {{-- Edit --}}
                                         <a class="avtar avtar-xs btn-link-primary text-primary customModal"

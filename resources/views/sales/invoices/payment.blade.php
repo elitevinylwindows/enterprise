@@ -1,9 +1,3 @@
-{{-- resources/views/sales/invoices/payment.blade.php --}}
-<div id="invoicePaymentModal" class="invoice-payment">
-  <div class="modal-header">
-      <h5 class="modal-title">Invoice Payment</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-  </div>
 
   <div class="modal-body">
       @php $totalAmount = $invoice->total ?? 0; @endphp

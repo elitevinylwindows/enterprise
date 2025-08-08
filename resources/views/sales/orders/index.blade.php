@@ -12,13 +12,13 @@
 @section('content')
 <div class="mb-4"></div> {{-- Space after title --}}
 
-<div class="row">
+<!--<div class="row">
     <div class="col-auto ms-auto">
         <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createOrderModal">
             <i class="fas fa-circle-plus"></i> Create Order
         </a>
     </div>
-</div>
+</div>-->
 
 
 <div class="mb-4"></div> {{-- Space --}}
