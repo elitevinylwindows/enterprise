@@ -371,6 +371,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
 
             // Invoices
             Route::get('invoices', [\App\Http\Controllers\Sales\InvoiceController::class, 'index'])->name('invoices.index');
+            Route::get('invoices/show/{id}', [\App\Http\Controllers\Sales\InvoiceController::class, 'show'])->name('invoices.show');
             Route::get('/invoices/customer/{customer_number}', [\App\Http\Controllers\Sales\InvoiceController::class, 'getCustomer'])->name('invoices.getCustomer');
             Route::get('/invoices/{id}/sendto-quickbooks', [QuickBooksController::class, 'sendInvoiceToQuickBooks'])->name('invoices.sendToQuickBooks');
         });
@@ -512,7 +513,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::get('/series/{id}/types', [QuoteController::class, 'getSeriesTypes']);
         Route::get('/sales/series-types/{seriesId}', [QuoteController::class, 'getSeriesTypes']);
 
-        Route::get('/sales/quotes/previous', [QuoteController::class, 'previous'])->name('sales.quotes.previous');
         Route::get('sales/settings', [SalesSettingsController::class, 'index'])->name('sales.settings.index');
         Route::post('sales/settings/update', [SalesSettingsController::class, 'update'])->name('sales.settings.update');
         Route::post('/sales/settings/save', [SalesSettingsController::class, 'save'])->name('sales.settings.save');
@@ -772,7 +772,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::get('/series/{id}/types', [QuoteController::class, 'getSeriesTypes']);
         Route::get('/sales/series-types/{seriesId}', [QuoteController::class, 'getSeriesTypes']);
 
-        Route::get('/sales/quotes/previous', [QuoteController::class, 'previous'])->name('sales.quotes.previous');
         Route::get('sales/settings', [SalesSettingsController::class, 'index'])->name('sales.settings.index');
         Route::post('sales/settings/update', [SalesSettingsController::class, 'update'])->name('sales.settings.update');
         Route::post('/sales/settings/save', [SalesSettingsController::class, 'save'])->name('sales.settings.save');
@@ -1104,6 +1103,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
 
         Route::prefix('sales')->name('sales.')->group(function () {
             Route::get('quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
+            Route::post('quotes/{id}/update', [QuoteController::class, 'update'])->name('quotes.update');
             Route::post('quotes', [QuoteController::class, 'store'])->name('quotes.store');
             Route::get('quotes/{id}', [QuoteController::class, 'details'])->name('quotes.details');
             Route::post('/quotes/check-price', [QuoteController::class, 'checkPrice'])->name('quotes.checkPrice');
@@ -1114,6 +1114,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('quotes/{id}/status/{status}', [QuoteController::class, 'updateStatus'])->name('quotes.update.status');
             Route::post('quotes/{id}/save-draft', [QuoteController::class, 'saveDraft'])->name('quotes.save.draft');
             Route::get('quotes/fetch-info/{id}', [QuoteController::class, 'fetchInfo']);
+            Route::get('quotes/{id}/previous', [QuoteController::class, 'previous'])->name('quotes.previous');
         });
 
 

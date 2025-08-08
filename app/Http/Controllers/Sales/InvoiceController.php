@@ -145,5 +145,10 @@ class InvoiceController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        $invoice = Invoice::with(['customer', 'order', 'quote'])->findOrFail($id);
+        return view('sales.invoices.show', compact('invoice'));
+    }
 
 }

@@ -82,7 +82,7 @@
     {{-- Totals --}}
     <div class="text-end mt-4">
         <p><strong>Total Qty:</strong> {{ $order->quote->items->sum('qty') }}</p>
-        <p><strong>Subtotal:</strong> ${{ number_format($order->subtotal, 2) }}</p>
+        <p><strong>Subtotal:</strong> ${{ number_format($order->sub_total, 2) }}</p>
         <p><strong>Tax:</strong> ${{ number_format($order->tax, 2) }}</p>
         <h5><strong>Total:</strong> ${{ number_format($order->total, 2) }}</h5>
     </div>
