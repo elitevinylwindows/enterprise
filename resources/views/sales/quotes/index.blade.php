@@ -87,11 +87,33 @@
                                     <span class="badge bg-light text-muted">{{ ucfirst($quote->status) }}</span>
                                     @endif
                                 </td>
-                                <td class="text-nowrap">
-                                    {{-- View --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" data-bs-original-title="View Summary" href="#" data-size="xl" data-url="{{ route('sales.quotes.view', $quote->id) }}" data-title="Quote Summary">
-                                        <i data-feather="eye"></i>
-                                    </a>
+                                <tbody>
+    
+        <td class="text-nowrap">
+            @if($status === 'deleted')
+                {{-- Restore Button --}}
+                <form action="{{ route('sales.quotes.restore', $quote->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="avtar avtar-xs btn-link-success text-success border-0 bg-transparent p-0" data-bs-toggle="tooltip" data-bs-original-title="Restore">
+                        <i data-feather="rotate-ccw"></i>
+                    </button>
+                </form>
+                
+                {{-- Permanent Delete Button --}}
+                <form action="{{ route('sales.quotes.force-delete', $quote->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0" 
+                            data-bs-toggle="tooltip" data-bs-original-title="Delete Permanently"
+                            onclick="return confirm('Permanently delete this quote?')">
+                        <i data-feather="trash-2"></i>
+                    </button>
+                </form>
+            @else
+                {{-- Original Action Buttons --}}
+                <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" data-bs-original-title="View Summary" href="#" data-size="xl" data-url="{{ route('sales.quotes.view', $quote->id) }}" data-title="Quote Summary">
+                    <i data-feather="eye"></i>
+                </a>
 
                                     {{-- Edit --}}
                                     <a class="avtar avtar-xs btn-link-primary text-primary" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="{{ route('sales.quotes.edit', $quote->id) }}" data-title="Edit Quote">

@@ -840,13 +840,15 @@ public function index(Request $request)
 public function restore($id)
 {
     Quote::withTrashed()->findOrFail($id)->restore();
-    return redirect()->route('sales.quotes.deleted')->with('success', 'Quote restored successfully');
+    return redirect()->route('sales.quotes.index', ['status' => 'deleted'])
+        ->with('success', 'Quote restored successfully');
 }
 
 public function forceDelete($id)
 {
     Quote::withTrashed()->findOrFail($id)->forceDelete();
-    return redirect()->route('sales.quotes.deleted')->with('success', 'Quote permanently deleted');
+    return redirect()->route('sales.quotes.index', ['status' => 'deleted'])
+        ->with('success', 'Quote permanently deleted');
 }
 
 
