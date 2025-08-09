@@ -1,5 +1,5 @@
+<form method="POST" action="{{ route('sales.orders.update', $order->id) }}" id="orderUpdateForm">
 <div class="modal-body">
-    <form method="POST" action="{{ route('sales.orders.update', $order->id) }}" id="orderUpdateForm">
         @csrf
         @method('PUT')
         <div class="row mb-3">
@@ -28,7 +28,7 @@
         <div class="row mb-3">
             <div class="col-md-4">
                 <label>Entry Date</label>
-                <input type="date" name="entry_date" class="form-control"  value="{{ $order->entry_date }}" readonly>
+                <input type="date" name="entry_date" class="form-control"  value="{{ $order->quote->entry_date }}" readonly>
             </div>
             <div class="col-md-4">
                 <label>Delivery Date</label>
@@ -104,25 +104,49 @@
                 </ul>
             </div>
         </div>
-    </form>
 </div>
 
 <div class="modal-footer">
     <button type="submit" class="btn btn-primary">Update Order</button>
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 </div>
+</form>
+
 <script>
     $(document).ready(function() {
-            $('#shipping').on('input focusout', function() {
-            const shippingCost = parseFloat($(this).val()) || 0;
+            $('#shipping').on('focusout', function() {
             const subtotal = parseFloat($('#subtotalDisplay').text().replace(/[^0-9.-]+/g,"")) || 0;
             const tax = parseFloat($('#taxDisplay').text().replace(/[^0-9.-]+/g,"")) || 0;
             const discount = parseFloat($('#discountDisplay').text().replace(/[^0-9.-]+/g,"")) || 0;
 
-            const total = subtotal + tax + shippingCost - discount;
-            $('#totalDisplay').text('$' + total.toFixed(2));
+            const shippingValue = parseFloat($(this).val()) || 0;
+            calculateTotals();
         });
     });
+
+    function calculateTotals(shipping = 0, modalOpen = false) {
+
+         fetch('{{ route('calculate.total', ['quote_id' => $order->quote_id]) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }, 
+            body: JSON.stringify({
+                shipping: parseFloat(document.getElementById('shipping').value) || 0    
+            })
+        }).then(response => response.json()).then(data => {
+            if (data.success) {
+
+                $('#totalDisplay').text('$' + data.data.grand_total.toFixed(2));
+
+            } else {
+                alert('Error calculating totals.');
+            }
+        }).catch(error => {
+            console.error('Error fetching total:', error);
+        });
+    }
 
 
 </script>

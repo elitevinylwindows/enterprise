@@ -1249,3 +1249,5 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
 
 Route::get('quote/request/{token}', [QuoteRequestController::class, 'secureView'])->name('quote.request.show');
 Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
+
+Route::post('calculate/total', [QuoteController::class, 'calculateTotal'])->name('calculate.total');

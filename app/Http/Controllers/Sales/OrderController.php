@@ -96,7 +96,17 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
             $order = Order::findOrFail($id);
+            $data = calculateTotal($order->quote, $request->shipping);
             $order->update($request->all());
+            $order->update([
+                "total" => $data['total'],
+                "sub_total" => $data['sub_total'],
+                "shipping" => $data['shipping'],
+                "discount" => $data['total_discount'],
+                "tax" => $data['tax'],
+                "total" => $data['grand_total'],
+            ]);
+
             DB::commit();
             return redirect()->route('sales.orders.index')->with('success', 'Order updated successfully.');
         } catch (\Exception $e) {

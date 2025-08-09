@@ -66,7 +66,6 @@
                                 <th>{{ __('Balance') }}</th>
                                 <th>{{ __('Payment Type') }}</th>
                                 <th>{{ __('Status') }}</th>
-                                <th>{{ __('PO') }}</th>
                                 <th>{{ __('Action') }}</th>
                             </tr>
                         </thead>
@@ -96,7 +95,6 @@
                                     @endif
                                     @endif
                                 </td>
-                                <td>{{ $invoice->quote->notes ?? '' }}</td>
                                 <td class="text-nowrap">
                                     @if($status === 'deleted')
                                     {{-- Restore Button --}}

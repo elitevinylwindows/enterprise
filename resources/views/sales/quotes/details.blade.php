@@ -1339,15 +1339,12 @@ updateWindowPreview();
         console.log('Selected finish type:', selectedFin);
     });
 
-    $('#shipping').on('input focusout', function() {
-        const shippingCost = parseFloat($(this).val()) || 0;
-        const subtotal = parseFloat($('#subtotal').val()) || 0;
-        const tax = parseFloat($('#tax').val()) || 0;
-        const discount = parseFloat($('#discount').val()) || 0;
-
-        const total = subtotal + tax + shippingCost - discount;
-        $('#total-amount').text('$' + total.toFixed(2));
-        $('#total').val(total.toFixed(2));
+    $('#shipping').on('focusout', function() {
+        
+        const shippingValue = parseFloat($(this).val()) || 0;
+        $('#shipping-amount').text('$' + shippingValue.toFixed(2));
+        $('#shipping').val(shippingValue.toFixed(2));
+        calculateTotals();
     });
 
     function openQuotePreview(quoteId) {
@@ -1363,33 +1360,44 @@ updateWindowPreview();
         }
     }
 
-    function calculateTotals() {
-        let subtotal = 0;
-        document.querySelectorAll('.qty-input').forEach(function(input) {
-            const qty = parseInt(input.value) || 0;
-            const price = parseFloat(input.dataset.price) || 0;
-            const rowTotal = qty * price;
-            subtotal += rowTotal;
+    function calculateTotals(shipping = 0, modalOpen = false) {
 
-            // Update row total
-            const id = input.dataset.id;
-            const totalCell = document.querySelector('.item-total[data-id="' + id + '"]');
-            if (totalCell) {
-                totalCell.textContent = '$' + rowTotal.toFixed(2);
+         fetch('{{ route('calculate.total', ['quote_id' => $quote->id]) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }, 
+            body: JSON.stringify({
+                shipping: parseFloat(document.getElementById('shipping').value) || 0    
+            })
+        }).then(response => response.json()).then(data => {
+            if (data.success) {
+                if(modalOpen) {
+                    var shipping = $('#shipping').val();
+                    // If modal is open, update the totals in the modal
+                    document.getElementById('discount-amount').textContent = '$' + data.data.total_discount;
+                    document.getElementById('sub-total-amount').textContent = '$' + data.data.sub_total;
+                    document.getElementById('tax-amount-preview').textContent = '$' + data.data.tax + ' (' + data.data.tax_rate + '%)';
+                    document.getElementById('shipping-amount').textContent = '$' + data.data.shipping;
+                    document.getElementById('grand-total-amount').textContent = '$' + data.data.grand_total;
+                } else {
+                    // Update the UI with the new totals
+                    $('#subtotal-amount').text('$' + data.data.sub_total);
+                    $('#tax-amount').text('$' + data.data.tax + ' (' + data.data.tax_rate + '%)');
+                    $('#total-amount').text('$' + data.data.grand_total);
+                    document.getElementById('tax').value = data.data.tax;
+                    document.getElementById('subtotal').value = data.data.sub_total;
+                    document.getElementById('tax').value = data.data.tax;
+                    document.getElementById('total').value = data.data.grand_total;
+                }
+            } else {
+                alert('Error calculating totals.');
             }
+        }).catch(error => {
+            console.error('Error fetching total:', error);
         });
 
-        const taxRate = {{ $taxRate }};
-        const discount = parseFloat(document.getElementById('discount').value) || 0;
-        const shipping = parseFloat(document.getElementById('shipping').value) || 0;
-        const tax =  subtotal * (taxRate / 100);
-        const total = (subtotal - discount) + tax + shipping;
-        document.getElementById('subtotal-amount').textContent = '$' + subtotal.toFixed(2);
-        document.getElementById('subtotal').value = subtotal.toFixed(2);
-        document.getElementById('tax-amount').textContent = '$' + tax.toFixed(2) + ' (' + taxRate.toFixed(2) + '%)';
-        document.getElementById('tax').value = tax.toFixed(2);
-        document.getElementById('total-amount').textContent = '$' + total.toFixed(2);
-        document.getElementById('total').value = total.toFixed(2);
     }
 
 
@@ -1435,10 +1443,15 @@ updateWindowPreview();
     // Listen for qty input changes
     document.addEventListener('input', function(e) {
         if (e.target.classList.contains('qty-input')) {
-            calculateTotals();
+            var shipping = $('#shipping').val();
+            calculateTotals(shipping, false);
         }
     });
 
+    document.getElementById('customModal').addEventListener('shown.bs.modal', function() {
+        var shipping = $('#shipping').val();
+        calculateTotals(shipping, true);
+    });
     // Initial calculation on page load
     document.addEventListener('DOMContentLoaded', calculateTotals);
 

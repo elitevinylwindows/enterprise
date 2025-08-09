@@ -10,6 +10,7 @@ use App\Models\Custom;
 use App\Models\FAQ;
 use App\Models\HomePage;
 use App\Models\LoggedHistory;
+use App\Models\Master\Prices\TaxCode;
 use App\Models\Notification;
 use App\Models\Page;
 use App\Models\Sales\Invoice;
@@ -1974,14 +1975,14 @@ if(!function_exists('quoteToInvoice')) {
                 'status' => 'Pending',
                 'customer_id' => $quote->customer?->id,
                 'invoice_date' => now(),
-                'total' => $quote->total,
-                'tax' => $quote->tax,
-                'sub_total' => $quote->sub_total,
-                'discount' => $quote->discount,
-                'shipping' => $quote->shipping,
+                'total' => $order->total,
+                'tax' => $order->tax,
+                'sub_total' => $order->sub_total,
+                'discount' => $order->discount,
+                'shipping' => $order->shipping,
                 'paid_amount' => 0,
-                'remaining_amount' => $quote->total,
-                'required_payment' => $quote->total,
+                'remaining_amount' => $order->total,
+                'required_payment' => $order->total,
                 'required_payment_type' => 'fixed',
                 'status' => 'Pending',
                 'notes' => null,
@@ -2015,5 +2016,38 @@ if(!function_exists('generateInvoiceNumber')) {
         $lastInvoice = Invoice::max('id')+27;
         $nextId = $lastInvoice ? $lastInvoice + 1 : 1;
         return 'INV-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
+    }
+}
+
+
+if (!function_exists('calculateTotal')) {
+    function calculateTotal($quote, $shipping = 0)
+    {
+        $total = $quote->items->sum(function ($item) {
+            return $item->price * $item->qty;
+        });
+        
+        $taxCode = TaxCode::where('city', $quote->customer->city)->first();
+
+        if ($taxCode) {
+            $taxRate = $taxCode->rate;
+        } else
+        {
+            $taxRate = 0; // Default tax rate if no code found
+        }
+        $tax = number_format($taxRate * ($total / 100), 2);
+
+
+        $data = [
+            'total' => $total,
+            'sub_total' => $total - $quote->discount,
+            'shipping' => number_format($shipping, 2),
+            'total_discount' => number_format($quote->discount, 2),
+            'tax' => $tax,
+            'tax_rate' => $taxRate,
+            'grand_total' => $total - $quote->discount + $tax + $shipping,
+        ];
+
+        return $data;
     }
 }

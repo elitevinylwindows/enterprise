@@ -72,7 +72,7 @@
                     </tr>
                     <tr>
                         <th>Subtotal:</th>
-                        <td id="subtotal-amount">
+                        <td id="sub-total-amount">
                             ${{ number_format($quote->sub_total, 2) }}
                         </td>
                     </tr>
@@ -86,7 +86,7 @@
                     </tr>
                     <tr>
                         <th>Total:</th>
-                        <td><strong id="total-amount">${{ number_format($quote->total, 2) }}</strong></td>
+                        <td><strong id="grand-total-amount">${{ number_format($quote->total, 2) }}</strong></td>
                     </tr>
                 </table>
             </div>
@@ -102,10 +102,10 @@
     document.getElementById('saveQuoteButton').addEventListener('click', function() {
         const formData = new FormData();
         formData.append('discount', document.getElementById('discount-amount').innerText.replace(/[$,]/g, ''));
-        formData.append('subtotal', document.getElementById('subtotal-amount').innerText.replace(/[$,]/g, ''));
-        formData.append('tax', document.getElementById('tax-amount-preview').innerText.replace(/[$,]/g, ''));
+        formData.append('subtotal', document.getElementById('sub-total-amount').innerText.replace(/[$,]/g, ''));
+        formData.append('tax', document.getElementById('tax-amount-preview').innerText.replace(/[$,]/g, '').replace(/\s*\(.*\)/, ''));
         formData.append('shipping', document.getElementById('shipping-amount').innerText.replace(/[$,]/g, ''));
-        formData.append('total', document.getElementById('total-amount').innerText.replace(/[$,]/g, ''));
+        formData.append('total', document.getElementById('grand-total-amount').innerText.replace(/[$,]/g, ''));
         formData.append('status', 'saved');
         fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
             method: 'POST',

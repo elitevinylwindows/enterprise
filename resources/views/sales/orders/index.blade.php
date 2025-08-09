@@ -75,8 +75,8 @@
         <td>{{ $order->customer->customer_name ?? 'N/A' }}</td>
         <td>{{ $order->created_at->format('m/d/Y') }}</td>
         <td>{{ $order->items->sum('qty') }}</td>
-        <td>${{ number_format($order->net_price ?? 0, 2) }}</td>
-        <td>${{ number_format($order->remaining_amount ?? 0, 2) }}</td>
+        <td>${{ number_format($order->sub_total ?? 0, 2) }}</td>
+        <td>${{ number_format($order->total ?? 0, 2) }}</td>
         <td>{{ $order->expected_delivery_date }}</td>
         <td>
             @if($status === 'deleted')
