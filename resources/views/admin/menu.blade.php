@@ -518,11 +518,17 @@
 
 
 
+<li class="pc-item pc-caption d-flex justify-content-between align-items-center">
+    <div>
+        <label>{{ __('Admin Views') }}</label>
+        <i class="ti ti-chart-arcs"></i>
+    </div>
+    <i class="ti ti-plus text-muted pe-2" style="font-size: 0.9rem;"></i>
+</li>
 
 
 
-
-<!-- Miscellaneous -->
+<!-- Miscellaneous 
 @if (Gate::check('manage miscellaneous'))
 <li class="pc-item pc-hasmenu {{ request()->routeIs('miscellaneous.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
@@ -546,7 +552,7 @@
         </li>
     </ul>
 </li>
-@endif
+@endif-->
 
 
 <!-- Bill of Material -->
