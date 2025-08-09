@@ -35,10 +35,10 @@
             <thead class="table-light">
                 <tr>
                     <th style="width: 0%;">Item</th>
-                    <th style="width: 0%;">Glass</th>
-                    <th style="width: 0%;">Grid</th>
                     <th>Qty</th>
                     <th>Size</th>
+                    <th style="width: 0%;">Glass</th>
+                    <th style="width: 0%;">Grid</th>
                     <th>Price</th>
                     <th>Total</th>
                 </tr>
@@ -47,10 +47,10 @@
                 @foreach($quote->items as $index => $item)
                 <tr>
                     <td style="width: 0%;">{{ $item->description ?? 'N/A' }}</td>
-                    <td style="width: 0%;">{{ $item->glass ?? 'N/A' }}</td>
-                    <td style="width: 0%;">{{ $item->grid ?? 'N/A' }}</td>
                     <td>{{ $item->qty }}</td>
                     <td>{{ $item->width }}" x {{ $item->height }}"</td>
+                    <td style="width: 0%;">{{ $item->glass ?? 'N/A' }}</td>
+                    <td style="width: 0%;">{{ $item->grid ?? 'N/A' }}</td> 
                     <td>${{ number_format($item->price, 2) }}</td>
                     <td>${{ number_format($item->total, 2) }}</td>
                 </tr>
