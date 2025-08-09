@@ -386,6 +386,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('invoices/deleted', [InvoiceController::class, 'deleted'])->name('invoices.deleted');
             Route::post('invoices/{id}/restore', [InvoiceController::class, 'restore'])->name('invoices.restore');
             Route::delete('invoices/{id}/force-delete', [InvoiceController::class, 'forceDelete'])->name('invoices.force-delete');
+            Route::get('invoices/{id}/email', [InvoiceController::class, 'email'])->name('invoices.email');
 
 
        Route::get('/quickbooks/wsdl', [QuickBooksController::class, 'wsdl']);

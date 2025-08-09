@@ -7,6 +7,7 @@
       <div class="d-flex justify-content-between align-items-center mb-3">
           <div><strong>Invoice #{{ $invoice->invoice_number }}</strong></div>
           <div><strong>Total:</strong> $<span id="ipmTotal" data-total="{{ $totalAmount }}">{{ number_format($totalAmount, 2) }}</span></div>
+          <div><strong>Remaining Balance:</strong> $<span id="ipmRemaining" data-remaining="{{ $invoice->remaining_amount }}">{{ number_format($invoice->remaining_amount, 2) }}</span></div>
       </div>
 
       {{-- Tabs --}}

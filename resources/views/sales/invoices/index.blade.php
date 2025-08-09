@@ -80,9 +80,9 @@
                                 <td>{{ $invoice->customer->customer_name ?? 'N/A' }}</td>
                                 <td>{{ $invoice->invoice_date }}</td>
                                 <td>${{ number_format($invoice->total ?? 0, 2) }}</td>
-                                <td>{{ $invoice->paid_amount }}</td>
-                                <td>{{ $invoice->remaining_amount }}</td>
-                                <td>{{ ucfirst($invoice->payment_type)}}</td>
+                                <td>${{ number_format($invoice->paid_amount ?? 0, 2) }}</td>
+                                <td>${{ number_format($invoice->remaining_amount ?? 0, 2) }}</td>
+                                <td>{{ ucfirst($invoice->payment_method)}}</td>
                                 <td>
                                     @if($status === 'deleted')
                                     <span class="badge bg-danger">Deleted</span>
@@ -128,7 +128,7 @@
                                     </a>
 
                                     {{-- Email --}}
-                                    <a class="avtar avtar-xs btn-link-warning text-warning customModal" data-bs-toggle="tooltip" data-bs-original-title="Email" href="#" data-size="md" data-url="" data-title="Send Email">
+                                    <a class="avtar avtar-xs btn-link-warning text-warning" data-bs-toggle="tooltip" data-bs-original-title="Email" href="{{route('sales.invoices.email', $invoice->id)}}" data-title="Send Email">
                                         <i data-feather="mail"></i>
                                     </a>
 

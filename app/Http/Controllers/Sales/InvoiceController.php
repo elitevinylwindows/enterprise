@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Sales;
 
 use App\Helper\FirstServe;
 use App\Http\Controllers\Controller;
+use App\Mail\InvoiceMail;
 use Illuminate\Http\Request;
 use App\Models\Sales\Invoice;
 use App\Models\Master\Customers\Customer;
@@ -13,6 +14,7 @@ use App\Models\Sales\Quote;
 use App\Services\QuickBooksService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class InvoiceController extends Controller
 {
@@ -144,15 +146,6 @@ class InvoiceController extends Controller
         return redirect()->route('sales.invoices.index')->with('success', 'Invoice deleted.');
     }
 
-
-    public function email($id)
-    {
-        $invoice = Order::findOrFail($id);
-        Mail::to($invoice->customer->email)->send(new InvoiceMail($invoice));
-
-        return redirect()->route('sales.invoices.index')->with('success', 'Invoice email sent successfully.');
-    }
-
     public function payment($id)
     {
         $invoice = Invoice::findOrFail($id);
@@ -184,20 +177,40 @@ class InvoiceController extends Controller
             ],
             'deposit_card_cvv' => [
                 'nullable',
-                'required_if:ipm_deposit_method,card',
-                'required_if:ipm_tab_type,deposit',
+                function ($attribute, $value, $fail) use ($request) {
+                    if (
+                        $request->ipm_tab_type === 'deposit' &&
+                        $request->ipm_deposit_method === 'card' &&
+                        empty($value)
+                    ) {
+                        $fail('The ' . str_replace('_', ' ', $attribute) . ' field is required when deposit method is card and tab type is deposit.');
+                    }
+                },
                 'digits_between:3,4',
             ],
             'deposit_card_expiry' => [
-                'nullable',
-                'required_if:ipm_deposit_method,card',
-                'required_if:ipm_tab_type,deposit',
+                        'nullable',
+                        function ($attribute, $value, $fail) use ($request) {
+                        if (
+                            $request->ipm_tab_type === 'deposit' &&
+                            $request->ipm_deposit_method === 'card' &&
+                            empty($value)
+                        ) {
+                            $fail('The ' . str_replace('_', ' ', $attribute) . ' field is required when deposit method is card and tab type is deposit.');
+                        }
+                    },
             ],
             'deposit_card_zip' => [
                 'nullable',
-                'required_if:ipm_deposit_method,card',
-                'required_if:ipm_tab_type,deposit',
-                'regex:/^\d{5}(-\d{1,4})?$/', // ZIP or ZIP+4
+                function ($attribute, $value, $fail) use ($request) {
+                        if (
+                        $request->ipm_tab_type === 'deposit' &&
+                        $request->ipm_deposit_method === 'card' &&
+                        empty($value)
+                        ) {
+                        $fail('The ' . str_replace('_', ' ', $attribute) . ' field is required when deposit method is card and tab type is deposit.');
+                        }
+                    },
             ],
             'payment_amount'   => 'required_if:ipm_tab_type,payments|array',
             'payment_amount.*' => 'nullable|numeric|min:0.01', // allow null for some indexes
@@ -215,21 +228,15 @@ class InvoiceController extends Controller
             'payment_card_expiry' => 'array',
             'payment_card_expiry.*' => [
                 'nullable',
-                'regex:/^(0[1-9]|1[0-2])\/\d{2}$/',
             ],
             'payment_card_zip' => 'array',
             'payment_card_zip.*' => [
                 'nullable',
-                'regex:/^\d{5}(-\d{1,4})?$/',
             ],
         ], [
             // Custom messages
-            'deposit_card_number.regex' => 'Deposit card number must be in format XXXX XXXX XXXX XXXX.',
-            'deposit_card_expiry.regex' => 'Deposit card expiry must be in MM/YY format.',
             'deposit_card_zip.regex'    => 'Deposit ZIP must be valid (12345 or 12345-6789).',
             'payment_card_number.*.regex' => 'Card number must be in format XXXX XXXX XXXX XXXX.',
-            'payment_card_expiry.*.regex' => 'Card expiry must be in MM/YY format.',
-            'payment_card_zip.*.regex'    => 'ZIP must be valid (12345 or 12345-6789).',
         ]);
 
         try{
@@ -263,8 +270,13 @@ class InvoiceController extends Controller
                     $invoice->update([
                         'deposit_amount' => $depositAmount,
                         'deposit_type' => 'percent',
-                        'payment_amount' => [$depositAmount],
+                        'payment_amount' => $depositAmount,
                         'deposit_method' => $request->ipm_deposit_method,
+                        'payment_method' => $request->ipm_deposit_method,
+                    ]);
+                    $payment->update([
+                        'payment_amount' => $depositAmount,
+                        'payment_method' => $request->ipm_deposit_method,
                     ]);
                 }
                 if ($request->ipm_deposit_type === 'amount') {
@@ -272,8 +284,13 @@ class InvoiceController extends Controller
                     $invoice->update([
                         'deposit_amount' => $depositAmount,
                         'deposit_type' => 'amount',
-                        'payment_amount' => [$depositAmount],
+                        'payment_amount' => $depositAmount,
                         'deposit_method' => $request->ipm_deposit_method,
+                        'payment_method' => $request->ipm_deposit_method,
+                    ]);
+                    $payment->update([
+                        'payment_amount' => $depositAmount,
+                        'payment_method' => $request->ipm_deposit_method,
                     ]);
                 }
 
@@ -286,9 +303,11 @@ class InvoiceController extends Controller
                 $invoice->save();
             }
 
-            if ($request->ipm_tab_type === 'payments') {
+           if ($request->ipm_tab_type === 'payments') {
                 $totalThisPayment = 0;
-                // Loop through each payment_amount and create a payment record for each
+                $cardPaymentIndex = 0; // Separate index for card payments
+                $bankPaymentIndex = 0; // Separate index for bank/echeck payments
+
                 foreach ($request->payment_amount as $idx => $amount) {
                     if (empty($amount) || floatval($amount) <= 0) {
                         continue;
@@ -306,13 +325,17 @@ class InvoiceController extends Controller
                     ];
 
                     if ($method === 'card') {
-                        $data['payment_card_number'] = $request->payment_card_number[$idx] ?? null;
-                        $data['payment_card_cvv'] = $request->payment_card_cvv[$idx] ?? null;
-                        $data['payment_card_expiry'] = $request->payment_card_expiry[$idx] ?? null;
-                        $data['payment_card_zip'] = $request->payment_card_zip[$idx] ?? null;
+                        // Use separate card payment index
+                        $data['payment_card_number'] = $request->payment_card_number[$cardPaymentIndex] ?? null;
+                        $data['payment_card_cvv'] = $request->payment_card_cvv[$cardPaymentIndex] ?? null;
+                        $data['payment_card_expiry'] = $request->payment_card_expiry[$cardPaymentIndex] ?? null;
+                        $data['payment_card_zip'] = $request->payment_card_zip[$cardPaymentIndex] ?? null;
+                        $cardPaymentIndex++; // Move to next card details for next card payment
                     } elseif ($method === 'echeck' || $method === 'bank') {
-                        $data['payment_bank_account'] = $request->payment_bank_account[$idx] ?? null;
-                        $data['payment_bank_routing'] = $request->payment_bank_routing[$idx] ?? null;
+                        // Use separate bank payment index
+                        $data['payment_bank_account'] = $request->payment_bank_account[$bankPaymentIndex] ?? null;
+                        $data['payment_bank_routing'] = $request->payment_bank_routing[$bankPaymentIndex] ?? null;
+                        $bankPaymentIndex++; // Move to next bank details for next bank payment
                     }
 
                     InvoicePayment::create($data);
@@ -325,12 +348,15 @@ class InvoiceController extends Controller
                     ->sum(DB::raw('COALESCE(amount_calculated, 0) + COALESCE(fixed_amount, 0) + COALESCE(payment_amount, 0)'));
 
                 $invoice->status = $totalPaid >= floatval($invoice->total) ? 'fully_paid' : 'partially_paid';
+                $invoice->payment_method = $method;
                 $invoice->save();
             }
+
             DB::commit();
             return redirect()->route('sales.invoices.index')->with('success', 'Payment recorded successfully.');
         }catch (\Exception $e) {
             DB::rollBack();
+            dd($e);
             return redirect()->back()->with('error', 'Payment failed: ' . $e->getMessage());
         }
     }
@@ -384,17 +410,26 @@ class InvoiceController extends Controller
     }
 
 
-public function restore($id)
-{
-    Invoice::withTrashed()->findOrFail($id)->restore();
-    return redirect()->route('sales.invoices.index', ['status' => 'deleted'])
-        ->with('success', 'Invoice restored successfully');
-}
+    public function restore($id)
+    {
+        Invoice::withTrashed()->findOrFail($id)->restore();
+        return redirect()->route('sales.invoices.index', ['status' => 'deleted'])
+            ->with('success', 'Invoice restored successfully');
+    }
 
-public function forceDelete($id)
-{
-    Invoice::withTrashed()->findOrFail($id)->forceDelete();
-    return redirect()->route('sales.invoices.index', ['status' => 'deleted'])
-        ->with('success', 'Invoice permanently deleted');
-}
+    public function forceDelete($id)
+    {
+        Invoice::withTrashed()->findOrFail($id)->forceDelete();
+        return redirect()->route('sales.invoices.index', ['status' => 'deleted'])
+            ->with('success', 'Invoice permanently deleted');
+    }
+
+    public function email($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        $mail = new InvoiceMail($invoice);
+        Mail::to($invoice->customer->email)->send($mail);
+        
+        return redirect()->route('sales.invoices.index')->with('success', 'Invoice email sent successfully.');
+    }
 }

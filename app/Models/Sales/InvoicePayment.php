@@ -29,6 +29,9 @@ class InvoicePayment extends Model
         'fixed_amount',
         'amount_calculated', // calculated amount based on percentage or fixed amount
         'percentage', // percentage value for deposit
+        'payment_bank_account',
+        'payment_bank_routing',
+        'payment_method',
     ];
         
     protected $casts = [
