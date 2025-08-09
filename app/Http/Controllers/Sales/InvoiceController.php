@@ -306,10 +306,12 @@ class InvoiceController extends Controller
                     ->sum(DB::raw('COALESCE(amount_calculated, 0) + COALESCE(fixed_amount, 0) + COALESCE(payment_amount, 0)'));
 
                 $invoice->status = $totalPaid >= floatval($invoice->total) ? 'fully_paid' : 'partially_paid';
+                $invoice->remaining_amount = $totalPaid < floatval($invoice->total) ? floatval($invoice->total) - $totalPaid : 0;
+                $invoice->paid_amount = $totalPaid >= floatval($invoice->total) ? floatval($invoice->total) : $totalPaid;
                 $invoice->save();
             }
 
-           if ($request->ipm_tab_type === 'payments') {
+            if ($request->ipm_tab_type === 'payments') {
                 $totalThisPayment = 0;
                 $cardPaymentIndex = 0; // Separate index for card payments
                 $bankPaymentIndex = 0; // Separate index for bank/echeck payments
@@ -355,10 +357,25 @@ class InvoiceController extends Controller
 
                 $invoice->status = $totalPaid >= floatval($invoice->total) ? 'fully_paid' : 'partially_paid';
                 $invoice->payment_method = $method;
+                $invoice->remaining_amount = $totalPaid < floatval($invoice->total) ? floatval($invoice->total) - $totalPaid : 0;
+                $invoice->paid_amount = $totalPaid >= floatval($invoice->total) ? floatval($invoice->total) : $totalPaid;
                 $invoice->save();
             }
-
+            
             DB::commit();
+
+            if($invoice->status === 'partially_paid') {
+                $firstServe = new FirstServe();
+                $firstServeInvoice = $firstServe->createInvoice($invoice);
+                if ($firstServeInvoice) {
+                    $invoice->update([
+                        'gateway_response' => json_encode($firstServeInvoice),
+                        'serve_invoice_id' => $firstServeInvoice['id'],
+                        'payment_link' => $firstServeInvoice['payment_link'],
+                    ]);
+                }
+            }
+
             return redirect()->route('sales.invoices.index')->with('success', 'Payment recorded successfully.');
         }catch (\Exception $e) {
             DB::rollBack();

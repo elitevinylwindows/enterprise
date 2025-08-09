@@ -125,12 +125,12 @@ class FirstServe
             'json' => [
                 'customer_id' => $customerID,
                 'date' => (string) date('Y-m-d'),
-                'number' => $invoice->invoice_number,
+                'number' => generateInvoiceNumber(),
                 'due_date' => (string) $invoice->due_date ?: null,
                 'action' => 'charge',
                 'requirement' => [
-                    'value' => $invoice->required_payment_type === 'percentage' ? (float) $invoice->required_payment_percentage : (float) $invoice->required_payment,
-                    'type' => $invoice->required_payment_type === 'percentage' ? 'percent' : 'amount', //percent or amount
+                    'value' => $invoice->remaining_amount ?: 0.0,
+                    'type' => 'amount'
                 ],
                 'discount' => [
                     'value' => round((float) $invoice->discount ?: 0, 2),
