@@ -620,6 +620,17 @@
             colorDisplay = `${colorConfig}`;
         }
 
+         // validate colorConfigDropdown
+       if (!colorConfigId) {
+           alert('Please select a Color Configuration.');
+           return;
+       }
+        // validate colorExt and colorInt
+        if (!colorExtId || !colorIntId) {
+            alert('Please select both Exterior and Interior colors.');
+            return;
+        }
+        
         if(!item_id) {
             if (!series || !config || !width || !height) {
                 alert('Please select Series, Configuration, Width, and Height.');
@@ -1064,25 +1075,34 @@ updateWindowPreview();
         const [exterior, interior] = value.split('-');
 
         // Reset all dropdowns
-        document.getElementById('exteriorDropdown').classList.add('d-none');
-        document.getElementById('exteriorLaminateDropdown').classList.add('d-none');
-        document.getElementById('interiorDropdown').classList.add('d-none');
-        document.getElementById('interiorLaminateDropdown').classList.add('d-none');
+        const exteriorDropdown = document.getElementById('exteriorDropdown');
+        const exteriorLaminateDropdown = document.getElementById('exteriorLaminateDropdown');
+        const interiorDropdown = document.getElementById('interiorDropdown');
+        const interiorLaminateDropdown = document.getElementById('interiorLaminateDropdown');
+
+        if (exteriorDropdown) exteriorDropdown.classList.add('d-none');
+        if (exteriorLaminateDropdown) exteriorLaminateDropdown.classList.add('d-none');
+        if (interiorDropdown) interiorDropdown.classList.add('d-none');
+        if (interiorLaminateDropdown) interiorLaminateDropdown.classList.add('d-none');
 
         // Exterior logic
         if (exterior === 'LAM') {
-            document.getElementById('exteriorLaminateDropdown').classList.remove('d-none');
+            if (exteriorLaminateDropdown) exteriorLaminateDropdown.classList.remove('d-none');
         } else {
-            document.getElementById('exteriorDropdown').classList.remove('d-none');
-            document.getElementById('exteriorDropdown').value = exterior;
+            if (exteriorDropdown) {
+                exteriorDropdown.classList.remove('d-none');
+                exteriorDropdown.value = exterior;
+            }
         }
 
         // Interior logic
         if (interior === 'LAM') {
-            document.getElementById('interiorLaminateDropdown').classList.remove('d-none');
+            if (interiorLaminateDropdown) interiorLaminateDropdown.classList.remove('d-none');
         } else {
-            document.getElementById('interiorDropdown').classList.remove('d-none');
-            document.getElementById('interiorDropdown').value = interior;
+            if (interiorDropdown) {
+                interiorDropdown.classList.remove('d-none');
+                interiorDropdown.value = interior;
+            }
         }
     });
 
@@ -1096,30 +1116,65 @@ updateWindowPreview();
         });
     }
 
-    document.getElementById('colorConfigDropdown').addEventListener('change', function() {
-        const config = this.value;
-        const [exteriorCode, interiorCode] = config.split('-');
-
+     document.getElementById('addItemModal').addEventListener('shown.bs.modal', function() {
+        const value = $('#colorConfigDropdown').val();
+        const [exterior, interior] = value.split('-');
         const exteriorDropdown = document.getElementById('colorExteriorDropdown');
         const interiorDropdown = document.getElementById('colorInteriorDropdown');
 
-        // Reset values
         exteriorDropdown.value = '';
         interiorDropdown.value = '';
 
-        // Filter options based on code
-        if (exteriorCode === 'LAM') {
-            filterColorOptions(exteriorDropdown, 'laminate');
-        } else {
-            filterColorOptions(exteriorDropdown, 'regular');
-            exteriorDropdown.value = exteriorCode;
-        }
+        filterColorOptions(exteriorDropdown, exterior === 'LAM' ? 'laminate' : 'regular');
+        filterColorOptions(interiorDropdown, interior === 'LAM' ? 'laminate' : 'regular');
 
-        if (interiorCode === 'LAM') {
-            filterColorOptions(interiorDropdown, 'laminate');
+        if (exterior !== 'LAM') exteriorDropdown.value = exterior;
+        if (interior !== 'LAM') interiorDropdown.value = interior;
+
+        // Add readonly if config is WH-WH, WH-BK, BK-WH, BK-BK
+        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK'];
+        if (readonlyConfigs.includes(value)) {
+            exteriorDropdown.disabled = true;
+            interiorDropdown.disabled = true;
+            exteriorDropdown.classList.add('readonly');
+            interiorDropdown.classList.add('readonly');
         } else {
-            filterColorOptions(interiorDropdown, 'regular');
-            interiorDropdown.value = interiorCode;
+            exteriorDropdown.disabled = false;
+            interiorDropdown.disabled = false;
+            exteriorDropdown.classList.remove('readonly');
+            interiorDropdown.classList.remove('readonly');
+        }
+    });
+
+
+    // Color config dropdown logic
+    document.getElementById('colorConfigDropdown').addEventListener('change', function() {
+        const value = this.value;
+        const [exterior, interior] = value.split('-');
+        const exteriorDropdown = document.getElementById('colorExteriorDropdown');
+        const interiorDropdown = document.getElementById('colorInteriorDropdown');
+
+        exteriorDropdown.value = '';
+        interiorDropdown.value = '';
+
+        filterColorOptions(exteriorDropdown, exterior === 'LAM' ? 'laminate' : 'regular');
+        filterColorOptions(interiorDropdown, interior === 'LAM' ? 'laminate' : 'regular');
+
+        if (exterior !== 'LAM') exteriorDropdown.value = exterior;
+        if (interior !== 'LAM') interiorDropdown.value = interior;
+
+        // Add readonly if config is WH-WH, WH-BK, BK-WH, BK-BK
+        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK'];
+        if (readonlyConfigs.includes(value)) {
+            exteriorDropdown.disabled = true;
+            interiorDropdown.disabled = true;
+            exteriorDropdown.classList.add('readonly');
+            interiorDropdown.classList.add('readonly');
+        } else {
+            exteriorDropdown.disabled = false;
+            interiorDropdown.disabled = false;
+            exteriorDropdown.classList.remove('readonly');
+            interiorDropdown.classList.remove('readonly');
         }
     });
 
