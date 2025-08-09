@@ -1903,7 +1903,7 @@ if(!function_exists('quoteToOrder')) {
                 'sub_total'         => $quote->sub_total,
                 'tax'               => $quote->tax,
                 'total'             => $quote->total,
-                'status'            => 'draft',
+                'status'            => 'created',
                 'notes'             => $quote->notes,
                 'paid_amount'       => 0,
                 'remaining_amount'  => $quote->total,
@@ -1998,7 +1998,9 @@ if(!function_exists('quoteToInvoice')) {
                     'serve_invoice_id' => $firstServeInvoice['id'],
                     'payment_link' => $firstServeInvoice['payment_link'],
                 ]);
-
+                $invoice->order->update([
+                    'status' => 'sent',
+                ]);
                 $mail = new InvoiceMail($invoice);
                 Mail::to($order->customer->email)->send($mail);
             }

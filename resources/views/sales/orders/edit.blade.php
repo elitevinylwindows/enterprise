@@ -90,7 +90,7 @@
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
                         <span>Subtotal:</span>
-                        <strong id="subtotalDisplay">${{ number_format($order->subtotal, 2) }}</strong>
+                        <strong id="subtotalDisplay">${{ number_format(($order->sub_total + $order->shipping) - $order->discount, 2) }}</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
                         <span>Tax:</span>

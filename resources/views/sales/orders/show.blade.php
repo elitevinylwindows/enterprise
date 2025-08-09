@@ -15,9 +15,9 @@
     <div class="row mb-4">
         <div class="col-md-4"><strong>Quotation #:</strong> {{ $order->quote->quote_number ?? '-' }}</div>
         <div class="col-md-4"><strong>Invoice #:</strong> {{ $order->invoice->invoice_number ?? '-' }}</div>
-        <div class="col-md-4"><strong>Sales Agent:</strong> {{ $order->quote->user->name ?? '-' }}</div>
+        <div class="col-md-4"><strong>Sales Agent:</strong> {{ $order->user->name ?? '-' }}</div>
         <div class="col-md-4"><strong>Direct Extension:</strong> {{ $order->quote->user->phone_extension ?? '-' }}</div>
-        <div class="col-md-4"><strong>Delivery Date:</strong> {{ $order->delivery_date ?? '-' }}</div>
+        <div class="col-md-4"><strong>Delivery Date:</strong> {{ $order->due_date ?? '-' }}</div>
     </div>
 
     {{-- Addresses --}}
@@ -49,26 +49,29 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Item</th>
-                    <th>Qty</th>
+                    <th>Unit</th>
                     <th>Size</th>
                     <th>Frame Type</th>
+                    <th>Color</th>
                     <th>Glass</th>
                     <th>Grid</th>
-                    
+                    <th>Qty</th>
+                    <th>Price</th>
                     <th>Total</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($order->quote->items as $index => $item)
+                @foreach($order->items as $index => $item)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->unit ?? '-' }}</td>
+                    <td>{{ $item->unit ?? 'Dynamic-XO' }}</td>
+                    <td>W {{ $item->width }}" x H {{ $item->height }}"</td>
+                    <td>{{ $item->frame_type }} {{ $item->fin_type }}</td>
+                    <td>{{ $item->color_exterior }}/{{ $item->color_interior }}</td>
+                    <td>{{ $item->glass_type }}</td>
+                    <td>{{ $item->grid_type }}</td>
                     <td>{{ $item->qty }}</td>
-                    <td>{{ $item->size ?? '-' }}</td>
-                    <td>{{ $item->frame_type ?? '-' }}</td>
-                    <td>{{ $item->glass ?? '-' }}</td>
-                    <td>{{ $item->grid ?? '-' }}</td>       
+                    <td>${{ number_format($item->price, 2) }}</td>
                     <td>${{ number_format($item->total, 2) }}</td>
                 </tr>
                 @endforeach
@@ -78,10 +81,9 @@
 
     {{-- Totals --}}
     <div class="text-end mt-4">
-        <p><strong>Total Qty:</strong> {{ $order->quote->items->sum('qty') }}</p>
+        <p><strong>Discount:</strong> ${{ number_format($order->discount, 2) }}</p>
         <p><strong>Shipping:</strong> ${{ number_format($order->shipping, 2) }}</p>
-        <p><strong>Subtotal:</strong> ${{ number_format($order->subtotal, 2) }}</p>
-        <p><strong>Discount:</strong> ${{ number_format($invoice->discount, 2) }}</p>
+        <p><strong>Subtotal:</strong> ${{ number_format(($order->sub_total + $order->shipping) - $order->discount, 2) }}</p>
         <p><strong>Tax:</strong> ${{ number_format($order->tax, 2) }}</p>
         <h5><strong>Total:</strong> ${{ number_format($order->total, 2) }}</h5>
     </div>

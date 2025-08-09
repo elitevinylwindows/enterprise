@@ -71,22 +71,16 @@
                     <tr>
                         <th>Subtotal:</th>
                         <td id="subtotal-amount">
-                            ${{ number_format($quote->items->sum('total'), 2) }}
+                            ${{ number_format($quote->items->sum('total') + $quote->shipping, 2) }}
                         </td>
                     </tr>
                     <tr>
                         <th>Tax:</th>
-                        @php
-                        $subtotal = $quote->items->sum('total');
-                        $surcharge = 0;
-                        $taxRate = 0.08;
-                        $tax = $subtotal * $taxRate;
-                        @endphp
-                        <td id="tax-amount">${{ number_format($tax, 2) }}</td>
+                        <td id="tax-amount">${{ number_format($quote->tax, 2) }}</td>
                     </tr>
                     <tr>
                         <th>Total:</th>
-                        <td><strong id="total-amount">${{ number_format($subtotal + $surcharge + $tax, 2) }}</strong></td>
+                        <td><strong id="total-amount">${{ number_format(($quote->items->sum('total') - $quote->discount) + $quote->shipping + $quote->tax, 2) }}</strong></td>
                     </tr>
                 </table>
             </div>
