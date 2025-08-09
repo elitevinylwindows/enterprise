@@ -62,11 +62,11 @@
                 <table class="table">
                     <tr>
                         <th>Discount:</th>
-                        <td id="discount">${{ number_format(0, 2) }}</td>
+                        <td id="discount">${{ number_format($quote->discount, 2) }}</td>
                     </tr>
                     <tr>
                         <th>Shipping:</th>
-                        <td id="shipping">${{ number_format(0, 2) }}</td>
+                        <td id="shipping">${{ number_format($quote->shipping, 2) }}</td>
                     </tr>
                     <tr>
                         <th>Subtotal:</th>
