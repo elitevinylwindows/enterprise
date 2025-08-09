@@ -25,8 +25,14 @@
                 <a href="{{ route('sales.invoices.index', ['status' => 'all']) }}" class="list-group-item {{ $status === 'all' ? 'active' : '' }}">
                     All Invoices
                 </a>
-                <a href="{{ route('sales.invoices.index', ['status' => 'paid']) }}" class="list-group-item {{ $status === 'paid' ? 'active' : '' }}">
-                    Paid Invoices
+                <a href="{{ route('sales.invoices.index', ['status' => 'pending']) }}" class="list-group-item {{ $status === 'pending' ? 'active' : '' }}">
+                    Pending Invoices
+                </a>
+                <a href="{{ route('sales.invoices.index', ['status' => 'partially_paid']) }}" class="list-group-item {{ $status === 'partially_paid' ? 'active' : '' }}">
+                    Partially Paid Invoices
+                </a>
+                <a href="{{ route('sales.invoices.index', ['status' => 'fully_paid']) }}" class="list-group-item {{ $status === 'fully_paid' ? 'active' : '' }}">
+                    Fully Paid Invoices
                 </a>
                 <a href="{{ route('sales.invoices.index', ['status' => 'deleted']) }}" class="list-group-item text-danger {{ $status === 'deleted' ? 'active' : '' }}">
                     Deleted

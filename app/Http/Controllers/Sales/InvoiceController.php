@@ -26,8 +26,14 @@ class InvoiceController extends Controller
         ->when($status === 'deleted', function($query) {
             return $query->onlyTrashed();
         })
-        ->when($status === 'paid', function($query) {
-            return $query->where('payment_status', 'paid');
+        ->when($status === 'fully_paid', function($query) {
+            return $query->where('status', 'fully_paid');
+        })
+        ->when($status === 'partially_paid', function($query) {
+            return $query->where('status', 'partially_paid');
+        })
+        ->when($status === 'pending', function($query) {
+            return $query->where('status', 'pending');
         })
         ->latest()
         ->get();
