@@ -30,6 +30,10 @@
        class="list-group-item {{ $status === 'draft' ? 'active' : '' }}">
        Draft Quotes
     </a>
+    <a href="{{ route('sales.quotes.index', ['status' => 'approved']) }}" 
+       class="list-group-item {{ $status === 'approved' ? 'active' : '' }}">
+       Approved Quotes
+    </a>
     <a href="{{ route('sales.quotes.index', ['status' => 'deleted']) }}" 
        class="list-group-item text-danger {{ $status === 'deleted' ? 'active' : '' }}">
        Deleted
@@ -70,7 +74,7 @@
         <td>{{ $quote->quote_number }}</td>
         <td>{{ $quote->customer_name }}</td>
         <td>{{ $quote->entry_date }}</td>
-        <td>{{ $quote->po_number }}</td>
+        <td>{{ $quote->order?->order_number }}</td>
         <td>{{ $quote->reference }}</td>
         <td>${{ number_format($quote->total ?? 0, 2) }}</td>
         <td>{{ $quote->valid_until }}</td>
@@ -113,10 +117,13 @@
                     <i data-feather="eye"></i>
                 </a>
 
+                @if($quote->status !== 'approved')
                 {{-- Edit --}}
-                <a class="avtar avtar-xs btn-link-primary text-primary" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="{{ route('sales.quotes.edit', $quote->id) }}" data-title="Edit Quote">
+                <a class="avtar avtar-xs btn-link-primary text-primary customModal" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="#" data-url="{{ route('sales.quotes.edit', $quote->id) }}" data-size="xl" data-title="Edit Quote">
                     <i data-feather="edit"></i>
                 </a>
+                @endif
+                {{-- View --}}
 
                 {{-- Email --}}
                 <a class="avtar avtar-xs btn-link-warning text-warning emailButton" data-bs-toggle="tooltip" data-bs-original-title="Email" href="#" data-size="md" data-url="{{ route('sales.quotes.email', $quote->id) }}" data-title="Send Email">
