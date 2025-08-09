@@ -650,7 +650,7 @@
 <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-brain"></i></span>
-        <span class="pc-mtext ms-2">Master</span>
+        <span class="pc-mtext ms-2">Master Data</span>
         <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
     </a>
 
