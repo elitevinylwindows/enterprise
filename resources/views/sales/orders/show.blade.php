@@ -49,13 +49,13 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Unit</th>
+                    <th>Item</th>
+                    <th>Qty</th>
                     <th>Size</th>
                     <th>Frame Type</th>
-                    <th>Color</th>
                     <th>Glass</th>
                     <th>Grid</th>
-                    <th>Qty</th>
+                    
                     <th>Total</th>
                 </tr>
             </thead>
@@ -64,12 +64,11 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $item->unit ?? '-' }}</td>
+                    <td>{{ $item->qty }}</td>
                     <td>{{ $item->size ?? '-' }}</td>
                     <td>{{ $item->frame_type ?? '-' }}</td>
-                    <td>{{ $item->color ?? '-' }}</td>
                     <td>{{ $item->glass ?? '-' }}</td>
-                    <td>{{ $item->grid ?? '-' }}</td>
-                    <td>{{ $item->qty }}</td>
+                    <td>{{ $item->grid ?? '-' }}</td>       
                     <td>${{ number_format($item->total, 2) }}</td>
                 </tr>
                 @endforeach
