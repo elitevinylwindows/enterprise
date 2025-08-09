@@ -745,7 +745,7 @@ public function index(Request $request)
     public function saveDraft(Request $request, $id)
     {
         $quote = Quote::findOrFail($id);
-        $quote->status = 'draft';
+        $quote->status = $request->status ?? 'draft';
         $quote->discount = $request->discount ?? 0;
         $quote->shipping = $request->shipping ?? 0;
         $quote->sub_total = $request->subtotal ?? 0;

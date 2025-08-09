@@ -272,7 +272,7 @@
                                 <div class="tab-pane fade" id="color">
                                     <div class="mb-3">
                                         <label>Color Configuration</label>
-                                        <select class="form-control" name="color_config" id="colorConfigDropdown">
+                                        <select class="form-control" name="color_config" id="colorConfigDropdown" required
                                             <option value="">Select Configuration</option>
                                             @foreach($colorConfigurations as $config)
                                             <option value="{{ $config->code }}" data-id="{{ $config->id }}">{{ $config->code }}</option>
@@ -282,7 +282,7 @@
 
                                     <div class="mb-3">
                                         <label>Color Code (Exterior)</label>
-                                        <select class="form-control" name="color_exterior" id="colorExteriorDropdown">
+                                        <select class="form-control" name="color_exterior" id="colorExteriorDropdown" required>
                                             <option value="">Select Exterior Color</option>
                                             @foreach($exteriorColors as $color)
                                             <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
@@ -295,7 +295,7 @@
 
                                     <div class="mb-3">
                                         <label>Color Code (Interior)</label>
-                                        <select class="form-control" name="color_interior" id="colorInteriorDropdown">
+                                        <select class="form-control" name="color_interior" id="colorInteriorDropdown" required>
                                             <option value="">Select Interior Color</option>
                                             @foreach($interiorColors as $color)
                                             <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
@@ -620,6 +620,17 @@
             colorDisplay = `${colorConfig}`;
         }
 
+       // validate colorConfigDropdown
+       if (!colorConfigId) {
+           alert('Please select a Color Configuration.');
+           return;
+       }
+        // validate colorExt and colorInt
+        if (!colorExtId || !colorIntId) {
+            alert('Please select both Exterior and Interior colors.');
+            return;
+        }
+
         if(!item_id) {
             if (!series || !config || !width || !height) {
                 alert('Please select Series, Configuration, Width, and Height.');
@@ -773,6 +784,9 @@
                 if (data.success) {
                     row.remove();
                     calculateTotals();
+                       // also reset seriesSelect field and seriesTypeSelect field to on delete the row
+                    document.getElementById('seriesSelect').value = '';
+                    document.getElementById('seriesTypeSelect').value = '';
                 } else {
                     alert('Failed to delete item.');
                 }
@@ -923,12 +937,9 @@
         document.getElementById('globalTotalPrice').textContent = '0.00';
     });
 
-
-    // Color config dropdown logic
-    document.getElementById('colorConfigDropdown').addEventListener('change', function() {
-        const value = this.value;
+    document.getElementById('addItemModal').addEventListener('shown.bs.modal', function() {
+        const value = $('#colorConfigDropdown').val();
         const [exterior, interior] = value.split('-');
-        console.log(exterior, interior);
         const exteriorDropdown = document.getElementById('colorExteriorDropdown');
         const interiorDropdown = document.getElementById('colorInteriorDropdown');
 
@@ -940,6 +951,52 @@
 
         if (exterior !== 'LAM') exteriorDropdown.value = exterior;
         if (interior !== 'LAM') interiorDropdown.value = interior;
+
+        // Add readonly if config is WH-WH, WH-BK, BK-WH, BK-BK
+        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK'];
+        if (readonlyConfigs.includes(value)) {
+            exteriorDropdown.disabled = true;
+            interiorDropdown.disabled = true;
+            exteriorDropdown.classList.add('readonly');
+            interiorDropdown.classList.add('readonly');
+        } else {
+            exteriorDropdown.disabled = false;
+            interiorDropdown.disabled = false;
+            exteriorDropdown.classList.remove('readonly');
+            interiorDropdown.classList.remove('readonly');
+        }
+    });
+
+
+    // Color config dropdown logic
+    document.getElementById('colorConfigDropdown').addEventListener('change', function() {
+        const value = this.value;
+        const [exterior, interior] = value.split('-');
+        const exteriorDropdown = document.getElementById('colorExteriorDropdown');
+        const interiorDropdown = document.getElementById('colorInteriorDropdown');
+
+        exteriorDropdown.value = '';
+        interiorDropdown.value = '';
+
+        filterColorOptions(exteriorDropdown, exterior === 'LAM' ? 'laminate' : 'regular');
+        filterColorOptions(interiorDropdown, interior === 'LAM' ? 'laminate' : 'regular');
+
+        if (exterior !== 'LAM') exteriorDropdown.value = exterior;
+        if (interior !== 'LAM') interiorDropdown.value = interior;
+
+        // Add readonly if config is WH-WH, WH-BK, BK-WH, BK-BK
+        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK'];
+        if (readonlyConfigs.includes(value)) {
+            exteriorDropdown.disabled = true;
+            interiorDropdown.disabled = true;
+            exteriorDropdown.classList.add('readonly');
+            interiorDropdown.classList.add('readonly');
+        } else {
+            exteriorDropdown.disabled = false;
+            interiorDropdown.disabled = false;
+            exteriorDropdown.classList.remove('readonly');
+            interiorDropdown.classList.remove('readonly');
+        }
     });
 
     // Filter color options
@@ -993,25 +1050,34 @@
         const [exterior, interior] = value.split('-');
 
         // Reset all dropdowns
-        document.getElementById('exteriorDropdown').classList.add('d-none');
-        document.getElementById('exteriorLaminateDropdown').classList.add('d-none');
-        document.getElementById('interiorDropdown').classList.add('d-none');
-        document.getElementById('interiorLaminateDropdown').classList.add('d-none');
+        const exteriorDropdown = document.getElementById('exteriorDropdown');
+        const exteriorLaminateDropdown = document.getElementById('exteriorLaminateDropdown');
+        const interiorDropdown = document.getElementById('interiorDropdown');
+        const interiorLaminateDropdown = document.getElementById('interiorLaminateDropdown');
+
+        if (exteriorDropdown) exteriorDropdown.classList.add('d-none');
+        if (exteriorLaminateDropdown) exteriorLaminateDropdown.classList.add('d-none');
+        if (interiorDropdown) interiorDropdown.classList.add('d-none');
+        if (interiorLaminateDropdown) interiorLaminateDropdown.classList.add('d-none');
 
         // Exterior logic
         if (exterior === 'LAM') {
-            document.getElementById('exteriorLaminateDropdown').classList.remove('d-none');
+            if (exteriorLaminateDropdown) exteriorLaminateDropdown.classList.remove('d-none');
         } else {
-            document.getElementById('exteriorDropdown').classList.remove('d-none');
-            document.getElementById('exteriorDropdown').value = exterior;
+            if (exteriorDropdown) {
+                exteriorDropdown.classList.remove('d-none');
+                exteriorDropdown.value = exterior;
+            }
         }
 
         // Interior logic
         if (interior === 'LAM') {
-            document.getElementById('interiorLaminateDropdown').classList.remove('d-none');
+            if (interiorLaminateDropdown) interiorLaminateDropdown.classList.remove('d-none');
         } else {
-            document.getElementById('interiorDropdown').classList.remove('d-none');
-            document.getElementById('interiorDropdown').value = interior;
+            if (interiorDropdown) {
+                interiorDropdown.classList.remove('d-none');
+                interiorDropdown.value = interior;
+            }
         }
     });
 
@@ -1238,9 +1304,10 @@
         }
     }
 
-    function calculateTotals() {
+    function calculateTotals() {        
         let subtotal = 0;
-        document.querySelectorAll('.qty-input').forEach(function(input) {
+        const qtyInputs = document.querySelectorAll('.qty-input');
+        qtyInputs.forEach(function(input) {
             const qty = parseInt(input.value) || 0;
             const price = parseFloat(input.dataset.price) || 0;
             const rowTotal = qty * price;
@@ -1256,8 +1323,16 @@
 
         // Example: Surcharge is 0, tax is 8%
         const taxRate = {{ $taxRate }};
-        const discount = parseFloat(document.getElementById('discount').value) || 0;
+        let discount = parseFloat(document.getElementById('discount').value) || 0;
         const shipping = parseFloat(document.getElementById('shipping').value) || 0;
+        // If there are no items, reset discount to 0
+        if (qtyInputs.length === 0) {
+            discount = 0;
+            document.getElementById('discount').value = '0.00';
+            document.getElementById('discount-amount').textContent = '$0.00';
+        } else {
+            document.getElementById('discount-amount').textContent = '$' + discount.toFixed(2);
+        }
         const tax =  subtotal * (taxRate / 100);
         const total = (subtotal - discount) + tax + shipping;
         document.getElementById('subtotal-amount').textContent = '$' + subtotal.toFixed(2);
@@ -1266,6 +1341,7 @@
         document.getElementById('tax').value = tax.toFixed(2);
         document.getElementById('total-amount').textContent = '$' + total.toFixed(2);
         document.getElementById('total').value = total.toFixed(2);
+       
     }
 
 

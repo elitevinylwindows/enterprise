@@ -63,14 +63,12 @@ public function create()
     public function update(Request $request, $id)
     {
         $config = ColorConfiguration::findOrFail($id);
-
-        $request->validate([
-            'name' => 'required|unique:elitevw_master_colors_color_configurations,' . $id,
-            'exterior' => 'required',
-            'interior' => 'required'
+        $validated = $request->validate([
+            'name' => 'required|unique:elitevw_master_colors_color_configurations,name,' . $id,
+            'code' => 'required'
         ]);
 
-        $config->update($request->all());
+        $config->update($request->only(['name', 'code']));
 
         return redirect()->route('color-options.color-configurations.index')->with('success', 'Updated successfully.');
     }

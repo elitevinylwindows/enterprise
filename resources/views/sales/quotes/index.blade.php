@@ -119,7 +119,7 @@
 
                 @if($quote->status !== 'approved')
                 {{-- Edit --}}
-                <a class="avtar avtar-xs btn-link-primary text-primary customModal" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="#" data-url="{{ route('sales.quotes.edit', $quote->id) }}" data-size="xl" data-title="Edit Quote">
+                <a class="avtar avtar-xs btn-link-primary text-primary" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="{{ route('sales.quotes.edit', $quote->id) }}" data-title="Edit Quote">
                     <i data-feather="edit"></i>
                 </a>
                 @endif
