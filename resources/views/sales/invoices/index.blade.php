@@ -82,7 +82,7 @@
                                 <td>${{ number_format($invoice->total ?? 0, 2) }}</td>
                                 <td>{{ $invoice->paid_amount }}</td>
                                 <td>{{ $invoice->remaining_amount }}</td>
-                                <td>{{ $invoice->required_payment_type === 'percentage' ? "%".$invoice->required_payment_percentage. ' ($'.$invoice->required_payment.')' : "$".number_format($invoice->required_payment, 2) }}</td>
+                                <td>{{ ucfirst($invoice->payment_type)}}</td>
                                 <td>
                                     @if($status === 'deleted')
                                     <span class="badge bg-danger">Deleted</span>
