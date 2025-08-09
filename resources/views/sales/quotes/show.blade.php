@@ -66,7 +66,6 @@
                                 <th>Unit</th>
                                 <th>Size</th>
                                 <th>Frame Type</th>
-                                <th>Color</th>
                                 <th>Glass</th>
                                 <th>Grid</th>
                                 <th>Pattern</th>
@@ -83,7 +82,6 @@
                                 <td>{{ $item->unit ?? 'Dynamic-XO' }}</td>
                                 <td>W {{ $item->width }}" x H {{ $item->height }}"</td>
                                 <td>{{ $item->frame_type }} {{ $item->fin_type }}</td>
-                                <td>{{ $item->color_exterior }}/{{ $item->color_interior }}</td>
                                 <td>{{ $item->glass_type }}</td>
                                 <td>{{ $item->grid_type }}</td>
                                 <td>{{ $item->grid_pattern }}</td>

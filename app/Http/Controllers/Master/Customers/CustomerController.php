@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Master\Customers\Customer;
 use App\Models\Tier;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -56,6 +57,45 @@ public function edit($id){
     return view('master.customers.edit', compact('customer', 'tiers'));
 }
 
+public function update(Request $request, $id)
+{
+    $validated = $request->validate([
+        'customer_number'    => 'required|string|max:255|unique:elitevw_master_customers,customer_number,' . $id,
+        'customer_name'      => 'required|string|max:255',
+        'email'              => 'nullable|email|max:255',
+        'tier'               => 'nullable|string|max:255',
+        'status'             => 'required|in:active,inactive',
+        'billing_address'    => 'nullable|string|max:255',
+        'billing_city'       => 'nullable|string|max:255',
+        'billing_state'      => 'nullable|string|max:255',
+        'billing_zip'        => 'nullable|string|max:20',
+        'billing_country'    => 'nullable|string|max:255',
+        'billing_phone'      => 'nullable|string|max:30',
+        'billing_fax'        => 'nullable|string|max:30',
+        'delivery_address'   => 'nullable|string|max:255',
+        'delivery_city'      => 'nullable|string|max:255',
+        'delivery_state'     => 'nullable|string|max:255',
+        'delivery_zip'       => 'nullable|string|max:20',
+        'delivery_country'   => 'nullable|string|max:255',
+        'delivery_phone'     => 'nullable|string|max:30',
+        'delivery_fax'       => 'nullable|string|max:30',
+    ]);
+
+    try
+    {
+
+        DB::beginTransaction();
+        $customer = Customer::findOrFail($id);
+        $customer->update($validated);
+
+        DB::commit();
+        return redirect()->route('master.customers.index')->with('success', 'Customer updated successfully.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        dd($e);
+        return redirect()->route('master.customers.index')->with('error', 'Failed to update customer.');
+    }
+}
 
 public function handleImports(Request $request)
 {
