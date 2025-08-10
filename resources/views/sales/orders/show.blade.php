@@ -48,14 +48,11 @@
         <table class="table table-bordered mt-3">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Unit</th>
-                    <th>Size</th>
-                    <th>Frame Type</th>
-                    <th>Color</th>
-                    <th>Glass</th>
-                    <th>Grid</th>
+                    <th style="width: 0%;">Item</th>
                     <th>Qty</th>
+                    <th>Size</th>
+                    <th style="width: 0%;">Glass</th>
+                    <th style="width: 0%;">Grid</th>
                     <th>Price</th>
                     <th>Total</th>
                 </tr>
@@ -63,29 +60,45 @@
             <tbody>
                 @foreach($order->items as $index => $item)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->unit ?? 'Dynamic-XO' }}</td>
-                    <td>W {{ $item->width }}" x H {{ $item->height }}"</td>
-                    <td>{{ $item->frame_type }} {{ $item->fin_type }}</td>
-                    <td>{{ $item->color_exterior }}/{{ $item->color_interior }}</td>
-                    <td>{{ $item->glass_type }}</td>
-                    <td>{{ $item->grid_type }}</td>
+                    <td style="width: 0%;">{{ $item->description ?? 'N/A' }}</td>
                     <td>{{ $item->qty }}</td>
+                    <td>{{ $item->width }}" x {{ $item->height }}"</td>
+                    <td style="width: 0%;">{{ $item->glass ?? 'N/A' }}</td>
+                    <td style="width: 0%;">{{ $item->grid ?? 'N/A' }}</td>
                     <td>${{ number_format($item->price, 2) }}</td>
                     <td>${{ number_format($item->total, 2) }}</td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
-    </div>
-
-    {{-- Totals --}}
-    <div class="text-end mt-4">
-        <p><strong>Discount:</strong> ${{ number_format($order->discount, 2) }}</p>
-        <p><strong>Shipping:</strong> ${{ number_format($order->shipping, 2) }}</p>
-        <p><strong>Subtotal:</strong> ${{ number_format(($order->sub_total + $order->shipping) - $order->discount, 2) }}</p>
-        <p><strong>Tax:</strong> ${{ number_format($order->tax, 2) }}</p>
-        <h5><strong>Total:</strong> ${{ number_format($order->total, 2) }}</h5>
+        <div class="row mt-4">
+            <div class="col-md-6 offset-md-6">
+                <table class="table">
+                    <tr>
+                        <th>Discount:</th>
+                        <td id="discount">${{ number_format($order->discount, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Shipping:</th>
+                        <td id="shipping">${{ number_format($order->shipping, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Subtotal:</th>
+                        <td id="subtotal-amount">
+                            ${{ number_format($order->items->sum('total') + $order->shipping, 2) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Tax:</th>
+                        <td id="tax-amount">${{ number_format($order->tax, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Total:</th>
+                        <td><strong id="total-amount">${{ number_format(($order->items->sum('total') - $order->discount) + $order->shipping + $order->tax, 2) }}</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
 
     {{-- Thank You --}}

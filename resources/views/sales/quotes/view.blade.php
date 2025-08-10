@@ -50,7 +50,7 @@
                     <td>{{ $item->qty }}</td>
                     <td>{{ $item->width }}" x {{ $item->height }}"</td>
                     <td style="width: 0%;">{{ $item->glass ?? 'N/A' }}</td>
-                    <td style="width: 0%;">{{ $item->grid ?? 'N/A' }}</td> 
+                    <td style="width: 0%;">{{ $item->grid ?? 'N/A' }}</td>
                     <td>${{ number_format($item->price, 2) }}</td>
                     <td>${{ number_format($item->total, 2) }}</td>
                 </tr>
