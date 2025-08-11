@@ -50,10 +50,10 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Item</th>
+                                 <th>Qty</th>
+                                <th>Size</th>
                                 <th>Glass</th>
                                 <th>Grid</th>
-                                <th>Qty</th>
-                                <th>Size</th>
                                 <th>Price</th>
                                 <th>Total</th>
                             </tr>
@@ -62,10 +62,10 @@
                             @foreach($quote->items as $item)
                             <tr>
                                 <td>{{ $item->description ?? 'N/A' }}</td>
-                                <td>{{ $item->glass ?? 'N/A' }}</td>
-                                <td>{{ $item->grid ?? 'N/A' }}</td>
                                 <td>{{ $item->qty }}</td>
                                 <td>{{ $item->width }}" x {{ $item->height }}"</td>
+                                <td>{{ $item->glass ?? 'N/A' }}</td>
+                                <td>{{ $item->grid ?? 'N/A' }}</td>                                
                                 <td>${{ number_format($item->price, 2) }}</td>
                                 <td>${{ number_format($item->total, 2) }}</td>
                             </tr>
@@ -76,7 +76,11 @@
                         <div class="col-md-6 offset-md-6">
                             <table class="table">
                                 <tr>
-                                    <th>Surcharge:</th>
+                                    <th>Discount:</th>
+                                    <td id="surcharge-amount">${{ number_format(0, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Shipping:</th>
                                     <td id="surcharge-amount">${{ number_format(0, 2) }}</td>
                                 </tr>
                                 <tr>
