@@ -114,7 +114,7 @@ public function update(Request $request, $id)
         'customer_number'    => 'required|string|max:255|unique:elitevw_master_customers,customer_number,' . $id,
         'customer_name'      => 'required|string|max:255',
         'email'              => 'nullable|email|max:255',
-        'tier'               => 'nullable|string|max:255',
+        'tier_id'               => 'nullable|string|max:255',
         'status'             => 'required|in:active,inactive',
         'billing_address'    => 'nullable|string|max:255',
         'billing_city'       => 'nullable|string|max:255',

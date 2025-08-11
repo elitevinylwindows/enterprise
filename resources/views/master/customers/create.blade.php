@@ -26,7 +26,7 @@
         <div class="row mb-4">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Tier</label>
-                <select name="tier" class="form-control">
+                <select name="tier_id" class="form-control">
                     @foreach($tiers as $tier)
                     <option value="{{ $tier->name }}">{{ $tier->name }}</option>
                     @endforeach
@@ -46,12 +46,12 @@
             <!-- Billing Information Column -->
             <div class="col-md-6">
                 <h6 class="mb-3 border-bottom pb-2">Billing Information</h6>
-                
+
                 <div class="mb-3">
                     <label class="form-label">Address</label>
                     <input type="text" name="billing_address" class="form-control" maxlength="255">
                 </div>
-                
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">City</label>
@@ -62,7 +62,7 @@
                         <input type="text" name="billing_state" class="form-control" maxlength="255">
                     </div>
                 </div>
-                
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">ZIP Code</label>
@@ -73,7 +73,7 @@
                         <input type="text" name="billing_country" class="form-control" maxlength="255">
                     </div>
                 </div>
-                
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Phone</label>
@@ -89,12 +89,12 @@
             <!-- Delivery Information Column -->
             <div class="col-md-6">
                 <h6 class="mb-3 border-bottom pb-2">Delivery Information</h6>
-                
+
                 <div class="mb-3">
                     <label class="form-label">Address</label>
                     <input type="text" name="delivery_address" class="form-control" maxlength="255">
                 </div>
-                
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">City</label>
@@ -105,7 +105,7 @@
                         <input type="text" name="delivery_state" class="form-control" maxlength="255">
                     </div>
                 </div>
-                
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">ZIP Code</label>
@@ -116,7 +116,7 @@
                         <input type="text" name="delivery_country" class="form-control" maxlength="255">
                     </div>
                 </div>
-                
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Phone</label>
