@@ -25,7 +25,7 @@
                 <label class="form-label">Tier</label>
                 <select name="tier_id" class="form-control">
                     @foreach($tiers as $tier)
-                    <option value="{{ $tier->name }}" {{ $customer->tier == $tier->name ? 'selected' : '' }}>{{ $tier->name }}</option>
+                    <option value="{{ $tier->id }}" {{ $customer->tier_id == $tier->id ? 'selected' : '' }}>{{ $tier->name }}</option>
                     @endforeach
                 </select>
             </div>

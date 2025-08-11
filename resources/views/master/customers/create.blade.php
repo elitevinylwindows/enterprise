@@ -28,7 +28,7 @@
                 <label class="form-label">Tier</label>
                 <select name="tier_id" class="form-control">
                     @foreach($tiers as $tier)
-                    <option value="{{ $tier->name }}">{{ $tier->name }}</option>
+                    <option value="{{ $tier->id }}">{{ $tier->name }}</option>
                     @endforeach
                 </select>
             </div>
