@@ -21,7 +21,7 @@ class InvoiceController extends Controller
     public function index(Request $request)
 {
     $status = $request->get('status', 'all');
-    
+
     $invoices = Invoice::with(['customer', 'order', 'quote'])
         ->when($status === 'deleted', function($query) {
             return $query->onlyTrashed();
@@ -103,7 +103,7 @@ class InvoiceController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'required_payment_type' => 'required|string|in:percentage,fixed',
+            'required_payment_type' => 'nullable|string|in:percentage,fixed',
             'required_payment_fixed' => 'nullable|numeric',
             'required_payment_percentage' => 'nullable|numeric|min:0|max:100',
             'discount' => 'nullable|numeric',
@@ -126,22 +126,22 @@ class InvoiceController extends Controller
 
         $invoice->save();
 
-        if ($invoice->serve_invoice_id) {
-            $firstServe = new FirstServe();
-            $firstServe->updateInvoiceAmounts($invoice);
-        } else {
-            // If the invoice is not yet created in FirstServe, create it
-            $firstServe = new FirstServe();
-            $firstServeInvoice = $firstServe->createInvoice($invoice);
+        // if ($invoice->serve_invoice_id) {
+        //     $firstServe = new FirstServe();
+        //     $firstServe->updateInvoiceAmounts($invoice);
+        // } else {
+        //     // If the invoice is not yet created in FirstServe, create it
+        //     $firstServe = new FirstServe();
+        //     $firstServeInvoice = $firstServe->createInvoice($invoice);
 
-            if ($firstServeInvoice) {
-                $invoice->update([
-                    'gateway_response' => json_encode($firstServeInvoice),
-                    'serve_invoice_id' => $firstServeInvoice['id'],
-                    'payment_link' => $firstServeInvoice['payment_link'],
-                ]);
-            }
-        }
+        //     if ($firstServeInvoice) {
+        //         $invoice->update([
+        //             'gateway_response' => json_encode($firstServeInvoice),
+        //             'serve_invoice_id' => $firstServeInvoice['id'],
+        //             'payment_link' => $firstServeInvoice['payment_link'],
+        //         ]);
+        //     }
+        // }
 
         return redirect()->route('sales.invoices.index')->with('success', 'Invoice updated successfully.');
     }
@@ -165,7 +165,7 @@ class InvoiceController extends Controller
         $validated = $request->validate([
             'ipm_tab_type' => 'required|in:deposit,payments',
             'ipm_deposit_type'   => 'required_if:ipm_tab_type,deposit|in:percent,amount',
-            'ipm_deposit_method' => 'required_if:ipm_tab_type,deposit|in:card,cash,bank', 
+            'ipm_deposit_method' => 'required_if:ipm_tab_type,deposit|in:card,cash,bank',
             'fixed_amount' => 'nullable|min:0',
             'percentage' => 'nullable|min:0|max:100',
             'amount_calculated' => 'nullable|numeric|min:0',
@@ -361,7 +361,7 @@ class InvoiceController extends Controller
                 $invoice->paid_amount = $totalPaid >= floatval($invoice->total) ? floatval($invoice->total) : $totalPaid;
                 $invoice->save();
             }
-            
+
             DB::commit();
 
             if($invoice->status === 'partially_paid') {
@@ -411,7 +411,7 @@ class InvoiceController extends Controller
             'invoice_number' => $invoice->invoice_number, // Match your DB field
             'date' => $invoice->invoice_date,
             'items' => $invoice->items->map(function ($item) {
-                return [    
+                return [
                     'name' => $item->name,
                     'quantity' => $item->quantity,
                     'rate' => $item->price,
@@ -452,7 +452,7 @@ class InvoiceController extends Controller
         $invoice = Invoice::findOrFail($id);
         $mail = new InvoiceMail($invoice);
         Mail::to($invoice->customer->email)->send($mail);
-        
+
         return redirect()->route('sales.invoices.index')->with('success', 'Invoice email sent successfully.');
     }
 }

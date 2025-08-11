@@ -80,7 +80,7 @@
             <div class="row mt-4">
 
                 <div class="col-md-6">
-                    <div class="row">
+                    {{-- <div class="row">
                         <div class="col-md-6">
                             <strong>Required Payment Type:</strong>
                             <select class="form-control w-100 mb-2" name="required_payment_type"
@@ -110,7 +110,7 @@
                                     name="required_payment_percentage" id="required_payment_percentage">
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="col-md-6">
                     <table class="table">
