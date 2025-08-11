@@ -365,9 +365,9 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::get('orders/create', [\App\Http\Controllers\Sales\OrderController::class, 'create'])->name('orders.create');
             Route::get('orders/{id}/edit', [\App\Http\Controllers\Sales\OrderController::class, 'edit'])->name('orders.edit');
             Route::put('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'update'])->name('orders.update');
-            Route::get('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
             Route::get('orders/{id}/email', [\App\Http\Controllers\Sales\OrderController::class, 'email'])->name('orders.email');
             Route::get('orders/{id}/show', [\App\Http\Controllers\Sales\OrderController::class, 'show'])->name('orders.show');
+            Route::delete('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
             Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
             Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
             Route::get('orders/deleted', [OrderController::class, 'deleted'])->name('orders.deleted');
@@ -391,7 +391,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
 
        Route::get('/quickbooks/wsdl', [QuickBooksController::class, 'wsdl']);
         Route::any('/quickbooks/endpoint', [QuickBooksController::class, 'handleWebConnector']);
-       
+
         });
 
         //Supplier
@@ -643,7 +643,6 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::get('orders', [\App\Http\Controllers\Sales\OrderController::class, 'index'])->name('orders.index');
         Route::get('orders/create', [\App\Http\Controllers\Sales\OrderController::class, 'create'])->name('orders.create');
         Route::get('orders/{id}/edit', [\App\Http\Controllers\Sales\OrderController::class, 'edit'])->name('orders.edit');
-        Route::delete('orders/{id}', [\App\Http\Controllers\Sales\OrderController::class, 'destroy'])->name('orders.destroy');
         Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
         Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
 
@@ -800,7 +799,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
         Route::resource('invoices', \App\Http\Controllers\Sales\InvoiceController::class);
 
         Route::get('invoices/{id}/payment', [\App\Http\Controllers\Sales\InvoiceController::class, 'payment'])
-        ->name('invoices.payment'); 
+        ->name('invoices.payment');
         Route::post('invoices/{id}/payment', [\App\Http\Controllers\Sales\InvoiceController::class, 'pay'])
         ->name('invoices.payment.post');
 });

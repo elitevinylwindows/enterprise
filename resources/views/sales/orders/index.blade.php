@@ -22,15 +22,15 @@
     <div class="col-md-2">
   <div class="card">
     <div class="list-group list-group-flush">
-        <a href="{{ route('sales.orders.index', ['status' => 'all']) }}" 
+        <a href="{{ route('sales.orders.index', ['status' => 'all']) }}"
            class="list-group-item {{ $status === 'all' ? 'active' : '' }}">
            All Orders
         </a>
-        <a href="{{ route('sales.orders.index', ['status' => 'modified']) }}" 
+        <a href="{{ route('sales.orders.index', ['status' => 'modified']) }}"
            class="list-group-item {{ $status === 'modified' ? 'active' : '' }}">
            Modified Orders
         </a>
-        <a href="{{ route('sales.orders.index', ['status' => 'deleted']) }}" 
+        <a href="{{ route('sales.orders.index', ['status' => 'deleted']) }}"
            class="list-group-item {{ $status === 'deleted' ? 'active' : '' }}">
            Deleted
         </a>
@@ -96,17 +96,17 @@
                 {{-- Restore Button --}}
                 <form action="{{ route('sales.orders.restore', $order->id) }}" method="POST" style="display:inline;">
                     @csrf
-                    <button type="submit" class="avtar avtar-xs btn-link-success text-success border-0 bg-transparent p-0" 
+                    <button type="submit" class="avtar avtar-xs btn-link-success text-success border-0 bg-transparent p-0"
                             data-bs-toggle="tooltip" data-bs-original-title="Restore Order">
                         <i data-feather="rotate-ccw"></i>
                     </button>
                 </form>
-                
+
                 {{-- Permanent Delete Button --}}
                 <form action="{{ route('sales.orders.force-delete', $order->id) }}" method="POST" style="display:inline;">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0" 
+                    <button type="submit" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0"
                             data-bs-toggle="tooltip" data-bs-original-title="Delete Permanently"
                             onclick="return confirm('Permanently delete this order?')">
                         <i data-feather="trash-2"></i>

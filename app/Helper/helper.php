@@ -1950,6 +1950,9 @@ if(!function_exists('quoteToOrder')) {
                     'checked_count' => $item->checked_count,
                 ]);
             }
+            $quote->update([
+                'status' => 'Order Created'
+            ]);
             DB::commit();
 
             return $order;
@@ -2004,6 +2007,10 @@ if(!function_exists('quoteToInvoice')) {
                 ]);
                 $mail = new InvoiceMail($invoice);
                 Mail::to($order->customer->email)->send($mail);
+
+                $quote->update([
+                    'status' => 'Inivoice Created'
+                ]);
             }
 
         return $invoice;
@@ -2026,7 +2033,7 @@ if (!function_exists('calculateTotal')) {
         $total = $quote->items->sum(function ($item) {
             return $item->price * $item->qty;
         });
-        
+
         $taxCode = TaxCode::where('city', $quote->customer->city)->first();
 
         if ($taxCode) {

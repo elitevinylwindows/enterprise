@@ -836,7 +836,7 @@ public function index(Request $request)
     }
 
 
-  
+
 public function restore($id)
 {
     Quote::withTrashed()->findOrFail($id)->restore();
@@ -854,7 +854,7 @@ public function forceDelete($id)
 public function calculateTotal(Request $request)
 {
     $quote = Quote::findOrFail($request->quote_id);
-    
+
     $data = calculateTotal($quote, $request->shipping);
 
     return response()->json(['success' => true, 'data' => $data]);
