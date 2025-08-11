@@ -139,6 +139,21 @@ public function update(Request $request, $id)
         $customer = Customer::findOrFail($id);
         $customer->update($validated);
 
+        if(isset($customer->serve_customer_id) && $customer->serve_customer_id) {
+            $firstServe = new FirstServe();
+            $serveCustomer =  $firstServe->updateCustomer($customer);
+        }
+        else {
+            $firstServe = new FirstServe();
+            $serveCustomer =  $firstServe->createCustomer($customer);
+        }
+
+        if($serveCustomer) {
+            $customer->update([
+                'serve_customer_id' => $serveCustomer['id'],
+            ]);
+        }
+
         DB::commit();
         return redirect()->route('master.customers.index')->with('success', 'Customer updated successfully.');
     } catch (\Exception $e) {
