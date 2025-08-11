@@ -151,6 +151,7 @@
                     $('#discount-amount').text("$" + data.data.total_discount);
                     $('#tax-amount').text('$' + data.data.tax + ' (' + data.data.tax_rate + '%)');
                     $('#total-amount').text('$' + data.data.grand_total);
+                    document.getElementById('shipping-amount').textContent = '$' + data.data.shipping;
                     document.getElementById('tax').value = data.data.tax;
                     document.getElementById('subtotal').value = data.data.sub_total;
                     document.getElementById('tax').value = data.data.tax;
