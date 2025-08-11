@@ -841,6 +841,8 @@
                     setTimeout(() => {
                         form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
                         form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                        form.querySelector('[name="color_interior"]').disabled = true;
+                        form.querySelector('[name="color_exterior"]').disabled = true;
                     }, 500);
 
                     // Disable all fields

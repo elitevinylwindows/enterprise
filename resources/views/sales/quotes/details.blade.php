@@ -832,6 +832,14 @@
                     form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
 
                     form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+
+                    setTimeout(() => {
+                        form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                        form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                        form.querySelector('[name="color_interior"]').disabled = true;
+                        form.querySelector('[name="color_exterior"]').disabled = true;
+                    }, 500);
+                    
                     // Disable all fields
                     Array.from(form.elements).forEach(el => {
                         // Do not disable the btn-close button
