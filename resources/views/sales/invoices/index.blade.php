@@ -122,7 +122,7 @@
                                     @else
                                     {{-- Original Action Buttons --}}
                                     {{-- View --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" data-bs-original-title="View Summary" href="#" data-size="xl" data-url="{{ route('sales.invoices.show', $invoice->id) }}" data-title="Invoice Summary">
+                                    <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" data-bs-original-title="View Invoice" href="#" data-size="xl" data-url="{{ route('sales.invoices.show', $invoice->id) }}" data-title="Invoice Summary">
                                         <i data-feather="eye"></i>
                                     </a>
 
@@ -137,7 +137,7 @@
                                     </a>
 
                                     {{-- Take Payment --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" title="Make Payment" href="#" data-size="lg" data-url="{{ route('sales.invoices.payment', $invoice->id) }}" data-title="Invoice Payment">
+                                    <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" title="Request Payment" href="#" data-size="lg" data-url="{{ route('sales.invoices.payment', $invoice->id) }}" data-title="Invoice Payment">
                                         <i data-feather="credit-card"></i>
                                     </a>
 
