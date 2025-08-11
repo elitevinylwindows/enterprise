@@ -81,6 +81,7 @@
                                 </tr>
                                 <tr>
                                     <th>Shipping:</th>
+                                    <input type="hidden" id="shipping" value="{{ $quote->shipping }}">
                                     <td id="shipping-amount">${{ number_format(0, 2) }}</td>
                                 </tr>
                                 <tr>
@@ -132,7 +133,7 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
-                shipping: 0
+                shipping: parseFloat(document.getElementById('shipping').value) || 0
             })
         }).then(response => response.json()).then(data => {
             if (data.success) {
@@ -151,7 +152,6 @@
                     $('#discount-amount').text("$" + data.data.total_discount);
                     $('#tax-amount').text('$' + data.data.tax + ' (' + data.data.tax_rate + '%)');
                     $('#total-amount').text('$' + data.data.grand_total);
-                    document.getElementById('shipping-amount').textContent = '$' + data.data.shipping;
                     document.getElementById('tax').value = data.data.tax;
                     document.getElementById('subtotal').value = data.data.sub_total;
                     document.getElementById('tax').value = data.data.tax;
