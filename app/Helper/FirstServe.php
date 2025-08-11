@@ -193,4 +193,38 @@ class FirstServe
         Log::info("Invoice Updated: " . $invoice);
         return json_decode($invoice, true);
     }
+
+
+    public function createPaymentMethod($customer, $cardDetails = [])
+    {
+        $response = $this->client->post($this->baseURL.'/customers/'.$customer->serve_customer_id.'/payment-methods', [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . base64_encode($this->apiKey . ':' . $this->apiSecret),
+            ],
+            'json' => [
+                "card" => $cardDetails['card'] ?? "string",
+                "expiry_month" => $cardDetails['expiry_month'] ?? 1,
+                "expiry_year" => $cardDetails['expiry_year'] ?? 2020,
+            ]
+        ]);
+
+        $paymentMethod = $response->getBody()->getContents();
+        Log::info("Payment Method Created: " . $paymentMethod);
+        return json_decode($paymentMethod, true);
+    }
+
+    public function getPaymentMethods($customer)
+    {
+        $response = $this->client->get($this->baseURL.'/customers/'.$customer->serve_customer_id.'/payment-methods', [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . base64_encode($this->apiKey . ':' . $this->apiSecret),
+            ],
+        ]);
+
+        $paymentMethod = $response->getBody()->getContents();
+        Log::info("Payment Methods: " . $paymentMethod);
+        return json_decode($paymentMethod, true);
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Sales;
 use App\Helper\FirstServe;
 use App\Http\Controllers\Controller;
 use App\Mail\InvoiceMail;
+use App\Models\CustomerPaymentMethod;
 use Illuminate\Http\Request;
 use App\Models\Sales\Invoice;
 use App\Models\Master\Customers\Customer;
@@ -156,8 +157,9 @@ class InvoiceController extends Controller
     {
         $invoice = Invoice::findOrFail($id);
         $total = $invoice->total ?? 0;
-
-        return view('sales.invoices.payment', compact('total', 'invoice'));
+        $firstServe = new FirstServe();
+        $firstServePaymentMethods = $firstServe->getPaymentMethods($invoice->customer);
+        return view('sales.invoices.payment', compact('total', 'invoice', 'firstServePaymentMethods'));
     }
 
     public function pay(Request $request, $id)
@@ -249,6 +251,7 @@ class InvoiceController extends Controller
             DB::beginTransaction();
             $invoice = Invoice::findOrFail($id);
 
+
             if ($request->ipm_tab_type === 'deposit') {
                 $payment = InvoicePayment::create([
                     'invoice_id' => $invoice->id,
@@ -309,6 +312,8 @@ class InvoiceController extends Controller
                 $invoice->remaining_amount = $totalPaid < floatval($invoice->total) ? floatval($invoice->total) - $totalPaid : 0;
                 $invoice->paid_amount = $totalPaid >= floatval($invoice->total) ? floatval($invoice->total) : $totalPaid;
                 $invoice->save();
+
+                $this->addPaymentMethodToCustomer($invoice->customer, $request->deposit_card_number, $request->deposit_card_expiry, $request->deposit_card_zip);
             }
 
             if ($request->ipm_tab_type === 'payments') {
@@ -338,6 +343,9 @@ class InvoiceController extends Controller
                         $data['payment_card_cvv'] = $request->payment_card_cvv[$cardPaymentIndex] ?? null;
                         $data['payment_card_expiry'] = $request->payment_card_expiry[$cardPaymentIndex] ?? null;
                         $data['payment_card_zip'] = $request->payment_card_zip[$cardPaymentIndex] ?? null;
+
+                        $this->addPaymentMethodToCustomer($invoice->customer, $request->payment_card_number[$cardPaymentIndex], $request->payment_card_expiry[$cardPaymentIndex], $request->payment_card_zip[$cardPaymentIndex]);
+
                         $cardPaymentIndex++; // Move to next card details for next card payment
                     } elseif ($method === 'echeck' || $method === 'bank') {
                         // Use separate bank payment index
@@ -363,6 +371,8 @@ class InvoiceController extends Controller
             }
 
             DB::commit();
+
+
 
             if($invoice->status === 'partially_paid') {
                 $firstServe = new FirstServe();
@@ -454,5 +464,36 @@ class InvoiceController extends Controller
         Mail::to($invoice->customer->email)->send($mail);
 
         return redirect()->route('sales.invoices.index')->with('success', 'Invoice email sent successfully.');
+    }
+
+    public function addPaymentMethodToCustomer($customer, $card, $expiry, $zip)
+    {
+        $expiry = explode('/', $expiry ?? '');
+        $expiryMonth = trim($expiry[0] ?? '');
+        $expiryYear = trim($expiry[1] ?? '');
+        $cardDetails = [
+            'card'         => str_replace(' ', '', trim($card ?? '')),
+            'expiry_month' => (int) $expiryMonth,
+            'expiry_year'  => strlen($expiryYear) === 2 ? (int)('20' . $expiryYear) : (int)$expiryYear,
+            'zip'          => trim($zip ?? ''),
+        ];
+
+
+        $firstServe = new FirstServe();
+        $firstServePaymentMethod = $firstServe->createPaymentMethod($customer, $cardDetails);
+        Log::info("FirstServe Payment Method Created: " . json_encode($firstServePaymentMethod));
+        if($firstServePaymentMethod) {
+            $paymentMethod = $firstServePaymentMethod['id'];
+
+            CustomerPaymentMethod::create([
+                'customer_id' => $customer->id,
+                'payment_method_id' => $paymentMethod,
+                'serve_customer_id' => $firstServePaymentMethod['customer_id'],
+                'serve_payment_method_id' => $firstServePaymentMethod['id'],
+            ]);
+
+        } else {
+            Log::error("Failed to create payment method in FirstServe for customer ID: {$customer->id}");
+        }
     }
 }
