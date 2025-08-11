@@ -132,7 +132,7 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
-                shipping: parseFloat(document.getElementById('shipping').value) || 0
+                shipping: 0
             })
         }).then(response => response.json()).then(data => {
             if (data.success) {
