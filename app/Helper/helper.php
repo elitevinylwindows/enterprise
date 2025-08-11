@@ -2044,15 +2044,15 @@ if (!function_exists('calculateTotal')) {
         }
         $tax = number_format($taxRate * ($total / 100), 2);
 
-
+        $subtotal = $total - $quote->discount + $shipping;
         $data = [
             'total' => $total,
-            'sub_total' => $total - $quote->discount + $shipping,
+            'sub_total' => $subtotal,
             'shipping' => number_format($shipping, 2),
             'total_discount' => number_format($quote->discount, 2),
             'tax' => $tax,
             'tax_rate' => $taxRate,
-            'grand_total' => $total + $tax,
+            'grand_total' => $subtotal + $tax,
         ];
 
         return $data;
