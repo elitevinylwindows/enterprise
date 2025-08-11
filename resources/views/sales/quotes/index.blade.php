@@ -22,19 +22,19 @@
     <div class="col-md-2">
         <div class="card">
     <div class="list-group list-group-flush">
-    <a href="{{ route('sales.quotes.index', ['status' => 'all']) }}" 
+    <a href="{{ route('sales.quotes.index', ['status' => 'all']) }}"
        class="list-group-item {{ $status === 'all' ? 'active' : '' }}">
        All Quotes
     </a>
-    <a href="{{ route('sales.quotes.index', ['status' => 'draft']) }}" 
+    <a href="{{ route('sales.quotes.index', ['status' => 'draft']) }}"
        class="list-group-item {{ $status === 'draft' ? 'active' : '' }}">
        Draft Quotes
     </a>
-    <a href="{{ route('sales.quotes.index', ['status' => 'approved']) }}" 
+    <a href="{{ route('sales.quotes.index', ['status' => 'approved']) }}"
        class="list-group-item {{ $status === 'approved' ? 'active' : '' }}">
        Approved Quotes
     </a>
-    <a href="{{ route('sales.quotes.index', ['status' => 'deleted']) }}" 
+    <a href="{{ route('sales.quotes.index', ['status' => 'deleted']) }}"
        class="list-group-item text-danger {{ $status === 'deleted' ? 'active' : '' }}">
        Deleted
     </a>
@@ -83,8 +83,10 @@
                                     <span class="badge bg-success">Approved</span>
                                     @elseif($quote->status === 'rejected')
                                     <span class="badge bg-danger">Rejected</span>
-                                    @elseif($quote->status === 'sent')
-                                    <span class="badge bg-success">Sent</span>
+                                    @elseif($quote->status === 'Invoice Created')
+                                    <span class="badge bg-success">Invoice Created</span>
+                                    @elseif($quote->status === 'Order Created')
+                                    <span class="badge bg-success">Order Created</span>
                                     @elseif($quote->status === 'draft')
                                     <span class="badge bg-secondary">Draft</span>
                                     @else
@@ -100,12 +102,12 @@
                                                 <i data-feather="rotate-ccw"></i>
                                             </button>
                                         </form>
-                                        
+
                                         {{-- Permanent Delete Button --}}
                                         <form action="{{ route('sales.quotes.force-delete', $quote->id) }}" method="POST" style="display:inline;">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0" 
+                                            <button type="submit" class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0"
                                                     data-bs-toggle="tooltip" data-bs-original-title="Delete Permanently"
                                                     onclick="return confirm('Permanently delete this quote?')">
                                                 <i data-feather="trash-2"></i>

@@ -106,7 +106,7 @@
         formData.append('tax', document.getElementById('tax-amount-preview').innerText.replace(/[$,]/g, '').replace(/\s*\(.*\)/, ''));
         formData.append('shipping', document.getElementById('shipping-amount').innerText.replace(/[$,]/g, ''));
         formData.append('total', document.getElementById('grand-total-amount').innerText.replace(/[$,]/g, ''));
-        formData.append('status', 'saved');
+        formData.append('status', 'Order Created');
         fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
             method: 'POST',
             body: formData,

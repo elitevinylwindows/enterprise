@@ -2009,7 +2009,7 @@ if(!function_exists('quoteToInvoice')) {
                 Mail::to($order->customer->email)->send($mail);
 
                 $quote->update([
-                    'status' => 'Inivoice Created'
+                    'status' => 'Invoice Created'
                 ]);
             }
 
