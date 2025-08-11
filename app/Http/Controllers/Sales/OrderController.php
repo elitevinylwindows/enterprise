@@ -17,7 +17,7 @@ class OrderController extends Controller
     public function index(Request $request)
 {
     $status = $request->get('status', 'all');
-    
+
     $orders = Order::with('customer')
         ->when($status === 'deleted', function($query) {
             return $query->onlyTrashed();
@@ -109,6 +109,9 @@ class OrderController extends Controller
     public function destroy($id)
     {
         $order = Order::findOrFail($id);
+        $order->quote->update([
+            'status' => 'saved',
+        ]);
         $order->items()->delete();
         $order->invoice()->delete();
         $order->delete();
