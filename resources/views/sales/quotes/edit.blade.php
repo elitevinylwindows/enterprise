@@ -607,6 +607,7 @@
         const colorConfigId = colorConfigDropdown.selectedOptions[0]?.value ?? '';
         const colorExt = form.querySelector('[name="color_exterior"]');
         const colorInt = form.querySelector('[name="color_interior"]');
+        const colorExtId = colorExt.selectedOptions[0]?.value?? '';
         const colorIntId = colorInt.selectedOptions[0]?.value ?? '';
         const item_id = form.querySelector('[name="item_id"]').value;
         const laminateExtText = colorExt ?.selectedOptions[0] ?.text ?? '';
@@ -841,7 +842,7 @@
                         form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
                         form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
                     }, 500);
-                    
+
                     // Disable all fields
                     Array.from(form.elements).forEach(el => {
                         // Do not disable the btn-close button
