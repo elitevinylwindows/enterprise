@@ -29,7 +29,7 @@
             </div>
             <div class="col-md-3">
               <label class="form-label">City</label>
-              <input type="text" name="city" class="form-control" value="{{ $customer->city }}">
+              <input type="text" name="city" class="form-control" value="{{ $customer->billing_city }}">
             </div>
             <div class="col-md-3">
               <label class="form-label">ZIP Code</label>

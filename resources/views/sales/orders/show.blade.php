@@ -24,19 +24,19 @@
     <div class="row">
         <div class="col-md-6">
             <h6>Billing Address</h6>
-            {{ $order->customer->billing_address ?? $order->customer->address }}<br>
-            {{ $order->customer->billing_city ?? $order->customer->city }},
-            {{ $order->customer->billing_state ?? $order->customer->state }},
-            {{ $order->customer->billing_zip ?? $order->customer->zip }}<br>
-            {{ $order->customer->phone }}
+            {{ $order->customer->billing_address ?? $order->customer->billing_address }}<br>
+            {{ $order->customer->billing_city ?? $order->customer->billing_city }},
+            {{ $order->customer->billing_state ?? $order->customer->billing_state }},
+            {{ $order->customer->billing_zip ?? $order->customer->billing_zip }}<br>
+            {{ $order->customer->billing_phone }}
         </div>
         <div class="col-md-6">
             <h6>Delivery Address</h6>
-            {{ $order->customer->delivery_address ?? $order->customer->address }}<br>
-            {{ $order->customer->delivery_city ?? $order->customer->city }},
-            {{ $order->customer->delivery_state ?? $order->customer->state }},
-            {{ $order->customer->delivery_zip ?? $order->customer->zip }}<br>
-            {{ $order->customer->phone }}
+            {{ $order->customer->delivery_address ?? $order->customer->delivery_address }}<br>
+            {{ $order->customer->delivery_city ?? $order->customer->delivery_city }},
+            {{ $order->customer->delivery_state ?? $order->customer->delivery_state }},
+            {{ $order->customer->delivery_zip ?? $order->customer->delivery_zip }}<br>
+            {{ $order->customer->delivery_phone }}
         </div>
     </div>
 

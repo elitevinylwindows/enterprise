@@ -518,7 +518,7 @@ public function index(Request $request)
 
         $quoteItems = QuoteItem::where('quote_id', $quote->id)->get();
 
-        $taxCode = TaxCode::where('city', $quote->customer->city)->first();
+        $taxCode = TaxCode::where('city', $quote->customer->billing_city)->first();
 
         if ($taxCode) {
             $taxRate = $taxCode->rate;
@@ -644,7 +644,7 @@ public function index(Request $request)
         $quoteItems = QuoteItem::where('quote_id', $quote->id)->get();
 
         $rawSeries = \App\Models\Master\Series\Series::all();
-        $taxCode = TaxCode::where('city', $quote->customer->city)->first();
+        $taxCode = TaxCode::where('city', $quote->customer->billing_city)->first();
 
         if ($taxCode) {
             $taxRate = $taxCode->rate;
