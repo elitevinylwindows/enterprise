@@ -751,7 +751,7 @@ public function index(Request $request)
         $quote->total = $request->total ?? 0;
         $quote->save();
 
-        if($request->status === 'Order Created') {
+        if($request->status === 'Quote Submitted') {
 
             $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
 
