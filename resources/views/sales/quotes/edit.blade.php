@@ -1118,6 +1118,8 @@
         }
     });
 
+    let isAddingLineItem = false;
+
     function fetchBasePrice() {
         const series_id = $('#seriesSelect').val();
         const series_type = $('#seriesTypeSelect').val();
@@ -1126,33 +1128,47 @@
 
         if (series_id && series_type && width && height) {
             $.post("{{ route('sales.quotes.checkPrice') }}", {
-                _token: "{{ csrf_token() }}"
-                , series_id: series_id
-                , series_type: series_type
-                , width: width
-                , height: height,
+                _token: "{{ csrf_token() }}",
+                series_id: series_id,
+                series_type: series_type,
+                width: width,
+                height: height,
                 customer_number: "{{ $quote->customer_number ?? '' }}"
             }, function(res) {
                 const price = parseFloat(res.price ?? 0).toFixed(2);
                 const newDiscount = parseFloat(res.discount ?? 0);
-                // Get the current discount value from the input (or 0 if not set)
-                const currentDiscount = parseFloat($('input[name="discount"]').val() ?? 0);
-                const totalDiscount = (currentDiscount + newDiscount).toFixed(2);
+
+                let totalDiscount;
+                if (isAddingLineItem) {
+                    const currentDiscount = parseFloat($('input[name="discount"]').val() ?? 0);
+                    totalDiscount = (currentDiscount + newDiscount).toFixed(2);
+                    $('input[name="discount"]').val(totalDiscount);
+                } else {
+                    totalDiscount = parseFloat($('input[name="discount"]').val() ?? 0).toFixed(2);
+                }
 
                 $('#globalTotalPrice').text(price);
                 $('input[name="price"]').val(price);
                 $('input[name="total"]').val(price);
-                $('input[name="discount"]').val(newDiscount);
                 $('#discount-amount').text("$" + totalDiscount);
-            });
 
+                // reset flag
+                isAddingLineItem = false;
+            });
         }
     }
+
+
 
     // Trigger on input change
     $('#seriesSelect, #seriesTypeSelect').on('change', fetchBasePrice);
     $('input[name="width"], input[name="height"]').on('keyup', fetchBasePrice);
 
+        // When adding a new line item
+    $('#addLineItemBtn').on('click', function() {
+        isAddingLineItem = true;
+        fetchBasePrice();
+    });
 
     @if(isset($allConfigurations))
 
@@ -1306,9 +1322,9 @@
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }, 
+            },
             body: JSON.stringify({
-                shipping: parseFloat(document.getElementById('shipping').value) || 0    
+                shipping: parseFloat(document.getElementById('shipping').value) || 0
             })
         }).then(response => response.json()).then(data => {
             if (data.success) {

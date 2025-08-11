@@ -2034,7 +2034,7 @@ if (!function_exists('calculateTotal')) {
             return $item->price * $item->qty;
         });
 
-        $taxCode = TaxCode::where('city', $quote->customer->city)->first();
+        $taxCode = TaxCode::where('city', $quote->customer->billing_city)->first();
 
         if ($taxCode) {
             $taxRate = $taxCode->rate;
