@@ -604,11 +604,10 @@
 
         const colorConfigDropdown = form.querySelector('[name="color_config"]');
         const colorConfig = colorConfigDropdown.value;
-        const colorConfigId = colorConfigDropdown.selectedOptions[0]?.getAttribute('data-id') ?? '';
+        const colorConfigId = colorConfigDropdown.selectedOptions[0]?.value ?? '';
         const colorExt = form.querySelector('[name="color_exterior"]');
         const colorInt = form.querySelector('[name="color_interior"]');
-        const colorExtId = colorExt.selectedOptions[0]?.getAttribute('data-id') ?? '';
-        const colorIntId = colorInt.selectedOptions[0]?.getAttribute('data-id') ?? '';
+        const colorIntId = colorInt.selectedOptions[0]?.value ?? '';
         const item_id = form.querySelector('[name="item_id"]').value;
         const laminateExtText = colorExt ?.selectedOptions[0] ?.text ?? '';
         const colorIntText = colorInt ?.selectedOptions[0] ?.text ?? '';
@@ -880,8 +879,6 @@
                     form.querySelector('[name="height"]').value = data.item.height;
                     form.querySelector('[name="item_comment"]').value = data.item.item_comment || '';
                     form.querySelector('[name="color_config"]').value = data.item.color_config || '';
-                    form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
-                    form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
                     form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
                     form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
                     form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
@@ -904,6 +901,10 @@
                     // Trigger change to load dependent series_type_id options
                     document.getElementById('seriesSelect').dispatchEvent(new Event('change'));
 
+                    setTimeout(() => {
+                        form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                        form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                    }, 500);
                     // Wait for the fetch to complete and then set the value
                     setTimeout(() => {
                         const seriesTypeSelect = document.getElementById('seriesTypeSelect');

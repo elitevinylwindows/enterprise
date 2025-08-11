@@ -2046,13 +2046,13 @@ if (!function_exists('calculateTotal')) {
 
         $subtotal = $total - $quote->discount + $shipping;
         $data = [
-            'total' => $total,
-            'sub_total' => $subtotal,
+            'total' => number_format($total, 2),
+            'sub_total' => number_format($subtotal, 2),
             'shipping' => number_format($shipping, 2),
             'total_discount' => number_format($quote->discount, 2),
-            'tax' => $tax,
-            'tax_rate' => $taxRate,
-            'grand_total' => $subtotal + $tax,
+            'tax' => number_format($tax, 2),
+            'tax_rate' => number_format($taxRate, 2),
+            'grand_total' => number_format($subtotal + $tax, 2),
         ];
 
         return $data;

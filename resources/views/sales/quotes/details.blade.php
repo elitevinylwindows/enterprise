@@ -604,11 +604,11 @@
 
         const colorConfigDropdown = form.querySelector('[name="color_config"]');
         const colorConfig = colorConfigDropdown.value;
-        const colorConfigId = colorConfigDropdown.selectedOptions[0]?.getAttribute('data-id') ?? '';
+        const colorConfigId = colorConfigDropdown.selectedOptions[0]?.value ?? '';
         const colorExt = form.querySelector('[name="color_exterior"]');
         const colorInt = form.querySelector('[name="color_interior"]');
-        const colorExtId = colorExt.selectedOptions[0]?.getAttribute('data-id') ?? '';
-        const colorIntId = colorInt.selectedOptions[0]?.getAttribute('data-id') ?? '';
+        const colorExtId = colorExt.selectedOptions[0]?.value?? '';
+        const colorIntId = colorInt.selectedOptions[0]?.value ?? '';
         const item_id = form.querySelector('[name="item_id"]').value;
         const laminateExtText = colorExt ?.selectedOptions[0] ?.text ?? '';
         const colorIntText = colorInt ?.selectedOptions[0] ?.text ?? '';
