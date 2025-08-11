@@ -819,8 +819,6 @@
                     form.querySelector('[name="height"]').value = data.item.height;
                     form.querySelector('[name="item_comment"]').value = data.item.item_comment || '';
                     form.querySelector('[name="color_config"]').value = data.item.color_config || '';
-                    form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
-                    form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
                     form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
                     form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
                     form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
@@ -838,6 +836,12 @@
                     form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
 
                     form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                   
+                    setTimeout(() => {
+                        form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                        form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                    }, 500);
+                    
                     // Disable all fields
                     Array.from(form.elements).forEach(el => {
                         // Do not disable the btn-close button
