@@ -122,6 +122,13 @@
                             </td>
                         </tr>
                         <tr>
+                            <th class="w-auto">Shipping:</th>
+                            <td id="shipping-amount" class="w-auto">
+                                <input type="numeric" step="0.01" class="form-control w-100"
+                                    value="{{ number_format($invoice->shipping, 2) }}" name="shipping" id="shipping">
+                            </td>
+                        </tr>
+                        <tr>
                             <th class="w-auto">Subtotal:</th>
                             <td id="subtotal-amount" class="w-auto">
                                 <input type="numeric" step="0.01" class="form-control w-100"
@@ -135,13 +142,7 @@
                                     value="{{ number_format($invoice->tax, 2) }}" name="tax" id="tax">
                             </td>
                         </tr>
-                        <tr>
-                            <th class="w-auto">Shipping:</th>
-                            <td id="shipping-amount" class="w-auto">
-                                <input type="numeric" step="0.01" class="form-control w-100"
-                                    value="{{ number_format($invoice->shipping, 2) }}" name="shipping" id="shipping">
-                            </td>
-                        </tr>
+                        
                         <tr>
                             <th class="w-auto">Total:</th>
                             <td class="w-auto"><strong id="total-amount">
