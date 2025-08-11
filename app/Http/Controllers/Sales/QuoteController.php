@@ -354,8 +354,6 @@ public function index(Request $request)
                 'status'            => $request->status ?? 'draft',
             ]);
 
-
-
             session([
                 'quote_number'     => $quote->quote_number,
                 'customer_number'  => $quote->customer_number,
@@ -363,6 +361,11 @@ public function index(Request $request)
             ]);
 
             DB::commit();
+
+            $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
+
+            Mail::to($quote->customer->email)
+            ->send(new QuoteEmail($quote, $pdf));
 
             return redirect()->route('sales.quotes.details', $quote->id);
         } catch(\Exception $e) {
