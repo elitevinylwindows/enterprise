@@ -76,7 +76,11 @@
                         <div class="col-md-6 offset-md-6">
                             <table class="table">
                                 <tr>
-                                    <th>Surcharge:</th>
+                                    <th>Discount:</th>
+                                    <td id="surcharge-amount">${{ number_format(0, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Shipping:</th>
                                     <td id="surcharge-amount">${{ number_format(0, 2) }}</td>
                                 </tr>
                                 <tr>
