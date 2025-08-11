@@ -2047,12 +2047,12 @@ if (!function_exists('calculateTotal')) {
 
         $data = [
             'total' => $total,
-            'sub_total' => $total - $quote->discount,
+            'sub_total' => $total - $quote->discount + $shipping,
             'shipping' => number_format($shipping, 2),
             'total_discount' => number_format($quote->discount, 2),
             'tax' => $tax,
             'tax_rate' => $taxRate,
-            'grand_total' => $total - $quote->discount + $tax + $shipping,
+            'grand_total' => $total + $tax,
         ];
 
         return $data;

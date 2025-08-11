@@ -731,6 +731,8 @@
                         </tr>
                     `;
 
+                    calculateTotals();
+
                     if(data.is_update == false) {
                         document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
                     } else {
@@ -741,7 +743,6 @@
 
                         document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
                     }
-                    calculateTotals();
                     console.log('Modal closed');
                 } else {
                     alert('Item failed to save.');
@@ -750,11 +751,11 @@
 
 
         // 3. Hide modal
-        const modalElement = document.getElementById('quoteItemModal');
-        const modal = bootstrap.Modal.getInstance(modalElement) ?? new bootstrap.Modal(modalElement);
-        if (modal) {
-            modal.hide();
-        }
+        // const modalElement = document.getElementById('quoteItemModal');
+        // const modal = bootstrap.Modal.getInstance(modalElement) ?? new bootstrap.Modal(modalElement);
+        // if (modal) {
+        //     modal.hide();
+        // }
         // 4. Reset form + preview
         form.reset();
 
@@ -953,18 +954,34 @@
         if (interior !== 'LAM') interiorDropdown.value = interior;
 
         // Add readonly if config is WH-WH, WH-BK, BK-WH, BK-BK
-        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK'];
+        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK', 'WH-LAM', 'BK-LAM', 'LAM-WH', 'LAM-BK'];
+        // Reset both first
+        exteriorDropdown.disabled = false;
+        interiorDropdown.disabled = false;
+        exteriorDropdown.classList.remove('readonly');
+        interiorDropdown.classList.remove('readonly');
+
         if (readonlyConfigs.includes(value)) {
-            exteriorDropdown.disabled = true;
-            interiorDropdown.disabled = true;
-            exteriorDropdown.classList.add('readonly');
-            interiorDropdown.classList.add('readonly');
-        } else {
-            exteriorDropdown.disabled = false;
-            interiorDropdown.disabled = false;
-            exteriorDropdown.classList.remove('readonly');
-            interiorDropdown.classList.remove('readonly');
+            // Special handling for LAM cases
+            if (value.includes('LAM')) {
+                if (value.startsWith('LAM')) {
+                    // LAM-X → disable X (interior)
+                    interiorDropdown.disabled = true;
+                    interiorDropdown.classList.add('readonly');
+                } else if (value.endsWith('LAM')) {
+                    // X-LAM → disable X (exterior)
+                    exteriorDropdown.disabled = true;
+                    exteriorDropdown.classList.add('readonly');
+                }
+            } else {
+                // Non-LAM case → disable both
+                exteriorDropdown.disabled = true;
+                interiorDropdown.disabled = true;
+                exteriorDropdown.classList.add('readonly');
+                interiorDropdown.classList.add('readonly');
+            }
         }
+
     });
 
 
@@ -985,17 +1002,32 @@
         if (interior !== 'LAM') interiorDropdown.value = interior;
 
         // Add readonly if config is WH-WH, WH-BK, BK-WH, BK-BK
-        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK'];
+        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK', 'WH-LAM', 'BK-LAM', 'LAM-WH', 'LAM-BK'];
+        // Reset both first
+        exteriorDropdown.disabled = false;
+        interiorDropdown.disabled = false;
+        exteriorDropdown.classList.remove('readonly');
+        interiorDropdown.classList.remove('readonly');
+
         if (readonlyConfigs.includes(value)) {
-            exteriorDropdown.disabled = true;
-            interiorDropdown.disabled = true;
-            exteriorDropdown.classList.add('readonly');
-            interiorDropdown.classList.add('readonly');
-        } else {
-            exteriorDropdown.disabled = false;
-            interiorDropdown.disabled = false;
-            exteriorDropdown.classList.remove('readonly');
-            interiorDropdown.classList.remove('readonly');
+            // Special handling for LAM cases
+            if (value.includes('LAM')) {
+                if (value.startsWith('LAM')) {
+                    // LAM-X → disable X (interior)
+                    interiorDropdown.disabled = true;
+                    interiorDropdown.classList.add('readonly');
+                } else if (value.endsWith('LAM')) {
+                    // X-LAM → disable X (exterior)
+                    exteriorDropdown.disabled = true;
+                    exteriorDropdown.classList.add('readonly');
+                }
+            } else {
+                // Non-LAM case → disable both
+                exteriorDropdown.disabled = true;
+                interiorDropdown.disabled = true;
+                exteriorDropdown.classList.add('readonly');
+                interiorDropdown.classList.add('readonly');
+            }
         }
     });
 
@@ -1041,7 +1073,7 @@
     document.addEventListener('hidden.bs.modal', function(event) {
         document.body.classList.remove('modal-open');
         document.body.style = '';
-        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        // document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
     });
 
 
@@ -1119,6 +1151,9 @@
     });
 
     let isAddingLineItem = false;
+    let isFirstLineItem = true;
+    let currentLineItemDiscount = 0; // Track discount for current line item
+    let hasAppliedFirstDiscount = false; // Ensure first discount only applies once
 
     function fetchBasePrice() {
         const series_id = $('#seriesSelect').val();
@@ -1137,37 +1172,45 @@
             }, function(res) {
                 const price = parseFloat(res.price ?? 0).toFixed(2);
                 const newDiscount = parseFloat(res.discount ?? 0);
+                const currentGlobalDiscount = parseFloat($('input[name="discount"]').val() || 0);
 
-                let totalDiscount;
-                if (isAddingLineItem) {
-                    const currentDiscount = parseFloat($('input[name="discount"]').val() ?? 0);
-                    totalDiscount = (currentDiscount + newDiscount).toFixed(2);
-                    $('input[name="discount"]').val(totalDiscount);
-                } else {
-                    totalDiscount = parseFloat($('input[name="discount"]').val() ?? 0).toFixed(2);
+                let updatedGlobalDiscount = currentGlobalDiscount;
+
+                // Case 1: First time discount application
+                if (isFirstLineItem && !hasAppliedFirstDiscount) {
+                    updatedGlobalDiscount = newDiscount;
+                    hasAppliedFirstDiscount = true;
+                    currentLineItemDiscount = newDiscount;
+                }
+                // Case 2: New line item being added
+                else if (isAddingLineItem) {
+                    // Remove previous discount for this item and add new
+                    updatedGlobalDiscount = currentGlobalDiscount - currentLineItemDiscount + newDiscount;
+                    currentLineItemDiscount = newDiscount;
+                }
+                // Case 3: Existing configuration change
+                else {
+                    // Only update current item's discount without affecting global total
+                    currentLineItemDiscount = newDiscount;
                 }
 
+                // Update UI elements
+                $('input[name="discount"]').val(updatedGlobalDiscount.toFixed(2));
                 $('#globalTotalPrice').text(price);
                 $('input[name="price"]').val(price);
                 $('input[name="total"]').val(price);
-                $('#discount-amount').text("$" + totalDiscount);
 
-                // reset flag
+                // Reset adding flag after processing
                 isAddingLineItem = false;
             });
         }
     }
 
-
-
-    // Trigger on input change
+    // Event handlers remain the same
     $('#seriesSelect, #seriesTypeSelect').on('change', fetchBasePrice);
     $('input[name="width"], input[name="height"]').on('keyup', fetchBasePrice);
-
-        // When adding a new line item
-    $('#addLineItemBtn').on('click', function() {
+    $('#saveQuoteItem').on('click', function() {
         isAddingLineItem = true;
-        fetchBasePrice();
     });
 
     @if(isset($allConfigurations))
@@ -1331,7 +1374,8 @@
                 if(modalOpen) {
                     var shipping = $('#shipping').val();
                     // If modal is open, update the totals in the modal
-                    document.getElementById('discount-amount').textContent = '$' + data.data.total_discount;
+                    $('#discount-amount').text("$" + data.data.total_discount);
+
                     document.getElementById('sub-total-amount').textContent = '$' + data.data.sub_total;
                     document.getElementById('tax-amount-preview').textContent = '$' + data.data.tax + ' (' + data.data.tax_rate + '%)';
                     document.getElementById('shipping-amount').textContent = '$' + data.data.shipping;
@@ -1339,6 +1383,7 @@
                 } else {
                     // Update the UI with the new totals
                     $('#subtotal-amount').text('$' + data.data.sub_total);
+                    $('#discount-amount').text("$" + data.data.total_discount);
                     $('#tax-amount').text('$' + data.data.tax + ' (' + data.data.tax_rate + '%)');
                     $('#total-amount').text('$' + data.data.grand_total);
                     document.getElementById('tax').value = data.data.tax;

@@ -362,11 +362,6 @@ public function index(Request $request)
 
             DB::commit();
 
-            $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
-
-            Mail::to($quote->customer->email)
-            ->send(new QuoteEmail($quote, $pdf));
-
             return redirect()->route('sales.quotes.details', $quote->id);
         } catch(\Exception $e) {
             dd($e);
@@ -755,6 +750,14 @@ public function index(Request $request)
         $quote->tax = $request->tax ?? 0;
         $quote->total = $request->total ?? 0;
         $quote->save();
+
+        if($request->status === 'Order Created') {
+
+            $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
+
+            Mail::to($quote->customer->email)
+            ->send(new QuoteEmail($quote, $pdf));
+        }
 
         return response()->json(['success' => true, 'message' => 'Quote saved as draft successfully.']);
     }
