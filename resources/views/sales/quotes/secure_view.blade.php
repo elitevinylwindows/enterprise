@@ -77,31 +77,25 @@
                             <table class="table">
                                 <tr>
                                     <th>Discount:</th>
-                                    <td id="surcharge-amount">${{ number_format(0, 2) }}</td>
+                                    <td id="discount-amount">${{ number_format(0, 2) }}</td>
                                 </tr>
                                 <tr>
                                     <th>Shipping:</th>
-                                    <td id="surcharge-amount">${{ number_format(0, 2) }}</td>
+                                    <td id="shipping-amount">${{ number_format(0, 2) }}</td>
                                 </tr>
                                 <tr>
                                     <th>Subtotal:</th>
                                     <td id="subtotal-amount">
-                                        ${{ number_format($quote->items->sum('total'), 2) }}
+                                        $0.00
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Tax:</th>
-                                    @php
-                                    $subtotal = $quote->items->sum('total');
-                                    $surcharge = 0;
-                                    $taxRate = 0.08;
-                                    $tax = $subtotal * $taxRate;
-                                    @endphp
-                                    <td id="tax-amount">${{ number_format($tax, 2) }}</td>
+                                    <td id="tax-amount">$0.00</td>
                                 </tr>
                                 <tr>
                                     <th>Total:</th>
-                                    <td><strong id="total-amount">${{ number_format($subtotal + $surcharge + $tax, 2) }}</strong></td>
+                                    <td><strong id="total-amount">$0.00</strong></td>
                                 </tr>
                             </table>
                         </div>
@@ -121,3 +115,53 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            // Calculate totals on page load
+            calculateTotals();
+        });
+
+        function calculateTotals(shipping = 0, modalOpen = false) {
+
+         fetch('{{ route('calculate.total', ['quote_id' => $quote->id]) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                shipping: parseFloat(document.getElementById('shipping').value) || 0
+            })
+        }).then(response => response.json()).then(data => {
+            if (data.success) {
+                if(modalOpen) {
+                    var shipping = $('#shipping').val();
+                    // If modal is open, update the totals in the modal
+                    $('#discount-amount').text("$" + data.data.total_discount);
+
+                    document.getElementById('sub-total-amount').textContent = '$' + data.data.sub_total;
+                    document.getElementById('tax-amount-preview').textContent = '$' + data.data.tax + ' (' + data.data.tax_rate + '%)';
+                    document.getElementById('shipping-amount').textContent = '$' + data.data.shipping;
+                    document.getElementById('grand-total-amount').textContent = '$' + data.data.grand_total;
+                } else {
+                    // Update the UI with the new totals
+                    $('#subtotal-amount').text('$' + data.data.sub_total);
+                    $('#discount-amount').text("$" + data.data.total_discount);
+                    $('#tax-amount').text('$' + data.data.tax + ' (' + data.data.tax_rate + '%)');
+                    $('#total-amount').text('$' + data.data.grand_total);
+                    document.getElementById('tax').value = data.data.tax;
+                    document.getElementById('subtotal').value = data.data.sub_total;
+                    document.getElementById('tax').value = data.data.tax;
+                    document.getElementById('total').value = data.data.grand_total;
+                }
+            } else {
+                alert('Error calculating totals.');
+            }
+        }).catch(error => {
+            console.error('Error fetching total:', error);
+        });
+    }
+    </script>
+@endpush
