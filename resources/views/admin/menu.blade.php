@@ -1012,26 +1012,67 @@
 </li>
 
 <!-- Master Data -->
-<li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
+ <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-brain"></i></span>
-        <span class="pc-mtext ms-2">Master Data</span>
+        <span class="pc-mtext ms-2">Dashboards</span>
         <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
     </a>
 
     <ul class="pc-submenu">
         <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
             <a href="{{ route('master.customers.index') }}" class="pc-link">
-                <span class="pc-mtext">Customers</span>
+                <span class="pc-mtext">Glass Cutting</span>
             </a>
         </li>
         <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
             <a href="{{ route('master.suppliers.index') }}" class="pc-link">
-                <span class="pc-mtext">Suppliers</span>
+                <span class="pc-mtext">Frame Addition</span>
             </a>
         </li>
     </ul>
 </li>
+<li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-brain"></i></span>
+        <span class="pc-mtext ms-2">Equipment</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+        <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.customers.index') }}" class="pc-link">
+                <span class="pc-mtext">Machines</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
+                <span class="pc-mtext">Stations</span>
+            </a>
+        </li>
+    </ul>
+</li>
+<li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-brain"></i></span>
+        <span class="pc-mtext ms-2">Work Orders</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+        <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.customers.index') }}" class="pc-link">
+                <span class="pc-mtext">Job Pool</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
+                <span class="pc-mtext">Tempered</span>
+            </a>
+        </li>
+    </ul>
+</li>
+
 
 <!-- Manufacturing Menu -->
 <li class="pc-item pc-hasmenu {{ request()->routeIs('production.*') ? 'active pc-trigger' : '' }}">
@@ -1055,6 +1096,9 @@
         </li>
     </ul>
 </li>
+
+
+
 @endif
 
 
