@@ -1254,5 +1254,5 @@ Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'i
 Route::post('calculate/total', [QuoteController::class, 'calculateTotal'])->name('calculate.total');
 
 Route::group(['prefix' => 'webhooks', 'as' => 'webhooks.'], function () {
-    Route::get('process-invoice', [WebhookController::class, 'handle'])->name('process-invoice');
+    Route::post('process-invoice', [WebhookController::class, 'handle'])->name('process-invoice');
 });
