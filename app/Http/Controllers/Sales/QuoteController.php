@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\View;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class QuoteController extends Controller
 {
@@ -669,9 +670,8 @@ public function index(Request $request)
             $quote = \App\Models\Sales\Quote::with('items')->findOrFail($id);
             $order = quoteToOrder($quote);
 
-            $mail = new OrderMail($order);
-            Mail::to($quote->customer->email)->send($mail);
-
+           sendOrderMail($order);
+            
             DB::commit();
         return redirect()->route('sales.orders.index', $order->id)->with('success', 'Quote converted to Order successfully.');
         } catch (\Exception $e) {
@@ -718,9 +718,8 @@ public function index(Request $request)
             if ($status === 'approved') {
                 $order = quoteToOrder($quote);
 
-                $mail = new OrderMail($order);
-                Mail::to($quote->customer->email)->send($mail);
-
+                sendOrderMail($order);
+                
                 $invoice = quoteToInvoice($quote, $order);
 
                 if (!$order) {

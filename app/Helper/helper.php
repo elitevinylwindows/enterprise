@@ -4,6 +4,7 @@ use App\Helper\FirstServe;
 use App\Mail\Common;
 use App\Mail\EmailVerification;
 use App\Mail\InvoiceMail;
+use App\Mail\OrderMail;
 use App\Mail\TestMail;
 use App\Models\AuthPage;
 use App\Models\Custom;
@@ -29,7 +30,7 @@ use Illuminate\Support\Facades\Storage;
 use PragmaRX\Google2FAQRCode\Google2FA;
 use Spatie\Permission\Models\Role;
 use App\Models\Sales\SalesSetting;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 
 if (!function_exists('settingsKeys')) {
     function settingsKeys()
@@ -2056,5 +2057,18 @@ if (!function_exists('calculateTotal')) {
         ];
 
         return $data;
+    }
+}
+
+
+if(!function_exists('sendOrderMail')) {
+    function sendOrderMail($order)
+    {
+        $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order]);
+        $pdfPath = 'orders/order_'.$order->order_number.'.pdf';
+        Storage::disk('public')->put($pdfPath, $pdf->output());
+
+        $mail = new OrderMail($order, $pdfPath);
+        Mail::to($order->customer->email)->send($mail);
     }
 }
