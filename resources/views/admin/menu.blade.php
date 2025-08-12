@@ -1027,7 +1027,12 @@
         </li>
         <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
             <a href="{{ route('master.suppliers.index') }}" class="pc-link">
-                <span class="pc-mtext">Frame Addition</span>
+                <span class="pc-mtext">Screen Cutting</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
+                <span class="pc-mtext">Window Cutting</span>
             </a>
         </li>
     </ul>
@@ -1040,14 +1045,19 @@
     </a>
 
     <ul class="pc-submenu">
-        <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
-            <a href="{{ route('master.customers.index') }}" class="pc-link">
+        <li class="pc-item {{ request()->routeIs('manufacturing.machines.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.machines.index') }}" class="pc-link">
                 <span class="pc-mtext">Machines</span>
             </a>
         </li>
         <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
             <a href="{{ route('master.suppliers.index') }}" class="pc-link">
                 <span class="pc-mtext">Stations</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('manufacturing.capacity.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.capacity.index') }}" class="pc-link">
+                <span class="pc-mtext">Capacity</span>
             </a>
         </li>
     </ul>
@@ -1065,6 +1075,11 @@
                 <span class="pc-mtext">Job Pool</span>
             </a>
         </li>
+        <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.customers.index') }}" class="pc-link">
+                <span class="pc-mtext">Job Pool</span>
+            </a>
+        </li>
         <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
             <a href="{{ route('master.suppliers.index') }}" class="pc-link">
                 <span class="pc-mtext">Tempered</span>
@@ -1077,7 +1092,7 @@
 <!-- Manufacturing Menu -->
 <li class="pc-item pc-hasmenu {{ request()->routeIs('production.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="ti ti-briefcase"></i></span>
+        <span class="pc-micon"><i class="fa-solid fa-code-fork"></i></span>
         <span class="pc-mtext ms-2">Production</span>
         <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
     </a>
@@ -1089,7 +1104,7 @@
                 <span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>
             </a>
             <ul class="pc-submenu" style="display: none;">
-                <li><a class="pc-link" href="{{ route('homepage.index') }}">Machines</a></li>
+                <li><a class="pc-link" href="{{ route('manufacturing.machines.index') }}">Machines</a></li>
                 <li><a class="pc-link" href="{{ route('pages.index') }}">Stations</a></li>
                 <li><a class="pc-link" href="{{ route('FAQ.index') }}">FAQ</a></li>
             </ul>
@@ -1097,7 +1112,26 @@
     </ul>
 </li>
 
+<li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-worm"></i></span>
+        <span class="pc-mtext ms-2">Reports</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
 
+    <ul class="pc-submenu">
+        <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.customers.index') }}" class="pc-link">
+                <span class="pc-mtext">Machines</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
+                <span class="pc-mtext">Stations</span>
+            </a>
+        </li>
+    </ul>
+</li>
 
 @endif
 

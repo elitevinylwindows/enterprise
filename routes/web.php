@@ -209,6 +209,14 @@ use App\Http\Controllers\Inventory\{
     BomController
 };
 
+
+
+use App\Http\Controllers\Manufacturing\{
+    CapacityController,
+    MachineController
+};
+
+
 // Purchasing Controllers
 use App\Http\Controllers\Purchasing\{
     PurchaseRequestController as PurchasingPurchaseRequestController,
@@ -1018,6 +1026,19 @@ use Stripe\Webhook;
             Route::get('/{id}/edit', [FormOptionGroupController::class, 'edit'])->name('edit');
             Route::put('/{id}', [FormOptionGroupController::class, 'update'])->name('update');
         });
+
+
+        //Manufacturing
+        Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
+        Route::get('/capacity', [CapacityController::class, 'index'])->name('capacity.index');
+        Route::resource('machines', MachineController::class);
+        });
+
+
+
+
+
+
 
 
         // web.php
