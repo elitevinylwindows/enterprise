@@ -17,12 +17,14 @@ class FirstServe
         $this->env = env('FIRST_SERVE_ENV', 'production');
         if($this->env === 'sandbox') {
             $this->baseURL = env('FIRST_SERVE_SANDBOX_BASE_URL', 'https://api.sandbox.mysfsgateway.com/api/v2');
+            $this->apiKey = env('FIRST_SERVE_SANDBOX_API_KEY');
+            $this->apiSecret = env('FIRST_SERVE_SANDBOX_API_PIN');
         } else {
             $this->baseURL = env('FIRST_SERVE_PRODUCTION_BASE_URL', 'https://api.mysfsgateway.com/api/v2');
+            $this->apiKey = env('FIRST_SERVE_PRODUCTION_API_KEY');
+            $this->apiSecret = env('FIRST_SERVE_PRODUCTION_API_PIN');
         }
 
-        $this->apiKey = env('FIRST_SERVE_API_KEY');
-        $this->apiSecret = env('FIRST_SERVE_API_PIN');
         $this->client = new Client();
     }
 
@@ -77,7 +79,7 @@ class FirstServe
                 'phone' => $customer->billing_phone ?: "",
                 'billing_info' => [
                     // Fill in address fields as required
-                    'address_line1' => $customer->billing_address,
+                    'street' => $customer->billing_address,
                     'city' => $customer->billing_city ?: "",
                     'state' => $customer->billing_state ?: "",
                     'postal_code' => $customer->billing_zip ?: "",
@@ -85,7 +87,7 @@ class FirstServe
                 ],
                 'shipping_info' => [
                     // Fill in address fields as required
-                    'address_line1' => $customer->delivery_address ?: "",
+                    'street' => $customer->delivery_address ?: "",
                     'city' => $customer->delivery_city ?: "",
                     'state' => $customer->delivery_state ?: "",
                     'postal_code' => $customer->delivery_zip ?: "",

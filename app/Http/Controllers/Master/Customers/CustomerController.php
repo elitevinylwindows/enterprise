@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Master\Customers\Customer;
 use App\Models\Tier;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
@@ -157,6 +158,7 @@ public function update(Request $request, $id)
         DB::commit();
         return redirect()->route('master.customers.index')->with('success', 'Customer updated successfully.');
     } catch (\Exception $e) {
+        Log::error($e);
         DB::rollBack();
         dd($e);
         return redirect()->route('master.customers.index')->with('error', 'Failed to update customer.');
