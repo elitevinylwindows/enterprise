@@ -60,6 +60,7 @@ use App\Http\Controllers\{
     ExecutiveTierController,
     FormulaController,
     RaffleDrawController,
+    WebhookController,
     WindowRenderController
 };
 
@@ -216,7 +217,7 @@ use App\Http\Controllers\Purchasing\{
 };
 use App\Http\Controllers\Sales\Quotes\GridProfileController;
 use App\Http\Controllers\Supplier\QuoteRequestController;
-
+use Stripe\Webhook;
 
     // Auth
     require __DIR__ . '/auth.php';
@@ -1251,3 +1252,7 @@ Route::get('quote/request/{token}', [QuoteRequestController::class, 'secureView'
 Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
 
 Route::post('calculate/total', [QuoteController::class, 'calculateTotal'])->name('calculate.total');
+
+Route::group(['prefix' => 'webhooks', 'as' => 'webhooks.'], function () {
+    Route::get('process-invoice', [WebhookController::class, 'processInvoice'])->name('process-invoice');
+});

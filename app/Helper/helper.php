@@ -1969,6 +1969,8 @@ if(!function_exists('quoteToOrder')) {
 if(!function_exists('quoteToInvoice')) {
     function quoteToInvoice($quote, $order)
     {
+        try{
+            DB::beginTransaction();
             $invoice = Invoice::create([
                 'order_id' => $order->id,
                 'quote_id' => $quote->id,
@@ -1993,7 +1995,8 @@ if(!function_exists('quoteToInvoice')) {
                 'payment_method' => null,
                 'gateway_response' => null,
             ]);
-
+            DB::commit();
+        
             $firstServe = new FirstServe();
             $firstServeInvoice = $firstServe->createInvoice($invoice);
 
@@ -2014,14 +2017,19 @@ if(!function_exists('quoteToInvoice')) {
                 ]);
             }
 
-        return $invoice;
+            return $invoice;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error creating invoice: ' . $e->getMessage());
+            return null;
+        }
     }
 }
 
 if(!function_exists('generateInvoiceNumber')) {
     function generateInvoiceNumber()
     {
-        $lastInvoice = Invoice::max('id')+27;
+        $lastInvoice = Invoice::max('id')+1;
         $nextId = $lastInvoice ? $lastInvoice + 1 : 1;
         return 'INV-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
     }

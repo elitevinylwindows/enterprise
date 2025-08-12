@@ -1,6 +1,7 @@
 <?php
 namespace App\Helper;
 
+use App\Models\Master\Prices\TaxCode;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 
@@ -104,67 +105,103 @@ class FirstServe
 
     public function createInvoice($invoice)
     {
+        // Validate and get customer ID
         $customerID = (int) $invoice->customer?->serve_customer_id ?: null;
 
         if ($customerID === null) {
-            // If customer does not exist in FirstServe, create it
             $firstServeCustomer = $this->createCustomer($invoice->customer);
             if (isset($firstServeCustomer['id'])) {
                 $customerID = (int) $firstServeCustomer['id'];
+                $invoice->customer->serve_customer_id = $customerID;
+                $invoice->customer->save();
             } else {
                 Log::error("Failed to create customer in FirstServe: " . json_encode($firstServeCustomer));
+                throw new \Exception("Failed to create customer in FirstServe");
             }
         }
 
-        $invoice->customer->serve_customer_id = $customerID;
-        $invoice->customer->save();
+        $taxCode = TaxCode::where('city', $invoice->customer->billing_city)->first();
 
-        $response = $this->client->post($this->baseURL.'/invoices', [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Basic ' . base64_encode($this->apiKey . ':' . $this->apiSecret),
+        if ($taxCode) {
+            $taxRate = $taxCode->rate;
+        } else
+        {
+            $taxRate = 0; // Default tax rate if no code found
+        }
+
+        // Calculate amounts
+        $subtotal = (float) $invoice->sub_total; // $428.96
+        $discount = (float) $invoice->discount; // -$1.04
+        $shipping = (float) $invoice->shipping; // $12.00
+        $tax = (float) $invoice->order->tax; // $39.71
+        $total = (float) $invoice->total; // $468.67
+
+
+        // Calculate shipping per item (distribute evenly)
+        $itemCount = count($invoice->order->items);
+        $shippingPerItem = $itemCount > 0 ? $shipping / $itemCount : 0;
+
+        // Prepare products with item-level taxes and shipping
+        $products = $invoice->order->items->map(function ($item) use ($taxRate, $shippingPerItem) {
+            $itemPrice = (float) $item->price;
+            $itemQuantity = (float) $item->qty;
+            
+            return [
+                'name' => substr($item->description ?? 'Product', 0, 255),
+                'description' => substr($item->glass ?? '', 0, 255),
+                'price' => $itemPrice + $shippingPerItem, // Include shipping in price
+                'quantity' => $itemQuantity,
+                'tax' => (float)$taxRate // Apply tax rate to each item
+            ];
+        })->toArray();
+        // Prepare invoice data
+        $invoiceData = [
+            'customer_id' => $customerID,
+            'date' => now()->format('Y-m-d'),
+            'number' => $invoice->invoice_number,
+            'due_date' => $invoice->due_date ? $invoice->due_date : null,
+            'action' => 'charge',
+            'requirement' => [
+                'value' => $total, // $468.67
+                'type' => 'amount'
             ],
-            'json' => [
-                'customer_id' => $customerID,
-                'date' => (string) date('Y-m-d'),
-                'number' => generateInvoiceNumber(),
-                'due_date' => (string) $invoice->due_date ?: null,
-                'action' => 'charge',
-                'requirement' => [
-                    'value' => $invoice->remaining_amount ?: 0.0,
-                    'type' => 'amount'
+            'discount' => [
+                'value' => abs($discount)*2, // 1.04 (positive value)
+                'type' => 'amount'
+            ],
+            'products' => $products,
+            'note' => "Subtotal: $" . number_format($subtotal, 2) . "\n" .
+                    "Discount: -$" . number_format(abs($discount), 2) . "\n" .
+                    "Shipping: $" . number_format($shipping, 2) . "\n" .
+                    "Tax: $" . number_format($tax, 2) . "\n" .
+                    "Total: $" . number_format($total, 2),
+        ];
+
+        
+        try {
+            $response = $this->client->post($this->baseURL.'/invoices', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Basic ' . base64_encode($this->apiKey . ':' . $this->apiSecret),
                 ],
-                'discount' => [
-                    'value' => round((float) $invoice->discount ?: 0, 2),
-                    'type' => 'amount'
-                ],
+                'json' => $invoiceData
+            ]);
 
-                'shipping' => [
-                    'value' => round((float) $invoice->shipping ?: 0, 2),
-                    'type' => 'amount'
-                ],
-
-                'products' => $invoice->order->items->map(function ($item) use ($invoice) {
-                    // Calculate per-item tax percentage
-                    $itemPrice = round($item->price);
-                    $totalItems = $invoice->order->items->count();
-                    $perItemTaxAmount = $totalItems > 0 ? ((float) $invoice->tax / $totalItems) : 0.0;
-                    $taxPercent = $itemPrice > 0 ? ($perItemTaxAmount / $itemPrice) * 100 : 0.0;
-
-                    return [
-                        'name' => $item->description,
-                        'description' => $item->description,
-                        'price' => $itemPrice,
-                        'quantity' => (float) $item->qty,
-                        'tax' => round($taxPercent, 2),
-                    ];
-                })->toArray(),
-            ]
-        ]);
-
-        $invoice = $response->getBody()->getContents();
-        Log::info("Invoice Created: " . $invoice);
-        return json_decode($invoice, true);
+            $responseData = json_decode($response->getBody()->getContents(), true);
+            
+            if (isset($responseData['id'])) {
+                $invoice->serve_invoice_id = $responseData['id'];
+                $invoice->save();
+                Log::info("Invoice #{$invoice->invoice_number} created successfully in FirstServe with amount due: $" . $total);
+                return $responseData;
+            } else {
+                Log::error("Invoice creation failed: " . json_encode($responseData));
+                throw new \Exception("Invoice creation failed: " . ($responseData['message'] ?? 'Unknown error'));
+            }
+        } catch (\Exception $e) {
+            Log::error("Invoice API Error: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function updateInvoiceAmounts($invoice)

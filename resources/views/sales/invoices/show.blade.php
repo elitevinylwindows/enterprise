@@ -72,7 +72,7 @@
                 <table class="table">
                     <tr>
                         <th>Discount:</th>
-                        <td id="discount">${{ number_format($invoice->discount, 2) }}</td>
+                        <td id="discount">-${{ number_format($invoice->discount, 2) }}</td>
                     </tr>
                     <tr>
                         <th>Shipping:</th>
@@ -81,7 +81,7 @@
                     <tr>
                         <th>Subtotal:</th>
                         <td id="subtotal-amount">
-                            ${{ number_format($invoice->order->items->sum('total') + $invoice->shipping, 2) }}
+                            ${{ number_format($invoice->sub_total, 2) }}
                         </td>
                     </tr>
                     <tr>

@@ -74,7 +74,7 @@
                                 </tr>
                                 <tr>
                                     <td style="padding: 8px; font-weight: bold;">{{ __('Total Amount') }}:</td>
-                                    <td style="padding: 8px;">{{ number_format($invoice->total_amount, 2) }}</td>
+                                    <td style="padding: 8px;">{{ number_format($invoice->total, 2) }}</td>
                                 </tr>
                             </table>
 
