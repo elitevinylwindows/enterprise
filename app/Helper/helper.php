@@ -2029,7 +2029,7 @@ if(!function_exists('quoteToInvoice')) {
 if(!function_exists('generateInvoiceNumber')) {
     function generateInvoiceNumber()
     {
-        $lastInvoice = Invoice::max('id')+4;
+        $lastInvoice = Invoice::max('id')+5;
         $nextId = $lastInvoice ? $lastInvoice + 1 : 1;
         return 'INV-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
     }
