@@ -1077,7 +1077,7 @@
             </a>
         </li>
         <li class="pc-item {{ request()->routeIs('manufacturing.tempered.*') ? 'active' : '' }}">
-            <a href="{{ route('manufacturing.tempered.index') }}" class="pc-link">
+            <a href="" class="pc-link">
                 <span class="pc-mtext">Tempered</span>
             </a>
         </li>
