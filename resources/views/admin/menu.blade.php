@@ -1011,6 +1011,7 @@
     <i class="ti ti-plus text-muted pe-2" style="font-size: 0.9rem;"></i>
 </li>
 
+<!-- Master Data -->
 <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-brain"></i></span>
@@ -1019,19 +1020,21 @@
     </a>
 
     <ul class="pc-submenu">
- <li class="pc-item {{ request()->routeIs('master.dashboard.*') ? 'active' : '' }}">
-    <a href="{{ route('master.customers.index') }}" class="pc-link">
-        <span class="pc-mtext">Customers</span>
-    </a>
-</li>   
-<li class="pc-item {{ request()->routeIs('master.dashboard.*') ? 'active' : '' }}">
-    <a href="{{ route('master.suppliers.index') }}" class="pc-link">
-        <span class="pc-mtext">Suppliers</span>
-    </a>
+        <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.customers.index') }}" class="pc-link">
+                <span class="pc-mtext">Customers</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
+                <span class="pc-mtext">Suppliers</span>
+            </a>
+        </li>
+    </ul>
 </li>
 
 <!-- Manufacturing Menu -->
-<li class="pc-item pc-hasmenu {{ request()->routeIs('shipping.*') ? 'active pc-trigger' : '' }}">
+<li class="pc-item pc-hasmenu {{ request()->routeIs('production.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="ti ti-briefcase"></i></span>
         <span class="pc-mtext ms-2">Production</span>
@@ -1053,6 +1056,7 @@
     </ul>
 </li>
 @endif
+
 
 <!-- Settings Section -->
 @if (
