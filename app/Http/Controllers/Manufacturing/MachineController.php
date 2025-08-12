@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Manufacturing;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Machine;
+use App\Models\Manufacturing\Machine;
 
 class MachineController extends Controller
 {
