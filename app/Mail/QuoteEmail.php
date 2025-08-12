@@ -35,7 +35,7 @@ class QuoteEmail extends Mailable
      */
     public function build()
     {
-        $email = $this->subject('Quote Email')
+        $email = $this->subject('Quote #'.$this->quote->quote_number.' Elite Vinyl Windows')
             ->view('email.quotes.quote_email')
             ->with([
                 'quote' => $this->quote,

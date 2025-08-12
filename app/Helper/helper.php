@@ -4,6 +4,7 @@ use App\Helper\FirstServe;
 use App\Mail\Common;
 use App\Mail\EmailVerification;
 use App\Mail\InvoiceMail;
+use App\Mail\OrderMail;
 use App\Mail\TestMail;
 use App\Models\AuthPage;
 use App\Models\Custom;
@@ -29,7 +30,7 @@ use Illuminate\Support\Facades\Storage;
 use PragmaRX\Google2FAQRCode\Google2FA;
 use Spatie\Permission\Models\Role;
 use App\Models\Sales\SalesSetting;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 
 if (!function_exists('settingsKeys')) {
     function settingsKeys()
@@ -2034,7 +2035,7 @@ if (!function_exists('calculateTotal')) {
             return $item->price * $item->qty;
         });
 
-        $taxCode = TaxCode::where('city', $quote->customer->city)->first();
+        $taxCode = TaxCode::where('city', $quote->customer->billing_city)->first();
 
         if ($taxCode) {
             $taxRate = $taxCode->rate;
@@ -2044,17 +2045,30 @@ if (!function_exists('calculateTotal')) {
         }
         $tax = number_format($taxRate * ($total / 100), 2);
 
-
+        $subtotal = $total - $quote->discount + $shipping;
         $data = [
-            'total' => $total,
-            'sub_total' => $total - $quote->discount,
+            'total' => number_format($total, 2),
+            'sub_total' => number_format($subtotal, 2),
             'shipping' => number_format($shipping, 2),
             'total_discount' => number_format($quote->discount, 2),
-            'tax' => $tax,
-            'tax_rate' => $taxRate,
-            'grand_total' => $total - $quote->discount + $tax + $shipping,
+            'tax' => number_format($tax, 2),
+            'tax_rate' => number_format($taxRate, 2),
+            'grand_total' => number_format($subtotal + $tax, 2),
         ];
 
         return $data;
+    }
+}
+
+
+if(!function_exists('sendOrderMail')) {
+    function sendOrderMail($order)
+    {
+        $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order]);
+        $pdfPath = 'orders/order_'.$order->order_number.'.pdf';
+        Storage::disk('public')->put($pdfPath, $pdf->output());
+
+        $mail = new OrderMail($order, $pdfPath);
+        Mail::to($order->customer->email)->send($mail);
     }
 }

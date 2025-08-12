@@ -27,19 +27,19 @@
     <div class="row">
         <div class="col-md-6">
             <h6>Billing Address</h6>
-            {{ $invoice->order->customer->billing_address ?? $invoice->order->customer->address }}<br>
-            {{ $invoice->order->customer->billing_city ?? $invoice->order->customer->city }},
-            {{ $invoice->order->customer->billing_state ?? $invoice->order->customer->state }},
-            {{ $invoice->order->customer->billing_zip ?? $invoice->order->customer->zip }}<br>
-            {{ $invoice->order->customer->phone }}
+            {{ $invoice->order->customer->billing_address ?? $invoice->order->customer->billing_address }}<br>
+            {{ $invoice->order->customer->billing_city ?? $invoice->order->customer->billing_city }},
+            {{ $invoice->order->customer->billing_state ?? $invoice->order->customer->billing_state }},
+            {{ $invoice->order->customer->billing_zip ?? $invoice->order->customer->billing_zip }}<br>
+            {{ $invoice->order->customer->billing_phone }}
         </div>
         <div class="col-md-6">
             <h6>Delivery Address</h6>
-            {{ $invoice->order->customer->delivery_address ?? $invoice->order->customer->address }}<br>
-            {{ $invoice->order->customer->delivery_city ?? $invoice->order->customer->city }},
-            {{ $invoice->order->customer->delivery_state ?? $invoice->order->customer->state }},
-            {{ $invoice->order->customer->delivery_zip ?? $invoice->order->customer->zip }}<br>
-            {{ $invoice->order->customer->phone }}
+            {{ $invoice->order->customer->delivery_address ?? $invoice->order->customer->delivery_address }}<br>
+            {{ $invoice->order->customer->delivery_city ?? $invoice->order->customer->delivery_city }},
+            {{ $invoice->order->customer->delivery_state ?? $invoice->order->customer->delivery_state }},
+            {{ $invoice->order->customer->delivery_zip ?? $invoice->order->customer->delivery_zip }}<br>
+            {{ $invoice->order->customer->delivery_phone }}
         </div>
     </div>
 
@@ -122,6 +122,13 @@
                             </td>
                         </tr>
                         <tr>
+                            <th class="w-auto">Shipping:</th>
+                            <td id="shipping-amount" class="w-auto">
+                                <input type="numeric" step="0.01" class="form-control w-100"
+                                    value="{{ number_format($invoice->shipping, 2) }}" name="shipping" id="shipping">
+                            </td>
+                        </tr>
+                        <tr>
                             <th class="w-auto">Subtotal:</th>
                             <td id="subtotal-amount" class="w-auto">
                                 <input type="numeric" step="0.01" class="form-control w-100"
@@ -135,13 +142,7 @@
                                     value="{{ number_format($invoice->tax, 2) }}" name="tax" id="tax">
                             </td>
                         </tr>
-                        <tr>
-                            <th class="w-auto">Shipping:</th>
-                            <td id="shipping-amount" class="w-auto">
-                                <input type="numeric" step="0.01" class="form-control w-100"
-                                    value="{{ number_format($invoice->shipping, 2) }}" name="shipping" id="shipping">
-                            </td>
-                        </tr>
+                        
                         <tr>
                             <th class="w-auto">Total:</th>
                             <td class="w-auto"><strong id="total-amount">

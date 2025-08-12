@@ -78,9 +78,9 @@
                         <td><input type="checkbox" class="customer-checkbox" value="{{ $customer->id }}"></td>
                         <td>{{ $customer->customer_number }}</td>
                         <td>{{ $customer->customer_name }}</td>
-                        <td>{{ $customer->street }}</td>
-                        <td>{{ $customer->city }}</td>
-                        <td>{{ $customer->zip }}</td>
+                        <td>{{ $customer->billing_address }}</td>
+                        <td>{{ $customer->billing_city }}</td>
+                        <td>{{ $customer->billing_zip }}</td>
                         <td>
                             <span class="badge bg-{{ $customer->status === 'active' ? 'warning' : 'secondary' }}">
                                 {{ ucfirst($customer->status) }}

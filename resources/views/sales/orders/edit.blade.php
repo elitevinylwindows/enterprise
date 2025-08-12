@@ -94,7 +94,7 @@
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
                         <span>Tax:</span>
-                        <strong id="taxDisplay">%{{ number_format($order->tax, 2) }}</strong>
+                        <strong id="taxDisplay">${{ number_format($order->tax, 2) }}</strong>
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">

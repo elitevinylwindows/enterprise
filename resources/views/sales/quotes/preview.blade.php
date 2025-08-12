@@ -41,10 +41,10 @@
             <thead class="table-light">
                 <tr>
                     <th style="width: 0%;">Item</th>
-                    <th style="width: 0%;">Glass</th>
-                    <th style="width: 0%;">Grid</th>
                     <th>Qty</th>
                     <th>Size</th>
+                    <th style="width: 0%;">Glass</th>
+                    <th style="width: 0%;">Grid</th>
                     <th>Price</th>
                     <th>Total</th>
                 </tr>
@@ -53,10 +53,10 @@
                 @foreach($quote->items as $index => $item)
                 <tr>
                     <td style="width: 0%;">{{ $item->description ?? 'N/A' }}</td>
-                    <td style="width: 0%;">{{ $item->glass ?? 'N/A' }}</td>
-                    <td style="width: 0%;">{{ $item->grid ?? 'N/A' }}</td>
-                    <td>{{ $item->qty }}</td>
+                     <td>{{ $item->qty }}</td>
                     <td>{{ $item->width }}" x {{ $item->height }}"</td>
+                    <td style="width: 0%;">{{ $item->glass ?? 'N/A' }}</td>
+                    <td style="width: 0%;">{{ $item->grid ?? 'N/A' }}</td>  
                     <td>${{ number_format($item->price, 2) }}</td>
                     <td>${{ number_format($item->total, 2) }}</td>
                 </tr>
@@ -71,6 +71,10 @@
                         <td id="discount-amount">${{ number_format($quote->discount, 2) }}</td>
                     </tr>
                     <tr>
+                        <th>Shipping:</th>
+                        <td id="shipping-amount">${{ number_format($quote->shipping, 2) }}</td>
+                    </tr>
+                    <tr>
                         <th>Subtotal:</th>
                         <td id="sub-total-amount">
                             ${{ number_format($quote->sub_total, 2) }}
@@ -80,10 +84,7 @@
                         <th>Tax:</th>
                         <td id="tax-amount-preview">${{ number_format($quote->tax, 2) }}</td>
                     </tr>
-                     <tr>
-                        <th>Shipping:</th>
-                        <td id="shipping-amount">${{ number_format($quote->shipping, 2) }}</td>
-                    </tr>
+                     
                     <tr>
                         <th>Total:</th>
                         <td><strong id="grand-total-amount">${{ number_format($quote->total, 2) }}</strong></td>
@@ -95,7 +96,7 @@
 </div>
 
 <div class="modal-footer">
-    <button class="btn btn-primary" type="button" id="saveQuoteButton">Save Quote</button>
+    <button class="btn btn-primary" type="button" id="saveQuoteButton">Submit Quote</button>
 </div>
 
 <script>
@@ -106,7 +107,7 @@
         formData.append('tax', document.getElementById('tax-amount-preview').innerText.replace(/[$,]/g, '').replace(/\s*\(.*\)/, ''));
         formData.append('shipping', document.getElementById('shipping-amount').innerText.replace(/[$,]/g, ''));
         formData.append('total', document.getElementById('grand-total-amount').innerText.replace(/[$,]/g, ''));
-        formData.append('status', 'Order Created');
+        formData.append('status', 'Quote Submitted');
         fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
             method: 'POST',
             body: formData,

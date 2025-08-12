@@ -115,7 +115,7 @@
                                         </form>
                                     @else
                                         {{-- Original Action Buttons --}}
-                                        <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" data-bs-original-title="View Summary" href="#" data-size="xl" data-url="{{ route('sales.quotes.view', $quote->id) }}" data-title="Quote Summary">
+                                        <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" data-bs-original-title="View Quote" href="#" data-size="xl" data-url="{{ route('sales.quotes.view', $quote->id) }}" data-title="Quote Summary">
                                             <i data-feather="eye"></i>
                                         </a>
 

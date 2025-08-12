@@ -604,11 +604,11 @@
 
         const colorConfigDropdown = form.querySelector('[name="color_config"]');
         const colorConfig = colorConfigDropdown.value;
-        const colorConfigId = colorConfigDropdown.selectedOptions[0]?.getAttribute('data-id') ?? '';
+        const colorConfigId = colorConfigDropdown.selectedOptions[0]?.value ?? '';
         const colorExt = form.querySelector('[name="color_exterior"]');
         const colorInt = form.querySelector('[name="color_interior"]');
-        const colorExtId = colorExt.selectedOptions[0]?.getAttribute('data-id') ?? '';
-        const colorIntId = colorInt.selectedOptions[0]?.getAttribute('data-id') ?? '';
+        const colorExtId = colorExt.selectedOptions[0]?.value?? '';
+        const colorIntId = colorInt.selectedOptions[0]?.value ?? '';
         const item_id = form.querySelector('[name="item_id"]').value;
         const laminateExtText = colorExt ?.selectedOptions[0] ?.text ?? '';
         const colorIntText = colorInt ?.selectedOptions[0] ?.text ?? '';
@@ -630,7 +630,7 @@
             alert('Please select both Exterior and Interior colors.');
             return;
         }
-        
+
         if(!item_id) {
             if (!series || !config || !width || !height) {
                 alert('Please select Series, Configuration, Width, and Height.');
@@ -832,6 +832,14 @@
                     form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
 
                     form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+
+                    setTimeout(() => {
+                        form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                        form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                        form.querySelector('[name="color_interior"]').disabled = true;
+                        form.querySelector('[name="color_exterior"]').disabled = true;
+                    }, 500);
+                    
                     // Disable all fields
                     Array.from(form.elements).forEach(el => {
                         // Do not disable the btn-close button
@@ -972,11 +980,11 @@ function updateWindowPreview() {
     previewBox.style.width = '300px';
     previewBox.style.height = '300px';
     previewBox.style.backgroundColor = '#f8f9fa'; // Fallback background
-    
+
     // Calculate aspect ratio and display dimensions
     const aspectRatio = widthInput / heightInput;
     const maxSize = 280; // Max width/height of the window within container
-    
+
     let displayWidth, displayHeight;
     if (aspectRatio > 1) { // Wider than tall
         displayWidth = maxSize;
@@ -988,65 +996,65 @@ function updateWindowPreview() {
 
     // Create SVG with proper window representation
     let svgContent = `
-        <svg width="100%" height="100%" viewBox="0 0 300 300" 
+        <svg width="100%" height="100%" viewBox="0 0 300 300"
              xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-             
+
         <!-- Background -->
         <rect x="0" y="0" width="300" height="300" fill="#f8f9fa"/>
-        
+
         <!-- Window centered in container -->
         <g transform="translate(${(300 - displayWidth) / 2}, ${(300 - displayHeight) / 2})">
             <!-- Window frame -->
-            <rect x="0" y="0" width="${displayWidth}" height="${displayHeight}" 
+            <rect x="0" y="0" width="${displayWidth}" height="${displayHeight}"
                   fill="#ffffff" stroke="#cccccc" stroke-width="1"/>
     `;
-    
+
     // For XO configuration (opens to right)
     if (config.includes('XO')) {
         // Left pane (fixed)
         svgContent += `
-            <rect x="2" y="2" width="${displayWidth/2-3}" height="${displayHeight-4}" 
+            <rect x="2" y="2" width="${displayWidth/2-3}" height="${displayHeight-4}"
                   fill="#f0f8ff" stroke="#ffffff" stroke-width="0.5"/>
         `;
-        
+
         // Right pane (operable)
         svgContent += `
-            <rect x="${displayWidth/2+1}" y="2" width="${displayWidth/2-3}" height="${displayHeight-4}" 
+            <rect x="${displayWidth/2+1}" y="2" width="${displayWidth/2-3}" height="${displayHeight-4}"
                   fill="#e6f2ff" stroke="#ffffff" stroke-width="0.5"/>
-                  
+
             <!-- Grid lines for operable pane -->
-            <line x1="${displayWidth/2+1}" y1="${displayHeight/3}" x2="${displayWidth-2}" y2="${displayHeight/3}" 
+            <line x1="${displayWidth/2+1}" y1="${displayHeight/3}" x2="${displayWidth-2}" y2="${displayHeight/3}"
                   stroke="#99cbee" stroke-width="0.5" stroke-dasharray="3,2"/>
-            <line x1="${displayWidth/2+1}" y1="${displayHeight*2/3}" x2="${displayWidth-2}" y2="${displayHeight*2/3}" 
+            <line x1="${displayWidth/2+1}" y1="${displayHeight*2/3}" x2="${displayWidth-2}" y2="${displayHeight*2/3}"
                   stroke="#99cbee" stroke-width="0.5" stroke-dasharray="3,2"/>
-            <line x1="${displayWidth/2+displayWidth/6}" y1="2" x2="${displayWidth/2+displayWidth/6}" y2="${displayHeight-2}" 
+            <line x1="${displayWidth/2+displayWidth/6}" y1="2" x2="${displayWidth/2+displayWidth/6}" y2="${displayHeight-2}"
                   stroke="#99cbee" stroke-width="0.5" stroke-dasharray="3,2"/>
-            
+
             <!-- Opening direction arrow -->
-            <path d="M${displayWidth/2+20},${displayHeight/2} L${displayWidth/2+5},${displayHeight/2-10} 
-                    L${displayWidth/2+5},${displayHeight/2+10} Z" 
+            <path d="M${displayWidth/2+20},${displayHeight/2} L${displayWidth/2+5},${displayHeight/2-10}
+                    L${displayWidth/2+5},${displayHeight/2+10} Z"
                   fill="#a80000"/>
         `;
-        
+
         // Divider between panes
         svgContent += `
-            <line x1="${displayWidth/2}" y1="2" x2="${displayWidth/2}" y2="${displayHeight-2}" 
+            <line x1="${displayWidth/2}" y1="2" x2="${displayWidth/2}" y2="${displayHeight-2}"
                   stroke="#a80000" stroke-width="1.5"/>
         `;
     }
-    
+
     svgContent += `
         </g>
-        
+
         <!-- Configuration label -->
-        <text x="150" y="290" 
+        <text x="150" y="290"
               text-anchor="middle" font-family="Arial" font-size="12" fill="#333">
             ${config} - ${widthInput}" × ${heightInput}"
         </text>
     `;
-    
+
     svgContent += `</svg>`;
-    
+
     previewBox.innerHTML = svgContent;
 }
 
@@ -1061,7 +1069,7 @@ document.getElementById('seriesTypeSelect').addEventListener('change', updateWin
 // Initial preview
 updateWindowPreview();
 
-    
+
     // Modal cleanup
     document.addEventListener('hidden.bs.modal', function(event) {
         document.body.classList.remove('modal-open');
@@ -1116,7 +1124,7 @@ updateWindowPreview();
         });
     }
 
-     document.getElementById('addItemModal').addEventListener('shown.bs.modal', function() {
+    document.getElementById('addItemModal').addEventListener('shown.bs.modal', function() {
         const value = $('#colorConfigDropdown').val();
         const [exterior, interior] = value.split('-');
         const exteriorDropdown = document.getElementById('colorExteriorDropdown');
@@ -1132,18 +1140,34 @@ updateWindowPreview();
         if (interior !== 'LAM') interiorDropdown.value = interior;
 
         // Add readonly if config is WH-WH, WH-BK, BK-WH, BK-BK
-        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK'];
+        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK', 'WH-LAM', 'BK-LAM', 'LAM-WH', 'LAM-BK'];
+        // Reset both first
+        exteriorDropdown.disabled = false;
+        interiorDropdown.disabled = false;
+        exteriorDropdown.classList.remove('readonly');
+        interiorDropdown.classList.remove('readonly');
+
         if (readonlyConfigs.includes(value)) {
-            exteriorDropdown.disabled = true;
-            interiorDropdown.disabled = true;
-            exteriorDropdown.classList.add('readonly');
-            interiorDropdown.classList.add('readonly');
-        } else {
-            exteriorDropdown.disabled = false;
-            interiorDropdown.disabled = false;
-            exteriorDropdown.classList.remove('readonly');
-            interiorDropdown.classList.remove('readonly');
+            // Special handling for LAM cases
+            if (value.includes('LAM')) {
+                if (value.startsWith('LAM')) {
+                    // LAM-X → disable X (interior)
+                    interiorDropdown.disabled = true;
+                    interiorDropdown.classList.add('readonly');
+                } else if (value.endsWith('LAM')) {
+                    // X-LAM → disable X (exterior)
+                    exteriorDropdown.disabled = true;
+                    exteriorDropdown.classList.add('readonly');
+                }
+            } else {
+                // Non-LAM case → disable both
+                exteriorDropdown.disabled = true;
+                interiorDropdown.disabled = true;
+                exteriorDropdown.classList.add('readonly');
+                interiorDropdown.classList.add('readonly');
+            }
         }
+
     });
 
 
@@ -1164,19 +1188,39 @@ updateWindowPreview();
         if (interior !== 'LAM') interiorDropdown.value = interior;
 
         // Add readonly if config is WH-WH, WH-BK, BK-WH, BK-BK
-        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK'];
+        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK', 'WH-LAM', 'BK-LAM', 'LAM-WH', 'LAM-BK'];
+        // Reset both first
+        exteriorDropdown.disabled = false;
+        interiorDropdown.disabled = false;
+        exteriorDropdown.classList.remove('readonly');
+        interiorDropdown.classList.remove('readonly');
+
         if (readonlyConfigs.includes(value)) {
-            exteriorDropdown.disabled = true;
-            interiorDropdown.disabled = true;
-            exteriorDropdown.classList.add('readonly');
-            interiorDropdown.classList.add('readonly');
-        } else {
-            exteriorDropdown.disabled = false;
-            interiorDropdown.disabled = false;
-            exteriorDropdown.classList.remove('readonly');
-            interiorDropdown.classList.remove('readonly');
+            // Special handling for LAM cases
+            if (value.includes('LAM')) {
+                if (value.startsWith('LAM')) {
+                    // LAM-X → disable X (interior)
+                    interiorDropdown.disabled = true;
+                    interiorDropdown.classList.add('readonly');
+                } else if (value.endsWith('LAM')) {
+                    // X-LAM → disable X (exterior)
+                    exteriorDropdown.disabled = true;
+                    exteriorDropdown.classList.add('readonly');
+                }
+            } else {
+                // Non-LAM case → disable both
+                exteriorDropdown.disabled = true;
+                interiorDropdown.disabled = true;
+                exteriorDropdown.classList.add('readonly');
+                interiorDropdown.classList.add('readonly');
+            }
         }
     });
+
+    let isAddingLineItem = false;
+    let isFirstLineItem = true;
+    let currentLineItemDiscount = 0; // Track discount for current line item
+    let hasAppliedFirstDiscount = false; // Ensure first discount only applies once
 
     function fetchBasePrice() {
         const series_id = $('#seriesSelect').val();
@@ -1186,33 +1230,55 @@ updateWindowPreview();
 
         if (series_id && series_type && width && height) {
             $.post("{{ route('sales.quotes.checkPrice') }}", {
-                _token: "{{ csrf_token() }}"
-                , series_id: series_id
-                , series_type: series_type
-                , width: width
-                , height: height,
+                _token: "{{ csrf_token() }}",
+                series_id: series_id,
+                series_type: series_type,
+                width: width,
+                height: height,
                 customer_number: "{{ $quote->customer_number ?? '' }}"
             }, function(res) {
-               const price = parseFloat(res.price ?? 0).toFixed(2);
+                const price = parseFloat(res.price ?? 0).toFixed(2);
                 const newDiscount = parseFloat(res.discount ?? 0);
-                // Get the current discount value from the input (or 0 if not set)
-                const currentDiscount = parseFloat($('input[name="discount"]').val() ?? 0);
-                const totalDiscount = (currentDiscount + newDiscount).toFixed(2);
+                const currentGlobalDiscount = parseFloat($('input[name="discount"]').val() || 0);
 
+                let updatedGlobalDiscount = currentGlobalDiscount;
+
+                // Case 1: First time discount application
+                if (isFirstLineItem && !hasAppliedFirstDiscount) {
+                    updatedGlobalDiscount = newDiscount;
+                    hasAppliedFirstDiscount = true;
+                    currentLineItemDiscount = newDiscount;
+                }
+                // Case 2: New line item being added
+                else if (isAddingLineItem) {
+                    // Remove previous discount for this item and add new
+                    updatedGlobalDiscount = currentGlobalDiscount - currentLineItemDiscount + newDiscount;
+                    currentLineItemDiscount = newDiscount;
+                }
+                // Case 3: Existing configuration change
+                else {
+                    // Only update current item's discount without affecting global total
+                    currentLineItemDiscount = newDiscount;
+                }
+
+                // Update UI elements
+                $('input[name="discount"]').val(updatedGlobalDiscount.toFixed(2));
                 $('#globalTotalPrice').text(price);
                 $('input[name="price"]').val(price);
                 $('input[name="total"]').val(price);
-                $('input[name="discount"]').val(newDiscount);
-                $('#discount-amount').text("$" + totalDiscount);
-            });
 
+                // Reset adding flag after processing
+                isAddingLineItem = false;
+            });
         }
     }
 
-    // Trigger on input change
+    // Event handlers remain the same
     $('#seriesSelect, #seriesTypeSelect').on('change', fetchBasePrice);
     $('input[name="width"], input[name="height"]').on('keyup', fetchBasePrice);
-
+    $('#saveQuoteItem').on('click', function() {
+        isAddingLineItem = true;
+    });
 
     @if(isset($allConfigurations))
 
@@ -1340,7 +1406,7 @@ updateWindowPreview();
     });
 
     $('#shipping').on('focusout', function() {
-        
+
         const shippingValue = parseFloat($(this).val()) || 0;
         $('#shipping-amount').text('$' + shippingValue.toFixed(2));
         $('#shipping').val(shippingValue.toFixed(2));
@@ -1367,9 +1433,9 @@ updateWindowPreview();
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }, 
+            },
             body: JSON.stringify({
-                shipping: parseFloat(document.getElementById('shipping').value) || 0    
+                shipping: parseFloat(document.getElementById('shipping').value) || 0
             })
         }).then(response => response.json()).then(data => {
             if (data.success) {
@@ -1386,6 +1452,7 @@ updateWindowPreview();
                     $('#subtotal-amount').text('$' + data.data.sub_total);
                     $('#tax-amount').text('$' + data.data.tax + ' (' + data.data.tax_rate + '%)');
                     $('#total-amount').text('$' + data.data.grand_total);
+                    document.getElementById('discount-amount').textContent = '$' + data.data.total_discount;
                     document.getElementById('tax').value = data.data.tax;
                     document.getElementById('subtotal').value = data.data.sub_total;
                     document.getElementById('tax').value = data.data.tax;
