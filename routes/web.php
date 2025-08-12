@@ -60,6 +60,7 @@ use App\Http\Controllers\{
     ExecutiveTierController,
     FormulaController,
     RaffleDrawController,
+    WebhookController,
     WindowRenderController
 };
 
@@ -216,7 +217,7 @@ use App\Http\Controllers\Purchasing\{
 };
 use App\Http\Controllers\Sales\Quotes\GridProfileController;
 use App\Http\Controllers\Supplier\QuoteRequestController;
-
+use Stripe\Webhook;
 
     // Auth
     require __DIR__ . '/auth.php';
@@ -1137,6 +1138,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::post('quotes/{id}/save-draft', [QuoteController::class, 'saveDraft'])->name('quotes.save.draft');
             Route::get('quotes/fetch-info/{id}', [QuoteController::class, 'fetchInfo']);
             Route::get('quotes/{id}/previous', [QuoteController::class, 'previous'])->name('quotes.previous');
+            Route::post('quotes/{id}/items/{itemId}/qty', [QuoteController::class, 'updateQty'])->name('quotes.items.qty');
         });
 
 
@@ -1250,3 +1252,4 @@ Route::get('quote/request/{token}', [QuoteRequestController::class, 'secureView'
 Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
 
 Route::post('calculate/total', [QuoteController::class, 'calculateTotal'])->name('calculate.total');
+

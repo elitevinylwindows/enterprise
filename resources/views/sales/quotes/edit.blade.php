@@ -604,11 +604,11 @@
 
         const colorConfigDropdown = form.querySelector('[name="color_config"]');
         const colorConfig = colorConfigDropdown.value;
-        const colorConfigId = colorConfigDropdown.selectedOptions[0]?.getAttribute('data-id') ?? '';
+        const colorConfigId = colorConfigDropdown.selectedOptions[0]?.value ?? '';
         const colorExt = form.querySelector('[name="color_exterior"]');
         const colorInt = form.querySelector('[name="color_interior"]');
-        const colorExtId = colorExt.selectedOptions[0]?.getAttribute('data-id') ?? '';
-        const colorIntId = colorInt.selectedOptions[0]?.getAttribute('data-id') ?? '';
+        const colorExtId = colorExt.selectedOptions[0]?.value?? '';
+        const colorIntId = colorInt.selectedOptions[0]?.value ?? '';
         const item_id = form.querySelector('[name="item_id"]').value;
         const laminateExtText = colorExt ?.selectedOptions[0] ?.text ?? '';
         const colorIntText = colorInt ?.selectedOptions[0] ?.text ?? '';
@@ -731,6 +731,8 @@
                         </tr>
                     `;
 
+                    calculateTotals();
+
                     if(data.is_update == false) {
                         document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
                     } else {
@@ -741,7 +743,6 @@
 
                         document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
                     }
-                    calculateTotals();
                     console.log('Modal closed');
                 } else {
                     alert('Item failed to save.');
@@ -750,11 +751,11 @@
 
 
         // 3. Hide modal
-        const modalElement = document.getElementById('quoteItemModal');
-        const modal = bootstrap.Modal.getInstance(modalElement) ?? new bootstrap.Modal(modalElement);
-        if (modal) {
-            modal.hide();
-        }
+        // const modalElement = document.getElementById('quoteItemModal');
+        // const modal = bootstrap.Modal.getInstance(modalElement) ?? new bootstrap.Modal(modalElement);
+        // if (modal) {
+        //     modal.hide();
+        // }
         // 4. Reset form + preview
         form.reset();
 
@@ -819,8 +820,6 @@
                     form.querySelector('[name="height"]').value = data.item.height;
                     form.querySelector('[name="item_comment"]').value = data.item.item_comment || '';
                     form.querySelector('[name="color_config"]').value = data.item.color_config || '';
-                    form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
-                    form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
                     form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
                     form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
                     form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
@@ -838,6 +837,14 @@
                     form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
 
                     form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                   
+                    setTimeout(() => {
+                        form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                        form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                        form.querySelector('[name="color_interior"]').disabled = true;
+                        form.querySelector('[name="color_exterior"]').disabled = true;
+                    }, 500);
+
                     // Disable all fields
                     Array.from(form.elements).forEach(el => {
                         // Do not disable the btn-close button
@@ -879,8 +886,6 @@
                     form.querySelector('[name="height"]').value = data.item.height;
                     form.querySelector('[name="item_comment"]').value = data.item.item_comment || '';
                     form.querySelector('[name="color_config"]').value = data.item.color_config || '';
-                    form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
-                    form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
                     form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
                     form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
                     form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
@@ -903,6 +908,10 @@
                     // Trigger change to load dependent series_type_id options
                     document.getElementById('seriesSelect').dispatchEvent(new Event('change'));
 
+                    setTimeout(() => {
+                        form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                        form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                    }, 500);
                     // Wait for the fetch to complete and then set the value
                     setTimeout(() => {
                         const seriesTypeSelect = document.getElementById('seriesTypeSelect');
@@ -953,18 +962,34 @@
         if (interior !== 'LAM') interiorDropdown.value = interior;
 
         // Add readonly if config is WH-WH, WH-BK, BK-WH, BK-BK
-        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK'];
+        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK', 'WH-LAM', 'BK-LAM', 'LAM-WH', 'LAM-BK'];
+        // Reset both first
+        exteriorDropdown.disabled = false;
+        interiorDropdown.disabled = false;
+        exteriorDropdown.classList.remove('readonly');
+        interiorDropdown.classList.remove('readonly');
+
         if (readonlyConfigs.includes(value)) {
-            exteriorDropdown.disabled = true;
-            interiorDropdown.disabled = true;
-            exteriorDropdown.classList.add('readonly');
-            interiorDropdown.classList.add('readonly');
-        } else {
-            exteriorDropdown.disabled = false;
-            interiorDropdown.disabled = false;
-            exteriorDropdown.classList.remove('readonly');
-            interiorDropdown.classList.remove('readonly');
+            // Special handling for LAM cases
+            if (value.includes('LAM')) {
+                if (value.startsWith('LAM')) {
+                    // LAM-X → disable X (interior)
+                    interiorDropdown.disabled = true;
+                    interiorDropdown.classList.add('readonly');
+                } else if (value.endsWith('LAM')) {
+                    // X-LAM → disable X (exterior)
+                    exteriorDropdown.disabled = true;
+                    exteriorDropdown.classList.add('readonly');
+                }
+            } else {
+                // Non-LAM case → disable both
+                exteriorDropdown.disabled = true;
+                interiorDropdown.disabled = true;
+                exteriorDropdown.classList.add('readonly');
+                interiorDropdown.classList.add('readonly');
+            }
         }
+
     });
 
 
@@ -985,17 +1010,32 @@
         if (interior !== 'LAM') interiorDropdown.value = interior;
 
         // Add readonly if config is WH-WH, WH-BK, BK-WH, BK-BK
-        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK'];
+        const readonlyConfigs = ['WH-WH', 'WH-BK', 'BK-WH', 'BK-BK', 'WH-LAM', 'BK-LAM', 'LAM-WH', 'LAM-BK'];
+        // Reset both first
+        exteriorDropdown.disabled = false;
+        interiorDropdown.disabled = false;
+        exteriorDropdown.classList.remove('readonly');
+        interiorDropdown.classList.remove('readonly');
+
         if (readonlyConfigs.includes(value)) {
-            exteriorDropdown.disabled = true;
-            interiorDropdown.disabled = true;
-            exteriorDropdown.classList.add('readonly');
-            interiorDropdown.classList.add('readonly');
-        } else {
-            exteriorDropdown.disabled = false;
-            interiorDropdown.disabled = false;
-            exteriorDropdown.classList.remove('readonly');
-            interiorDropdown.classList.remove('readonly');
+            // Special handling for LAM cases
+            if (value.includes('LAM')) {
+                if (value.startsWith('LAM')) {
+                    // LAM-X → disable X (interior)
+                    interiorDropdown.disabled = true;
+                    interiorDropdown.classList.add('readonly');
+                } else if (value.endsWith('LAM')) {
+                    // X-LAM → disable X (exterior)
+                    exteriorDropdown.disabled = true;
+                    exteriorDropdown.classList.add('readonly');
+                }
+            } else {
+                // Non-LAM case → disable both
+                exteriorDropdown.disabled = true;
+                interiorDropdown.disabled = true;
+                exteriorDropdown.classList.add('readonly');
+                interiorDropdown.classList.add('readonly');
+            }
         }
     });
 
@@ -1041,7 +1081,7 @@
     document.addEventListener('hidden.bs.modal', function(event) {
         document.body.classList.remove('modal-open');
         document.body.style = '';
-        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        // document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
     });
 
 
@@ -1119,6 +1159,9 @@
     });
 
     let isAddingLineItem = false;
+    let isFirstLineItem = true;
+    let currentLineItemDiscount = 0; // Track discount for current line item
+    let hasAppliedFirstDiscount = false; // Ensure first discount only applies once
 
     function fetchBasePrice() {
         const series_id = $('#seriesSelect').val();
@@ -1137,37 +1180,45 @@
             }, function(res) {
                 const price = parseFloat(res.price ?? 0).toFixed(2);
                 const newDiscount = parseFloat(res.discount ?? 0);
+                const currentGlobalDiscount = parseFloat($('input[name="discount"]').val() || 0);
 
-                let totalDiscount;
-                if (isAddingLineItem) {
-                    const currentDiscount = parseFloat($('input[name="discount"]').val() ?? 0);
-                    totalDiscount = (currentDiscount + newDiscount).toFixed(2);
-                    $('input[name="discount"]').val(totalDiscount);
-                } else {
-                    totalDiscount = parseFloat($('input[name="discount"]').val() ?? 0).toFixed(2);
+                let updatedGlobalDiscount = currentGlobalDiscount;
+
+                // Case 1: First time discount application
+                if (isFirstLineItem && !hasAppliedFirstDiscount) {
+                    updatedGlobalDiscount = newDiscount;
+                    hasAppliedFirstDiscount = true;
+                    currentLineItemDiscount = newDiscount;
+                }
+                // Case 2: New line item being added
+                else if (isAddingLineItem) {
+                    // Remove previous discount for this item and add new
+                    updatedGlobalDiscount = currentGlobalDiscount - currentLineItemDiscount + newDiscount;
+                    currentLineItemDiscount = newDiscount;
+                }
+                // Case 3: Existing configuration change
+                else {
+                    // Only update current item's discount without affecting global total
+                    currentLineItemDiscount = newDiscount;
                 }
 
+                // Update UI elements
+                $('input[name="discount"]').val(updatedGlobalDiscount.toFixed(2));
                 $('#globalTotalPrice').text(price);
                 $('input[name="price"]').val(price);
                 $('input[name="total"]').val(price);
-                $('#discount-amount').text("$" + totalDiscount);
 
-                // reset flag
+                // Reset adding flag after processing
                 isAddingLineItem = false;
             });
         }
     }
 
-
-
-    // Trigger on input change
+    // Event handlers remain the same
     $('#seriesSelect, #seriesTypeSelect').on('change', fetchBasePrice);
     $('input[name="width"], input[name="height"]').on('keyup', fetchBasePrice);
-
-        // When adding a new line item
-    $('#addLineItemBtn').on('click', function() {
+    $('#saveQuoteItem').on('click', function() {
         isAddingLineItem = true;
-        fetchBasePrice();
     });
 
     @if(isset($allConfigurations))
@@ -1324,14 +1375,15 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
-                shipping: parseFloat(document.getElementById('shipping').value) || 0
+                shipping: parseFloat(document.getElementById('shipping').value) || 0,
             })
         }).then(response => response.json()).then(data => {
             if (data.success) {
                 if(modalOpen) {
                     var shipping = $('#shipping').val();
                     // If modal is open, update the totals in the modal
-                    document.getElementById('discount-amount').textContent = '$' + data.data.total_discount;
+                    $('#discount-amount').text("$" + data.data.total_discount);
+
                     document.getElementById('sub-total-amount').textContent = '$' + data.data.sub_total;
                     document.getElementById('tax-amount-preview').textContent = '$' + data.data.tax + ' (' + data.data.tax_rate + '%)';
                     document.getElementById('shipping-amount').textContent = '$' + data.data.shipping;
@@ -1339,6 +1391,7 @@
                 } else {
                     // Update the UI with the new totals
                     $('#subtotal-amount').text('$' + data.data.sub_total);
+                    $('#discount-amount').text("$" + data.data.total_discount);
                     $('#tax-amount').text('$' + data.data.tax + ' (' + data.data.tax_rate + '%)');
                     $('#total-amount').text('$' + data.data.grand_total);
                     document.getElementById('tax').value = data.data.tax;
@@ -1393,10 +1446,44 @@
     });
 
     // Listen for qty input changes
-     document.addEventListener('input', function(e) {
+    document.addEventListener('focusout', function(e) {
         if (e.target.classList.contains('qty-input')) {
             var shipping = $('#shipping').val();
-            calculateTotals(shipping, false);
+
+            // AJAX call to update qty for the line item
+            const input = e.target;
+            const itemId = input.getAttribute('data-id');
+            const newQty = input.value;
+            const quoteId = "{{ $quote->id }}";
+
+            console.log(newQty);
+            console.log(itemId);
+            if (itemId && newQty > 0) {
+                fetch(`/sales/quotes/${quoteId}/items/${itemId}/qty`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ qty: newQty })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Optionally update price/total in the row if returned
+                        if (data.data) {
+                            const totalCell = document.querySelector(`.item-total[data-id="${itemId}"]`);
+                            if (totalCell) {
+                                totalCell.textContent = '$' + data.data.total;
+                            }
+                        }
+                        calculateTotals(shipping, false);
+                    } else {
+                        alert('Failed to update quantity.');
+                    }
+                })
+                .catch(() => alert('Server error updating quantity.'));
+            }
         }
     });
 

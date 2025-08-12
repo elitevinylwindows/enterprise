@@ -4,6 +4,7 @@ use App\Helper\FirstServe;
 use App\Mail\Common;
 use App\Mail\EmailVerification;
 use App\Mail\InvoiceMail;
+use App\Mail\OrderMail;
 use App\Mail\TestMail;
 use App\Models\AuthPage;
 use App\Models\Custom;
@@ -29,7 +30,7 @@ use Illuminate\Support\Facades\Storage;
 use PragmaRX\Google2FAQRCode\Google2FA;
 use Spatie\Permission\Models\Role;
 use App\Models\Sales\SalesSetting;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 
 if (!function_exists('settingsKeys')) {
     function settingsKeys()
@@ -1968,6 +1969,8 @@ if(!function_exists('quoteToOrder')) {
 if(!function_exists('quoteToInvoice')) {
     function quoteToInvoice($quote, $order)
     {
+        try{
+            DB::beginTransaction();
             $invoice = Invoice::create([
                 'order_id' => $order->id,
                 'quote_id' => $quote->id,
@@ -1992,7 +1995,8 @@ if(!function_exists('quoteToInvoice')) {
                 'payment_method' => null,
                 'gateway_response' => null,
             ]);
-
+            DB::commit();
+        
             $firstServe = new FirstServe();
             $firstServeInvoice = $firstServe->createInvoice($invoice);
 
@@ -2013,14 +2017,19 @@ if(!function_exists('quoteToInvoice')) {
                 ]);
             }
 
-        return $invoice;
+            return $invoice;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error creating invoice: ' . $e->getMessage());
+            return null;
+        }
     }
 }
 
 if(!function_exists('generateInvoiceNumber')) {
     function generateInvoiceNumber()
     {
-        $lastInvoice = Invoice::max('id')+27;
+        $lastInvoice = Invoice::max('id')+5;
         $nextId = $lastInvoice ? $lastInvoice + 1 : 1;
         return 'INV-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
     }
@@ -2044,17 +2053,30 @@ if (!function_exists('calculateTotal')) {
         }
         $tax = number_format($taxRate * ($total / 100), 2);
 
-
+        $subtotal = $total - $quote->discount + $shipping;
         $data = [
-            'total' => $total,
-            'sub_total' => $total - $quote->discount,
+            'total' => number_format($total, 2),
+            'sub_total' => number_format($subtotal, 2),
             'shipping' => number_format($shipping, 2),
             'total_discount' => number_format($quote->discount, 2),
-            'tax' => $tax,
-            'tax_rate' => $taxRate,
-            'grand_total' => $total - $quote->discount + $tax + $shipping,
+            'tax' => number_format($tax, 2),
+            'tax_rate' => number_format($taxRate, 2),
+            'grand_total' => number_format($subtotal + $tax, 2),
         ];
 
         return $data;
+    }
+}
+
+
+if(!function_exists('sendOrderMail')) {
+    function sendOrderMail($order)
+    {
+        $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order]);
+        $pdfPath = 'orders/order_'.$order->order_number.'.pdf';
+        Storage::disk('public')->put($pdfPath, $pdf->output());
+
+        $mail = new OrderMail($order, $pdfPath);
+        Mail::to($order->customer->email)->send($mail);
     }
 }

@@ -71,6 +71,10 @@
                         <td id="discount-amount">${{ number_format($quote->discount, 2) }}</td>
                     </tr>
                     <tr>
+                        <th>Shipping:</th>
+                        <td id="shipping-amount">${{ number_format($quote->shipping, 2) }}</td>
+                    </tr>
+                    <tr>
                         <th>Subtotal:</th>
                         <td id="sub-total-amount">
                             ${{ number_format($quote->sub_total, 2) }}
@@ -80,10 +84,7 @@
                         <th>Tax:</th>
                         <td id="tax-amount-preview">${{ number_format($quote->tax, 2) }}</td>
                     </tr>
-                     <tr>
-                        <th>Shipping:</th>
-                        <td id="shipping-amount">${{ number_format($quote->shipping, 2) }}</td>
-                    </tr>
+                     
                     <tr>
                         <th>Total:</th>
                         <td><strong id="grand-total-amount">${{ number_format($quote->total, 2) }}</strong></td>
@@ -106,7 +107,7 @@
         formData.append('tax', document.getElementById('tax-amount-preview').innerText.replace(/[$,]/g, '').replace(/\s*\(.*\)/, ''));
         formData.append('shipping', document.getElementById('shipping-amount').innerText.replace(/[$,]/g, ''));
         formData.append('total', document.getElementById('grand-total-amount').innerText.replace(/[$,]/g, ''));
-        formData.append('status', 'Order Created');
+        formData.append('status', 'Quote Submitted');
         fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
             method: 'POST',
             body: formData,
