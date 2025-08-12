@@ -137,6 +137,8 @@
 </div>
 @endsection
 
+@include('manufacturing.stations.create')
+
 @push('scripts')
 <script>
 $(function () {

@@ -105,6 +105,8 @@
 </div>
 @endsection
 
+@include('manufacturing.capacity.create')
+
 @push('scripts')
 <script>
     $(function () {

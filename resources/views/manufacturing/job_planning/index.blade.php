@@ -147,6 +147,8 @@
 </div>
 @endsection
 
+@include('manufacturing.job_planning.create')
+
 @push('scripts')
 
 <script>

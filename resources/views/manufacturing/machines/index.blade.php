@@ -151,6 +151,9 @@
 </div>
 @endsection
 
+
+@include('manufacturing.machines.create')
+
 @push('scripts')
 <script>
 $(function () {
