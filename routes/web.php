@@ -213,7 +213,8 @@ use App\Http\Controllers\Inventory\{
 
 use App\Http\Controllers\Manufacturing\{
     CapacityController,
-    MachineController
+    MachineController,
+    JobPlanningController
 };
 
 
@@ -1032,7 +1033,25 @@ use Stripe\Webhook;
         Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
         Route::get('/capacity', [CapacityController::class, 'index'])->name('capacity.index');
         Route::resource('machines', MachineController::class);
-        });
+        Route::get('job-planning',                 [JobPlanningController::class, 'index'])->name('job_planning.index');
+    Route::get('job-planning/{job}',           [JobPlanningController::class, 'show'])->name('job_planning.show');
+    Route::get('job-planning/{job}/edit',      [JobPlanningController::class, 'edit'])->name('job_planning.edit');
+    Route::put('job-planning/{job}',           [JobPlanningController::class, 'update'])->name('job_planning.update');
+    Route::delete('job-planning/{job}',        [JobPlanningController::class, 'destroy'])->name('job_planning.destroy');
+
+    Route::post('job-planning/{id}/restore',   [JobPlanningController::class, 'restore'])->name('job_planning.restore');
+    Route::delete('job-planning/{id}/force',   [JobPlanningController::class, 'forceDelete'])->name('job_planning.force-delete');
+
+    Route::get('job-planning/{job}/prioritize',[JobPlanningController::class, 'prioritize'])->name('job_planning.prioritize');
+    Route::get('job-planning/{job}/payment',   [JobPlanningController::class, 'payment'])->name('job_planning.payment');
+    
+    
+    
+    
+    
+    
+    
+    });
 
 
 
