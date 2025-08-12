@@ -59,36 +59,30 @@
                             </tr>
                         </thead>
                         <tbody>
+@php $thCount = 4; @endphp
+
 @forelse ($machines as $machine)
     <tr>
         <td>{{ $machine->id }}</td>
         <td>{{ $machine->machine }}</td>
-        <td>{{ ucfirst($machine->file_type) }}</td>
+        <td>{{ $machine->file_type ? ucfirst($machine->file_type) : '—' }}</td>
         <td class="text-nowrap">
-            {{-- View --}}
             <a href="{{ route('manufacturing.machines.show', $machine->id) }}"
-               class="avtar avtar-xs btn-link-success text-success"
-               data-bs-toggle="tooltip"
-               title="View">
-                <i data-feather="eye"></i>
+               class="avtar avtar-xs btn-link-success text-success" title="View">
+               <i data-feather="eye"></i>
             </a>
 
-            {{-- Edit --}}
             <a href="{{ route('manufacturing.machines.edit', $machine->id) }}"
-               class="avtar avtar-xs btn-link-primary text-primary"
-               data-bs-toggle="tooltip"
-               title="Edit">
-                <i data-feather="edit"></i>
+               class="avtar avtar-xs btn-link-primary text-primary" title="Edit">
+               <i data-feather="edit"></i>
             </a>
 
-            {{-- Delete --}}
             <form action="{{ route('manufacturing.machines.destroy', $machine->id) }}"
-                  method="POST" style="display:inline;">
+                  method="POST" class="d-inline">
                 @csrf
                 @method('DELETE')
                 <button type="submit"
                         class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0"
-                        data-bs-toggle="tooltip"
                         title="Delete"
                         onclick="return confirm('Delete this machine?')">
                     <i data-feather="trash-2"></i>
@@ -98,10 +92,11 @@
     </tr>
 @empty
     <tr>
-        <td colspan="4" class="text-center text-muted">No machines found</td>
+        <td colspan="{{ $thCount }}" class="text-center text-muted">No machines found</td>
     </tr>
 @endforelse
 </tbody>
+
 
                     </table>
                 </div> 
