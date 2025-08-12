@@ -1037,7 +1037,7 @@
         </li>
     </ul>
 </li>
-<li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
+<li class="pc-item pc-hasmenu {{ request()->routeIs('manufacturing.machines.*') || request()->routeIs('manufacturing.stations.*') || request()->routeIs('manufacturing.capacity.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-wrench"></i></span>
         <span class="pc-mtext ms-2">Equipment</span>
@@ -1050,8 +1050,8 @@
                 <span class="pc-mtext">Machines</span>
             </a>
         </li>
-        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
-            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
+        <li class="pc-item {{ request()->routeIs('manufacturing.stations.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.stations.index') }}" class="pc-link">
                 <span class="pc-mtext">Stations</span>
             </a>
         </li>
@@ -1062,7 +1062,8 @@
         </li>
     </ul>
 </li>
-<li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('manufacturing.job_planning.*') || request()->routeIs('manufacturing.tempered.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-check-to-slot"></i></span>
         <span class="pc-mtext ms-2">Work Orders</span>
@@ -1070,23 +1071,19 @@
     </a>
 
     <ul class="pc-submenu">
-        <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
-            <a href="{{ route('master.customers.index') }}" class="pc-link">
-                <span class="pc-mtext">Job Pool</span>
+        <li class="pc-item {{ request()->routeIs('manufacturing.job_planning.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.job_planning.index') }}" class="pc-link">
+                <span class="pc-mtext">Job Planning</span>
             </a>
         </li>
-        <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
-            <a href="{{ route('master.customers.index') }}" class="pc-link">
-                <span class="pc-mtext">Job Pool</span>
-            </a>
-        </li>
-        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
-            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
+        <li class="pc-item {{ request()->routeIs('manufacturing.tempered.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.tempered.index') }}" class="pc-link">
                 <span class="pc-mtext">Tempered</span>
             </a>
         </li>
     </ul>
 </li>
+
 
 
 <!-- Manufacturing Menu -->
