@@ -29,10 +29,10 @@ class QuoteController extends Controller
 
 public function index(Request $request)
 {
-    $order = Order::with('user')->latest()->first();
+    // $order = Order::with('user')->latest()->first();
 
-    $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order])->stream();
-    return $pdf;
+    // $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order])->stream();
+    // return $pdf;
 
     $status = $request->get('status', 'all');
 
