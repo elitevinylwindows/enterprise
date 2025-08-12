@@ -26,8 +26,14 @@ use Illuminate\Support\Facades\Storage;
 
 class QuoteController extends Controller
 {
+
 public function index(Request $request)
 {
+    $order = Order::with('user')->latest()->first();
+
+    $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order])->stream();
+    return $pdf;
+
     $status = $request->get('status', 'all');
 
     $quotes = Quote::query();
@@ -670,7 +676,7 @@ public function index(Request $request)
             $order = quoteToOrder($quote);
 
            sendOrderMail($order);
-            
+
             DB::commit();
         return redirect()->route('sales.orders.index', $order->id)->with('success', 'Quote converted to Order successfully.');
         } catch (\Exception $e) {
@@ -718,7 +724,7 @@ public function index(Request $request)
                 $order = quoteToOrder($quote);
 
                 sendOrderMail($order);
-                
+
                 $invoice = quoteToInvoice($quote, $order);
 
                 if (!$order) {
