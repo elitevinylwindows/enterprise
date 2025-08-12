@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
-     public function handle(Request $request)
+    public function handle(Request $request)
     {
+        Log::error('webhook called');
+
         // Verify the webhook signature (if provided)
         $signature = $request->header('X-FirstServe-Signature');
         $payload = $request->getContent();
@@ -20,7 +22,7 @@ class WebhookController extends Controller
 
         $event = $request->input('event');
         $data = $request->input('data');
-
+        Log::info("Webhook event received: {$event}", $data);
         switch ($event) {
             case 'payment.created':
                 $this->handlePaymentCreated($data);
