@@ -29,6 +29,10 @@
                    class="list-group-item {{ ($status ?? '') === 'image' ? 'active' : '' }}">
                     .XML
                 </a>
+                <a href="{{ route('manufacturing.machines.index', ['file_type' => 'video']) }}"
+                   class="list-group-item {{ ($status ?? '') === 'video' ? 'active' : '' }}">
+                    Videos
+                </a>
                 <a href="{{ route('manufacturing.machines.index', ['file_type' => 'other']) }}"
                    class="list-group-item {{ ($status ?? '') === 'other' ? 'active' : '' }}">
                     Other
@@ -59,45 +63,48 @@
                             </tr>
                         </thead>
                         <tbody>
-@php $thCount = 4; @endphp
+                        @foreach ($machines as $machine)
+                            <tr>
+                                <td>{{ $machine->id }}</td>
+                                <td>{{ $machine->machine }}</td>
+                                <td>{{ $machine->file_type ? ucfirst($machine->file_type) : '—' }}</td>
+                                <td class="text-nowrap">
+                                    {{-- View --}}
+                                    <a href="{{ route('manufacturing.machines.show', $machine->id) }}"
+                                       class="avtar avtar-xs btn-link-success text-success"
+                                       title="View">
+                                        <i data-feather="eye"></i>
+                                    </a>
 
-@forelse ($machines as $machine)
-    <tr>
-        <td>{{ $machine->id }}</td>
-        <td>{{ $machine->machine }}</td>
-        <td>{{ $machine->file_type ? ucfirst($machine->file_type) : '—' }}</td>
-        <td class="text-nowrap">
-            <a href="{{ route('manufacturing.machines.show', $machine->id) }}"
-               class="avtar avtar-xs btn-link-success text-success" title="View">
-               <i data-feather="eye"></i>
-            </a>
+                                    {{-- Edit --}}
+                                    <a href="{{ route('manufacturing.machines.edit', $machine->id) }}"
+                                       class="avtar avtar-xs btn-link-primary text-primary"
+                                       title="Edit">
+                                        <i data-feather="edit"></i>
+                                    </a>
 
-            <a href="{{ route('manufacturing.machines.edit', $machine->id) }}"
-               class="avtar avtar-xs btn-link-primary text-primary" title="Edit">
-               <i data-feather="edit"></i>
-            </a>
+                                    {{-- Delete --}}
+                                    <form action="{{ route('manufacturing.machines.destroy', $machine->id) }}"
+                                          method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0"
+                                                title="Delete"
+                                                onclick="return confirm('Delete this machine?')">
+                                            <i data-feather="trash-2"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
 
-            <form action="{{ route('manufacturing.machines.destroy', $machine->id) }}"
-                  method="POST" class="d-inline">
-                @csrf
-                @method('DELETE')
-                <button type="submit"
-                        class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0"
-                        title="Delete"
-                        onclick="return confirm('Delete this machine?')">
-                    <i data-feather="trash-2"></i>
-                </button>
-            </form>
-        </td>
-    </tr>
-@empty
-    <tr>
-        <td colspan="{{ $thCount }}" class="text-center text-muted">No machines found</td>
-    </tr>
-@endforelse
-</tbody>
-
-
+                        @if($machines->isEmpty())
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No machines found</td>
+                            </tr>
+                        @endif
+                        </tbody>
                     </table>
                 </div> 
             </div>
@@ -108,13 +115,27 @@
 
 @push('scripts')
 <script>
-    $(function () {
-        if ($.fn.DataTable) {
-            $('#machinesTable').DataTable({
-                pageLength: 25,
-                order: [[0, 'asc']]
-            });
+$(function () {
+    var $t = $('#machinesTable');
+    var thCount = $t.find('thead th').length;
+
+    // Debug: check for column mismatches
+    $t.find('tbody tr').each(function (i) {
+        var tdCount = $(this).children('td').length;
+        if (tdCount !== thCount) {
+            console.warn('Column mismatch on row', i, 'td:', tdCount, 'th:', thCount, this);
         }
     });
+
+    if ($.fn.DataTable) {
+        $t.DataTable({
+            pageLength: 25,
+            order: [[0, 'asc']],
+            columnDefs: [
+                { targets: -1, orderable: false, searchable: false }
+            ]
+        });
+    }
+});
 </script>
 @endpush
