@@ -1014,7 +1014,7 @@
 <!-- Master Data -->
  <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="fa-solid fa-brain"></i></span>
+        <span class="pc-micon"><i class="fa-solid fa-grip"></i></span>
         <span class="pc-mtext ms-2">Dashboards</span>
         <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
     </a>
@@ -1034,7 +1034,7 @@
 </li>
 <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="fa-solid fa-brain"></i></span>
+        <span class="pc-micon"><i class="fa-solid fa-wrench"></i></span>
         <span class="pc-mtext ms-2">Equipment</span>
         <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
     </a>
@@ -1054,7 +1054,7 @@
 </li>
 <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="fa-solid fa-brain"></i></span>
+        <span class="pc-micon"><i class="fa-solid fa-check-to-slot"></i></span>
         <span class="pc-mtext ms-2">Work Orders</span>
         <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
     </a>
