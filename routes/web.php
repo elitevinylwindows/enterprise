@@ -1137,6 +1137,7 @@ use App\Http\Controllers\Supplier\QuoteRequestController;
             Route::post('quotes/{id}/save-draft', [QuoteController::class, 'saveDraft'])->name('quotes.save.draft');
             Route::get('quotes/fetch-info/{id}', [QuoteController::class, 'fetchInfo']);
             Route::get('quotes/{id}/previous', [QuoteController::class, 'previous'])->name('quotes.previous');
+            Route::post('quotes/{id}/items/{itemId}/qty', [QuoteController::class, 'updateQty'])->name('quotes.items.qty');
         });
 
 

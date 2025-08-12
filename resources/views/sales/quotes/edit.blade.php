@@ -1375,7 +1375,7 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
-                shipping: parseFloat(document.getElementById('shipping').value) || 0
+                shipping: parseFloat(document.getElementById('shipping').value) || 0,
             })
         }).then(response => response.json()).then(data => {
             if (data.success) {
@@ -1446,10 +1446,44 @@
     });
 
     // Listen for qty input changes
-     document.addEventListener('input', function(e) {
+    document.addEventListener('focusout', function(e) {
         if (e.target.classList.contains('qty-input')) {
             var shipping = $('#shipping').val();
-            calculateTotals(shipping, false);
+
+            // AJAX call to update qty for the line item
+            const input = e.target;
+            const itemId = input.getAttribute('data-id');
+            const newQty = input.value;
+            const quoteId = "{{ $quote->id }}";
+
+            console.log(newQty);
+            console.log(itemId);
+            if (itemId && newQty > 0) {
+                fetch(`/sales/quotes/${quoteId}/items/${itemId}/qty`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ qty: newQty })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Optionally update price/total in the row if returned
+                        if (data.data) {
+                            const totalCell = document.querySelector(`.item-total[data-id="${itemId}"]`);
+                            if (totalCell) {
+                                totalCell.textContent = '$' + data.data.total;
+                            }
+                        }
+                        calculateTotals(shipping, false);
+                    } else {
+                        alert('Failed to update quantity.');
+                    }
+                })
+                .catch(() => alert('Server error updating quantity.'));
+            }
         }
     });
 

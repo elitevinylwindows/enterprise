@@ -165,7 +165,6 @@ public function index(Request $request)
                 'knocked_down' => 'nullable|boolean',
             ]);
             $isUpdate = false;
-
             // Check if item already exists
             if (isset($validated['item_id'])) {
 
@@ -842,27 +841,39 @@ public function index(Request $request)
 
 
 
-public function restore($id)
-{
-    Quote::withTrashed()->findOrFail($id)->restore();
-    return redirect()->route('sales.quotes.index', ['status' => 'deleted'])
-        ->with('success', 'Quote restored successfully');
-}
+    public function restore($id)
+    {
+        Quote::withTrashed()->findOrFail($id)->restore();
+        return redirect()->route('sales.quotes.index', ['status' => 'deleted'])
+            ->with('success', 'Quote restored successfully');
+    }
 
-public function forceDelete($id)
-{
-    Quote::withTrashed()->findOrFail($id)->forceDelete();
-    return redirect()->route('sales.quotes.index', ['status' => 'deleted'])
-        ->with('success', 'Quote permanently deleted');
-}
+    public function forceDelete($id)
+    {
+        Quote::withTrashed()->findOrFail($id)->forceDelete();
+        return redirect()->route('sales.quotes.index', ['status' => 'deleted'])
+            ->with('success', 'Quote permanently deleted');
+    }
 
-public function calculateTotal(Request $request)
-{
-    $quote = Quote::findOrFail($request->quote_id);
+    public function calculateTotal(Request $request)
+    {
+        $quote = Quote::findOrFail($request->quote_id);
 
-    $data = calculateTotal($quote, $request->shipping);
+        $data = calculateTotal($quote, $request->shipping);
 
-    return response()->json(['success' => true, 'data' => $data]);
-}
+        return response()->json(['success' => true, 'data' => $data]);
+    }
+
+    public function updateQty($quoteId, $itemId)
+    {
+        $quote = Quote::findOrFail($quoteId);
+        $item = QuoteItem::findOrFail($itemId);
+        $item->qty = request()->input('qty');
+        $item->total = $item->qty * $item->price;
+        $item->save();
+
+        return response()->json(['success' => true, 'data' => $item]);
+
+    }
 
 }
