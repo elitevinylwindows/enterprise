@@ -1,0 +1,128 @@
+@extends('layouts.app')
+
+@section('page-title')
+    {{ __('Machines') }}
+@endsection
+
+@section('breadcrumb')
+    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ __('Machines') }}</li>
+@endsection
+
+@section('content')
+<div class="mb-4"></div>
+
+<div class="row">
+    {{-- Sidebar --}}
+    <div class="col-md-2">
+        <div class="card">
+            <div class="list-group list-group-flush">
+                <a href="{{ route('manufacturing.machines.index') }}"
+                   class="list-group-item {{ ($status ?? 'all') === 'all' ? 'active' : '' }}">
+                    All Machines
+                </a>
+                <a href="{{ route('manufacturing.machines.index', ['file_type' => 'pdf']) }}"
+                   class="list-group-item {{ ($status ?? '') === 'pdf' ? 'active' : '' }}">
+                    PDF
+                </a>
+                <a href="{{ route('manufacturing.machines.index', ['file_type' => 'image']) }}"
+                   class="list-group-item {{ ($status ?? '') === 'image' ? 'active' : '' }}">
+                    Images
+                </a>
+                <a href="{{ route('manufacturing.machines.index', ['file_type' => 'video']) }}"
+                   class="list-group-item {{ ($status ?? '') === 'video' ? 'active' : '' }}">
+                    Videos
+                </a>
+                <a href="{{ route('manufacturing.machines.index', ['file_type' => 'other']) }}"
+                   class="list-group-item {{ ($status ?? '') === 'other' ? 'active' : '' }}">
+                    Other
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {{-- Main Content --}}
+    <div class="col-sm-10">
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>{{ __('Machines List') }}</h5>
+                <a href="{{ route('manufacturing.machines.create') }}" class="btn btn-primary btn-sm">
+                    <i data-feather="plus"></i> Add Machine
+                </a>
+            </div>
+
+            <div class="card-body pt-0">
+                <div class="dt-responsive table-responsive">
+                    <table class="table table-hover advance-datatable" id="machinesTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Machine</th>
+                                <th>File Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @forelse ($machines as $machine)
+                            <tr>
+                                <td>{{ $machine->id }}</td>
+                                <td>{{ $machine->machine }}</td>
+                                <td>{{ ucfirst($machine->file_type) }}</td>
+                                <td class="text-nowrap">
+                                    {{-- View --}}
+                                    <a href="{{ route('manufacturing.machines.show', $machine->id) }}"
+                                       class="avtar avtar-xs btn-link-success text-success"
+                                       data-bs-toggle="tooltip"
+                                       title="View">
+                                        <i data-feather="eye"></i>
+                                    </a>
+
+                                    {{-- Edit --}}
+                                    <a href="{{ route('manufacturing.machines.edit', $machine->id) }}"
+                                       class="avtar avtar-xs btn-link-primary text-primary"
+                                       data-bs-toggle="tooltip"
+                                       title="Edit">
+                                        <i data-feather="edit"></i>
+                                    </a>
+
+                                    {{-- Delete --}}
+                                    <form action="{{ route('manufacturing.machines.destroy', $machine->id) }}"
+                                          method="POST" style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0"
+                                                data-bs-toggle="tooltip"
+                                                title="Delete"
+                                                onclick="return confirm('Delete this machine?')">
+                                            <i data-feather="trash-2"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No machines found</td>
+                            </tr>
+                        @endforelse
+                        </tbody>
+                    </table>
+                </div> 
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+    $(function () {
+        if ($.fn.DataTable) {
+            $('#machinesTable').DataTable({
+                pageLength: 25,
+                order: [[0, 'asc']]
+            });
+        }
+    });
+</script>
+@endpush
