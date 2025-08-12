@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Manufacturing;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Capacity;
+use App\Models\Manufacturing\Capacity;
 
 class CapacityController extends Controller
 {
