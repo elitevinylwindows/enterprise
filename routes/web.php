@@ -1048,10 +1048,7 @@ use Stripe\Webhook;
     Route::get('job-planning/{job}/payment',   [JobPlanningController::class, 'payment'])->name('job_planning.payment');
     
     
-    
-    
-    
-    
+
     
     });
 
