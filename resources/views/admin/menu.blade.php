@@ -240,7 +240,7 @@
             </a>
             <ul class="pc-submenu" style="{{ request()->routeIs('sales.quotes.*') ? 'display: block;' : 'display: none;' }}">
                 <li><a class="pc-link" href="{{ route('sales.quotes.create') }}">New Quote</a></li>
-                <li><a class="pc-link" href="{{ route('sales.quotes.index') }}">All Quoutes</a></li>
+                <li><a class="pc-link" href="{{ route('sales.quotes.index') }}">All Quotes</a></li>
             </ul>
         </li>
         @endif
@@ -1009,6 +1009,25 @@
         <i class="ti ti-chart-arcs"></i>
     </div>
     <i class="ti ti-plus text-muted pe-2" style="font-size: 0.9rem;"></i>
+</li>
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-brain"></i></span>
+        <span class="pc-mtext ms-2">Master Data</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+ <li class="pc-item {{ request()->routeIs('master.dashboard.*') ? 'active' : '' }}">
+    <a href="{{ route('master.customers.index') }}" class="pc-link">
+        <span class="pc-mtext">Customers</span>
+    </a>
+</li>   
+<li class="pc-item {{ request()->routeIs('master.dashboard.*') ? 'active' : '' }}">
+    <a href="{{ route('master.suppliers.index') }}" class="pc-link">
+        <span class="pc-mtext">Suppliers</span>
+    </a>
 </li>
 
 <!-- Manufacturing Menu -->
