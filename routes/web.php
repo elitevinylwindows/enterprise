@@ -214,7 +214,8 @@ use App\Http\Controllers\Inventory\{
 use App\Http\Controllers\Manufacturing\{
     CapacityController,
     MachineController,
-    JobPlanningController
+    JobPlanningController,
+    StationController
 };
 
 
@@ -1033,6 +1034,7 @@ use Stripe\Webhook;
         Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
         Route::get('/capacity', [CapacityController::class, 'index'])->name('capacity.index');
         Route::resource('machines', MachineController::class);
+        Route::resource('stations', StationController::class);
         Route::get('job-planning',                 [JobPlanningController::class, 'index'])->name('job_planning.index');
     Route::get('job-planning/{job}',           [JobPlanningController::class, 'show'])->name('job_planning.show');
     Route::get('job-planning/{job}/edit',      [JobPlanningController::class, 'edit'])->name('job_planning.edit');
