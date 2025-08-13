@@ -92,10 +92,12 @@
                                     @if($status === 'deleted')
                                     <span class="badge bg-danger">Deleted</span>
                                     @else
-                                    @if($invoice->status === 'active')
+                                    @if($invoice->paid === 'paid')
                                     <span class="badge bg-success">Active</span>
-                                    @elseif($invoice->status === 'draft')
-                                    <span class="badge bg-secondary">Draft</span>
+                                    @elseif($invoice->status === 'warning')
+                                    <span class="badge bg-warning">error</span>
+                                    @elseif($invoice->status === 'declined')
+                                    <span class="badge bg-danger">declined</span>
                                     @else
                                     <span class="badge bg-light text-muted">{{ ucfirst($invoice->status) }}</span>
                                     @endif
