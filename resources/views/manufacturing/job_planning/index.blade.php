@@ -57,38 +57,44 @@
   <h5 class="mb-3">{{ __('Job Queue 01') }}</h5>
 
 
-   {{-- Sample Card --}}
-   <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
-      <div class="card h-100 shadow-sm rounded-3 overflow-hidden">
-        <div class="p-3 text-white" style="background: var(--brand-red, #a70f0f);">
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="fw-bold" style="font-size:1.1rem;">{{ __('Job Order #') }} JP-0001</div>
-            <span class="badge rounded-pill bg-light text-dark">{{ __('Job Created') }}</span>
-          </div>
-          <div class="mt-2 small opacity-75">
-            <div>{{ __('Delivery Date:') }} 2025-08-20</div>
-            <div>{{ __('Customer #:') }} CUST-42</div>
-            <div>{{ __('Customer Name:') }} Wayne Enterprises</div>
-          </div>
+   {{-- {{ Sample Card }} --}}
+<div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
+  <div class="card h-100 shadow-sm rounded-3 overflow-hidden">
+    <div class="p-3 text-white" style="background: var(--brand-red, #a70f0f);">
+      <div class="d-flex justify-content-between align-items-start">
+        <div class="fw-bold" style="font-size:1.1rem;">
+          {{ __('Job Order #') }} JP-0001
         </div>
-        <div class="p-3">
-          <div class="small text-muted">
-            <div class="mb-1">{{ __('Line:') }} <span class="text-body">Line A</span></div>
-            <div class="mb-1">{{ __('Series:') }} <span class="text-body">LAM-WH</span></div>
-            <div class="mb-3">{{ __('Qty:') }} <span class="text-body">36</span></div>
-          </div>
-          <a href="#"
-             class="btn w-100 text-white customModal"
-             style="background: var(--brand-red, #a70f0f); border-radius: 18px;"
-             data-size="xl"
-             data-title="{{ __('Job #') }} JP-0001"
-             data-url="{{ route('manufacturing.job_planning.show', 123) }}">
-             {{ __('Open Job') }}
-          </a>
-        </div>
+        <span class="badge rounded-pill bg-light text-dark">{{ __('Job Created') }}</span>
+      </div>
+      <div class="mt-2 small opacity-75">
+        <div>{{ __('Delivery Date:') }} 2025-08-20</div>
+        <div>{{ __('Customer #:') }} CUST-42</div>
+        <div>{{ __('Customer Name:') }} Wayne Enterprises</div>
       </div>
     </div>
-    {{-- {{ /Sample Card }} --}}
+
+    <div class="p-3">
+      <div class="small text-muted">
+        <div class="mb-1">{{ __('Line:') }} <span class="text-body">Line A</span></div>
+        <div class="mb-1">{{ __('Series:') }} <span class="text-body">LAM-WH</span></div>
+        <div class="mb-3">{{ __('Qty:') }} <span class="text-body">36</span></div>
+      </div>
+
+      {{-- Opens the "Open Job" modal; replace 123 with a real job ID when ready --}}
+      <a href="#"
+         class="btn w-100 text-white customModal"
+         style="background: var(--brand-red, #a70f0f); border-radius: 18px;"
+         data-size="xl"
+         data-title="{{ __('Job #') }} JP-0001"
+         data-url="{{ route('manufacturing.job_planning.show', 123) }}">
+         {{ __('Open Job') }}
+      </a>
+    </div>
+  </div>
+</div>
+{{-- {{ /Sample Card }} --}}
+
     
 
 
