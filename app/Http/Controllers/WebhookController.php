@@ -16,8 +16,10 @@ class WebhookController extends Controller
         }
 
         // Process the event
+        $eventId = $request->input('id');
         $eventType = $request->input('event_type');
         $eventData = $request->input('data');
+
         Log::info('Received FirstServe webhook event', [
             'event_type' => $eventType,
             'data' => $eventData
@@ -39,7 +41,7 @@ class WebhookController extends Controller
         ]);
 
         $payload = $request->getContent();
-        $secret = config('services.firstserve.webhook_secret');
+        $secret = config('services.firstserve.webhook_sandbox_secret');
 
         $expectedSignature = hash_hmac('sha256', $payload, $secret);
 
@@ -85,13 +87,6 @@ class WebhookController extends Controller
                     ]);
             }
 
-            // Record processed event
-            ProcessedWebhook::create([
-                'event_id' => $eventId,
-                'event_type' => $eventType,
-                'processed_at' => Carbon::now()
-            ]);
-
         } catch (\Exception $e) {
             Log::error("Error processing webhook event", [
                 'event_type' => $eventType,
@@ -115,7 +110,7 @@ class WebhookController extends Controller
         //   "invoice_id": "inv_123",
         //   "created_at": "2023-06-15T12:00:00Z"
         // }
-        
+
         $payment = Payment::updateOrCreate(
             ['gateway_id' => $data['payment_id']],
             [
@@ -129,7 +124,6 @@ class WebhookController extends Controller
         );
 
         // Trigger any payment success actions
-        event(new PaymentProcessed($payment));
     }
 
     protected function handlePaymentFailed(array $data)
@@ -179,7 +173,7 @@ class WebhookController extends Controller
                 'paid_at' => Carbon::parse($data['paid_at']),
                 'amount_paid' => $data['amount_paid'] / 100
             ]);
-            
+
             // Trigger invoice paid actions
             event(new InvoicePaid($invoice));
         }
