@@ -1,6 +1,4 @@
-<!-- Station Create Modal -->
-<div class="modal fade" id="createStationModal" tabindex="-1" aria-labelledby="createStationLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
+
     <form method="POST" action="{{ route('manufacturing.stations.store') }}" id="stationCreateForm">
       @csrf
       <div class="modal-content">
@@ -43,5 +41,3 @@
         </div>
       </div>
     </form>
-  </div>
-</div>
