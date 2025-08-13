@@ -89,7 +89,7 @@
                                 <td>${{ number_format($invoice->remaining_amount ?? 0, 2) }}</td>
                                 <td>{{ ucfirst($invoice->payment_method)}}</td>
                                 <td>
-                                    @if($invoice->paid === 'paid')
+                                    @if($invoice->status === 'paid')
                                         <span class="badge bg-success">paid</span>
                                     @elseif($invoice->status === 'warning')
                                         <span class="badge bg-warning">error</span>
