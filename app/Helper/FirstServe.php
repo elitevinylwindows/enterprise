@@ -145,7 +145,7 @@ class FirstServe
         $products = $invoice->order->items->map(function ($item) use ($taxRate, $shippingPerItem) {
             $itemPrice = (float) $item->price;
             $itemQuantity = (float) $item->qty;
-            
+
             return [
                 'name' => substr($item->description ?? 'Product', 0, 255),
                 'description' => substr($item->glass ?? '', 0, 255),
@@ -166,7 +166,7 @@ class FirstServe
                 'type' => 'amount'
             ],
             'discount' => [
-                'value' => abs($discount)*2, // 1.04 (positive value)
+                'value' => abs($discount), // 1.04 (positive value)
                 'type' => 'amount'
             ],
             'products' => $products,
@@ -177,7 +177,7 @@ class FirstServe
                     "Total: $" . number_format($total, 2),
         ];
 
-        
+
         try {
             $response = $this->client->post($this->baseURL.'/invoices', [
                 'headers' => [
@@ -188,7 +188,7 @@ class FirstServe
             ]);
 
             $responseData = json_decode($response->getBody()->getContents(), true);
-            
+
             if (isset($responseData['id'])) {
                 $invoice->serve_invoice_id = $responseData['id'];
                 $invoice->save();

@@ -31,7 +31,19 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-'google_maps' => [
-    'api_key' => env('AIzaSyCPhMXb_6VAGwwSMYj9S1udEO027E3BZT0'),
-],
+    'google_maps' => [
+        'api_key' => env('AIzaSyCPhMXb_6VAGwwSMYj9S1udEO027E3BZT0'),
+    ],
+
+    'firstserve' => [
+        'env' => env('FIRST_SERVE_ENV', 'sandbox'),
+        'sandbox_base_url' => env('FIRST_SERVE_SANDBOX_BASE_URL', 'https://api.sandbox.mysfsgateway.com/api/v2'),
+        'sandbox_api_key' => env('FIRST_SERVE_SANDBOX_API_KEY', 'FWTHFabOKw7DJVNSVvo3YS2ZwuWbQnUM'),
+        'sandbox_api_pin' => env('FIRST_SERVE_SANDBOX_API_PIN', '1234'),
+        'production_base_url' => env('FIRST_SERVE_PRODUCTION_BASE_URL', 'https://api.mysfsgateway.com/api/v2'),
+        'production_api_key' => env('FIRST_SERVE_PRODUCTION_API_KEY', 'FJqTSiCkjkMkdnknbw4RwLMuSHuXc4Pd'),
+        'production_api_pin' => env('FIRST_SERVE_PRODUCTION_API_PIN', '0129'),
+        'webhook_sandbox_secret' => env('FIRST_SERVE_SANDBOX_SIGNATURE', 'JMkVGUiVXBkNQa6lYgmztRQFJbnGO6Zx'),
+        "webhook_production_secret" => env('FIRST_SERVE_PRODUCTION_SIGNATURE', 'FJqTSiCkjkMkdnknbw4RwLMuSHuXc4Pd'),
+    ],
 ];
