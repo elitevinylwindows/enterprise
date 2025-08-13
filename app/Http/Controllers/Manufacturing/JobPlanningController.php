@@ -52,12 +52,20 @@ class JobPlanningController extends Controller
             ->with('success', 'Job created.');
     }
 
- public function show(\App\Models\Manufacturing\JobPlanning $job)
-{
-    // Fetch real rows if you have them; otherwise pass empty arrays.
-    $glassRows = []; $frameRows = []; $sashRows = []; $gridRows = [];
-    return view('manufacturing.job_planning._show', compact('job','glassRows','frameRows','sashRows','gridRows'));
-}
+public function show(Request $request, JobPlanning $job)
+    {
+        // Return the modal PARTIAL when opened via customModal (AJAX)
+        if ($request->ajax()) {
+            // Load any rows you want to show in the tabs, or leave empty arrays
+            $glassRows = []; $frameRows = []; $sashRows = []; $gridRows = [];
+            return view('manufacturing.job_planning._show', compact(
+                'job','glassRows','frameRows','sashRows','gridRows'
+            ));
+        }
+
+        // Optional: if user hits the URL directly, render a full page wrapper
+        return view('manufacturing.job_planning.show_page', compact('job'));
+    }
 
 
     public function edit(Job $job)
