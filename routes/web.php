@@ -1035,6 +1035,7 @@ use Stripe\Webhook;
 Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
     // Capacity
     Route::get('/capacity', [CapacityController::class, 'index'])->name('capacity.index');
+    Route::get('/job_pool', [JobPoolController::class, 'index'])->name('job_pool.index');
 
     // Machines & Stations
     Route::resource('machines', MachineController::class)->names('machines');
@@ -1062,6 +1063,9 @@ Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
     // Lookup + Queue for your modal
     Route::get('job-planning-lookup', [JobPlanningController::class, 'lookup'])->name('job_planning.lookup');
     Route::post('job-planning-queue', [JobPlanningController::class, 'queue'])->name('job_planning.queue');
+
+
+
 });
 
 
