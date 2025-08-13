@@ -43,7 +43,7 @@
                 <table class="content" width="600" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse; border: 1px solid #cccccc;">
                     <!-- Header -->
                     <tr>
-                        <td class="header" style="background-color: #345C72; padding: 40px; text-align: center; color: white; font-size: 24px;">
+                        <td class="header" style="background-color: #a80000; padding: 40px; text-align: center; color: white; font-size: 24px;">
                             <img src="{{ asset(Storage::url('upload/logo/')) . '/logo.png' }}" style="height: 100px;" alt="">
                         </td>
                     </tr>
@@ -70,7 +70,7 @@
                                     <td style="padding: 8px; font-weight: bold;">{{ __('Date') }}:</td>
                                     <td style="padding: 8px;">{{ $quote->entry_date }}</td>
                                 </tr>
-                             
+
                                 <tr>
                                     <td style="padding: 8px; font-weight: bold;">{{ __('Expiry Date') }}:</td>
                                     <td style="padding: 8px;">{{ $quote->valid_until }}</td>

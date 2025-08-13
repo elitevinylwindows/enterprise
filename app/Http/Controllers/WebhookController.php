@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sales\Invoice;
+use App\Models\Sales\InvoicePayment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -16,15 +19,15 @@ class WebhookController extends Controller
         }
 
         // Process the event
-        $eventType = $request->input('event_type');
-        $eventData = $request->input('data');
+
+        $payload = json_decode($request->getContent(), true);
+
         Log::info('Received FirstServe webhook event', [
-            'event_type' => $eventType,
-            'data' => $eventData
+            'data' => $payload
         ]);
 
 
-        $this->processEvent($eventType, $eventData, $eventId);
+        $this->processEvent($payload['type'], $payload['data'], $payload['id']);
 
         return response()->json(['status' => 'success']);
     }
@@ -39,7 +42,7 @@ class WebhookController extends Controller
         ]);
 
         $payload = $request->getContent();
-        $secret = config('services.firstserve.webhook_secret');
+        $secret = config('services.firstserve.webhook_sandbox_secret');
 
         $expectedSignature = hash_hmac('sha256', $payload, $secret);
 
@@ -57,40 +60,30 @@ class WebhookController extends Controller
 
 
     // Route events to appropriate handlers
-    protected function processEvent(string $eventType, array $data, string $eventId)
+    protected function processEvent( $eventType, $data, $eventId)
     {
+        Log::info('Processing event:', [
+            'event_type' => $eventType,
+            'data' => $data,
+            'event_id' => $eventId
+        ]);
+
         try {
             switch ($eventType) {
-                case 'payment.succeeded':
+                case 'succeeded':
                     $this->handlePaymentSucceeded($data);
                     break;
-                case 'payment.failed':
+                case 'declined':
                     $this->handlePaymentFailed($data);
                     break;
-                case 'invoice.paid':
-                    $this->handleInvoicePaid($data);
-                    break;
-                case 'invoice.payment_failed':
-                    $this->handleInvoicePaymentFailed($data);
-                    break;
-                case 'subscription.created':
-                    $this->handleSubscriptionCreated($data);
-                    break;
-                case 'subscription.cancelled':
-                    $this->handleSubscriptionCancelled($data);
+                case 'error':
+                    $this->handlePaymentError($data);
                     break;
                 default:
                     Log::warning("Unhandled webhook event type", [
                         'event_type' => $eventType
                     ]);
             }
-
-            // Record processed event
-            ProcessedWebhook::create([
-                'event_id' => $eventId,
-                'event_type' => $eventType,
-                'processed_at' => Carbon::now()
-            ]);
 
         } catch (\Exception $e) {
             Log::error("Error processing webhook event", [
@@ -106,82 +99,61 @@ class WebhookController extends Controller
 
     protected function handlePaymentSucceeded(array $data)
     {
-        // Example data:
-        // {
-        //   "payment_id": "pay_123",
-        //   "amount": 10000,
-        //   "currency": "USD",
-        //   "customer_id": "cus_123",
-        //   "invoice_id": "inv_123",
-        //   "created_at": "2023-06-15T12:00:00Z"
-        // }
-        
-        $payment = Payment::updateOrCreate(
-            ['gateway_id' => $data['payment_id']],
-            [
-                'amount' => $data['amount'] / 100, // Convert cents to dollars
-                'currency' => $data['currency'],
-                'customer_id' => $data['customer_id'],
-                'invoice_id' => $data['invoice_id'],
-                'status' => 'succeeded',
-                'processed_at' => Carbon::parse($data['created_at'])
-            ]
-        );
+        $invoice = Invoice::where('invoice_number', $data['transaction']['transaction_details']['invoice_number'])->first();
 
-        // Trigger any payment success actions
-        event(new PaymentProcessed($payment));
+        if($invoice) {
+            $invoice->update([
+                'status' => 'paid',
+                'paid_amount' => $data['auth_amount'],
+                'remaining_amount' => $invoice->total - $data['auth_amount'],
+            ]);
+
+            InvoicePayment::create([
+                'invoice_id' => $invoice->id,
+                'status' => 'completed',
+                'payment_amount' => $data['transaction']['amount_details']['amount'],
+                'gateway_response' => json_encode($data)
+            ]);
+        }
     }
 
     protected function handlePaymentFailed(array $data)
     {
-        // Example data:
-        // {
-        //   "payment_id": "pay_123",
-        //   "amount": 10000,
-        //   "currency": "USD",
-        //   "customer_id": "cus_123",
-        //   "invoice_id": "inv_123",
-        //   "failure_reason": "insufficient_funds",
-        //   "created_at": "2023-06-15T12:00:00Z"
-        // }
+        $invoice = Invoice::where('invoice_number', $data['transaction']['transaction_details']['invoice_number'])->first();
 
-        $payment = Payment::updateOrCreate(
-            ['gateway_id' => $data['payment_id']],
-            [
-                'amount' => $data['amount'] / 100,
-                'currency' => $data['currency'],
-                'customer_id' => $data['customer_id'],
-                'invoice_id' => $data['invoice_id'],
-                'status' => 'failed',
-                'failure_reason' => $data['failure_reason'],
-                'processed_at' => Carbon::parse($data['created_at'])
-            ]
-        );
+        if($invoice) {
+            $invoice->update([
+                'status' => 'declined',
+                'paid_amount' => $data['auth_amount'],
+                'remaining_amount' => $invoice->total - $data['auth_amount'],
+            ]);
 
-        // Trigger payment failure actions
-        event(new PaymentFailed($payment));
+            InvoicePayment::create([
+                'invoice_id' => $invoice->id,
+                'status' => 'declined',
+                'payment_amount' => $data['transaction']['amount_details']['amount'],
+                'gateway_response' => json_encode($data)
+            ]);
+        }
     }
 
-    protected function handleInvoicePaid(array $data)
+    public function handlePaymentError($data)
     {
-        // Example data:
-        // {
-        //   "invoice_id": "inv_123",
-        //   "amount_paid": 10000,
-        //   "currency": "USD",
-        //   "paid_at": "2023-06-15T12:00:00Z"
-        // }
+        $invoice = Invoice::where('invoice_number', $data['transaction']['transaction_details']['invoice_number'])->first();
 
-        $invoice = Invoice::where('gateway_id', $data['invoice_id'])->first();
-        if ($invoice) {
+        if($invoice) {
             $invoice->update([
-                'status' => 'paid',
-                'paid_at' => Carbon::parse($data['paid_at']),
-                'amount_paid' => $data['amount_paid'] / 100
+                'status' => 'error',
+                'paid_amount' => $data['auth_amount'],
+                'remaining_amount' => $invoice->total - $data['auth_amount'],
             ]);
-            
-            // Trigger invoice paid actions
-            event(new InvoicePaid($invoice));
+
+            InvoicePayment::create([
+                'invoice_id' => $invoice->id,
+                'status' => 'error',
+                'error_message' => $data['error_message'],
+                'gateway_response' => json_encode($data)
+            ]);
         }
     }
 }

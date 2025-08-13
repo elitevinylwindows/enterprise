@@ -32,8 +32,9 @@ class InvoicePayment extends Model
         'payment_bank_account',
         'payment_bank_routing',
         'payment_method',
+        'gateway_response'
     ];
-        
+
     protected $casts = [
         'payment_amount' => 'array',
         'payment_card_number' => 'array',

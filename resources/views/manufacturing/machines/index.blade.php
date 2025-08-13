@@ -68,7 +68,7 @@
 
             <div class="card-body pt-0">
                 <div class="dt-responsive table-responsive">
-                    <table class="table table-hover advance-datatable" id="machinesTable">
+                    <table class="table table-hover" id="machinesTable">
                         <thead class="table-light">
                             <tr>
                                 <th>{{ __('ID') }}</th>
@@ -136,12 +136,6 @@
                                     </td>
                                 </tr>
                             @endforeach
-
-                            @if($machines->isEmpty())
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted">No machines found</td>
-                                </tr>
-                            @endif
                         </tbody>
                     </table>
                 </div> <!-- table-responsive -->
@@ -151,15 +145,22 @@
 </div>
 @endsection
 
+
+@include('manufacturing.machines.create')
+
 @push('scripts')
 <script>
 $(function () {
     // Initialize DataTable (kept simple — 4 columns only)
     if ($.fn.DataTable) {
+        if ( $.fn.dataTable.isDataTable('#machinesTable') ) {
+            $('#machinesTable').DataTable().destroy();
+        }
+        // Columns: 0: ID, 1: Machine, 2: File Type, 3: Action
         $('#machinesTable').DataTable({
             pageLength: 25,
             order: [[0, 'desc']],
-            columnDefs: [{ targets: -1, orderable: false, searchable: false }]
+            columnDefs: [{ orderable: false, searchable: false, targets: 4 }] // Action column not orderable/searchable
         });
     }
 

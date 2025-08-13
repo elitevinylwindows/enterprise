@@ -56,7 +56,7 @@
 
             <div class="card-body pt-0">
                 <div class="dt-responsive table-responsive">
-                    <table class="table table-hover advance-datatable" id="stationsTable">
+                    <table class="table table-hover" id="stationsTable">
                         <thead class="table-light">
                             <tr>
                                 <th>{{ __('ID') }}</th>
@@ -123,11 +123,7 @@
                                 </tr>
                             @endforeach
 
-                            @if($stations->isEmpty())
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted">No stations found</td>
-                                </tr>
-                            @endif
+
                         </tbody>
                     </table>
                 </div> <!-- table-responsive -->
@@ -137,14 +133,19 @@
 </div>
 @endsection
 
+@include('manufacturing.stations.create')
+
 @push('scripts')
 <script>
 $(function () {
     if ($.fn.DataTable) {
+        if ( $.fn.dataTable.isDataTable('#machinesTable') ) {
+            $('#machinesTable').DataTable().destroy();
+        }
         $('#stationsTable').DataTable({
             pageLength: 25,
             order: [[0, 'desc']],
-            columnDefs: [{ targets: -1, orderable: false, searchable: false }]
+            columnDefs: [{ targets: -1, orderable: false, searchable: false, targets: 4 }]
         });
     }
     if (window.feather) feather.replace();

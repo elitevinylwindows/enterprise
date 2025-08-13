@@ -89,16 +89,14 @@
                                 <td>${{ number_format($invoice->remaining_amount ?? 0, 2) }}</td>
                                 <td>{{ ucfirst($invoice->payment_method)}}</td>
                                 <td>
-                                    @if($status === 'deleted')
-                                    <span class="badge bg-danger">Deleted</span>
+                                    @if($invoice->status === 'paid')
+                                        <span class="badge bg-success">paid</span>
+                                    @elseif($invoice->status === 'warning')
+                                        <span class="badge bg-warning">error</span>
+                                    @elseif($invoice->status === 'declined')
+                                        <span class="badge bg-danger">declined</span>
                                     @else
-                                    @if($invoice->status === 'active')
-                                    <span class="badge bg-success">Active</span>
-                                    @elseif($invoice->status === 'draft')
-                                    <span class="badge bg-secondary">Draft</span>
-                                    @else
-                                    <span class="badge bg-light text-muted">{{ ucfirst($invoice->status) }}</span>
-                                    @endif
+                                        <span class="badge bg-light text-muted">{{ ucfirst($invoice->status) }}</span>
                                     @endif
                                 </td>
                                 <td class="text-nowrap">
