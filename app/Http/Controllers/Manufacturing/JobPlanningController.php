@@ -9,63 +9,32 @@ use App\Models\Manufacturing\Job;
 class JobPlanningController extends Controller
 {
     public function index(Request $request)
-{
-    $status = (string) $request->get('status', 'all');
-    $q      = trim((string) $request->get('q', ''));
+    {
+        $status = $request->get('status', 'all');
 
-    // Map UI-friendly statuses to DB statuses (adjust as needed)
-    $alias = [
-        'queued'         => 'unprocessed',
-        'in_production'  => 'processed',
-        'completed'      => 'tempered',
-        'deleted'        => 'deleted',
-        'all'            => 'all',
-    ];
-    $normalized = $alias[$status] ?? $status;
+        $query = Job::query()->with('order');
 
-    $query = Job::query()->with(['order']); // eager-load order details used by cards
+        if ($status === 'deleted') {
+            $query = Job::onlyTrashed()->with('order');
+        } elseif ($status === 'processed') {
+            $query->where('status', 'processed');
+        } elseif ($status === 'tempered') {
+            $query->where('status', 'tempered');
+        } elseif ($status === 'unprocessed') {
+            $query->where('status', 'unprocessed');
+        }
 
-    if ($normalized === 'deleted') {
-        $query = Job::onlyTrashed()->with('order');
-    } elseif ($normalized !== 'all') {
-        $query->where('status', $normalized);
+        $jobs = $query->orderByDesc('id')->get();
+
+        // If you pass stations to the Create modal:
+        $stations = []; // or \App\Models\Manufacturing\Station::orderBy('station_number')->get();
+
+        return view('manufacturing.job_planning.index', [
+            'jobs'     => $jobs,
+            'status'   => $status,
+            'stations' => $stations,
+        ]);
     }
-
-    if ($q !== '') {
-        $query->where(function ($w) use ($q) {
-            $w->where('job_order_number', 'like', "%{$q}%")
-              ->orWhere('series', 'like', "%{$q}%")
-              ->orWhere('line', 'like', "%{$q}%")
-              ->orWhereHas('order', function ($oo) use ($q) {
-                  $oo->where('customer_number', 'like', "%{$q}%")
-                     ->orWhere('customer_name', 'like', "%{$q}%");
-              });
-        });
-    }
-
-    $jobs = $query->orderByDesc('id')->get()->map(function ($j) {
-        // Provide the exact fields the card view expects, with safe fallbacks
-        $j->production_status  = $j->production_status ?? $j->status; // badge in the card
-        $j->customer_number    = $j->customer_number   ?? optional($j->order)->customer_number;
-        $j->customer_name      = $j->customer_name     ?? optional($j->order)->customer_name;
-        $j->delivery_date      = $j->delivery_date     ?? optional($j->order)->delivery_date;
-        // Ensure these exist too (if not already on the Job)
-        $j->job_order_number   = $j->job_order_number  ?? $j->order_number ?? null;
-        $j->qty                = $j->qty               ?? 0;
-        $j->series             = $j->series            ?? null;
-        $j->line               = $j->line              ?? null;
-        return $j;
-    });
-
-    // If your Create modal needs stations, fetch them here (or keep empty)
-    $stations = []; // e.g., Station::orderBy('station_number')->get();
-
-    return view('manufacturing.job_planning.index', [
-        'jobs'     => $jobs,
-        'status'   => $status,
-        'stations' => $stations,
-    ]);
-}
 
     public function store(Request $request)
     {
