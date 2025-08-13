@@ -1,5 +1,5 @@
-{{-- Modal body for Job Pool Create / Send to Production --}}
-<form id="jobPoolQueueForm" method="POST" action="{{ route('manufacturing.job_planning.queue') }}">
+{{-- Modal body for Job Planning Create / Send to Production --}}
+<form id="jobPlanningQueueForm" method="POST" action="{{ route('manufacturing.job_planning.queue') }}">
     @csrf
 
     {{-- FILTERS CARD --}}
@@ -25,9 +25,7 @@
                 <div class="col-md-9">
                     <label class="form-label d-block mb-2">{{ __('Color') }}</label>
                     <div class="d-flex flex-wrap gap-3">
-                        @php
-                            $colors = ['White' => 'white', 'Black' => 'black', 'Almond' => 'almond'];
-                        @endphp
+                        @php $colors = ['White' => 'white', 'Black' => 'black', 'Almond' => 'almond']; @endphp
                         @foreach($colors as $label => $val)
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input color-filter" type="checkbox" value="{{ $val }}" id="color_{{ $val }}">
@@ -61,20 +59,18 @@
                 <table class="table table-hover mb-0" id="jobResultsTable">
                     <thead class="table-light">
                         <tr>
-                            <th style="width:36px;">
-                                <input type="checkbox" id="checkAll">
-                            </th>
+                            <th style="width:36px;"><input type="checkbox" id="checkAll"></th>
                             <th>{{ __('ID') }}</th>
-                                <th>{{ __('Job Order #') }}</th>
-                                <th>{{ __('Series') }}</th>
-                                <th class="text-end">{{ __('Qty') }}</th>
-                                <th>{{ __('Line') }}</th>
-                                <th>{{ __('Delivery Date') }}</th>
-                                <th>{{ __('Type') }}</th>
-                                <th>{{ __('Production Status') }}</th>
-                                <th>{{ __('Entry Date') }}</th>
-                                <th>{{ __('Last Transaction Date') }}</th>
-                                <th>{{ __('Action') }}</th>
+                            <th>{{ __('Job Order #') }}</th>
+                            <th>{{ __('Series') }}</th>
+                            <th class="text-end">{{ __('Qty') }}</th>
+                            <th>{{ __('Line') }}</th>
+                            <th>{{ __('Delivery Date') }}</th>
+                            <th>{{ __('Type') }}</th>
+                            <th>{{ __('Production Status') }}</th>
+                            <th>{{ __('Entry Date') }}</th>
+                            <th>{{ __('Last Transaction Date') }}</th>
+                            <th>{{ __('Action') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -107,6 +103,17 @@
     const selectedContainer = document.getElementById('selectedContainer');
     const selectionHint = document.getElementById('selectionHint');
 
+    // helpers
+    const showRouteTpl = `{{ route('manufacturing.job_planning.show', ':id') }}`;
+    function statusBadge(s) {
+      const v = (s || '').toLowerCase();
+      const cls = v === 'completed' ? 'success'
+               : (v === 'queued' || v === 'pending') ? 'warning'
+               : 'info';
+      const label = (s || '-').toString().replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+      return `<span class="badge bg-light-${cls}">${label}</span>`;
+    }
+
     function getSelectedColors() {
         if (document.getElementById('color_all').checked) return [];
         const vals = [];
@@ -114,10 +121,9 @@
         return vals;
     }
 
-    // All toggle
+    // "All" toggle clears specific colors
     document.getElementById('color_all').addEventListener('change', (e) => {
-        const on = e.target.checked;
-        document.querySelectorAll('.color-filter').forEach(cb => cb.checked = false);
+        if (e.target.checked) document.querySelectorAll('.color-filter').forEach(cb => cb.checked = false);
     });
 
     function renderRows(rows) {
@@ -125,7 +131,7 @@
         let html = '';
         rows.forEach(r => {
             html += `
-            <tr>
+<tr>
   <td><input type="checkbox" class="row-check" value="${r.id}"></td>
   <td>${r.id ?? '-'}</td>
   <td>${r.job_order_number ?? '-'}</td>
@@ -151,9 +157,7 @@
         resultCount.textContent = rows.length;
 
         // bind selection change
-        tableBody.querySelectorAll('.row-check').forEach(cb => {
-            cb.addEventListener('change', updateSelection);
-        });
+        tableBody.querySelectorAll('.row-check').forEach(cb => cb.addEventListener('change', updateSelection));
 
         // reset controls
         checkAll.checked = false;
@@ -176,9 +180,7 @@
             selectedContainer.appendChild(input);
         });
         btnSendQueue.disabled = selected.length === 0;
-        selectionHint.textContent = selected.length
-            ? `${selected.length} selected`
-            : '{{ __('Select jobs to send') }}';
+        selectionHint.textContent = selected.length ? `${selected.length} selected` : '{{ __('Select jobs to send') }}';
     }
 
     btnSearch.addEventListener('click', () => {
@@ -192,13 +194,7 @@
             headers: { 'Accept': 'application/json' }
         })
         .then(r => r.json())
-        .then(json => {
-            if (json && json.success) {
-                renderRows(json.data || []);
-            } else {
-                renderRows([]);
-            }
-        })
+        .then(json => renderRows(json && json.success ? (json.data || []) : []))
         .catch(() => renderRows([]));
     });
 })();
