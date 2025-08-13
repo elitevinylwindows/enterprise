@@ -1073,8 +1073,10 @@ Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
     Route::get('job-planning/{job}/payment',    [JobPlanningController::class, 'payment'])
          ->whereNumber('job')->name('job_planning.payment');
 
-    Route::resource('job-pool', JobPoolController::class)->names('job_pool');
-
+    Route::resource('job-planning', JobPlanningController::class)->names('job-planning');
+     Route::resource('job-planning', JobPlanningController::class)->names('job-planning');
+    Route::get('job-planning-lookup', [JobPlanningController::class, 'lookup'])->name('job-planning.lookup');
+    Route::post('job-planning-queue', [JobPlanningController::class, 'queue'])->name('job-planning.queue');
 
 
 });

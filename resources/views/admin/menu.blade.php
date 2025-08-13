@@ -1078,7 +1078,7 @@
         </li>
         <li class="pc-item {{ request()->routeIs('manufacturing.job_planning.*') ? 'active' : '' }}">
             <a href="{{ route('manufacturing.job_planning.index') }}" class="pc-link">
-                <span class="pc-mtext">Job Cards</span>
+                <span class="pc-mtext">Job Planning</span>
             </a>
         </li>
         <li class="pc-item {{ request()->routeIs('manufacturing.tempered.*') ? 'active' : '' }}">
