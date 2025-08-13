@@ -86,42 +86,50 @@
   {{-- Cards --}}
   <div class="row g-3">
 
-    {{-- {{ Sample Card }} --}}
-    <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
-      <div class="card h-100 shadow-sm rounded-3 overflow-hidden">
-        <div class="p-3 text-white" style="background: var(--brand-red, #a70f0f);">
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="fw-bold" style="font-size:1.1rem;">
-              {{ __('Job Order #') }} {{ $first->job_order_number ?? 'JP-0001' }}
-            </div>
-            <span class="badge rounded-pill bg-light text-dark">{{ __('Job Created') }}</span>
-          </div>
-          <div class="mt-2 small opacity-75">
-            <div>{{ __('Delivery Date:') }} {{ $first ? $fmt($first->delivery_date) : '2025-08-20' }}</div>
-            <div>{{ __('Customer #:') }} {{ $first->customer_number ?? 'CUST-42' }}</div>
-            <div>{{ __('Customer Name:') }} {{ $first->customer_name ?? 'Wayne Enterprises' }}</div>
-          </div>
+   {{-- {{ Sample Card }} --}}
+@php $first = ($jobs ?? collect())->first(); @endphp
+<div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
+  <div class="card h-100 shadow-sm rounded-3 overflow-hidden">
+    <div class="p-3 text-white" style="background: var(--brand-red, #a70f0f);">
+      <div class="d-flex justify-content-between align-items-start">
+        <div class="fw-bold" style="font-size:1.1rem;">
+          {{ __('Job Order #') }} {{ $first->job_order_number ?? 'JP-0001' }}
         </div>
-
-        <div class="p-3">
-          <div class="small text-muted">
-            <div class="mb-1">{{ __('Line:') }} <span class="text-body">{{ $first->line ?? 'Line A' }}</span></div>
-            <div class="mb-1">{{ __('Series:') }} <span class="text-body">{{ $first->series ?? 'LAM-WH' }}</span></div>
-            <div class="mb-3">{{ __('Qty:') }} <span class="text-body">{{ $first->qty ?? 36 }}</span></div>
-          </div>
-
-          <a href="#"
-             class="btn w-100 text-white customModal"
-             style="background: var(--brand-red, #a70f0f); border-radius: 18px;"
-             data-size="xl"
-             data-title="{{ $sampleTitle }}"
-             data-url="{{ $sampleUrl }}">
-             {{ __('Open Job') }}
-          </a>
-        </div>
+        <span class="badge rounded-pill bg-light text-dark">{{ __('Job Created') }}</span>
+      </div>
+      <div class="mt-2 small opacity-75">
+        <div>{{ __('Delivery Date:') }} {{ $first? optional($first->delivery_date)->format('Y-m-d') : '2025-08-20' }}</div>
+        <div>{{ __('Customer #:') }} {{ $first->customer_number ?? 'CUST-42' }}</div>
+        <div>{{ __('Customer Name:') }} {{ $first->customer_name ?? 'Wayne Enterprises' }}</div>
       </div>
     </div>
-    {{-- {{ /Sample Card }} --}}
+
+    <div class="p-3">
+      <div class="small text-muted">
+        <div class="mb-1">{{ __('Line:') }} <span class="text-body">{{ $first->line ?? 'Line A' }}</span></div>
+        <div class="mb-1">{{ __('Series:') }} <span class="text-body">{{ $first->series ?? 'LAM-WH' }}</span></div>
+        <div class="mb-3">{{ __('Qty:') }} <span class="text-body">{{ $first->qty ?? 36 }}</span></div>
+      </div>
+
+      @if($first)
+        <a href="#"
+           class="btn w-100 text-white customModal"
+           style="background:#a70f0f; border-radius:18px;"
+           data-size="xl"
+           data-title="{{ __('Job #') }} {{ $first->job_order_number }}"
+           data-url="{{ route('manufacturing.job_planning.show', $first->id) }}">
+           {{ __('Open Job') }}
+        </a>
+      @else
+        <button class="btn w-100 text-white" style="background:#a70f0f; border-radius:18px;" disabled>
+          {{ __('Open Job') }}
+        </button>
+      @endif
+    </div>
+  </div>
+</div>
+{{-- {{ /Sample Card }} --}}
+
 
     @forelse($jobs as $job)
       @php
