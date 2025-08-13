@@ -100,4 +100,3 @@
 
 @endsection
 
-@include('manufacturing.stations.create')
