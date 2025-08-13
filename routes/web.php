@@ -1035,7 +1035,7 @@ use Stripe\Webhook;
 Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
     // Capacity
     Route::get('/capacity', [CapacityController::class, 'index'])->name('capacity.index');
-    Route::get('/job_pool', [JobPoolController::class, 'index'])->name('job_pool.index');
+    Route::resource('job_pool', JobPoolController::class)->names('job_pool');
 
     // Machines & Stations
     Route::resource('machines', MachineController::class)->names('machines');
