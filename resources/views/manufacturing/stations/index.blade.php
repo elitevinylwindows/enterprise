@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
-@section('page-title')
-{{ __('Stations') }}
-@endsection
+@section('page-title', __('Stations'))
 
 @section('breadcrumb')
 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
@@ -10,8 +8,9 @@
 @endsection
 
 @section('content')
-<div class="mb-4"></div>
-<div class="mb-4"></div>
+
+<div class="mb-4"></div> {{-- Space after title --}}
+<div class="mb-4"></div> {{-- Space --}}
 
 <div class="row">
     {{-- Taskbar Card --}}
@@ -38,117 +37,65 @@
         </div>
     </div>
 
-    {{-- Main Content Card --}}
     <div class="col-sm-10">
         <div class="card table-card">
             <div class="card-header">
                 <div class="row align-items-center g-2">
-                    <div class="col">
-                        <h5>{{ __('Stations') }}</h5>
-                    </div>
-                    <div class="col-auto ms-auto">
-                        <a href="{{ route('manufacturing.stations.create') }}" class="btn btn-primary">
-                            <i class="fa-solid fa-plus"></i> Add Station
+                    <div class="col"><h5>{{ __('Stations') }}</h5></div>
+                    <div class="col-auto">
+                        <a href="#" class="btn btn-primary customModal"
+                           data-size="lg"
+                           data-url="{{ route('manufacturing.stations.create') }}"
+                           data-title="{{ __('Create Station') }}">
+                           <i class="fa-solid fa-circle-plus"></i> {{ __('Create') }}
                         </a>
                     </div>
                 </div>
             </div>
-
             <div class="card-body pt-0">
                 <div class="dt-responsive table-responsive">
-                    <table class="table table-hover" id="stationsTable">
-                        <thead class="table-light">
+                    <table class="table table-hover advance-datatable">
+                        <thead>
                             <tr>
                                 <th>{{ __('ID') }}</th>
-                                <th>{{ __('Station #') }}</th>
+                                <th>{{ __('Station') }}</th>
                                 <th>{{ __('Description') }}</th>
                                 <th>{{ __('Action') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($stations as $station)
-                                <tr>
-                                    <td>{{ $station->id }}</td>
-                                    <td>{{ $station->station_number ?? $station->station_no ?? 'N/A' }}</td>
-                                    <td>{{ $station->description ?? '—' }}</td>
-                                    <td class="text-nowrap">
-                                        @if(($status ?? 'all') === 'deleted')
-                                            {{-- Restore --}}
-                                            <form action="{{ route('manufacturing.stations.restore', $station->id) }}"
-                                                  method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="submit"
-                                                        class="avtar avtar-xs btn-link-success text-success border-0 bg-transparent p-0"
-                                                        title="Restore">
-                                                    <i data-feather="rotate-ccw"></i>
-                                                </button>
-                                            </form>
-                                            {{-- Force Delete --}}
-                                            <form action="{{ route('manufacturing.stations.force-delete', $station->id) }}"
-                                                  method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0"
-                                                        title="Delete Permanently"
-                                                        onclick="return confirm('Permanently delete this station?')">
-                                                    <i data-feather="trash-2"></i>
-                                                </button>
-                                            </form>
-                                        @else
-                                            {{-- View --}}
-                                            <a href="{{ route('manufacturing.stations.show', $station->id) }}"
-                                               class="avtar avtar-xs btn-link-success text-success" title="View">
-                                                <i data-feather="eye"></i>
-                                            </a>
-                                            {{-- Edit --}}
-                                            <a href="{{ route('manufacturing.stations.edit', $station->id) }}"
-                                               class="avtar avtar-xs btn-link-primary text-primary" title="Edit">
-                                                <i data-feather="edit"></i>
-                                            </a>
-                                            {{-- Delete --}}
-                                            <form action="{{ route('manufacturing.stations.destroy', $station->id) }}"
-                                                  method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        class="avtar avtar-xs btn-link-danger text-danger border-0 bg-transparent p-0"
-                                                        title="Delete"
-                                                        onclick="return confirm('Delete this station?')">
-                                                    <i data-feather="trash-2"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td>{{ $station->id }}</td>
+                                <td>{{ $station->station }}</td>
+                                <td>{{ $station->description }}</td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-info customModal"
+                                       data-size="lg"
+                                       data-url="{{ route('manufacturing.stations.edit', $station->id) }}"
+                                       data-title="{{ __('Edit Station') }}">
+                                       <i data-feather="edit"></i>
+                                    </a>
+                                    <form action="{{ route('manufacturing.stations.destroy', $station->id) }}" 
+                                          method="POST" 
+                                          style="display:inline-block;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="btn btn-sm btn-danger" 
+                                                onclick="return confirm('{{ __('Are you sure?') }}')">
+                                            <i data-feather="trash-2"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                             @endforeach
-
-
                         </tbody>
                     </table>
-                </div> <!-- table-responsive -->
-            </div> <!-- card-body -->
-        </div> <!-- card -->
-    </div> <!-- col -->
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 @endsection
-
-@include('manufacturing.stations.create')
-
-@push('scripts')
-<script>
-$(function () {
-    if ($.fn.DataTable) {
-        if ( $.fn.dataTable.isDataTable('#machinesTable') ) {
-            $('#machinesTable').DataTable().destroy();
-        }
-        $('#stationsTable').DataTable({
-            pageLength: 25,
-            order: [[0, 'desc']],
-            columnDefs: [{ targets: -1, orderable: false, searchable: false, targets: 4 }]
-        });
-    }
-    if (window.feather) feather.replace();
-});
-</script>
-@endpush
