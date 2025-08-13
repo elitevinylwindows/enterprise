@@ -19,23 +19,23 @@
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" value="queued" id="filterQueued"
                                @checked(request('status') === 'queued') 
-                               onclick="window.location='{{ route('manufacturing.job-planning.index', ['status'=>'queued']) }}'">
+                               onclick="window.location='{{ route('manufacturing.job_planning.index', ['status'=>'queued']) }}'">
                         <label class="form-check-label" for="filterQueued">{{ __('Queued') }}</label>
                     </div>
                 </div>
                 <input type="text" class="form-control mt-3" placeholder="{{ __('Search by Job # / Customer / Series') }}"
                        value="{{ request('q') }}"
-                       onkeydown="if(event.key==='Enter'){window.location='{{ route('manufacturing.job-planning.index') }}?q='+encodeURIComponent(this.value)}">
+                       onkeydown="if(event.key==='Enter'){window.location='{{ route('manufacturing.job_planning.index') }}?q='+encodeURIComponent(this.value)}">
             </div>
         </div>
         <div class="col-md-4">
             <div class="card p-3">
                 <div class="fw-semibold mb-2">&nbsp;</div>
                 <div class="d-flex gap-2">
-                    <a href="{{ route('manufacturing.job-planning.index') }}" class="btn btn-outline-secondary w-50">{{ __('Clear') }}</a>
-                    <a href="{{ route('manufacturing.job-planning.create') }}" class="btn btn-primary customModal w-50"
+                    <a href="{{ route('manufacturing.job_planning.index') }}" class="btn btn-outline-secondary w-50">{{ __('Clear') }}</a>
+                    <a href="{{ route('manufacturing.job_planning.create') }}" class="btn btn-primary customModal w-50"
                        data-size="lg" data-title="{{ __('Create Job') }}"
-                       data-url="{{ route('manufacturing.job-planning.create') }}">
+                       data-url="{{ route('manufacturing.job_planning.create') }}">
                         <i class="fa-solid fa-circle-plus"></i> {{ __('Create') }}
                     </a>
                 </div>
@@ -76,7 +76,7 @@
                         <a href="#" class="btn btn-lg w-100 text-white" style="background:#a70f0f; border-radius: 18px;"
                            data-size="xl"
                            data-title="{{ __('Job #') }} {{ $job->job_order_number }}"
-                           data-url="{{ route('manufacturing.job-planning.show', $job->id) }}"
+                           data-url="{{ route('manufacturing.job_planning.show', $job->id) }}"
                            class="btn btn-primary customModal"
                            onclick="return false;"
                            data-bs-toggle="tooltip"
@@ -86,7 +86,7 @@
                            style="background:#a70f0f; border-radius: 18px;"
                            data-size="xl"
                            data-title="{{ __('Job #') }} {{ $job->job_order_number }}"
-                           data-url="{{ route('manufacturing.job-planning.show', $job->id) }}">
+                           data-url="{{ route('manufacturing.job_planning.show', $job->id) }}">
                            {{ __('Open Job') }}
                         </a>
                     </div>
