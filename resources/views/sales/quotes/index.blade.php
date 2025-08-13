@@ -80,17 +80,17 @@
                                 <td>{{ $quote->valid_until }}</td>
                                 <td>
                                     @if($quote->status === 'approved')
-                                    <span class="badge bg-success">Approved</span>
+                                        <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i>Approved</span>
                                     @elseif($quote->status === 'rejected')
-                                    <span class="badge bg-danger">Rejected</span>
+                                        <span class="badge bg-danger"><i class="bi bi-x-circle-fill me-1"></i>Rejected</span>
                                     @elseif($quote->status === 'Invoice Created')
-                                    <span class="badge bg-success">Invoice Created</span>
+                                        <span class="badge bg-primary"><i class="bi bi-file-earmark-text-fill me-1"></i>Invoice Created</span>
                                     @elseif($quote->status === 'Order Created')
-                                    <span class="badge bg-success">Order Created</span>
+                                        <span class="badge bg-info text-dark"><i class="bi bi-cart-check-fill me-1"></i>Order Created</span>
                                     @elseif($quote->status === 'draft')
-                                    <span class="badge bg-secondary">Draft</span>
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-pencil-fill me-1"></i>Draft</span>
                                     @else
-                                    <span class="badge bg-light text-muted">{{ ucfirst($quote->status) }}</span>
+                                        <span class="badge bg-light text-muted"><i class="bi bi-question-circle-fill me-1"></i>{{ ucfirst($quote->status) }}</span>
                                     @endif
                                 </td>
                                 <td class="text-nowrap">
