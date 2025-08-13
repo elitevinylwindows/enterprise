@@ -17,7 +17,7 @@ class WebhookController extends Controller
 
         // Process the event
 
-        $payload = $request->getContent();
+        $payload = json_decode($request->getContent(), true);
 
         Log::info('Received FirstServe webhook event', [
             'data' => $payload
