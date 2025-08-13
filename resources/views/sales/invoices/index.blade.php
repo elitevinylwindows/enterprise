@@ -93,7 +93,7 @@
                                     <span class="badge bg-danger">Deleted</span>
                                     @else
                                     @if($invoice->paid === 'paid')
-                                    <span class="badge bg-success">Active</span>
+                                    <span class="badge bg-success">paid</span>
                                     @elseif($invoice->status === 'warning')
                                     <span class="badge bg-warning">error</span>
                                     @elseif($invoice->status === 'declined')
