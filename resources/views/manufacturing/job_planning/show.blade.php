@@ -1,22 +1,11 @@
-{{-- Open Job – Modal PARTIAL for customModal --}}
+{{-- Modal PARTIAL for customModal — NO @extends --}}
 @php
-    use Carbon\Carbon;
-
-    // Safe date formatting helper (accepts Carbon|string|null)
-    $fmt = function($v, $pattern = 'Y-m-d') {
-        if (!$v) return '-';
-        try { return Carbon::parse($v)->format($pattern); } catch (\Throwable $e) { return (string) $v; }
-    };
-
-    // Optional datasets for the tables (fallback to empty so view never breaks)
-    $glassRows = $glassRows ?? [];
-    $frameRows = $frameRows ?? [];
-    $sashRows  = $sashRows  ?? [];
-    $gridRows  = $gridRows  ?? [];
+  use Carbon\Carbon;
+  $fmt = function($v,$p='Y-m-d'){ if(!$v) return '-'; try{ return Carbon::parse($v)->format($p);}catch(\Throwable){return (string)$v;}};
+  $glassRows = $glassRows ?? []; $frameRows = $frameRows ?? []; $sashRows = $sashRows ?? []; $gridRows = $gridRows ?? [];
 @endphp
 
 <div class="container-fluid">
-
   {{-- Tabs --}}
   <ul class="nav nav-tabs mb-3" role="tablist" style="--bs-nav-tabs-border-width:0;">
     <li class="nav-item" role="presentation">
@@ -35,11 +24,10 @@
 
   <div class="tab-content">
 
-    {{-- TAB 1: Job Order # (details layout like your image) --}}
+    {{-- Job Order # --}}
     <div class="tab-pane fade show active" id="jp-pane-job" role="tabpanel">
       <div class="card">
         <div class="card-body px-3 px-md-4">
-
           <div class="row gy-3">
             <div class="col-md-6">
               <div><strong>{{ __('Delivery Date:') }}</strong> {{ $fmt($job->delivery_date) }}</div>
@@ -58,7 +46,6 @@
             <textarea class="form-control" rows="4" disabled>{{ $job->internal_notes ?? '' }}</textarea>
           </div>
 
-          {{-- Download chips row --}}
           <div class="row text-center mt-4 g-3">
             <div class="col-6 col-sm-4 col-md-2">
               <div class="fw-bold small">GLASS</div>
@@ -88,19 +75,11 @@
                 <i class="fa-regular fa-file-excel"></i> XLS
               </a>
             </div>
-
             <div class="col-6 col-sm-4 col-md-2">
               <div class="fw-bold small">BARCODES</div>
               <a href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id, 'type'=>'barcodes_pdf']) }}"
                  class="btn btn-outline-secondary btn-sm mt-1">
                 <i class="fa-regular fa-file-pdf"></i> PDF
-              </a>
-            </div>
-
-            <div class="col-6 col-sm-4 col-md-2 d-flex align-items-center">
-              <a href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id, 'type'=>'all']) }}"
-                 class="btn btn-outline-dark w-100">
-                <i class="fa-solid fa-download"></i> {{ __('Download') }}
               </a>
             </div>
           </div>
@@ -109,7 +88,7 @@
       </div>
     </div>
 
-    {{-- TAB 2: Glass --}}
+    {{-- Glass --}}
     <div class="tab-pane fade" id="jp-pane-glass" role="tabpanel">
       <div class="card">
         <div class="card-body px-3 px-md-4">
@@ -151,7 +130,7 @@
       </div>
     </div>
 
-    {{-- TAB 3: Frame --}}
+    {{-- Frame --}}
     <div class="tab-pane fade" id="jp-pane-frame" role="tabpanel">
       <div class="card">
         <div class="card-body px-3 px-md-4">
@@ -193,7 +172,7 @@
       </div>
     </div>
 
-    {{-- TAB 4: Sash --}}
+    {{-- Sash --}}
     <div class="tab-pane fade" id="jp-pane-sash" role="tabpanel">
       <div class="card">
         <div class="card-body px-3 px-md-4">
@@ -235,7 +214,7 @@
       </div>
     </div>
 
-    {{-- TAB 5: Grids --}}
+    {{-- Grids --}}
     <div class="tab-pane fade" id="jp-pane-grids" role="tabpanel">
       <div class="card">
         <div class="card-body px-3 px-md-4">
@@ -277,12 +256,12 @@
       </div>
     </div>
 
-    {{-- TAB 6: Barcodes (placeholder) --}}
+    {{-- Barcodes --}}
     <div class="tab-pane fade" id="jp-pane-barc" role="tabpanel">
       <div class="card">
         <div class="card-body px-3 px-md-4">
           <div class="alert alert-secondary mb-0">
-            {{ __('Barcode preview / controls go here (PDF, printer options, etc.).') }}
+            {{ __('Barcode preview / controls go here.') }}
           </div>
         </div>
       </div>
@@ -293,7 +272,6 @@
 
 @push('scripts')
 <script>
-  // If you use feather icons after AJAX load
   if (window.feather && typeof window.feather.replace === 'function') {
     window.feather.replace();
   }
