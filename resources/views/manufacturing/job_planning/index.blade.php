@@ -14,7 +14,7 @@
 
   {{-- Filters --}}
   <div class="row g-3 mb-4">
-    <div class="col-md-4">
+    <div class="col-md-8">
       <div class="card p-3">
         <div class="d-flex align-items-center justify-content-between">
           <div class="fw-semibold">{{ __('Filter by:') }}</div>
