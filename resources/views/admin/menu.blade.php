@@ -1072,7 +1072,7 @@
 
     <ul class="pc-submenu">
         <li class="pc-item {{ request()->routeIs('manufacturing.job_pool.*') ? 'active' : '' }}">
-            <a href="{{ route('manufacturing.job_planning.index') }}" class="pc-link">
+            <a href="{{ route('manufacturing.job_pool.index') }}" class="pc-link">
                 <span class="pc-mtext">Job Pool</span>
             </a>
         </li>
