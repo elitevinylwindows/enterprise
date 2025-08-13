@@ -16,17 +16,15 @@ class WebhookController extends Controller
         }
 
         // Process the event
-        $eventId = $request->input('id');
-        $eventType = $request->input('event_type');
-        $eventData = $request->input('data');
+
+        $payload = $request->getContent();
 
         Log::info('Received FirstServe webhook event', [
-            'event_type' => $eventType,
-            'data' => $eventData
+            'data' => $payload
         ]);
 
 
-        $this->processEvent($eventType, $eventData, $eventId);
+        $this->processEvent($payload['event'], $payload['data'], $payload['id']);
 
         return response()->json(['status' => 'success']);
     }
@@ -59,8 +57,14 @@ class WebhookController extends Controller
 
 
     // Route events to appropriate handlers
-    protected function processEvent(string $eventType, array $data, string $eventId)
+    protected function processEvent( $eventType, $data, $eventId)
     {
+        Log::info('Processing event:', [
+            'event_type' => $eventType,
+            'data' => $data,
+            'event_id' => $eventId
+        ]);
+
         try {
             switch ($eventType) {
                 case 'payment.succeeded':
