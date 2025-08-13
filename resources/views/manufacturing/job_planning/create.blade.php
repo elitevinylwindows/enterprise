@@ -64,14 +64,17 @@
                             <th style="width:36px;">
                                 <input type="checkbox" id="checkAll">
                             </th>
-                            <th>{{ __('Job Order #') }}</th>
-                            <th>{{ __('Delivery Date') }}</th>
-                            <th>{{ __('Customer #') }}</th>
-                            <th>{{ __('Customer Name') }}</th>
-                            <th>{{ __('Line') }}</th>
-                            <th>{{ __('Series') }}</th>
-                            <th>{{ __('Color') }}</th>
-                            <th class="text-end">{{ __('Qty') }}</th>
+                            <th>{{ __('ID') }}</th>
+                                <th>{{ __('Job Order #') }}</th>
+                                <th>{{ __('Series') }}</th>
+                                <th class="text-end">{{ __('Qty') }}</th>
+                                <th>{{ __('Line') }}</th>
+                                <th>{{ __('Delivery Date') }}</th>
+                                <th>{{ __('Type') }}</th>
+                                <th>{{ __('Production Status') }}</th>
+                                <th>{{ __('Entry Date') }}</th>
+                                <th>{{ __('Last Transaction Date') }}</th>
+                                <th>{{ __('Action') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -123,16 +126,26 @@
         rows.forEach(r => {
             html += `
             <tr>
-                <td><input type="checkbox" class="row-check" value="${r.id}"></td>
-                <td>${r.job_order_number ?? '-'}</td>
-                <td>${r.delivery_date ?? '-'}</td>
-                <td>${r.customer_number ?? '-'}</td>
-                <td>${r.customer_name ?? '-'}</td>
-                <td>${r.line ?? '-'}</td>
-                <td>${r.series ?? '-'}</td>
-                <td>${r.color ?? '-'}</td>
-                <td class="text-end">${r.qty ?? 0}</td>
-            </tr>`;
+  <td><input type="checkbox" class="row-check" value="${r.id}"></td>
+  <td>${r.id ?? '-'}</td>
+  <td>${r.job_order_number ?? '-'}</td>
+  <td>${r.series ?? '-'}</td>
+  <td class="text-end">${r.qty ?? 0}</td>
+  <td>${r.line ?? '-'}</td>
+  <td>${r.delivery_date ?? '-'}</td>
+  <td>${r.type ?? '-'}</td>
+  <td>${statusBadge(r.production_status)}</td>
+  <td>${r.entry_date ?? '-'}</td>
+  <td>${r.last_transaction_date ?? '-'}</td>
+  <td>
+    <a href="#" class="btn btn-sm btn-info customModal"
+       data-size="xl"
+       data-title="Job # ${r.job_order_number ?? r.id}"
+       data-url="${showRouteTpl.replace(':id', r.id)}">
+       <i data-feather="eye"></i>
+    </a>
+  </td>
+</tr>`;
         });
         tableBody.insertAdjacentHTML('beforeend', html);
         resultCount.textContent = rows.length;
