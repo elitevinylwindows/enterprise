@@ -99,3 +99,5 @@
 </div>
 
 @endsection
+
+@include('manufacturing.stations.create')
