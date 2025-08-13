@@ -52,11 +52,13 @@ class JobPlanningController extends Controller
             ->with('success', 'Job created.');
     }
 
-    public function show(Job $job)
-    {
-        $job->loadMissing('order');
-        return view('manufacturing.job_planning.show', compact('job'));
-    }
+ public function show(\App\Models\Manufacturing\JobPlanning $job)
+{
+    // Fetch real rows if you have them; otherwise pass empty arrays.
+    $glassRows = []; $frameRows = []; $sashRows = []; $gridRows = [];
+    return view('manufacturing.job_planning._show', compact('job','glassRows','frameRows','sashRows','gridRows'));
+}
+
 
     public function edit(Job $job)
     {
