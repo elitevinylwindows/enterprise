@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sales\Invoice;
+use App\Models\Sales\InvoicePayment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -24,7 +27,7 @@ class WebhookController extends Controller
         ]);
 
 
-        $this->processEvent($payload['event'], $payload['data'], $payload['id']);
+        $this->processEvent($payload['type'], $payload['data'], $payload['id']);
 
         return response()->json(['status' => 'success']);
     }
@@ -67,23 +70,14 @@ class WebhookController extends Controller
 
         try {
             switch ($eventType) {
-                case 'payment.succeeded':
+                case 'succeeded':
                     $this->handlePaymentSucceeded($data);
                     break;
-                case 'payment.failed':
+                case 'declined':
                     $this->handlePaymentFailed($data);
                     break;
-                case 'invoice.paid':
-                    $this->handleInvoicePaid($data);
-                    break;
-                case 'invoice.payment_failed':
-                    $this->handleInvoicePaymentFailed($data);
-                    break;
-                case 'subscription.created':
-                    $this->handleSubscriptionCreated($data);
-                    break;
-                case 'subscription.cancelled':
-                    $this->handleSubscriptionCancelled($data);
+                case 'error':
+                    $this->handlePaymentError($data);
                     break;
                 default:
                     Log::warning("Unhandled webhook event type", [
@@ -105,81 +99,61 @@ class WebhookController extends Controller
 
     protected function handlePaymentSucceeded(array $data)
     {
-        // Example data:
-        // {
-        //   "payment_id": "pay_123",
-        //   "amount": 10000,
-        //   "currency": "USD",
-        //   "customer_id": "cus_123",
-        //   "invoice_id": "inv_123",
-        //   "created_at": "2023-06-15T12:00:00Z"
-        // }
+        $invoice = Invoice::where('invoice_number', $data['transaction']['transaction_details']['invoice_number'])->first();
 
-        $payment = Payment::updateOrCreate(
-            ['gateway_id' => $data['payment_id']],
-            [
-                'amount' => $data['amount'] / 100, // Convert cents to dollars
-                'currency' => $data['currency'],
-                'customer_id' => $data['customer_id'],
-                'invoice_id' => $data['invoice_id'],
-                'status' => 'succeeded',
-                'processed_at' => Carbon::parse($data['created_at'])
-            ]
-        );
+        if($invoice) {
+            $invoice->update([
+                'status' => 'paid',
+                'paid_amount' => $data['auth_amount'],
+                'remaining_amount' => $invoice->total - $data['auth_amount'],
+            ]);
 
-        // Trigger any payment success actions
+            InvoicePayment::create([
+                'invoice_id' => $invoice->id,
+                'status' => 'completed',
+                'payment_amount' => $data['transaction']['amount_details']['amount'],
+                'gateway_response' => json_encode($data)
+            ]);
+        }
     }
 
     protected function handlePaymentFailed(array $data)
     {
-        // Example data:
-        // {
-        //   "payment_id": "pay_123",
-        //   "amount": 10000,
-        //   "currency": "USD",
-        //   "customer_id": "cus_123",
-        //   "invoice_id": "inv_123",
-        //   "failure_reason": "insufficient_funds",
-        //   "created_at": "2023-06-15T12:00:00Z"
-        // }
+        $invoice = Invoice::where('invoice_number', $data['transaction']['transaction_details']['invoice_number'])->first();
 
-        $payment = Payment::updateOrCreate(
-            ['gateway_id' => $data['payment_id']],
-            [
-                'amount' => $data['amount'] / 100,
-                'currency' => $data['currency'],
-                'customer_id' => $data['customer_id'],
-                'invoice_id' => $data['invoice_id'],
-                'status' => 'failed',
-                'failure_reason' => $data['failure_reason'],
-                'processed_at' => Carbon::parse($data['created_at'])
-            ]
-        );
-
-        // Trigger payment failure actions
-        event(new PaymentFailed($payment));
-    }
-
-    protected function handleInvoicePaid(array $data)
-    {
-        // Example data:
-        // {
-        //   "invoice_id": "inv_123",
-        //   "amount_paid": 10000,
-        //   "currency": "USD",
-        //   "paid_at": "2023-06-15T12:00:00Z"
-        // }
-
-        $invoice = Invoice::where('gateway_id', $data['invoice_id'])->first();
-        if ($invoice) {
+        if($invoice) {
             $invoice->update([
-                'status' => 'paid',
-                'paid_at' => Carbon::parse($data['paid_at']),
-                'amount_paid' => $data['amount_paid'] / 100
+                'status' => 'declined',
+                'paid_amount' => $data['auth_amount'],
+                'remaining_amount' => $invoice->total - $data['auth_amount'],
             ]);
 
-            // Trigger invoice paid actions
-            event(new InvoicePaid($invoice));
+            InvoicePayment::create([
+                'invoice_id' => $invoice->id,
+                'status' => 'declined',
+                'payment_amount' => $data['transaction']['amount_details']['amount'],
+                'gateway_response' => json_encode($data)
+            ]);
+        }
+    }
+
+    public function handlePaymentError($data)
+    {
+        $invoice = Invoice::where('invoice_number', $data['transaction']['transaction_details']['invoice_number'])->first();
+
+        if($invoice) {
+            $invoice->update([
+                'status' => 'error',
+                'paid_amount' => $data['auth_amount'],
+                'remaining_amount' => $invoice->total - $data['auth_amount'],
+            ]);
+
+            InvoicePayment::create([
+                'invoice_id' => $invoice->id,
+                'status' => 'error',
+                'error_message' => $data['error_message'],
+                'gateway_response' => json_encode($data)
+            ]);
         }
     }
 }
