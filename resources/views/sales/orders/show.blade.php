@@ -100,12 +100,47 @@
             </div>
         </div>
 
-        <div class="mt-5 text-center">
-           <a href="{{ asset('storage/your-pdf-file.pdf') }}" target="_blank" class="pdf-thumbnail">
-                <img src="{{ asset('storage/thumbnails/pdf-thumb.png') }}" alt="PDF Thumbnail">
-                <div class="pdf-label">PDF</div>
-            </a>
-        </div>
+        @php
+  $pdfUrl   = asset('storage/your-pdf-file.pdf');
+  $thumbUrl = asset('storage/thumbnails/pdf-thumb.png');
+@endphp
+
+<div class="pdf-tile">
+  <img src="{{ $thumbUrl }}" class="pdf-thumb" alt="PDF Thumbnail">
+
+  {{-- Center eye: open in new tab --}}
+  <a href="{{ $pdfUrl }}" target="_blank" rel="noopener" class="tile-eye" title="Open">
+    <i class="fa-solid fa-eye"></i>
+  </a>
+
+  {{-- Top-right 3-dot menu --}}
+  <div class="dropdown tile-menu">
+    <button class="btn btn-light btn-sm p-1 rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="More">
+      <i class="fa-solid fa-ellipsis-vertical"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow">
+      <li>
+        <a class="dropdown-item" href="{{ $pdfUrl }}" target="_blank" rel="noopener">
+          <i class="fa-solid fa-up-right-from-square me-2"></i> Open
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ $pdfUrl }}" download>
+          <i class="fa-solid fa-download me-2"></i> Download
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  {{-- Bottom-left label --}}
+  <div class="pdf-label">
+    <i class="fa-solid fa-file-pdf me-1"></i> PDF
+  </div>
+
+  {{-- Hover overlay (for subtle darkening) --}}
+  <div class="tile-overlay"></div>
+</div>
+
     </div>
 
     {{-- Thank You --}}
@@ -119,3 +154,36 @@
     {{-- <button class="btn btn-primary">Save</button> --}}
     <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 </div>
+
+
+@push('styles')
+<style>
+.pdf-tile{
+  position:relative; display:inline-block; width:160px; aspect-ratio:3/4;
+  border-radius:14px; overflow:hidden; /* keeps corners round */
+}
+.pdf-thumb{
+  width:100%; height:100%; object-fit:cover;
+  display:block; filter:saturate(0.95);
+}
+.tile-overlay{
+  position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.25));
+  opacity:0; transition:opacity .2s ease;
+}
+.tile-eye{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:1.25rem; text-decoration:none;
+  opacity:0; transform:translateY(4px); transition:all .2s ease;
+}
+.tile-menu{
+  position:absolute; top:8px; right:8px; z-index:2;
+}
+.pdf-label{
+  position:absolute; left:8px; bottom:8px; z-index:1;
+  background:rgba(255,255,255,0.9); color:#333;
+  font-size:.75rem; padding:2px 8px; border-radius:999px; backdrop-filter:saturate(180%) blur(2px);
+}
+.pdf-tile:hover .tile-eye{ opacity:1; transform:none; }
+.pdf-tile:hover .tile-overlay{ opacity:1; }
+</style>
+@endpush
