@@ -109,71 +109,68 @@
   $pdfUrl = asset('storage/your-pdf-file.pdf');
 @endphp
 
-<div class="mt-4 d-flex gap-3 flex-wrap">
-  <div class="pdf-tile">
-    <div class="thumb-wrap icon-only">
-      {{-- Medium FA icon as the "thumbnail" --}}
-      <i class="fa-solid fa-file-pdf pdf-icon" aria-hidden="true"></i>
-      <div class="tile-overlay"></div>
-    </div>
+<div class="pdf-tile">
+  <div class="thumb-wrap icon-only">
+    {{-- Medium PDF icon as the thumbnail --}}
+    <i class="fa-solid fa-file-pdf pdf-icon" aria-hidden="true"></i>
+    <div class="tile-overlay"></div>
+  </div>
 
-    {{-- Center eye: open in new tab --}}
-    <a href="{{ $pdfUrl }}" target="_blank" rel="noopener" class="tile-eye" title="Open">
-      <i class="fa-solid fa-eye"></i>
-    </a>
+  {{-- Center eye: open in a new tab --}}
+  <a href="{{ $pdfUrl }}" target="_blank" rel="noopener" class="tile-eye" title="Open">
+    <i class="fa-solid fa-eye"></i>
+  </a>
 
-    {{-- Top-right 3-dot menu --}}
-    <div class="dropdown tile-menu">
-      <button class="btn btn-light btn-sm p-1 rounded-circle shadow-sm"
-              type="button" data-bs-toggle="dropdown" data-bs-display="static"
-              aria-expanded="false" title="More">
-        <i class="fa-solid fa-ellipsis-vertical"></i>
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end shadow">
-        <li>
-          <a class="dropdown-item" href="{{ $pdfUrl }}" target="_blank" rel="noopener">
-            <i class="fa-solid fa-up-right-from-square me-2"></i> Open
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item" href="{{ $pdfUrl }}" download>
-            <i class="fa-solid fa-download me-2"></i> Download
-          </a>
-        </li>
-      </ul>
-    </div>
+  {{-- Top-right neutral 3-dot menu --}}
+  <div class="dropdown tile-menu">
+    <button class="tile-dot" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false" aria-label="More">
+      <i class="fa-solid fa-ellipsis-vertical"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow">
+      <li>
+        <a class="dropdown-item" href="{{ $pdfUrl }}" target="_blank" rel="noopener">
+          <i class="fa-solid fa-up-right-from-square me-2"></i> Open
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ $pdfUrl }}" download>
+          <i class="fa-solid fa-download me-2"></i> Download
+        </a>
+      </li>
+    </ul>
+  </div>
 
-    {{-- Bottom-left label --}}
-    <div class="pdf-label">
-      <i class="fa-solid fa-file-pdf me-1"></i> PDF
-    </div>
+  <div class="pdf-label">
+    <i class="fa-solid fa-file-pdf me-1"></i> PDF
   </div>
 </div>
 
+
 <style>
-/* Inline so it works when loaded via customModal */
-.pdf-tile{
-  position:relative; display:inline-block; width:160px; aspect-ratio:3/4; border-radius:14px;
-}
-.pdf-tile .thumb-wrap{
-  position:relative; width:100%; height:100%; overflow:hidden; border-radius:14px;
-}
+.pdf-tile{ position:relative; display:inline-block; width:160px; aspect-ratio:3/4; border-radius:14px; }
+.pdf-tile .thumb-wrap{ position:relative; width:100%; height:100%; overflow:hidden; border-radius:14px; }
 .pdf-tile .thumb-wrap.icon-only{
   display:flex; align-items:center; justify-content:center;
-  background:linear-gradient(135deg,#fff 0%,#f5f6f8 100%);
-  border:1px solid rgba(0,0,0,0.06);
+  background:linear-gradient(135deg,#ffffff 0%,#f5f6f8 100%); border:1px solid rgba(0,0,0,.06);
 }
-.pdf-icon{ font-size: clamp(44px, 7.5vw, 72px); color:#c71f1f; filter: drop-shadow(0 1px 1px rgba(0,0,0,.15)); }
+.pdf-icon{ font-size:clamp(44px,7.5vw,72px); color:#c71f1f; filter:drop-shadow(0 1px 1px rgba(0,0,0,.15)); }
+
 .tile-overlay{ position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.25)); opacity:0; transition:opacity .2s; }
-.tile-eye{
-  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  color:#fff; font-size:1.25rem; text-decoration:none; opacity:0; transform:translateY(4px); transition:all .2s; z-index:2;
-}
+.tile-eye{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.25rem; text-decoration:none; opacity:0; transform:translateY(4px); transition:all .2s; z-index:2; }
+
 .tile-menu{ position:absolute; top:8px; right:8px; z-index:3; }
+/* Neutral 3-dot button (no red background) */
+.tile-dot{
+  background:#fff !important; color:#6c757d !important; border:1px solid rgba(0,0,0,.08) !important;
+  padding:4px 6px; line-height:1; border-radius:999px; box-shadow:0 1px 2px rgba(0,0,0,.06);
+}
+.tile-dot:hover{ background:#f8f9fa !important; color:#212529 !important; }
+
 .pdf-label{
   position:absolute; left:8px; bottom:8px; z-index:2; background:rgba(255,255,255,.95); color:#333;
   font-size:.75rem; padding:2px 8px; border-radius:999px; backdrop-filter:saturate(180%) blur(2px);
 }
+
 .pdf-tile:hover .tile-eye{ opacity:1; transform:none; }
 .pdf-tile:hover .tile-overlay{ opacity:1; }
 </style>
