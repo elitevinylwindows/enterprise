@@ -11,6 +11,8 @@ use App\Models\Sales\Quote;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+
 
 class OrderController extends Controller
 {
@@ -185,4 +187,17 @@ public function forceDelete($id)
     return redirect()->route('sales.orders.index', ['status' => 'deleted'])
         ->with('success', 'Order permanently deleted');
 }
+
+
+public function pdf(\App\Models\Order $order)
+{
+    $pdfPath = $order->pdf_path; // or rebuild it the same way you did in the mail
+    abort_unless($pdfPath && Storage::disk('public')->exists($pdfPath), 404);
+
+    return response()->file(
+        Storage::disk('public')->path($pdfPath),
+        ['Content-Type' => 'application/pdf']
+    );
+}
+
 }
