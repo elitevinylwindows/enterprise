@@ -204,7 +204,7 @@ class FirstServe
         }
     }
 
-    public function updateInvoiceAmounts($invoice)
+    public function updateInvoiceAmounts($invoice, $amount)
     {
         $response = $this->client->patch($this->baseURL.'/invoices/'.$invoice->serve_invoice_id, [
             'headers' => [
@@ -213,18 +213,9 @@ class FirstServe
             ],
             'json' => [
                 'requirement' => [
-                    'value' => $invoice->required_payment_type === 'percentage' ? (float) $invoice->required_payment_percentage : (float) $invoice->required_payment,
-                    'type' => $invoice->required_payment_type === 'percentage' ? 'percent' : 'amount'
-                ],
-                'discount' => [
-                    'value' => round((float) $invoice->discount ?: 0, 2),
+                    'value' => (float) $amount,
                     'type' => 'amount'
                 ],
-                'shipping' => [
-                    'value' => round((float) $invoice->shipping ?: 0, 2),
-                    'type' => 'amount'
-                ],
-                'due_date' => (string) $invoice->due_date ?: null,
             ]
         ]);
 
@@ -251,6 +242,7 @@ class FirstServe
         $paymentMethod = $response->getBody()->getContents();
         Log::info("Payment Method Created: " . $paymentMethod);
         return json_decode($paymentMethod, true);
+        
     }
 
     public function getPaymentMethods($customer)
@@ -265,5 +257,31 @@ class FirstServe
         $paymentMethod = $response->getBody()->getContents();
         Log::info("Payment Methods: " . $paymentMethod);
         return json_decode($paymentMethod, true);
+    }
+
+    public function chargeCard($customer, $amount, $paymentMethodId, $invoiceId = null, $orderId = null)
+    {
+        $response = $this->client->post($this->baseURL.'/transactions/charge', [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . base64_encode($this->apiKey . ':' . $this->apiSecret),
+            ],
+            'json' => [
+                'amount' => (float)$amount,
+                'source' =>'pm-'.$paymentMethodId,
+                'save_card' => true,
+                'charge' => true,
+                'customer' => [
+                    'customer_id' =>(int) $customer->serve_customer_id
+                ],
+                'transaction_details' => [
+                    'invoice_number' => $invoiceId,
+                ]
+            ]
+        ]);
+
+        $charge = $response->getBody()->getContents();
+        Log::info("Card Charged: " . $charge);
+        return json_decode($charge, true);
     }
 }
