@@ -42,6 +42,73 @@
           <div class="mt-4">
             <label class="form-label">{{ __('Internal Notes') }}</label>
             <textarea class="form-control" rows="4" disabled>{{ $job->internal_notes ?? '' }}</textarea>
+            {{-- Downloads row (left: 4 XLS + 1 PDF, center: 2 TXT, right: Download All) --}}
+<div class="mt-4">
+  <div class="row g-3 align-items-center">
+
+    {{-- LEFT: 4 Excel + 1 PDF --}}
+    <div class="col-12 col-md-5">
+      <div class="d-flex flex-wrap gap-2">
+        {{-- Excel: Glass --}}
+        <a class="btn btn-outline-secondary btn-sm"
+           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'glass_xls']) }}"
+           title="Glass (XLS)">
+          <i class="fa-regular fa-file-excel"></i>
+        </a>
+        {{-- Excel: Frame --}}
+        <a class="btn btn-outline-secondary btn-sm"
+           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'frame_xls']) }}"
+           title="Frame (XLS)">
+          <i class="fa-regular fa-file-excel"></i>
+        </a>
+        {{-- Excel: Sash --}}
+        <a class="btn btn-outline-secondary btn-sm"
+           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'sash_xls']) }}"
+           title="Sash (XLS)">
+          <i class="fa-regular fa-file-excel"></i>
+        </a>
+        {{-- Excel: Grids --}}
+        <a class="btn btn-outline-secondary btn-sm"
+           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'grids_xls']) }}"
+           title="Grids (XLS)">
+          <i class="fa-regular fa-file-excel"></i>
+        </a>
+        {{-- PDF: Barcodes --}}
+        <a class="btn btn-outline-secondary btn-sm"
+           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'barcodes_pdf']) }}"
+           title="Barcodes (PDF)">
+          <i class="fa-regular fa-file-pdf"></i>
+        </a>
+      </div>
+    </div>
+
+    {{-- CENTER: 2 TXT icons --}}
+    <div class="col-12 col-md-2 text-center">
+      <div class="d-flex justify-content-center gap-2">
+        <a class="btn btn-outline-secondary btn-sm"
+           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'cutlist_txt']) }}"
+           title="TXT #1">
+          <i class="fa-regular fa-file-lines"></i>
+        </a>
+        <a class="btn btn-outline-secondary btn-sm"
+           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'labels_txt']) }}"
+           title="TXT #2">
+          <i class="fa-regular fa-file-lines"></i>
+        </a>
+      </div>
+    </div>
+
+    {{-- RIGHT: Download All --}}
+    <div class="col-12 col-md-5 text-md-end">
+      <a href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'all']) }}"
+         class="btn btn-outline-dark">
+        <i class="fa-solid fa-download"></i> {{ __('Download All') }}
+      </a>
+    </div>
+
+  </div>
+</div>
+
           </div>
         </div>
       </div>
