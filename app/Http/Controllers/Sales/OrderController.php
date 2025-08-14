@@ -144,10 +144,15 @@ class OrderController extends Controller
 
     public function email($id)
     {
-        $order = Order::findOrFail($id);
-        sendOrderMail($order);
-
-        return redirect()->route('sales.orders.index')->with('success', 'Order email sent successfully.');
+        try{
+            $order = Order::findOrFail($id);
+            sendOrderMail($order);
+            return redirect()->route('sales.orders.index')->with('success', 'Order email sent successfully.');
+        } catch (\Exception $e) {
+            dd($e);
+            Log::error("Failed to send order email: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to send order email: ' . $e->getMessage());
+        }
     }
 
     public function show($id)
