@@ -85,6 +85,23 @@
           </div>
         </div>
       </div>
+
+
+        <div class="w-100 h-100 tile top-tile top-tile-fixed tile-chat p-4">
+  <h5 class="fw-bold mb-3">CHAT</h5>
+
+  <div class="chat-log flex-grow-1 border rounded-3 p-2 mb-2 bg-light-subtle overflow-auto">
+    <div class="small text-muted">No messages yet.</div>
+  </div>
+
+  <div class="input-group mt-auto">
+    <input type="text" class="form-control" placeholder="Type a message…">
+    <button class="btn btn-primary" type="button">
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
+  </div>
+</div>
+
     </div>
 
     {{-- MIDDLE: BIG WORK AREA -----------------------------------------------}}
