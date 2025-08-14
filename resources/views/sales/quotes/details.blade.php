@@ -285,7 +285,6 @@
                                             @foreach($exteriorColors as $color)
                                             <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
                                             @endforeach
-                                            <option value="">Select Interior Color</option>
                                             @foreach($laminateColors as $color)
                                             <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="laminate">{{ $color->name }}</option>
                                             @endforeach
