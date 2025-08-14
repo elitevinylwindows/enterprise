@@ -264,10 +264,7 @@
                                             <span class="input-group-text">inches</span>
                                         </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label>Line Item Comment</label>
-                                        <textarea name="item_comment" class="form-control" rows="2"></textarea>
-                                    </div>
+                                    
                                 </div>
 
                                 <div class="tab-pane fade" id="color">
@@ -435,7 +432,7 @@
                                     </div>
 
                                     <div class="mb-3 mt-3">
-                                        <label>Internal Notes</label>
+                                        <label>Line Item Internal Notes</label>
                                         <textarea name="internal_note" class="form-control" rows="3" placeholder="Enter internal notes..."></textarea>
                                     </div>
                                 </div>

@@ -86,7 +86,7 @@
 
                 <div class="row">
                     <div class="col-md-5 mb-3">
-                        <label>Reference</label>
+                        <label>Reference (PO)</label>
                         <input type="text" name="reference" class="form-control">
                     </div>
                     <div class="col-md-5 mb-3">
