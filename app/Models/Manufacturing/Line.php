@@ -9,9 +9,8 @@ class Line extends Model
 {
     use SoftDeletes;
 
-    // If your table name is different, set it here:
-    // protected $table = 'manufacturing_lines';
-
+   
+    protected $table = 'elitevw_manufacturing_lines';
     protected $fillable = [
         'line',        // string, required
         'description', // text, nullable
