@@ -74,7 +74,7 @@
                 @endif
                 
 
-
+<!--
 @if (
     Gate::check('access crud generator') ||
     Gate::check('view all menus') ||
@@ -135,7 +135,7 @@
     </ul>
 </li>
 @endif
-@endif
+@endif-->
 
 @if (
     Gate::check('view sales dashboard') ||
@@ -1015,14 +1015,14 @@
  <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-grip"></i></span>
-        <span class="pc-mtext ms-2">Dashboards</span>
+        <span class="pc-mtext ms-2">Terminal Dashboards</span>
         <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
     </a>
 
     <ul class="pc-submenu">
         <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
             <a href="{{ route('master.customers.index') }}" class="pc-link">
-                <span class="pc-mtext">Glass Cutting</span>
+                <span class="pc-mtext">NODO-A Terminal</span>
             </a>
         </li>
         <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
