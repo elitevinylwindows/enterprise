@@ -45,56 +45,47 @@
             <div class="mt-4">
   <div class="row g-3 align-items-center">
 
-    {{-- LEFT: 4 Excel + 1 PDF --}}
+    {{-- LEFT: 4 Excel + 1 PDF (image icons) --}}
     <div class="col-12 col-md-5">
       <div class="d-flex flex-wrap gap-2">
-        <a class="btn btn-outline-secondary btn-sm" aria-label="Glass (XLS)"
-           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'glass_xls']) }}"
-           title="Glass (XLS)" data-bs-toggle="tooltip">
-          <i class="fa-regular fa-file-excel" aria-hidden="true"></i>
-        </a>
-        <a class="btn btn-outline-secondary btn-sm" aria-label="Frame (XLS)"
-           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'frame_xls']) }}"
-           title="Frame (XLS)" data-bs-toggle="tooltip">
-          <i class="fa-regular fa-file-excel" aria-hidden="true"></i>
-        </a>
-        <a class="btn btn-outline-secondary btn-sm" aria-label="Sash (XLS)"
-           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'sash_xls']) }}"
-           title="Sash (XLS)" data-bs-toggle="tooltip">
-          <i class="fa-regular fa-file-excel" aria-hidden="true"></i>
-        </a>
-        <a class="btn btn-outline-secondary btn-sm" aria-label="Grids (XLS)"
-           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'grids_xls']) }}"
-           title="Grids (XLS)" data-bs-toggle="tooltip">
-          <i class="fa-regular fa-file-excel" aria-hidden="true"></i>
-        </a>
-        <a class="btn btn-outline-secondary btn-sm" aria-label="Barcodes (PDF)"
-           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'barcodes_pdf']) }}"
-           title="Barcodes (PDF)" data-bs-toggle="tooltip">
-          <i class="fa-regular fa-file-pdf" aria-hidden="true"></i>
-        </a>
+        <a class="icon-link" aria-label="Glass (XLS)"
+           href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id,'type'=>'glass_xls']) }}"
+           title="Glass (XLS)"><img src="{{ asset('assets/icons/excel.svg') }}" alt="Excel"></a>
+
+        <a class="icon-link" aria-label="Frame (XLS)"
+           href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id,'type'=>'frame_xls']) }}"
+           title="Frame (XLS)"><img src="{{ asset('assets/icons/excel.svg') }}" alt="Excel"></a>
+
+        <a class="icon-link" aria-label="Sash (XLS)"
+           href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id,'type'=>'sash_xls']) }}"
+           title="Sash (XLS)"><img src="{{ asset('assets/icons/excel.svg') }}" alt="Excel"></a>
+
+        <a class="icon-link" aria-label="Grids (XLS)"
+           href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id,'type'=>'grids_xls']) }}"
+           title="Grids (XLS)"><img src="{{ asset('assets/icons/excel.svg') }}" alt="Excel"></a>
+
+        <a class="icon-link" aria-label="Barcodes (PDF)"
+           href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id,'type'=>'barcodes_pdf']) }}"
+           title="Barcodes (PDF)"><img src="{{ asset('assets/icons/pdf.svg') }}" alt="PDF"></a>
       </div>
     </div>
 
     {{-- CENTER: 2 TXT icons --}}
     <div class="col-12 col-md-2 text-center">
       <div class="d-flex justify-content-center gap-2">
-        <a class="btn btn-outline-secondary btn-sm" aria-label="Cutlist (TXT)"
-           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'cutlist_txt']) }}"
-           title="Cutlist (TXT)" data-bs-toggle="tooltip">
-          <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
-        </a>
-        <a class="btn btn-outline-secondary btn-sm" aria-label="Labels (TXT)"
-           href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'labels_txt']) }}"
-           title="Labels (TXT)" data-bs-toggle="tooltip">
-          <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
-        </a>
+        <a class="icon-link" aria-label="Cutlist (TXT)"
+           href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id,'type'=>'cutlist_txt']) }}"
+           title="Cutlist (TXT)"><img src="{{ asset('assets/icons/txt.svg') }}" alt="TXT"></a>
+
+        <a class="icon-link" aria-label="Labels (TXT)"
+           href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id,'type'=>'labels_txt']) }}"
+           title="Labels (TXT)"><img src="{{ asset('assets/icons/txt.svg') }}" alt="TXT"></a>
       </div>
     </div>
 
     {{-- RIGHT: Download All --}}
     <div class="col-12 col-md-5 text-md-end">
-      <a href="{{ route('manufacturing.job_planning.download', ['job' => $job->id, 'type' => 'all']) }}"
+      <a href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id,'type'=>'all']) }}"
          class="btn btn-outline-dark">
         <i class="fa-solid fa-download" aria-hidden="true"></i> {{ __('Download All') }}
       </a>
