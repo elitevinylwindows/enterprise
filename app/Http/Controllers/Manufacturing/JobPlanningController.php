@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Manufacturing;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Manufacturing\Job;
+use App\Models\Manufacturing\JobPlanning;
 
 class JobPlanningController extends Controller
 {
@@ -12,10 +12,10 @@ class JobPlanningController extends Controller
     {
         $status = $request->get('status', 'all');
 
-        $query = Job::query()->with('order');
+        $query = JobPlanning::query()->with('order');
 
         if ($status === 'deleted') {
-            $query = Job::onlyTrashed()->with('order');
+            $query = JobPlanning::onlyTrashed()->with('order');
         } elseif ($status === 'processed') {
             $query->where('status', 'processed');
         } elseif ($status === 'tempered') {
@@ -46,7 +46,7 @@ class JobPlanningController extends Controller
             'description' => ['nullable','string'],
         ]);
 
-        Job::create($data);
+        JobPlanning::create($data);
 
         return redirect()->route('manufacturing.job_planning.index')
             ->with('success', 'Job created.');
@@ -62,13 +62,13 @@ public function show(\Illuminate\Http\Request $request, \App\Models\Manufacturin
 
 
 
-    public function edit(Job $job)
+    public function edit(JobPlanning $job)
     {
         $job->loadMissing('order');
         return view('manufacturing.job_planning.edit', compact('job'));
     }
 
-    public function update(Request $request, Job $job)
+    public function update(Request $request, JobPlanning $job)
     {
         $data = $request->validate([
             'status'      => ['required','string','in:unprocessed,processed,tempered,active,draft'],
