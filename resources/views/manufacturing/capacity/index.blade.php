@@ -67,47 +67,50 @@
                         </thead>
                         <tbody>
                             @foreach ($capacities as $capacity)
-                            @php
-                                $pct = $capacity->percentage;
-                                if ($pct === null && (float) $capacity->limit > 0) {
-                                    $pct = round(((float) $capacity->actual / (float) $capacity->limit) * 100, 2);
-                                }
-                                $pct = $pct ?? 0;
-                                $badge = $pct > 100 ? 'danger' : ($pct >= 80 ? 'warning' : 'success');
-                            @endphp
-                            <tr>
-                                <td>{{ $capacity->id }}</td>
-                                <td>{{ $capacity->description }}</td>
-                                <td>{{ number_format((float) $capacity->limit, 2) }}</td>
-                                <td>{{ number_format((float) $capacity->actual, 2) }}</td>
-                                <td>
-                                    <span class="badge bg-light-{{ $badge }}">{{ number_format($pct, 2) }}%</span>
-                                </td>
-                                <td>
-                                    <a href="#" class="btn btn-sm btn-info customModal"
-                                       data-size="lg"
-                                       data-url="{{ route('manufacturing.capacity.edit', $capacity->id) }}"
-                                       data-title="{{ __('Edit Capacity Record') }}">
-                                       <i data-feather="edit"></i>
-                                    </a>
-                                    <form action="{{ route('manufacturing.capacity.destroy', $capacity->id) }}"
-                                          method="POST"
-                                          style="display:inline-block;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="btn btn-sm btn-danger"
-                                                onclick="return confirm('{{ __('Are you sure?') }}')">
-                                            <i data-feather="trash-2"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
+                                @php
+                                    $pct = $capacity->percentage;
+                                    if ($pct === null && (float) $capacity->limit > 0) {
+                                        $pct = round(((float) $capacity->actual / (float) $capacity->limit) * 100, 2);
+                                    }
+                                    $pct = $pct ?? 0;
+                                    $badge = $pct > 100 ? 'danger' : ($pct >= 80 ? 'warning' : 'success');
+                                @endphp
+                                <tr>
+                                    <td>{{ $capacity->id }}</td>
+                                    <td>{{ $capacity->description }}</td>
+                                    <td>{{ number_format((float) $capacity->limit, 2) }}</td>
+                                    <td>{{ number_format((float) $capacity->actual, 2) }}</td>
+                                    <td>
+                                        <span class="badge bg-light-{{ $badge }}">{{ number_format($pct, 2) }}%</span>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-info customModal"
+                                           data-size="lg"
+                                           data-url="{{ route('manufacturing.capacity.edit', $capacity->id) }}"
+                                           data-title="{{ __('Edit Capacity Record') }}">
+                                           <i data-feather="edit"></i>
+                                        </a>
+
+                                        <form action="{{ route('manufacturing.capacity.destroy', $capacity->id) }}"
+                                              method="POST" style="display:inline-block;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('{{ __('Are you sure?') }}')">
+                                                <i data-feather="trash-2"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
                             @endforeach
+
                             @if($capacities->isEmpty())
-                            <tr>
-                                <td colspan="6" class="text-center text-muted">{{ __('No capacity records found.') }}</td>
-                            </tr>
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">
+                                        {{ __('No capacity records found.') }}
+                                    </td>
+                                </tr>
                             @endif
                         </tbody>
                     </table>
