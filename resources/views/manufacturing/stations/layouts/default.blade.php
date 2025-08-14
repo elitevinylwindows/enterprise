@@ -95,9 +95,10 @@
   </div>
 
   {{-- MIDDLE ROW: Work Area (left) • Preview (right) --}}
-  <div class="row g-4 mt-4">
-    <div class="col-xl-9">
-      <div class="tile p-4 work-area d-flex align-items-center justify-content-center">
+ <div class="row g-4 mt-4 align-items-stretch">
+  <div class="col-xl-9 d-flex">
+    <div class="tile p-4 work-area h-100 flex-fill d-flex align-items-center justify-content-center">
+
         <div class="text-muted text-center">
           <div class="fw-semibold mb-1">Work Area</div>
           <small>Render job details, drawings, or controls here.</small>
@@ -105,8 +106,8 @@
       </div>
     </div>
 
-    <div class="col-xl-3">
-      <div class="tile p-3 preview-sticky">
+    <div class="col-xl-3 d-flex">
+  <div class="tile p-3 h-100 flex-fill">
         <h6 class="fw-bold mb-3">Preview</h6>
         @if($previewUrl)
           <div class="ratio ratio-4x3 rounded-3 overflow-hidden border">
