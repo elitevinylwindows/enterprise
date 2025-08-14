@@ -710,9 +710,9 @@ public function index(Request $request)
 
     public function previewPDF($id)
     {
-        $quote = Quote::findOrFail($id);
-        $pdf = PDF::loadView('sales.quotes.preview_pdf', compact('quote'));
-        return $pdf->stream('quote-' . $quote->id . '.pdf');
+        $order = Order::findOrFail($id);
+        $pdf = PDF::loadView('sales.quotes.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
+        return $pdf->stream('quote-' . $order->id . '.pdf');
     }
 
     public function updateStatus($id, $status)

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class OrderController extends Controller
@@ -59,9 +60,7 @@ class OrderController extends Controller
             $order->status = $request->status;
             $order->save();
 
-            $mail = new OrderMail($order);
-            Mail::to($quote->customer->email)->send($mail);
-
+            sendOrderMail($order);
             DB::commit();
 
             return redirect()->route('sales.orders.index')->with('success', 'Order created successfully.');
@@ -146,10 +145,17 @@ class OrderController extends Controller
 
     public function email($id)
     {
-        $order = Order::findOrFail($id);
-        Mail::to($order->customer->email)->send(new OrderMail($order));
-
-        return redirect()->route('sales.orders.index')->with('success', 'Order email sent successfully.');
+        try{
+            $order = Order::findOrFail($id);
+            $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order]);
+            return $pdf->stream('order_' . $order->order_number . '.pdf', ['Attachment' => false]);
+            // sendOrderMail($order);
+            return redirect()->route('sales.orders.index')->with('success', 'Order email sent successfully.');
+        } catch (\Exception $e) {
+            dd($e);
+            Log::error("Failed to send order email: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to send order email: ' . $e->getMessage());
+        }
     }
 
     public function show($id)

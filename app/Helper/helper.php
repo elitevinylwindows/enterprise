@@ -1997,7 +1997,7 @@ if(!function_exists('quoteToInvoice')) {
                 'gateway_response' => null,
             ]);
             DB::commit();
-        
+
             $firstServe = new FirstServe();
             $firstServeInvoice = $firstServe->createInvoice($invoice);
 
@@ -2073,18 +2073,23 @@ if (!function_exists('calculateTotal')) {
 if(!function_exists('sendOrderMail')) {
     function sendOrderMail($order)
     {
-        $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order]);
+        $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order])->setPaper('a4', 'landscape');;
         $pdfPath = 'orders/order_'.$order->order_number.'.pdf';
         Storage::disk('public')->put($pdfPath, $pdf->output());
 
-        $pdf = new PdfToImage(storage_path('app/public/orders/order_'.$order->order_number.'.pdf'));
-        $pdf->saveImage(storage_path('app/public/thumbnails/order_'.$order->order_number.'.png'));
+        // $pdf = new PdfToImage(storage_path('app/public/orders/order_'.$order->order_number.'.pdf'));
+        // Ensure the thumbnails directory exists
+        // $thumbnailDir = storage_path('app/public/thumbnails');
+        // if (!file_exists($thumbnailDir)) {
+        //     mkdir($thumbnailDir, 0755, true);
+        // }
+        // $pdf->saveImage($thumbnailDir . '/order_' . $order->order_number . '.png');
 
         $order->update([
             'pdf_path' => "order_'.$order->order_number.'.pdf",
-            'pdf_thumbnail' => 'order_'.$order->order_number.'.png',
+            // 'pdf_thumbnail' => 'order_'.$order->order_number.'.png',
         ]);
-        
+
         $mail = new OrderMail($order, $pdfPath);
         Mail::to($order->customer->email)->send($mail);
     }

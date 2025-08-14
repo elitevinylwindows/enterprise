@@ -81,14 +81,12 @@
         <td>
             @if($status === 'deleted')
                 <span class="badge bg-danger">Deleted</span>
+            @elseif($order->status === 'sent')
+                <span class="badge bg-success">Sent</span>
+            @elseif($order->status === 'created')
+                <span class="badge bg-secondary">Created</span>
             @else
-                @if($order->status === 'active')
-                    <span class="badge bg-success">Active</span>
-                @elseif($order->status === 'draft')
-                    <span class="badge bg-secondary">Draft</span>
-                @else
-                    <span class="badge bg-light text-muted">{{ ucfirst($order->status) }}</span>
-                @endif
+                <span class="badge bg-light text-muted">{{ ucfirst($order->status) }}</span>
             @endif
         </td>
         <td class="text-nowrap">

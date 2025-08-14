@@ -51,4 +51,9 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    public function series()
+    {
+        return $this->belongsTo(\App\Models\Master\Series\Series::class, 'series_id', 'id');
+    }
 }

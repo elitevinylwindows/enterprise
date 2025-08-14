@@ -48,4 +48,9 @@ class QuoteItem extends Model
     {
         return $this->belongsTo(Quote::class, 'quote_id');
     }
+
+    public function series()
+    {
+        return $this->belongsTo(App\Models\Master\Series::class, 'series_id');
+    }
 }
