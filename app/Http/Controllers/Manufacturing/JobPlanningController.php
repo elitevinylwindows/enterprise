@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Manufacturing;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Manufacturing\JobPlanning;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 
 class JobPlanningController extends Controller
 {
@@ -82,6 +84,34 @@ public function show(Request $request, $job)
         'frameRows' => $frameRows,
         'sashRows'  => $sashRows,
         'gridRows'  => $gridRows,
+    ]);
+}
+
+
+
+public function download(Request $request, $job)
+{
+    $type = (string) $request->get('type', '');
+
+    // Simple placeholder content per type
+    $map = [
+        'glass_xls'   => ['filename' => "glass_$job.xlsx",   'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'body' => "Glass XLS for job $job"],
+        'frame_xls'   => ['filename' => "frame_$job.xlsx",   'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'body' => "Frame XLS for job $job"],
+        'sash_xls'    => ['filename' => "sash_$job.xlsx",    'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'body' => "Sash XLS for job $job"],
+        'grids_xls'   => ['filename' => "grids_$job.xlsx",   'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'body' => "Grids XLS for job $job"],
+        'barcodes_pdf'=> ['filename' => "barcodes_$job.pdf", 'mime' => 'application/pdf',                                              'body' => "PDF for job $job"],
+        'cutlist_txt' => ['filename' => "cutlist_$job.txt",  'mime' => 'text/plain',                                                   'body' => "Cutlist for job $job"],
+        'labels_txt'  => ['filename' => "labels_$job.txt",   'mime' => 'text/plain',                                                   'body' => "Labels for job $job"],
+        'all'         => ['filename' => "job_$job_all.zip",  'mime' => 'application/zip',                                             'body' => "ZIP bundle for job $job"],
+    ];
+
+    $conf = $map[$type] ?? ['filename' => "job_$job.txt", 'mime' => 'text/plain', 'body' => "Download for job $job ($type)"];
+
+    return new StreamedResponse(function () use ($conf) {
+        echo $conf['body']; // placeholder; replace with real file stream
+    }, 200, [
+        'Content-Type'        => $conf['mime'],
+        'Content-Disposition' => 'attachment; filename="'.$conf['filename'].'"',
     ]);
 }
 

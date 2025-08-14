@@ -1064,7 +1064,9 @@ Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
     Route::get('job-planning-lookup', [JobPlanningController::class, 'lookup'])->name('job_planning.lookup');
     Route::post('job-planning-queue', [JobPlanningController::class, 'queue'])->name('job_planning.queue');
 
-
+    Route::get('job-planning/{job}/download', [\App\Http\Controllers\Manufacturing\JobPlanningController::class, 'download'])
+        ->whereNumber('job')
+        ->name('job_planning.download');
 
 });
 
