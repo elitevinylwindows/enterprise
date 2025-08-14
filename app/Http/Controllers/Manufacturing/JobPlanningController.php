@@ -52,12 +52,37 @@ class JobPlanningController extends Controller
             ->with('success', 'Job created.');
     }
 
-// app/Http/Controllers/Manufacturing/JobPlanningController.php
-public function show(\Illuminate\Http\Request $request, \App\Models\Manufacturing\JobPlanning $job)
+public function show(Request $request, $job)
 {
-    // Return the modal PARTIAL (no @extends)
+    $record = JobPlanning::find($job);
+
+    // Fallback stub so the modal shows even without a real record
+    if (!$record) {
+        $record = (object) [
+            'id'               => 0,
+            'job_order_number' => 'JP-0001',
+            'delivery_date'    => now()->addDays(7),
+            'customer_number'  => 'CUST-42',
+            'customer_name'    => 'Wayne Enterprises',
+            'line'             => 'Line A',
+            'series'           => 'LAM-WH',
+            'qty'              => 36,
+            'internal_notes'   => 'Demo notes…',
+            'production_status'=> 'created',
+        ];
+    }
+
+    // Empty datasets for tabs (you can wire real data later)
     $glassRows = []; $frameRows = []; $sashRows = []; $gridRows = [];
-    return view('manufacturing.job_planning.show', compact('job','glassRows','frameRows','sashRows','gridRows'));
+
+    // IMPORTANT: return a PARTIAL (no @extends)
+    return view('manufacturing.job_planning.show', [
+        'job'       => $record,
+        'glassRows' => $glassRows,
+        'frameRows' => $frameRows,
+        'sashRows'  => $sashRows,
+        'gridRows'  => $gridRows,
+    ]);
 }
 
 
