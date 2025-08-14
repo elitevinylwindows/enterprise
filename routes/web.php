@@ -216,6 +216,7 @@ use App\Http\Controllers\Manufacturing\{
     MachineController,
     JobPlanningController,
     JobPoolController,
+    LineController,
     StationController
 };
 
@@ -1037,7 +1038,7 @@ Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
     Route::get('/capacity', [CapacityController::class, 'index'])->name('capacity.index');
     Route::resource('job_pool', JobPoolController::class)->names('job_pool');
     Route::resource('lines', LineController::class)->names('lines');
-    
+
     // Machines & Stations
     Route::resource('machines', MachineController::class)->names('machines');
     Route::resource('stations', StationController::class)->names('stations');
