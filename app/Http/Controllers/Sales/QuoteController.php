@@ -711,7 +711,7 @@ public function index(Request $request)
     public function previewPDF($id)
     {
         $order = Order::findOrFail($id);
-        $pdf = PDF::loadView('sales.quotes.preview_pdf', compact('order'));
+        $pdf = PDF::loadView('sales.quotes.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
         return $pdf->stream('quote-' . $order->id . '.pdf');
     }
 

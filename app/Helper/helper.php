@@ -2073,7 +2073,7 @@ if (!function_exists('calculateTotal')) {
 if(!function_exists('sendOrderMail')) {
     function sendOrderMail($order)
     {
-        $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order]);
+        $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order])->setPaper('a4', 'landscape');;
         $pdfPath = 'orders/order_'.$order->order_number.'.pdf';
         Storage::disk('public')->put($pdfPath, $pdf->output());
 
