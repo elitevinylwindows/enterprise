@@ -1,15 +1,14 @@
 @extends('layouts.app')
 
-@section('page-title')
-    {{ __('Capacity') }}
-@endsection
+@section('page-title', __('Capacity'))
 
 @section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ __('Capacity') }}</li>
+<li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ __('Capacity') }}</li>
 @endsection
 
 @section('content')
+
 <div class="mb-4"></div> {{-- Space after title --}}
 <div class="mb-4"></div> {{-- Space --}}
 
@@ -20,103 +19,87 @@
             <div class="list-group list-group-flush">
                 <a href="{{ route('manufacturing.capacity.index', ['status' => 'all']) }}"
                    class="list-group-item {{ ($status ?? 'all') === 'all' ? 'active' : '' }}">
-                    All
+                    All Capacity Records
                 </a>
-                <a href="{{ route('manufacturing.capacity.index', ['status' => 'under']) }}"
-                   class="list-group-item {{ ($status ?? '') === 'under' ? 'active' : '' }}">
-                    Under Capacity (&lt; 80%)
+                <a href="{{ route('manufacturing.capacity.index', ['status' => 'over']) }}"
+                   class="list-group-item {{ ($status ?? '') === 'over' ? 'active' : '' }}">
+                    Over Limit
                 </a>
-                <a href="{{ route('manufacturing.capacity.index', ['status' => 'near']) }}"
-                   class="list-group-item {{ ($status ?? '') === 'near' ? 'active' : '' }}">
-                    Near Capacity (80–99%)
+                <a href="{{ route('manufacturing.capacity.index', ['status' => 'within']) }}"
+                   class="list-group-item {{ ($status ?? '') === 'within' ? 'active' : '' }}">
+                    Within Limit
                 </a>
-                <a href="{{ route('manufacturing.capacity.index', ['status' => 'full']) }}"
-                   class="list-group-item {{ ($status ?? '') === 'full' ? 'active' : '' }}">
-                    At / Over Capacity (≥ 100%)
+                <a href="{{ route('manufacturing.capacity.index', ['status' => 'deleted']) }}"
+                   class="list-group-item text-danger {{ ($status ?? '') === 'deleted' ? 'active' : '' }}">
+                    Deleted
                 </a>
             </div>
         </div>
     </div>
 
-    {{-- Main Content Card --}}
     <div class="col-sm-10">
         <div class="card table-card">
             <div class="card-header">
                 <div class="row align-items-center g-2">
-                    <div class="col">
-                        <h5>{{ __('Capacity List') }}</h5>
+                    <div class="col"><h5>{{ __('Capacity') }}</h5></div>
+                    <div class="col-auto">
+                        <a href="#" class="btn btn-primary customModal"
+                           data-size="lg"
+                           data-url="{{ route('manufacturing.capacity.create') }}"
+                           data-title="{{ __('Create Capacity Record') }}">
+                           <i class="fa-solid fa-circle-plus"></i> {{ __('Create') }}
+                        </a>
                     </div>
                 </div>
             </div>
-
             <div class="card-body pt-0">
                 <div class="dt-responsive table-responsive">
-                    <table class="table table-hover advance-datatable" id="capacityTable">
-                        <thead class="table-light">
+                    <table class="table table-hover advance-datatable">
+                        <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Description</th>
-                                <th class="text-end">Limit</th>
-                                <th class="text-end">Actual</th>
-                                <th class="text-end">Percentage</th>
-                                <th class="text-end">Actions</th>
+                                <th>{{ __('ID') }}</th>
+                                <th>{{ __('Description') }}</th>
+                                <th>{{ __('Limit') }}</th>
+                                <th>{{ __('Actual') }}</th>
+                                <th>{{ __('Percentage') }}</th>
+                                <th>{{ __('Action') }}</th>
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach ($capacities as $cap)
-                            @php
-                                $limit = (float)($cap->limit ?? 0);
-                                $actual = (float)($cap->actual ?? 0);
-                                $pct = $limit > 0 ? ($actual / $limit) * 100 : 0;
-                            @endphp
+                            @foreach ($capacities as $capacity)
                             <tr>
-                                <td>{{ $cap->id }}</td>
-                                <td>{{ $cap->description }}</td>
-                                <td class="text-end">{{ number_format($limit, 0) }}</td>
-                                <td class="text-end">{{ number_format($actual, 0) }}</td>
-                                <td class="text-end">
-                                    {{ number_format($pct, 1) }}%
-                                </td>
-                                <td class="text-nowrap">
-                                    {{-- Original Action Buttons --}}
-                                    {{-- View --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" data-bs-original-title="View Invoice" href="#" data-size="xl" data-url="{{ route('sales.invoices.show', $invoice->id) }}" data-title="Invoice Summary">
-                                        <i data-feather="eye"></i>
+                                <td>{{ $capacity->id }}</td>
+                                <td>{{ $capacity->description }}</td>
+                                <td>{{ $capacity->limit }}</td>
+                                <td>{{ $capacity->actual }}</td>
+                                <td>{{ $capacity->percentage }}%</td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-info customModal"
+                                       data-size="lg"
+                                       data-url="{{ route('manufacturing.capacity.edit', $capacity->id) }}"
+                                       data-title="{{ __('Edit Capacity Record') }}">
+                                       <i data-feather="edit"></i>
                                     </a>
-
-                                    {{-- Send to QB --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success" data-bs-toggle="tooltip" data-bs-original-title="Send to QuickBooks" href="{{ route('sales.invoices.sendToQuickBooks', $invoice->id) }}" data-title="Send to Quickbooks">
-                                        <i data-feather="share"></i>
-                                    </a>
-
-                                    {{-- Edit --}}
-                                    <a class="avtar avtar-xs btn-link-primary text-primary customModal" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="#" data-size="xl" data-url="{{ route('sales.invoices.edit', $invoice->id) }}" data-title="Edit Invoice">
-                                        <i data-feather="edit"></i>
-                                    </a>
+                                    <form action="{{ route('manufacturing.capacity.destroy', $capacity->id) }}" 
+                                          method="POST" 
+                                          style="display:inline-block;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="btn btn-sm btn-danger" 
+                                                onclick="return confirm('{{ __('Are you sure?') }}')">
+                                            <i data-feather="trash-2"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
-                        @endforeach
+                            @endforeach
                         </tbody>
                     </table>
-                </div> <!-- table-responsive -->
-            </div> <!-- card-body -->
-        </div> <!-- card -->
-    </div> <!-- col -->
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 @endsection
-
-@include('manufacturing.capacity.create')
-
-@push('scripts')
-<script>
-    $(function () {
-        // If you’re using DataTables elsewhere, this will hook in seamlessly.
-        if ($.fn.DataTable) {
-            $('#capacityTable').DataTable({
-                pageLength: 25,
-                order: [[0, 'asc']]
-            });
-        }
-    });
-</script>
-@endpush

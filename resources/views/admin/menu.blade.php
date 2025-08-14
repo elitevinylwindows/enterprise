@@ -1045,6 +1045,11 @@
     </a>
 
     <ul class="pc-submenu">
+        <li class="pc-item {{ request()->routeIs('manufacturing.capacity.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.capacity.index') }}" class="pc-link">
+                <span class="pc-mtext">Capacity</span>
+            </a>
+        </li>
         <li class="pc-item {{ request()->routeIs('manufacturing.machines.*') ? 'active' : '' }}">
             <a href="{{ route('manufacturing.machines.index') }}" class="pc-link">
                 <span class="pc-mtext">Machines</span>
@@ -1055,9 +1060,9 @@
                 <span class="pc-mtext">Stations</span>
             </a>
         </li>
-        <li class="pc-item {{ request()->routeIs('manufacturing.capacity.*') ? 'active' : '' }}">
-            <a href="{{ route('manufacturing.capacity.index') }}" class="pc-link">
-                <span class="pc-mtext">Capacity</span>
+        <li class="pc-item {{ request()->routeIs('manufacturing.lines.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.lines.index') }}" class="pc-link">
+                <span class="pc-mtext">Lines</span>
             </a>
         </li>
     </ul>
@@ -1071,6 +1076,11 @@
     </a>
 
     <ul class="pc-submenu">
+        <li class="pc-item {{ request()->routeIs('manufacturing.job_pool.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.job_pool.index') }}" class="pc-link">
+                <span class="pc-mtext">Job Pool</span>
+            </a>
+        </li>
         <li class="pc-item {{ request()->routeIs('manufacturing.job_planning.*') ? 'active' : '' }}">
             <a href="{{ route('manufacturing.job_planning.index') }}" class="pc-link">
                 <span class="pc-mtext">Job Planning</span>

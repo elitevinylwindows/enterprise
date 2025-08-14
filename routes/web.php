@@ -215,6 +215,8 @@ use App\Http\Controllers\Manufacturing\{
     CapacityController,
     MachineController,
     JobPlanningController,
+    JobPoolController,
+    LineController,
     StationController
 };
 
@@ -1030,47 +1032,41 @@ use Stripe\Webhook;
         });
 
 
-     // Manufacturing
+    // Manufacturing
 Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
-    Route::get('/capacity', [CapacityController::class, 'index'])->name('capacity.index');
-
-    Route::resource('machines', MachineController::class);
-    Route::resource('stations', StationController::class);
-
+    Route::resource('job_pool', JobPoolController::class)->names('job_pool');
+    Route::resource('lines', LineController::class)->names('lines');
+    Route::resource('machines', MachineController::class)->names('machines');
+    Route::resource('stations', StationController::class)->names('stations');
+    Route::resource('capacity', CapacityController::class)->names('capacity');
+    
     // Job Planning
-    Route::get('job-planning',              [JobPlanningController::class, 'index'])->name('job_planning.index');
+    // URL stays "job-planning/..."; route NAMES use underscores: manufacturing.job_planning.*
+    Route::resource('job-planning', JobPlanningController::class)
+        ->parameters(['job-planning' => 'job'])
+        ->names('job_planning');
 
-    // OPTIONAL: if you ever load the create form via AJAX/customModal
-    Route::get('job-planning/create',       [JobPlanningController::class, 'create'])
-         ->name('job_planning.create');
-
-    // ✅ MISSING BEFORE: store route for your Create Job modal form
-    Route::post('job-planning',             [JobPlanningController::class, 'store'])->name('job_planning.store');
-
-    // Put a numeric constraint on {job} so it won't swallow "create"
-    Route::get('job-planning/{job}',        [JobPlanningController::class, 'show'])
-         ->whereNumber('job')->name('job_planning.show');
-
-    Route::get('job-planning/{job}/edit',   [JobPlanningController::class, 'edit'])
-         ->whereNumber('job')->name('job_planning.edit');
-
-    Route::put('job-planning/{job}',        [JobPlanningController::class, 'update'])
-         ->whereNumber('job')->name('job_planning.update');
-
-    Route::delete('job-planning/{job}',     [JobPlanningController::class, 'destroy'])
-         ->whereNumber('job')->name('job_planning.destroy');
-
-    Route::post('job-planning/{id}/restore',[JobPlanningController::class, 'restore'])
-         ->whereNumber('id')->name('job_planning.restore');
-
-    Route::delete('job-planning/{id}/force',[JobPlanningController::class, 'forceDelete'])
-         ->whereNumber('id')->name('job_planning.force-delete');
-
+    // Extra actions
     Route::get('job-planning/{job}/prioritize', [JobPlanningController::class, 'prioritize'])
-         ->whereNumber('job')->name('job_planning.prioritize');
+        ->whereNumber('job')->name('job_planning.prioritize');
 
-    Route::get('job-planning/{job}/payment',    [JobPlanningController::class, 'payment'])
-         ->whereNumber('job')->name('job_planning.payment');
+    Route::get('job-planning/{job}/payment', [JobPlanningController::class, 'payment'])
+        ->whereNumber('job')->name('job_planning.payment');
+
+    Route::post('job-planning/{id}/restore', [JobPlanningController::class, 'restore'])
+        ->whereNumber('id')->name('job_planning.restore');
+
+    Route::delete('job-planning/{id}/force', [JobPlanningController::class, 'forceDelete'])
+        ->whereNumber('id')->name('job_planning.force-delete');
+
+    // Lookup + Queue for your modal
+    Route::get('job-planning-lookup', [JobPlanningController::class, 'lookup'])->name('job_planning.lookup');
+    Route::post('job-planning-queue', [JobPlanningController::class, 'queue'])->name('job_planning.queue');
+
+    Route::get('job-planning/{job}/download', [\App\Http\Controllers\Manufacturing\JobPlanningController::class, 'download'])
+        ->whereNumber('job')
+        ->name('job_planning.download');
+
 });
 
 

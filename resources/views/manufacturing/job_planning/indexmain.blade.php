@@ -56,47 +56,6 @@
   {{-- Queue Title --}}
   <h5 class="mb-3">{{ __('Job Queue 01') }}</h5>
 
-
-   {{-- {{ Sample Card (static; opens show route id 0) }} --}}
-<div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
-  <div class="card h-100 shadow-sm rounded-3 overflow-hidden">
-    <div class="p-3 text-white" style="background:#a70f0f;">
-      <div class="d-flex justify-content-between align-items-start">
-        <div class="fw-bold" style="font-size:1.1rem;">{{ __('Job Order #') }} JP-0001</div>
-        <span class="badge rounded-pill bg-light text-dark">{{ __('Job Created') }}</span>
-      </div>
-      <div class="mt-2 small opacity-75">
-        <div>{{ __('Delivery Date:') }} 2025-08-20</div>
-        <div>{{ __('Customer #:') }} CUST-42</div>
-        <div>{{ __('Customer Name:') }} Wayne Enterprises</div>
-      </div>
-    </div>
-
-    <div class="p-3">
-      <div class="small text-muted">
-        <div class="mb-1">{{ __('Line:') }} <span class="text-body">Line A</span></div>
-        <div class="mb-1">{{ __('Series:') }} <span class="text-body">LAM-WH</span></div>
-        <div class="mb-3">{{ __('Qty:') }} <span class="text-body">36</span></div>
-      </div>
-
-      {{-- Just opens the show route; controller will handle id=0 --}}
-      <a href="#"
-         class="btn w-100 text-white customModal"
-         style="background:#a70f0f; border-radius:18px;"
-         data-size="xl"
-         data-title="{{ __('Job #') }} JP-0001"
-         data-url="{{ route('manufacturing.job_planning.show', 0) }}">
-         {{ __('Open Job') }}
-      </a>
-    </div>
-  </div>
-</div>
-{{-- {{ /Sample Card }} --}}
-
-
-    
-
-
   {{-- Cards --}}
   <div class="row g-3">
     @forelse($jobs as $job)
@@ -154,18 +113,3 @@
 
 </div>
 @endsection
-
-
-@push('styles')
-<style>
-  .icon-link{
-    display:inline-flex;align-items:center;justify-content:center;
-    width:42px;height:42px;border:1px solid #dee2e6;border-radius:10px;
-    background:transparent;transition:background .15s ease-in-out;
-  }
-  .icon-link:hover{ background:#f8f9fa; }
-  .icon-link img{
-    width:26px;height:26px;object-fit:contain;display:block;
-  }
-</style>
-@endpush

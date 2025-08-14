@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Manufacturing;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Manufacturing\Job;
+use App\Models\Manufacturing\JobPlanning;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 
 class JobPlanningController extends Controller
 {
@@ -12,10 +14,10 @@ class JobPlanningController extends Controller
     {
         $status = $request->get('status', 'all');
 
-        $query = Job::query()->with('order');
+        $query = JobPlanning::query()->with('order');
 
         if ($status === 'deleted') {
-            $query = Job::onlyTrashed()->with('order');
+            $query = JobPlanning::onlyTrashed()->with('order');
         } elseif ($status === 'processed') {
             $query->where('status', 'processed');
         } elseif ($status === 'tempered') {
@@ -46,25 +48,82 @@ class JobPlanningController extends Controller
             'description' => ['nullable','string'],
         ]);
 
-        Job::create($data);
+        JobPlanning::create($data);
 
         return redirect()->route('manufacturing.job_planning.index')
             ->with('success', 'Job created.');
     }
 
-    public function show(Job $job)
-    {
-        $job->loadMissing('order');
-        return view('manufacturing.job_planning.show', compact('job'));
+public function show(Request $request, $job)
+{
+    $record = JobPlanning::find($job);
+
+    // Fallback stub so the modal shows even without a real record
+    if (!$record) {
+        $record = (object) [
+            'id'               => 0,
+            'job_order_number' => 'JP-0001',
+            'delivery_date'    => now()->addDays(7),
+            'customer_number'  => 'CUST-42',
+            'customer_name'    => 'Wayne Enterprises',
+            'line'             => 'Line A',
+            'series'           => 'LAM-WH',
+            'qty'              => 36,
+            'internal_notes'   => 'Demo notes…',
+            'production_status'=> 'created',
+        ];
     }
 
-    public function edit(Job $job)
+    // Empty datasets for tabs (you can wire real data later)
+    $glassRows = []; $frameRows = []; $sashRows = []; $gridRows = [];
+
+    // IMPORTANT: return a PARTIAL (no @extends)
+    return view('manufacturing.job_planning.show', [
+        'job'       => $record,
+        'glassRows' => $glassRows,
+        'frameRows' => $frameRows,
+        'sashRows'  => $sashRows,
+        'gridRows'  => $gridRows,
+    ]);
+}
+
+
+
+public function download(Request $request, $job)
+{
+    $type = (string) $request->get('type', '');
+
+    // Simple placeholder content per type
+    $map = [
+        'glass_xls'   => ['filename' => "glass_$job.xlsx",   'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'body' => "Glass XLS for job $job"],
+        'frame_xls'   => ['filename' => "frame_$job.xlsx",   'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'body' => "Frame XLS for job $job"],
+        'sash_xls'    => ['filename' => "sash_$job.xlsx",    'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'body' => "Sash XLS for job $job"],
+        'grids_xls'   => ['filename' => "grids_$job.xlsx",   'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'body' => "Grids XLS for job $job"],
+        'barcodes_pdf'=> ['filename' => "barcodes_$job.pdf", 'mime' => 'application/pdf',                                              'body' => "PDF for job $job"],
+        'cutlist_txt' => ['filename' => "cutlist_$job.txt",  'mime' => 'text/plain',                                                   'body' => "Cutlist for job $job"],
+        'labels_txt'  => ['filename' => "labels_$job.txt",   'mime' => 'text/plain',                                                   'body' => "Labels for job $job"],
+        'all'         => ['filename' => "job_$job_all.zip",  'mime' => 'application/zip',                                             'body' => "ZIP bundle for job $job"],
+    ];
+
+    $conf = $map[$type] ?? ['filename' => "job_$job.txt", 'mime' => 'text/plain', 'body' => "Download for job $job ($type)"];
+
+    return new StreamedResponse(function () use ($conf) {
+        echo $conf['body']; // placeholder; replace with real file stream
+    }, 200, [
+        'Content-Type'        => $conf['mime'],
+        'Content-Disposition' => 'attachment; filename="'.$conf['filename'].'"',
+    ]);
+}
+
+
+
+    public function edit(JobPlanning $job)
     {
         $job->loadMissing('order');
         return view('manufacturing.job_planning.edit', compact('job'));
     }
 
-    public function update(Request $request, Job $job)
+    public function update(Request $request, JobPlanning $job)
     {
         $data = $request->validate([
             'status'      => ['required','string','in:unprocessed,processed,tempered,active,draft'],
@@ -115,4 +174,62 @@ class JobPlanningController extends Controller
     {
         return view('manufacturing.job_planning.payment', compact('job'));
     }
+
+    // Returns the modal body above
+public function create()
+{
+    return view('manufacturing.job_planning.create');
+}
+
+/** Lookup jobs to send (JSON) */
+public function lookup(Request $request)
+{
+    $dateFrom = $request->date_from ? date('Y-m-d', strtotime($request->date_from)) : null;
+    $dateTo   = $request->date_to   ? date('Y-m-d', strtotime($request->date_to))   : null;
+    $series   = trim((string) $request->series);
+    $colors   = (array) $request->get('colors', []);
+
+    // Pull "created/draft" jobs (not yet queued)
+    $q = \App\Models\Manufacturing\JobPool::query()
+        ->whereIn('production_status', ['created', 'draft']);
+
+    if ($dateFrom) $q->whereDate('delivery_date', '>=', $dateFrom);
+    if ($dateTo)   $q->whereDate('delivery_date', '<=', $dateTo);
+    if ($series !== '') $q->where('series', 'like', "%{$series}%");
+    if (!empty($colors)) $q->whereIn('color', $colors);
+
+    $rows = $q->latest('id')->limit(500)->get()->map(function($j){
+        return [
+            'id' => $j->id,
+            'job_order_number' => $j->job_order_number,
+            'delivery_date' => optional($j->delivery_date)->format('Y-m-d'),
+            'customer_number' => $j->customer_number,
+            'customer_name' => $j->customer_name,
+            'line' => $j->line,
+            'series' => $j->series,
+            'color' => $j->color,
+            'qty' => $j->qty,
+        ];
+    });
+
+    return response()->json(['success' => true, 'data' => $rows]);
+}
+
+/** Bulk send selected to production queue */
+public function queue(Request $request)
+{
+    $ids = (array) $request->get('selected_ids', []);
+    if (empty($ids)) {
+        return back()->with('error', 'No jobs selected.');
+    }
+
+    \App\Models\Manufacturing\JobPool::whereIn('id', $ids)->update([
+        'production_status' => 'queued',
+        'last_transaction_date' => now(),
+        'updated_at' => now()
+    ]);
+
+    return redirect()->route('manufacturing.job_planning.index')->with('success', 'Selected jobs sent to Production Queue.');
+}
+
 }

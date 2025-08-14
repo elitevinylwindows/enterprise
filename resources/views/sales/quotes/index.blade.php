@@ -60,8 +60,8 @@
                                 <th>Quote #</th>
                                 <th>Customer</th>
                                 <th>Entry Date</th>
-                                <th>PO #</th>
-                                <th>Reference</th>
+                                <th>Order #</th>
+                                <th>Reference (PO)</th>
                                 <th>Total</th>
                                 <th>Expires By</th>
                                 <th>Status</th>
