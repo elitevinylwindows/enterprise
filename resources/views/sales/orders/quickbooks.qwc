@@ -1,0 +1,11 @@
+<QBWCXML>
+    <AppName>Elite Enterprise</AppName>
+    <AppID></AppID>
+    <AppURL>http://app.elitevinylwindows.com/quickbooks/endpoint</AppURL>
+    <AppDescription>Sync invoices to QuickBooks</AppDescription>
+    <AppSupport>http://elitevinylwindows.com/support</AppSupport>
+    <UserName>Jeanette Ortiz</UserName>
+    <OwnerID>{57F3B9B6-86F1-4FCC-B1FF-966DE1813D20}</OwnerID>
+    <FileID>{A6B5A441-CAC5-4D6D-88DF-8A06FB91714A}</FileID>
+    <QBType>QBFS</QBType>
+</QBWCXML>

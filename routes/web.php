@@ -163,7 +163,8 @@ use App\Http\Controllers\Master\Colors\{
     ColorConfigurationController,
     ExteriorColorController,
     InteriorColorController,
-    LaminateColorController
+    LaminateColorController,
+    StatusColorController
 };
 
 
@@ -502,13 +503,6 @@ use Stripe\Webhook;
         });
 
 
-        Route::prefix('color-options')->name('color-options.')->group(function () {
-            Route::resource('color-configurations', ColorConfigurationController::class);
-            Route::resource('exterior-colors', ExteriorColorController::class);
-            Route::resource('interior-colors', InteriorColorController::class);
-            Route::resource('laminate-colors', LaminateColorController::class);
-        });
-
         Route::prefix('grid-options')->name('grid-options.')->group(function () {
             Route::resource('grid-types', GridTypeController::class);
             Route::resource('grid-patterns', GridPatternController::class);
@@ -658,6 +652,8 @@ use Stripe\Webhook;
         Route::get('orders/{id}/edit', [\App\Http\Controllers\Sales\OrderController::class, 'edit'])->name('orders.edit');
         Route::get('orders/{id}/print', [\App\Http\Controllers\Sales\OrderController::class, 'print'])->name('orders.print');
         Route::post('orders', [\App\Http\Controllers\Sales\OrderController::class, 'store'])->name('orders.store');
+        Route::get('/orders/{order}/pdf', [\App\Http\Controllers\OrderController::class, 'pdf'])
+     ->name('orders.pdf');
 
         // Invoices
         Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
@@ -764,6 +760,7 @@ use Stripe\Webhook;
             Route::resource('exterior-colors', ExteriorColorController::class);
             Route::resource('interior-colors', InteriorColorController::class);
             Route::resource('laminate-colors', LaminateColorController::class);
+            Route::resource('status-colors', StatusColorColorController::class);
         });
 
         Route::prefix('grid-options')->name('grid-options.')->group(function () {
@@ -1039,7 +1036,7 @@ Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
     Route::resource('machines', MachineController::class)->names('machines');
     Route::resource('stations', StationController::class)->names('stations');
     Route::resource('capacity', CapacityController::class)->names('capacity');
-    
+
     // Job Planning
     // URL stays "job-planning/..."; route NAMES use underscores: manufacturing.job_planning.*
     Route::resource('job-planning', JobPlanningController::class)
