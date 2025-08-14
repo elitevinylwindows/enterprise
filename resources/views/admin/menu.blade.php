@@ -1028,7 +1028,7 @@
 
     <ul class="pc-submenu">
         <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
-            <a href="{{ route('manufacturing.terminal.dashboard') }}" class="pc-link">
+            <a href="" class="pc-link">
                 <span class="pc-mtext">Dashboard</span>
             </a>
         </li>
