@@ -97,8 +97,8 @@
     </div>
 
     {{-- BOTTOM: CONTROLS BAR --}}
-    <div class="terminal-tile p-3 mt-4 d-flex align-items-center justify-content-between">
-      <div class="d-flex align-items-center gap-3">
+<div class="terminal-tile p-3 mt-4 mb-5 d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
         <button type="button" class="btn btn-light d-inline-flex align-items-center gap-2 px-3" title="Stop All">
           <span class="stop-oct" aria-hidden="true">🛑</span>
           <span class="d-none d-sm-inline fw-semibold">Stop</span>
@@ -127,7 +127,7 @@
 
       @if($previewUrl)
         <div class="ratio ratio-4x3 rounded-3 overflow-hidden border">
-          <img src="{{ $previewUrl }}" class="w-100 h-100 object-fit-cover" alt="Preview">
+          <img src="{{ $previewUrl }}" class="w-100 h-80 object-fit-cover" alt="Preview">
         </div>
       @else
         <div class="preview-box ratio ratio-4x3 rounded-3 border d-flex align-items-center justify-content-center bg-light">
