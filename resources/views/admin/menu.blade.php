@@ -1019,7 +1019,7 @@
                             </a>
                         </li>
 
- <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
+<!-- <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-grip"></i></span>
         <span class="pc-mtext ms-2">Terminals</span>
@@ -1043,7 +1043,7 @@
             </a>
         </li>
     </ul>
-</li>
+</li>-->
 <li class="pc-item pc-hasmenu {{ request()->routeIs('manufacturing.machines.*') || request()->routeIs('manufacturing.stations.*') || request()->routeIs('manufacturing.capacity.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-wrench"></i></span>
