@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class OrderController extends Controller
@@ -146,7 +147,9 @@ class OrderController extends Controller
     {
         try{
             $order = Order::findOrFail($id);
-            sendOrderMail($order);
+            $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order]);
+            return $pdf->stream('order_' . $order->order_number . '.pdf', ['Attachment' => false]);
+            // sendOrderMail($order);
             return redirect()->route('sales.orders.index')->with('success', 'Order email sent successfully.');
         } catch (\Exception $e) {
             dd($e);
