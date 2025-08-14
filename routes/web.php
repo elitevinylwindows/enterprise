@@ -1036,6 +1036,7 @@ Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
     // Capacity
     Route::get('/capacity', [CapacityController::class, 'index'])->name('capacity.index');
     Route::resource('job_pool', JobPoolController::class)->names('job_pool');
+    Route::resource('lines', LineController::class)->names('lines');
 
     // Machines & Stations
     Route::resource('machines', MachineController::class)->names('machines');
