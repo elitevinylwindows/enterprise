@@ -57,7 +57,7 @@
   <h5 class="mb-3">{{ __('Job Queue 01') }}</h5>
 
 
-   {{-- {{ Sample Card (works even with no data) }} --}}
+   {{-- {{ Sample Card (static; opens show route id 0) }} --}}
 <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
   <div class="card h-100 shadow-sm rounded-3 overflow-hidden">
     <div class="p-3 text-white" style="background:#a70f0f;">
@@ -79,6 +79,7 @@
         <div class="mb-3">{{ __('Qty:') }} <span class="text-body">36</span></div>
       </div>
 
+      {{-- Just opens the show route; controller will handle id=0 --}}
       <a href="#"
          class="btn w-100 text-white customModal"
          style="background:#a70f0f; border-radius:18px;"
@@ -91,6 +92,7 @@
   </div>
 </div>
 {{-- {{ /Sample Card }} --}}
+
 
     
 
