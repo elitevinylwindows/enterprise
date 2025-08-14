@@ -106,19 +106,16 @@
 </div>
 
 @php
-  $pdfUrl   = asset('storage/your-pdf-file.pdf');
-  $thumbUrl = asset('storage/thumbnails/pdf-thumb.png');
+  $pdfUrl = asset('storage/your-pdf-file.pdf');
 @endphp
 
-{{-- Attachments row (tile sits OUTSIDE .table-responsive to avoid clipping) --}}
 <div class="mt-4 d-flex gap-3 flex-wrap">
   <div class="pdf-tile">
-    {{-- ...inside your .pdf-tile --}}
-<div class="thumb-wrap icon-only">
-  <i class="fa-solid fa-file-pdf pdf-icon" aria-hidden="true"></i>
-  <div class="tile-overlay"></div>
-</div>
-
+    <div class="thumb-wrap icon-only">
+      {{-- Medium FA icon as the "thumbnail" --}}
+      <i class="fa-solid fa-file-pdf pdf-icon" aria-hidden="true"></i>
+      <div class="tile-overlay"></div>
+    </div>
 
     {{-- Center eye: open in new tab --}}
     <a href="{{ $pdfUrl }}" target="_blank" rel="noopener" class="tile-eye" title="Open">
@@ -128,11 +125,8 @@
     {{-- Top-right 3-dot menu --}}
     <div class="dropdown tile-menu">
       <button class="btn btn-light btn-sm p-1 rounded-circle shadow-sm"
-              type="button"
-              data-bs-toggle="dropdown"
-              data-bs-display="static"
-              aria-expanded="false"
-              title="More">
+              type="button" data-bs-toggle="dropdown" data-bs-display="static"
+              aria-expanded="false" title="More">
         <i class="fa-solid fa-ellipsis-vertical"></i>
       </button>
       <ul class="dropdown-menu dropdown-menu-end shadow">
@@ -156,6 +150,35 @@
   </div>
 </div>
 
+<style>
+/* Inline so it works when loaded via customModal */
+.pdf-tile{
+  position:relative; display:inline-block; width:160px; aspect-ratio:3/4; border-radius:14px;
+}
+.pdf-tile .thumb-wrap{
+  position:relative; width:100%; height:100%; overflow:hidden; border-radius:14px;
+}
+.pdf-tile .thumb-wrap.icon-only{
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#fff 0%,#f5f6f8 100%);
+  border:1px solid rgba(0,0,0,0.06);
+}
+.pdf-icon{ font-size: clamp(44px, 7.5vw, 72px); color:#c71f1f; filter: drop-shadow(0 1px 1px rgba(0,0,0,.15)); }
+.tile-overlay{ position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.25)); opacity:0; transition:opacity .2s; }
+.tile-eye{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:1.25rem; text-decoration:none; opacity:0; transform:translateY(4px); transition:all .2s; z-index:2;
+}
+.tile-menu{ position:absolute; top:8px; right:8px; z-index:3; }
+.pdf-label{
+  position:absolute; left:8px; bottom:8px; z-index:2; background:rgba(255,255,255,.95); color:#333;
+  font-size:.75rem; padding:2px 8px; border-radius:999px; backdrop-filter:saturate(180%) blur(2px);
+}
+.pdf-tile:hover .tile-eye{ opacity:1; transform:none; }
+.pdf-tile:hover .tile-overlay{ opacity:1; }
+</style>
+
+
 
     {{-- Thank You --}}
     <div class="mt-5 text-center">
@@ -170,51 +193,3 @@
 </div>
 
 
-
-@push('styles')
-<style>
-/* existing */
-.pdf-tile{
-  position:relative; display:inline-block; width:160px; aspect-ratio:3/4;
-  border-radius:14px; /* visual; actual clipping is thumb-wrap */
-}
-.pdf-tile .thumb-wrap{
-  position:relative; width:100%; height:100%;
-  overflow:hidden; border-radius:14px;
-}
-/* NEW: when using icon instead of image */
-.pdf-tile .thumb-wrap.icon-only{
-  display:flex; align-items:center; justify-content:center;
-  background: linear-gradient(135deg, #ffffff 0%, #f5f6f8 100%);
-  border: 1px solid rgba(0,0,0,0.06);
-}
-
-/* NEW: the medium PDF icon */
-.pdf-icon{
-  font-size: clamp(44px, 7.5vw, 72px);
-  color: #c71f1f; /* classic PDF red */
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
-}
-
-/* overlay + controls (unchanged) */
-.tile-overlay{
-  position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.25));
-  opacity:0; transition:opacity .2s ease;
-}
-.tile-eye{
-  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  color:#fff; font-size:1.25rem; text-decoration:none;
-  opacity:0; transform:translateY(4px); transition:all .2s ease; z-index:2;
-}
-.tile-menu{ position:absolute; top:8px; right:8px; z-index:3; }
-.pdf-label{
-  position:absolute; left:8px; bottom:8px; z-index:2;
-  background:rgba(255,255,255,0.95); color:#333;
-  font-size:.75rem; padding:2px 8px; border-radius:999px;
-  backdrop-filter:saturate(180%) blur(2px);
-}
-.pdf-tile:hover .tile-eye{ opacity:1; transform:none; }
-.pdf-tile:hover .tile-overlay{ opacity:1; }
-</style>
-@endpush
