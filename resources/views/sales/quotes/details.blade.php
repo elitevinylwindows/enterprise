@@ -285,6 +285,7 @@
                                             @foreach($exteriorColors as $color)
                                             <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
                                             @endforeach
+                                            <option value="">Select Interior Color</option>
                                             @foreach($laminateColors as $color)
                                             <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="laminate">{{ $color->name }}</option>
                                             @endforeach
@@ -432,7 +433,7 @@
                                     </div>
 
                                     <div class="mb-3 mt-3">
-                                        <label>Internal Notes</label>
+                                        <label>Line Item Internal Notes</label>
                                         <textarea name="internal_note" class="form-control" rows="3" placeholder="Enter internal notes..."></textarea>
                                     </div>
                                 </div>
