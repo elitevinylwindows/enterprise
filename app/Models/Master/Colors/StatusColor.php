@@ -11,7 +11,7 @@ class StatusColor extends Model
     use HasFactory, SoftDeletes;
 
     // Adjust if your table name differs
-    protected $table = 'elitevw_master_status_colors';
+    protected $table = 'elitevw_master_colors_status_colors';
 
     protected $fillable = [
         'color_code',   // HEX like #FF0000
