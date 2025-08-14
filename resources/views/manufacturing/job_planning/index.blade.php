@@ -154,3 +154,18 @@
 
 </div>
 @endsection
+
+
+@push('styles')
+<style>
+  .icon-link{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:42px;height:42px;border:1px solid #dee2e6;border-radius:10px;
+    background:transparent;transition:background .15s ease-in-out;
+  }
+  .icon-link:hover{ background:#f8f9fa; }
+  .icon-link img{
+    width:26px;height:26px;object-fit:contain;display:block;
+  }
+</style>
+@endpush
