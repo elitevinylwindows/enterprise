@@ -1011,7 +1011,14 @@
     <i class="ti ti-plus text-muted pe-2" style="font-size: 0.9rem;"></i>
 </li>
 
-<!-- Master Data -->
+<!-- Manufacturing -->
+ <li class="pc-item {{ in_array($routeName, ['manufacturing.dashboard']) ? 'active' : '' }}">
+                            <a href="{{ route('manufacturing.dashboard') }}" class="pc-link">
+                                <span class="pc-micon"><i class="fa-solid fa-grip"></i></span>
+                                <span class="pc-mtext">{{ __('Dashboard') }}</span>
+                            </a>
+                        </li>
+
  <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-grip"></i></span>
@@ -1021,8 +1028,8 @@
 
     <ul class="pc-submenu">
         <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
-            <a href="{{ route('master.customers.index') }}" class="pc-link">
-                <span class="pc-mtext">NODO-A Terminal</span>
+            <a href="{{ route('manufacturing.terminal.dashboard') }}" class="pc-link">
+                <span class="pc-mtext">Dashboard</span>
             </a>
         </li>
         <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">

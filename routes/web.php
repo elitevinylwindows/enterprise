@@ -218,6 +218,7 @@ use App\Http\Controllers\Manufacturing\{
     JobPlanningController,
     JobPoolController,
     LineController,
+    DashboardController,
     StationController
 };
 
@@ -1036,6 +1037,8 @@ Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
     Route::resource('machines', MachineController::class)->names('machines');
     Route::resource('stations', StationController::class)->names('stations');
     Route::resource('capacity', CapacityController::class)->names('capacity');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
 
     // Job Planning
     // URL stays "job-planning/..."; route NAMES use underscores: manufacturing.job_planning.*

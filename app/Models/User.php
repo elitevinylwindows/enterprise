@@ -50,6 +50,12 @@ class User extends Authenticatable
         return $this->type == 'super admin';
     }
 
+    public function station()
+{
+    return $this->belongsTo(\App\Models\Manufacturing\Station::class);
+}
+
+
     public function totalUser()
     {
         return User::whereNotIn('type', ['tenant', 'maintainer'])->where('parent_id', $this->id)->count();

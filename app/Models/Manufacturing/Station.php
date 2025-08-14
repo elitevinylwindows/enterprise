@@ -16,10 +16,16 @@ class Station extends Model
         'id', 
         'station',  // "Station #"
         'description',
-        'status',           // 'active' | 'inactive'
+        'status',
+        'ui_key',           // 'active' | 'inactive'
     ];
 
     protected $casts = [
-        'station_number' => 'string',
+        'station' => 'string',
     ];
+
+    public function users()
+{
+    return $this->hasMany(\App\Models\User::class);
+}
 }
