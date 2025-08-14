@@ -13,7 +13,8 @@ class Station extends Model
     protected $table = 'elitevw_manufacturing_stations';
 
     protected $fillable = [
-        'station_number',   // "Station #"
+        'id', 
+        'station',  // "Station #"
         'description',
         'status',           // 'active' | 'inactive'
     ];

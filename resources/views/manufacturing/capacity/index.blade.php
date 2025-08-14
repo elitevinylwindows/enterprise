@@ -19,19 +19,19 @@
             <div class="list-group list-group-flush">
                 <a href="{{ route('manufacturing.capacity.index', ['status' => 'all']) }}"
                    class="list-group-item {{ ($status ?? 'all') === 'all' ? 'active' : '' }}">
-                    All Capacity Records
+                    {{ __('All Capacity Records') }}
                 </a>
                 <a href="{{ route('manufacturing.capacity.index', ['status' => 'over']) }}"
                    class="list-group-item {{ ($status ?? '') === 'over' ? 'active' : '' }}">
-                    Over Limit
+                    {{ __('Over Limit') }}
                 </a>
                 <a href="{{ route('manufacturing.capacity.index', ['status' => 'within']) }}"
                    class="list-group-item {{ ($status ?? '') === 'within' ? 'active' : '' }}">
-                    Within Limit
+                    {{ __('Within Limit') }}
                 </a>
                 <a href="{{ route('manufacturing.capacity.index', ['status' => 'deleted']) }}"
                    class="list-group-item text-danger {{ ($status ?? '') === 'deleted' ? 'active' : '' }}">
-                    Deleted
+                    {{ __('Deleted') }}
                 </a>
             </div>
         </div>
@@ -67,12 +67,22 @@
                         </thead>
                         <tbody>
                             @foreach ($capacities as $capacity)
+                            @php
+                                $pct = $capacity->percentage;
+                                if ($pct === null && (float) $capacity->limit > 0) {
+                                    $pct = round(((float) $capacity->actual / (float) $capacity->limit) * 100, 2);
+                                }
+                                $pct = $pct ?? 0;
+                                $badge = $pct > 100 ? 'danger' : ($pct >= 80 ? 'warning' : 'success');
+                            @endphp
                             <tr>
                                 <td>{{ $capacity->id }}</td>
                                 <td>{{ $capacity->description }}</td>
-                                <td>{{ $capacity->limit }}</td>
-                                <td>{{ $capacity->actual }}</td>
-                                <td>{{ $capacity->percentage }}%</td>
+                                <td>{{ number_format((float) $capacity->limit, 2) }}</td>
+                                <td>{{ number_format((float) $capacity->actual, 2) }}</td>
+                                <td>
+                                    <span class="badge bg-light-{{ $badge }}">{{ number_format($pct, 2) }}%</span>
+                                </td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-info customModal"
                                        data-size="lg"
@@ -80,13 +90,14 @@
                                        data-title="{{ __('Edit Capacity Record') }}">
                                        <i data-feather="edit"></i>
                                     </a>
-                                    <form action="{{ route('manufacturing.capacity.destroy', $capacity->id) }}" 
-                                          method="POST" 
+
+                                    <form action="{{ route('manufacturing.capacity.destroy', $capacity->id) }}"
+                                          method="POST"
                                           style="display:inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" 
-                                                class="btn btn-sm btn-danger" 
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger"
                                                 onclick="return confirm('{{ __('Are you sure?') }}')">
                                             <i data-feather="trash-2"></i>
                                         </button>

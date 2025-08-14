@@ -6,6 +6,7 @@
 @endphp
 
 <div class="container-fluid">
+  <div class="mb-4"></div> {{-- Space --}}
   <ul class="nav nav-tabs mb-3" role="tablist" style="--bs-nav-tabs-border-width:0;">
     <li class="nav-item" role="presentation">
       <button class="nav-link active text-white" style="background:#a70f0f; border-radius:14px 14px 0 0;"
