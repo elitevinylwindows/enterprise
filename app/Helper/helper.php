@@ -31,6 +31,7 @@ use PragmaRX\Google2FAQRCode\Google2FA;
 use Spatie\Permission\Models\Role;
 use App\Models\Sales\SalesSetting;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Spatie\PdfToImage\Pdf as PdfToImage;
 
 if (!function_exists('settingsKeys')) {
     function settingsKeys()
@@ -2029,7 +2030,7 @@ if(!function_exists('quoteToInvoice')) {
 if(!function_exists('generateInvoiceNumber')) {
     function generateInvoiceNumber()
     {
-        $lastInvoice = Invoice::max('id')+5;
+        $lastInvoice = Invoice::max('id')+2;
         $nextId = $lastInvoice ? $lastInvoice + 1 : 1;
         return 'INV-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
     }
@@ -2076,6 +2077,14 @@ if(!function_exists('sendOrderMail')) {
         $pdfPath = 'orders/order_'.$order->order_number.'.pdf';
         Storage::disk('public')->put($pdfPath, $pdf->output());
 
+        $pdf = new PdfToImage(storage_path('app/public/orders/order_'.$order->order_number.'.pdf'));
+        $pdf->saveImage(storage_path('app/public/thumbnails/order_'.$order->order_number.'.png'));
+
+        $order->update([
+            'pdf_path' => "order_'.$order->order_number.'.pdf",
+            'pdf_thumbnail' => 'order_'.$order->order_number.'.png',
+        ]);
+        
         $mail = new OrderMail($order, $pdfPath);
         Mail::to($order->customer->email)->send($mail);
     }

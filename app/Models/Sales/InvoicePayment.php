@@ -35,12 +35,4 @@ class InvoicePayment extends Model
         'gateway_response'
     ];
 
-    protected $casts = [
-        'payment_amount' => 'array',
-        'payment_card_number' => 'array',
-        'payment_card_cvv' => 'array',
-        'payment_card_expiry' => 'array',
-        'payment_card_zip' => 'array',
-    ];
-
 }

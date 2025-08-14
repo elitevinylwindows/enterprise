@@ -99,6 +99,13 @@
                 </table>
             </div>
         </div>
+
+        <div class="mt-5 text-center">
+           <a href="{{ asset('storage/your-pdf-file.pdf') }}" target="_blank" class="pdf-thumbnail">
+                <img src="{{ asset('storage/thumbnails/pdf-thumb.png') }}" alt="PDF Thumbnail">
+                <div class="pdf-label">PDF</div>
+            </a>
+        </div>
     </div>
 
     {{-- Thank You --}}
