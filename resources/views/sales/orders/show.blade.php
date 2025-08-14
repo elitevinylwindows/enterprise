@@ -100,10 +100,10 @@
             </div>
         </div>
 
-        <div class="mt-5 text-center">
-           <a href="{{ asset('storage/your-pdf-file.pdf') }}" target="_blank" class="pdf-thumbnail">
-                <img src="{{ asset('storage/thumbnails/pdf-thumb.png') }}" alt="PDF Thumbnail">
-                <div class="pdf-label">PDF</div>
+        <div class="mt-5">
+           <a href="{{ asset('storage/orders/order_' . $order->order_number . '.pdf') }}" target="_blank" class="pdf-thumbnail">
+                <img src="{{ asset('storage/thumbnails/order_' . $order->order_number . '.png') }}" width="120" height="100" alt="PDF Thumbnail">
+                <br><div class="btn btn-primary"><i class="fas fa-file-pdf"></i>Download PDF</div>
             </a>
         </div>
     </div>

@@ -57,9 +57,7 @@ class OrderController extends Controller
             $order->status = $request->status;
             $order->save();
 
-            $mail = new OrderMail($order);
-            Mail::to($quote->customer->email)->send($mail);
-
+            sendOrderMail($order);
             DB::commit();
 
             return redirect()->route('sales.orders.index')->with('success', 'Order created successfully.');
@@ -145,7 +143,7 @@ class OrderController extends Controller
     public function email($id)
     {
         $order = Order::findOrFail($id);
-        Mail::to($order->customer->email)->send(new OrderMail($order));
+        sendOrderMail($order);
 
         return redirect()->route('sales.orders.index')->with('success', 'Order email sent successfully.');
     }
