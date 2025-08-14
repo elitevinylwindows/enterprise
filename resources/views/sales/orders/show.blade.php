@@ -106,7 +106,7 @@
 </div>
 
 @php
-  $pdfUrl = asset('storage/your-pdf-file.pdf');
+  $pdfUrl = asset('storage/orders/order_' . $order->order_number . '.pdf');
 @endphp
 
 <div class="pdf-tile">

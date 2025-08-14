@@ -2077,17 +2077,17 @@ if(!function_exists('sendOrderMail')) {
         $pdfPath = 'orders/order_'.$order->order_number.'.pdf';
         Storage::disk('public')->put($pdfPath, $pdf->output());
 
-        $pdf = new PdfToImage(storage_path('app/public/orders/order_'.$order->order_number.'.pdf'));
+        // $pdf = new PdfToImage(storage_path('app/public/orders/order_'.$order->order_number.'.pdf'));
         // Ensure the thumbnails directory exists
-        $thumbnailDir = storage_path('app/public/thumbnails');
-        if (!file_exists($thumbnailDir)) {
-            mkdir($thumbnailDir, 0755, true);
-        }
-        $pdf->saveImage($thumbnailDir . '/order_' . $order->order_number . '.png');
+        // $thumbnailDir = storage_path('app/public/thumbnails');
+        // if (!file_exists($thumbnailDir)) {
+        //     mkdir($thumbnailDir, 0755, true);
+        // }
+        // $pdf->saveImage($thumbnailDir . '/order_' . $order->order_number . '.png');
 
         $order->update([
             'pdf_path' => "order_'.$order->order_number.'.pdf",
-            'pdf_thumbnail' => 'order_'.$order->order_number.'.png',
+            // 'pdf_thumbnail' => 'order_'.$order->order_number.'.png',
         ]);
 
         $mail = new OrderMail($order, $pdfPath);
