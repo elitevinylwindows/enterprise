@@ -8,11 +8,11 @@
     <div class="col-md-4">
       <label class="form-label">{{ __('Station #') }}</label>
       <input type="text"
-             name="station_number"
+             name="station"
              class="form-control"
-             value="{{ old('station_number', $station->station_number) }}"
+             value="{{ old('station', $station->station) }}"
              required>
-      @error('station_number') <div class="text-danger small">{{ $message }}</div> @enderror
+      @error('station') <div class="text-danger small">{{ $message }}</div> @enderror
     </div>
 
     <div class="col-md-4">
