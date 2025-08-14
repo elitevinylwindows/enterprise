@@ -694,9 +694,9 @@
 <li><a class="pc-link" href="{{ route('color-options.exterior-colors.index') }}">Exterior Colors</a></li>
 <li><a class="pc-link" href="{{ route('color-options.interior-colors.index') }}">Interior Colors</a></li>
 <li><a class="pc-link" href="{{ route('color-options.laminate-colors.index') }}">Laminate Colors</a></li>
-
+<li><a class="pc-link" href="{{ route('color-options.status-colors.index') }}">Status Colors</a></li>
                 <li><a class="pc-link" href="#">System Colors</a></li>
-                <li><a class="pc-link" href="#">Status Colors</a></li>
+                
 
             </ul>
         </li>
