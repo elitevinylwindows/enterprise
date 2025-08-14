@@ -12,7 +12,7 @@
             font-family: 'Helvetica', 'Arial', sans-serif;
             font-size: 12px;
             line-height: 1.6;
-            color: #333;
+            color: #000000;
         }
 
         .header {
@@ -21,7 +21,7 @@
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 2px solid #2c3e50;
+            border-bottom: 2px solid #000000;
         }
 
         .company-logo {
@@ -34,7 +34,7 @@
         }
 
         .order-title {
-            color: #2c3e50;
+            color: #000000;
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 5px;
@@ -62,16 +62,16 @@
             padding: 15px;
             background: #f8f9fa;
             border-radius: 5px;
-            border-left: 4px solid #3498db;
+            border-left: 4px solid #000000;
         }
 
         .address-box.delivery {
-            border-left-color: #2ecc71;
+            border-left-color: #000000;
         }
 
         .section-title {
             font-size: 16px;
-            color: #2c3e50;
+            color: #000000;
             margin-bottom: 10px;
             font-weight: bold;
         }
@@ -79,11 +79,11 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 25px 0;
+            margin: 2px 0;
         }
 
         th {
-            background-color: #2c3e50;
+            background-color: #000000;
             color: white;
             padding: 10px;
             text-align: left;
@@ -165,7 +165,7 @@
     </table>
 
     
-    <table class="table-layout">
+    <table class="">
         <tr>
             <td class="col-6">
                 <div class="address-box">
@@ -190,7 +190,6 @@
         </tr>
     </table>
 
-    <div class="order-meta">
         <table>
             <tr>
                 <td class="col-6">
@@ -201,8 +200,6 @@
                 </td>
             </tr>
         </table>
-    </div>
-
 
     <table>
         <thead>
