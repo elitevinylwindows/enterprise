@@ -124,7 +124,7 @@
 
   {{-- BOTTOM ROW: Controls (left) --}}
   <div class="row g-4 mt-4">
-    <div class="col-xl-9">
+    <div class="col-xl-12">
       <div class="tile p-3 d-flex align-items-center justify-content-between mb-5">
         <div class="d-flex align-items-center gap-3">
           <button type="button" class="btn btn-light d-inline-flex align-items-center gap-2 px-3" title="Stop All">
