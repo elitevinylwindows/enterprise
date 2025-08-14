@@ -760,7 +760,7 @@ use Stripe\Webhook;
             Route::resource('exterior-colors', ExteriorColorController::class);
             Route::resource('interior-colors', InteriorColorController::class);
             Route::resource('laminate-colors', LaminateColorController::class);
-            Route::resource('status-colors', StatusColorColorController::class);
+            Route::resource('status-colors', StatusColorController::class);
         });
 
         Route::prefix('grid-options')->name('grid-options.')->group(function () {
