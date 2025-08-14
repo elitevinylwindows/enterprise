@@ -1045,6 +1045,11 @@
     </a>
 
     <ul class="pc-submenu">
+        <li class="pc-item {{ request()->routeIs('manufacturing.capacity.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.capacity.index') }}" class="pc-link">
+                <span class="pc-mtext">Capacity</span>
+            </a>
+        </li>
         <li class="pc-item {{ request()->routeIs('manufacturing.machines.*') ? 'active' : '' }}">
             <a href="{{ route('manufacturing.machines.index') }}" class="pc-link">
                 <span class="pc-mtext">Machines</span>
@@ -1057,12 +1062,7 @@
         </li>
         <li class="pc-item {{ request()->routeIs('manufacturing.lines.*') ? 'active' : '' }}">
             <a href="{{ route('manufacturing.lines.index') }}" class="pc-link">
-                <span class="pc-mtext">Line</span>
-            </a>
-        </li>
-        <li class="pc-item {{ request()->routeIs('manufacturing.capacity.*') ? 'active' : '' }}">
-            <a href="{{ route('manufacturing.capacity.index') }}" class="pc-link">
-                <span class="pc-mtext">Capacity</span>
+                <span class="pc-mtext">Lines</span>
             </a>
         </li>
     </ul>
