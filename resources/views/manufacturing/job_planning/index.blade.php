@@ -1,4 +1,3 @@
-{{-- resources/views/manufacturing/job_planning/index.blade.php --}}
 @extends('layouts.app')
 
 @section('page-title', __('Job Planning'))
@@ -8,30 +7,7 @@
 <li class="breadcrumb-item active" aria-current="page">{{ __('Job Planning') }}</li>
 @endsection
 
-@push('styles')
-<style>
-  /* Ensure the "Open Job" button is always clickable */
-  .jp-open-btn { position: relative; z-index: 10; pointer-events: auto; }
-  /* If you have decorative overlays inside cards, make them click-through */
-  .card .overlay, .card .ghost-link { pointer-events: none; }
-</style>
-@endpush
-
 @section('content')
-@php
-    use Carbon\Carbon;
-
-    // Ensure $jobs exists so view never fatals
-    $jobs = $jobs ?? collect();
-
-    // Safe date formatter (accepts Carbon|string|null)
-    $fmt = function ($v, $pattern = 'Y-m-d') {
-        if (!$v) return '-';
-        try { return Carbon::parse($v)->format($pattern); }
-        catch (\Throwable $e) { return (string) $v; }
-    };
-@endphp
-
 <div class="container-fluid">
 
   <div class="mb-4"></div>
@@ -44,7 +20,7 @@
           <div class="fw-semibold">{{ __('Filter by:') }}</div>
           <div class="form-check">
             <input class="form-check-input" type="checkbox" value="queued" id="filterQueued"
-                   {{ request('status') === 'queued' ? 'checked' : '' }}
+                   @checked(request('status') === 'queued')
                    onclick="window.location='{{ route('manufacturing.job_planning.index', ['status'=>'queued']) }}'">
             <label class="form-check-label" for="filterQueued">{{ __('Queued') }}</label>
           </div>
@@ -80,71 +56,63 @@
   {{-- Queue Title --}}
   <h5 class="mb-3">{{ __('Job Queue 01') }}</h5>
 
-  {{-- Cards --}}
-  <div class="row g-3">
 
-    {{-- {{ Sample Card }} --}}
-    @php $first = $jobs->first(); @endphp
-    <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
+   {{-- Sample Card --}}
+   <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
       <div class="card h-100 shadow-sm rounded-3 overflow-hidden">
         <div class="p-3 text-white" style="background: var(--brand-red, #a70f0f);">
           <div class="d-flex justify-content-between align-items-start">
-            <div class="fw-bold" style="font-size:1.1rem;">
-              {{ __('Job Order #') }} {{ $first->job_order_number ?? 'JP-0001' }}
-            </div>
+            <div class="fw-bold" style="font-size:1.1rem;">{{ __('Job Order #') }} JP-0001</div>
             <span class="badge rounded-pill bg-light text-dark">{{ __('Job Created') }}</span>
           </div>
           <div class="mt-2 small opacity-75">
-            <div>{{ __('Delivery Date:') }} {{ $first ? $fmt($first->delivery_date) : '2025-08-20' }}</div>
-            <div>{{ __('Customer #:') }} {{ $first->customer_number ?? 'CUST-42' }}</div>
-            <div>{{ __('Customer Name:') }} {{ $first->customer_name ?? 'Wayne Enterprises' }}</div>
+            <div>{{ __('Delivery Date:') }} 2025-08-20</div>
+            <div>{{ __('Customer #:') }} CUST-42</div>
+            <div>{{ __('Customer Name:') }} Wayne Enterprises</div>
           </div>
         </div>
-
         <div class="p-3">
           <div class="small text-muted">
-            <div class="mb-1">{{ __('Line:') }} <span class="text-body">{{ $first->line ?? 'Line A' }}</span></div>
-            <div class="mb-1">{{ __('Series:') }} <span class="text-body">{{ $first->series ?? 'LAM-WH' }}</span></div>
-            <div class="mb-3">{{ __('Qty:') }} <span class="text-body">{{ $first->qty ?? 36 }}</span></div>
+            <div class="mb-1">{{ __('Line:') }} <span class="text-body">Line A</span></div>
+            <div class="mb-1">{{ __('Series:') }} <span class="text-body">LAM-WH</span></div>
+            <div class="mb-3">{{ __('Qty:') }} <span class="text-body">36</span></div>
           </div>
+          <a href="#" class="btn customModal"
+   data-size="xl"
+   data-title="{{ __('Job #') }} {{ $job->job_order_number }}"
+   data-url="{{ route('manufacturing.job_planning.show', $job->id) }}">
+   {{ __('Open Job') }}
+</a>
 
-          @if($first)
-            <a href="#"
-               class="btn w-100 text-white customModal jp-open-btn"
-               style="background:#a70f0f; border-radius:18px;"
-               data-size="xl"
-               data-title="{{ __('Job #') }} {{ $first->job_order_number }}"
-               data-url="{{ route('manufacturing.job_planning.show', $first->id) }}">
-               {{ __('Open Job') }}
-            </a>
-          @else
-            <button class="btn w-100 text-white" style="background:#a70f0f; border-radius:18px;" disabled>
-              {{ __('Open Job') }}
-            </button>
-          @endif
         </div>
       </div>
     </div>
     {{-- {{ /Sample Card }} --}}
+    
 
+
+  {{-- Cards --}}
+  <div class="row g-3">
     @forelse($jobs as $job)
       @php
-        $statusText = $job->production_status ? ucwords(str_replace('_',' ',$job->production_status)) : __('Job Created');
+        $status = strtolower($job->production_status ?? '');
+        $pill = $status === 'completed' ? 'success' : (in_array($status, ['queued','pending']) ? 'warning' : 'info');
       @endphp
-
       <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
         <div class="card h-100 shadow-sm rounded-3 overflow-hidden">
 
-          {{-- Header --}}
+          {{-- Red header --}}
           <div class="p-3 text-white" style="background: var(--brand-red, #a70f0f);">
             <div class="d-flex justify-content-between align-items-start">
               <div class="fw-bold" style="font-size:1.1rem;">
                 {{ __('Job Order #') }} {{ $job->job_order_number }}
               </div>
-              <span class="badge rounded-pill bg-light text-dark">{{ $statusText }}</span>
+              <span class="badge rounded-pill bg-light text-dark">
+                {{ $job->production_status ? ucwords(str_replace('_',' ',$job->production_status)) : __('Job Created') }}
+              </span>
             </div>
             <div class="mt-2 small opacity-75">
-              <div>{{ __('Delivery Date:') }} {{ $fmt($job->delivery_date) }}</div>
+              <div>{{ __('Delivery Date:') }} {{ optional($job->delivery_date)->format('Y-m-d') ?: '-' }}</div>
               <div>{{ __('Customer #:') }} {{ $job->customer_number ?? '-' }}</div>
               <div>{{ __('Customer Name:') }} {{ $job->customer_name ?? '-' }}</div>
             </div>
@@ -158,9 +126,10 @@
               <div class="mb-3">{{ __('Qty:') }} <span class="text-body">{{ $job->qty }}</span></div>
             </div>
 
+            {{-- Single button (no duplicate <a>) --}}
             <a href="#"
-               class="btn w-100 text-white customModal jp-open-btn"
-               style="background:#a70f0f; border-radius:18px;"
+               class="btn w-100 text-white customModal"
+               style="background: var(--brand-red, #a70f0f); border-radius: 18px;"
                data-size="xl"
                data-title="{{ __('Job #') }} {{ $job->job_order_number }}"
                data-url="{{ route('manufacturing.job_planning.show', $job->id) }}">
@@ -175,7 +144,7 @@
         <div class="alert alert-secondary mb-0">{{ __('No jobs found.') }}</div>
       </div>
     @endforelse
-
   </div>
+
 </div>
 @endsection
