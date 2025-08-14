@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Master\Colors;
 
 use App\Http\Controllers\Controller;
-use App\Models\Manufacturing\StatusColor; // or your actual model namespace
+use App\Models\Master\Colors\StatusColor; // or your actual model namespace
 use Illuminate\Http\Request;
 
 class StatusColorController extends Controller
