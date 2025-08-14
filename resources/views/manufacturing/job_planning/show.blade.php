@@ -6,11 +6,9 @@
 @endphp
 
 <div class="container-fluid">
-  {{-- Tabs --}}
   <ul class="nav nav-tabs mb-3" role="tablist" style="--bs-nav-tabs-border-width:0;">
     <li class="nav-item" role="presentation">
-      <button class="nav-link active text-white"
-              style="background:#a70f0f; border-radius:14px 14px 0 0;"
+      <button class="nav-link active text-white" style="background:#a70f0f; border-radius:14px 14px 0 0;"
               data-bs-toggle="tab" data-bs-target="#jp-pane-job" type="button" role="tab">
         {{ __('Job #:') }} {{ $job->job_order_number ?? '-' }}
       </button>
@@ -45,235 +43,176 @@
             <label class="form-label">{{ __('Internal Notes') }}</label>
             <textarea class="form-control" rows="4" disabled>{{ $job->internal_notes ?? '' }}</textarea>
           </div>
-
-          <div class="row text-center mt-4 g-3">
-            <div class="col-6 col-sm-4 col-md-2">
-              <div class="fw-bold small">GLASS</div>
-              <a href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id, 'type'=>'glass_xls']) }}"
-                 class="btn btn-outline-secondary btn-sm mt-1">
-                <i class="fa-regular fa-file-excel"></i> XLS
-              </a>
-            </div>
-            <div class="col-6 col-sm-4 col-md-2">
-              <div class="fw-bold small">FRAME</div>
-              <a href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id, 'type'=>'frame_xls']) }}"
-                 class="btn btn-outline-secondary btn-sm mt-1">
-                <i class="fa-regular fa-file-excel"></i> XLS
-              </a>
-            </div>
-            <div class="col-6 col-sm-4 col-md-2">
-              <div class="fw-bold small">SASH</div>
-              <a href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id, 'type'=>'sash_xls']) }}"
-                 class="btn btn-outline-secondary btn-sm mt-1">
-                <i class="fa-regular fa-file-excel"></i> XLS
-              </a>
-            </div>
-            <div class="col-6 col-sm-4 col-md-2">
-              <div class="fw-bold small">GRIDS</div>
-              <a href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id, 'type'=>'grids_xls']) }}"
-                 class="btn btn-outline-secondary btn-sm mt-1">
-                <i class="fa-regular fa-file-excel"></i> XLS
-              </a>
-            </div>
-            <div class="col-6 col-sm-4 col-md-2">
-              <div class="fw-bold small">BARCODES</div>
-              <a href="{{ route('manufacturing.job_planning.download', ['job'=>$job->id, 'type'=>'barcodes_pdf']) }}"
-                 class="btn btn-outline-secondary btn-sm mt-1">
-                <i class="fa-regular fa-file-pdf"></i> PDF
-              </a>
-            </div>
-          </div>
-
         </div>
       </div>
     </div>
 
     {{-- Glass --}}
     <div class="tab-pane fade" id="jp-pane-glass" role="tabpanel">
-      <div class="card">
-        <div class="card-body px-3 px-md-4">
-          <div class="table-responsive">
-            <table class="table table-hover table-sm mb-0">
-              <thead class="table-light">
+      <div class="card"><div class="card-body px-3 px-md-4">
+        <div class="table-responsive">
+          <table class="table table-hover table-sm mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>{{ __('PO') }}</th>
+                <th>{{ __('Unit') }}</th>
+                <th>{{ __('Grid') }}</th>
+                <th>{{ __('Pattern') }}</th>
+                <th>{{ __('Cardinal') }}</th>
+                <th>{{ __('Glass Description') }}</th>
+                <th>{{ __('Width') }}</th>
+                <th>{{ __('Height') }}</th>
+                <th>{{ __('Slot') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($glassRows as $r)
                 <tr>
-                  <th>{{ __('PO') }}</th>
-                  <th>{{ __('Unit') }}</th>
-                  <th>{{ __('Grid') }}</th>
-                  <th>{{ __('Pattern') }}</th>
-                  <th>{{ __('Cardinal') }}</th>
-                  <th>{{ __('Glass Description') }}</th>
-                  <th>{{ __('Width') }}</th>
-                  <th>{{ __('Height') }}</th>
-                  <th>{{ __('Slot') }}</th>
+                  <td>{{ $r['po'] ?? '-' }}</td>
+                  <td>{{ $r['unit'] ?? '-' }}</td>
+                  <td>{{ $r['grid'] ?? '-' }}</td>
+                  <td>{{ $r['pattern'] ?? '-' }}</td>
+                  <td>{{ $r['cardinal'] ?? '-' }}</td>
+                  <td>{{ $r['glass_description'] ?? '-' }}</td>
+                  <td>{{ $r['width'] ?? '-' }}</td>
+                  <td>{{ $r['height'] ?? '-' }}</td>
+                  <td>{{ $r['slot'] ?? '-' }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                @forelse($glassRows as $r)
-                  <tr>
-                    <td>{{ $r['po'] ?? '-' }}</td>
-                    <td>{{ $r['unit'] ?? '-' }}</td>
-                    <td>{{ $r['grid'] ?? '-' }}</td>
-                    <td>{{ $r['pattern'] ?? '-' }}</td>
-                    <td>{{ $r['cardinal'] ?? '-' }}</td>
-                    <td>{{ $r['glass_description'] ?? '-' }}</td>
-                    <td>{{ $r['width'] ?? '-' }}</td>
-                    <td>{{ $r['height'] ?? '-' }}</td>
-                    <td>{{ $r['slot'] ?? '-' }}</td>
-                  </tr>
-                @empty
-                  <tr><td colspan="9" class="text-center text-muted">{{ __('No glass rows.') }}</td></tr>
-                @endforelse
-              </tbody>
-            </table>
-          </div>
+              @empty
+                <tr><td colspan="9" class="text-center text-muted">{{ __('No glass rows.') }}</td></tr>
+              @endforelse
+            </tbody>
+          </table>
         </div>
-      </div>
+      </div></div>
     </div>
 
     {{-- Frame --}}
     <div class="tab-pane fade" id="jp-pane-frame" role="tabpanel">
-      <div class="card">
-        <div class="card-body px-3 px-md-4">
-          <div class="table-responsive">
-            <table class="table table-hover table-sm mb-0">
-              <thead class="table-light">
+      <div class="card"><div class="card-body px-3 px-md-4">
+        <div class="table-responsive">
+          <table class="table table-hover table-sm mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>{{ __('Bar') }}</th>
+                <th>{{ __('Unit') }}</th>
+                <th>{{ __('Note') }}</th>
+                <th>{{ __('Color') }}</th>
+                <th>{{ __('Profile') }}</th>
+                <th>{{ __('Frabrication') }}</th>
+                <th>{{ __('Cut Lenght') }}</th>
+                <th>{{ __('Frame Bin') }}</th>
+                <th>{{ __('PO') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($frameRows as $r)
                 <tr>
-                  <th>{{ __('Bar') }}</th>
-                  <th>{{ __('Unit') }}</th>
-                  <th>{{ __('Note') }}</th>
-                  <th>{{ __('Color') }}</th>
-                  <th>{{ __('Profile') }}</th>
-                  <th>{{ __('Frabrication') }}</th> {{-- as requested --}}
-                  <th>{{ __('Cut Lenght') }}</th>     {{-- as requested --}}
-                  <th>{{ __('Frame Bin') }}</th>
-                  <th>{{ __('PO') }}</th>
+                  <td>{{ $r['bar'] ?? '-' }}</td>
+                  <td>{{ $r['unit'] ?? '-' }}</td>
+                  <td>{{ $r['note'] ?? '-' }}</td>
+                  <td>{{ $r['color'] ?? '-' }}</td>
+                  <td>{{ $r['profile'] ?? '-' }}</td>
+                  <td>{{ $r['frabrication'] ?? $r['fabrication'] ?? '-' }}</td>
+                  <td>{{ $r['cut_lenght'] ?? $r['cut_length'] ?? '-' }}</td>
+                  <td>{{ $r['frame_bin'] ?? '-' }}</td>
+                  <td>{{ $r['po'] ?? '-' }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                @forelse($frameRows as $r)
-                  <tr>
-                    <td>{{ $r['bar'] ?? '-' }}</td>
-                    <td>{{ $r['unit'] ?? '-' }}</td>
-                    <td>{{ $r['note'] ?? '-' }}</td>
-                    <td>{{ $r['color'] ?? '-' }}</td>
-                    <td>{{ $r['profile'] ?? '-' }}</td>
-                    <td>{{ $r['frabrication'] ?? $r['fabrication'] ?? '-' }}</td>
-                    <td>{{ $r['cut_lenght'] ?? $r['cut_length'] ?? '-' }}</td>
-                    <td>{{ $r['frame_bin'] ?? '-' }}</td>
-                    <td>{{ $r['po'] ?? '-' }}</td>
-                  </tr>
-                @empty
-                  <tr><td colspan="9" class="text-center text-muted">{{ __('No frame rows.') }}</td></tr>
-                @endforelse
-              </tbody>
-            </table>
-          </div>
+              @empty
+                <tr><td colspan="9" class="text-center text-muted">{{ __('No frame rows.') }}</td></tr>
+              @endforelse
+            </tbody>
+          </table>
         </div>
-      </div>
+      </div></div>
     </div>
 
     {{-- Sash --}}
     <div class="tab-pane fade" id="jp-pane-sash" role="tabpanel">
-      <div class="card">
-        <div class="card-body px-3 px-md-4">
-          <div class="table-responsive">
-            <table class="table table-hover table-sm mb-0">
-              <thead class="table-light">
+      <div class="card"><div class="card-body px-3 px-md-4">
+        <div class="table-responsive">
+          <table class="table table-hover table-sm mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>{{ __('Bar') }}</th>
+                <th>{{ __('Unit') }}</th>
+                <th>{{ __('Note') }}</th>
+                <th>{{ __('Color') }}</th>
+                <th>{{ __('Profile') }}</th>
+                <th>{{ __('Fabrication') }}</th>
+                <th>{{ __('Cut lenght') }}</th>
+                <th>{{ __('Frame Bin') }}</th>
+                <th>{{ __('PO') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($sashRows as $r)
                 <tr>
-                  <th>{{ __('Bar') }}</th>
-                  <th>{{ __('Unit') }}</th>
-                  <th>{{ __('Note') }}</th>
-                  <th>{{ __('Color') }}</th>
-                  <th>{{ __('Profile') }}</th>
-                  <th>{{ __('Fabrication') }}</th>
-                  <th>{{ __('Cut lenght') }}</th> {{-- as requested --}}
-                  <th>{{ __('Frame Bin') }}</th>
-                  <th>{{ __('PO') }}</th>
+                  <td>{{ $r['bar'] ?? '-' }}</td>
+                  <td>{{ $r['unit'] ?? '-' }}</td>
+                  <td>{{ $r['note'] ?? '-' }}</td>
+                  <td>{{ $r['color'] ?? '-' }}</td>
+                  <td>{{ $r['profile'] ?? '-' }}</td>
+                  <td>{{ $r['fabrication'] ?? '-' }}</td>
+                  <td>{{ $r['cut_lenght'] ?? $r['cut_length'] ?? '-' }}</td>
+                  <td>{{ $r['frame_bin'] ?? '-' }}</td>
+                  <td>{{ $r['po'] ?? '-' }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                @forelse($sashRows as $r)
-                  <tr>
-                    <td>{{ $r['bar'] ?? '-' }}</td>
-                    <td>{{ $r['unit'] ?? '-' }}</td>
-                    <td>{{ $r['note'] ?? '-' }}</td>
-                    <td>{{ $r['color'] ?? '-' }}</td>
-                    <td>{{ $r['profile'] ?? '-' }}</td>
-                    <td>{{ $r['fabrication'] ?? '-' }}</td>
-                    <td>{{ $r['cut_lenght'] ?? $r['cut_length'] ?? '-' }}</td>
-                    <td>{{ $r['frame_bin'] ?? '-' }}</td>
-                    <td>{{ $r['po'] ?? '-' }}</td>
-                  </tr>
-                @empty
-                  <tr><td colspan="9" class="text-center text-muted">{{ __('No sash rows.') }}</td></tr>
-                @endforelse
-              </tbody>
-            </table>
-          </div>
+              @empty
+                <tr><td colspan="9" class="text-center text-muted">{{ __('No sash rows.') }}</td></tr>
+              @endforelse
+            </tbody>
+          </table>
         </div>
-      </div>
+      </div></div>
     </div>
 
     {{-- Grids --}}
     <div class="tab-pane fade" id="jp-pane-grids" role="tabpanel">
-      <div class="card">
-        <div class="card-body px-3 px-md-4">
-          <div class="table-responsive">
-            <table class="table table-hover table-sm mb-0">
-              <thead class="table-light">
+      <div class="card"><div class="card-body px-3 px-md-4">
+        <div class="table-responsive">
+          <table class="table table-hover table-sm mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>{{ __('PO') }}</th>
+                <th>{{ __('color') }}</th>
+                <th>{{ __('window') }}</th>
+                <th>{{ __('Unit') }}</th>
+                <th>{{ __('grid') }}</th>
+                <th>{{ __('pattern') }}</th>
+                <th>{{ __('width') }}</th>
+                <th>{{ __('height') }}</th>
+                <th>{{ __('slot') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($gridRows as $r)
                 <tr>
-                  <th>{{ __('PO') }}</th>
-                  <th>{{ __('color') }}</th>
-                  <th>{{ __('window') }}</th>
-                  <th>{{ __('Unit') }}</th>
-                  <th>{{ __('grid') }}</th>
-                  <th>{{ __('pattern') }}</th>
-                  <th>{{ __('width') }}</th>
-                  <th>{{ __('height') }}</th>
-                  <th>{{ __('slot') }}</th>
+                  <td>{{ $r['po'] ?? '-' }}</td>
+                  <td>{{ $r['color'] ?? '-' }}</td>
+                  <td>{{ $r['window'] ?? '-' }}</td>
+                  <td>{{ $r['unit'] ?? '-' }}</td>
+                  <td>{{ $r['grid'] ?? '-' }}</td>
+                  <td>{{ $r['pattern'] ?? '-' }}</td>
+                  <td>{{ $r['width'] ?? '-' }}</td>
+                  <td>{{ $r['height'] ?? '-' }}</td>
+                  <td>{{ $r['slot'] ?? '-' }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                @forelse($gridRows as $r)
-                  <tr>
-                    <td>{{ $r['po'] ?? '-' }}</td>
-                    <td>{{ $r['color'] ?? '-' }}</td>
-                    <td>{{ $r['window'] ?? '-' }}</td>
-                    <td>{{ $r['unit'] ?? '-' }}</td>
-                    <td>{{ $r['grid'] ?? '-' }}</td>
-                    <td>{{ $r['pattern'] ?? '-' }}</td>
-                    <td>{{ $r['width'] ?? '-' }}</td>
-                    <td>{{ $r['height'] ?? '-' }}</td>
-                    <td>{{ $r['slot'] ?? '-' }}</td>
-                  </tr>
-                @empty
-                  <tr><td colspan="9" class="text-center text-muted">{{ __('No grid rows.') }}</td></tr>
-                @endforelse
-              </tbody>
-            </table>
-          </div>
+              @empty
+                <tr><td colspan="9" class="text-center text-muted">{{ __('No grid rows.') }}</td></tr>
+              @endforelse
+            </tbody>
+          </table>
         </div>
-      </div>
+      </div></div>
     </div>
 
     {{-- Barcodes --}}
     <div class="tab-pane fade" id="jp-pane-barc" role="tabpanel">
-      <div class="card">
-        <div class="card-body px-3 px-md-4">
-          <div class="alert alert-secondary mb-0">
-            {{ __('Barcode preview / controls go here.') }}
-          </div>
-        </div>
-      </div>
+      <div class="card"><div class="card-body px-3 px-md-4">
+        <div class="alert alert-secondary mb-0">{{ __('Barcode preview / controls go here.') }}</div>
+      </div></div>
     </div>
 
   </div>
 </div>
-
-@push('scripts')
-<script>
-  if (window.feather && typeof window.feather.replace === 'function') {
-    window.feather.replace();
-  }
-</script>
-@endpush
