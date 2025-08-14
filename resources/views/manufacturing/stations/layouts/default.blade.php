@@ -12,8 +12,8 @@
     <div class="row g-4">
       <div class="col-md-6">
         <div class="terminal-tile p-4">
-          <h4 class="mb-3 fw-bold">TERMINAL: {{ $terminalLabel }}</h4>
-          <div class="small text-muted">{{ $station->id }}</div>
+          <h4 class="mb-3 fw-bold">TERMINAL:{{ $station->id }} </h4>
+          <div class="small text-muted">{{ $terminalLabel }}</div>
 
           <div class="mt-4 h5 fw-semibold mb-2">JOB:</div>
           <div class="text-muted small">
@@ -26,7 +26,7 @@
       <div class="col-md-6">
         <div class="terminal-tile p-4 h-100">
           <h4 class="mb-3 fw-bold">NOTES</h4>
-          <textarea class="form-control" rows="7" placeholder="Type notes here…"></textarea>
+          <textarea class="form-control" rows="3" placeholder="Type notes here…"></textarea>
         </div>
       </div>
     </div>
