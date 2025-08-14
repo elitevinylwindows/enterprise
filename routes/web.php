@@ -1034,15 +1034,12 @@ use Stripe\Webhook;
 
     // Manufacturing
 Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
-    // Capacity
-    Route::get('/capacity', [CapacityController::class, 'index'])->name('capacity.index');
     Route::resource('job_pool', JobPoolController::class)->names('job_pool');
     Route::resource('lines', LineController::class)->names('lines');
-
-    // Machines & Stations
     Route::resource('machines', MachineController::class)->names('machines');
     Route::resource('stations', StationController::class)->names('stations');
-
+    Route::resource('capacity', CapacityController::class)->names('capacity');
+    
     // Job Planning
     // URL stays "job-planning/..."; route NAMES use underscores: manufacturing.job_planning.*
     Route::resource('job-planning', JobPlanningController::class)
