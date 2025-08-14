@@ -42,9 +42,9 @@ class StationController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'station_number' => [
+            'station' => [
                 'required', 'string', 'max:50',
-                Rule::unique('elitevw_manufacturing_stations', 'station_number'),
+                Rule::unique('elitevw_manufacturing_stations', 'station'),
             ],
             'description' => ['nullable', 'string'],
             'status'      => ['required', Rule::in(['active', 'inactive'])],
@@ -69,9 +69,9 @@ class StationController extends Controller
     public function update(Request $request, Station $station)
     {
         $data = $request->validate([
-            'station_number' => [
+            'station' => [
                 'required', 'string', 'max:50',
-                Rule::unique('elitevw_manufacturing_stations', 'station_number')->ignore($station->id),
+                Rule::unique('elitevw_manufacturing_stations', 'station')->ignore($station->id),
             ],
             'description' => ['nullable', 'string'],
             'status'      => ['required', Rule::in(['active', 'inactive'])],
