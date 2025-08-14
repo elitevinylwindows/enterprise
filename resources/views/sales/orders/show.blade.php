@@ -106,47 +106,44 @@
 </div>
 
 @php
-  use Illuminate\Support\Facades\Storage;
-
-  $pdfUrl = null;
-  if (!empty($order->pdf_path) && Storage::disk('public')->exists($order->pdf_path)) {
-      $pdfUrl = Storage::disk('public')->url($order->pdf_path); // -> /storage/...
-  }
+  $pdfUrl = asset('storage/your-pdf-file.pdf');
 @endphp
 
-@if($pdfUrl)
-  <div class="mt-4 d-flex gap-3 flex-wrap">
-    <div class="pdf-tile">
-      <div class="thumb-wrap icon-only">
-        <i class="fa-solid fa-file-pdf pdf-icon" aria-hidden="true"></i>
-        <div class="tile-overlay"></div>
-      </div>
-
-      {{-- Open in new tab --}}
-      <a href="{{ $pdfUrl }}" target="_blank" rel="noopener" class="tile-eye" title="Open">
-        <i class="fa-solid fa-eye"></i>
-      </a>
-
-      {{-- 3-dot menu --}}
-      <div class="dropdown tile-menu">
-        <button class="tile-dot" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-label="More">
-          <i class="fa-solid fa-ellipsis-vertical"></i>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end shadow">
-          <li><a class="dropdown-item" href="{{ $pdfUrl }}" target="_blank" rel="noopener">
-            <i class="fa-solid fa-up-right-from-square me-2"></i> Open
-          </a></li>
-          <li><a class="dropdown-item" href="{{ $pdfUrl }}" download>
-            <i class="fa-solid fa-download me-2"></i> Download
-          </a></li>
-        </ul>
-      </div>
-
-      <div class="pdf-label"><i class="fa-solid fa-file-pdf me-1"></i> PDF</div>
-    </div>
+<div class="pdf-tile">
+  <div class="thumb-wrap icon-only">
+    {{-- Medium PDF icon as the thumbnail --}}
+    <i class="fa-solid fa-file-pdf pdf-icon" aria-hidden="true"></i>
+    <div class="tile-overlay"></div>
   </div>
-@endif
 
+  {{-- Center eye: open in a new tab --}}
+  <a href="{{ $pdfUrl }}" target="_blank" rel="noopener" class="tile-eye" title="Open">
+    <i class="fa-solid fa-eye"></i>
+  </a>
+
+  {{-- Top-right neutral 3-dot menu --}}
+  <div class="dropdown tile-menu">
+    <button class="tile-dot" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false" aria-label="More">
+      <i class="fa-solid fa-ellipsis-vertical"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow">
+      <li>
+        <a class="dropdown-item" href="{{ $pdfUrl }}" target="_blank" rel="noopener">
+          <i class="fa-solid fa-up-right-from-square me-2"></i> Open
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ $pdfUrl }}" download>
+          <i class="fa-solid fa-download me-2"></i> Download
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="pdf-label">
+    <i class="fa-solid fa-file-pdf me-1"></i> PDF
+  </div>
+</div>
 
 
 <style>
