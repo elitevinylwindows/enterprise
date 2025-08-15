@@ -11,18 +11,19 @@ class SeriesConfigurationController extends Controller
 {
     public function index()
     {
-        $seriesTypes  = SeriesType::with(['productTypes'])->latest()->get();
+        $seriesTypes  = SeriesConfiguration::with('productTypes')->latest()->get();
         $productTypes = ProductType::orderBy('product_type')->get();
 
         return view('master.series.series_configuration.index', compact('seriesTypes', 'productTypes'));
+        // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ underscore folder
     }
 
     public function create()
     {
-        $series       = Series::orderBy('series')->get();
         $productTypes = ProductType::orderBy('product_type')->get();
 
-        return view('master.series.series-configuration.create', compact('series', 'productTypes'));
+        // Return a PARTIAL (no @extends) because customModal will inject it
+        return view('master.series.series_configuration.create', compact('productTypes'));
     }
 
     public function store(Request $request)
@@ -30,23 +31,26 @@ class SeriesConfigurationController extends Controller
         $validated = $request->validate([
             'series_type'         => ['required','string','max:255'],
             'product_type_ids'    => ['required','array','min:1'],
-            'product_type_ids.*'  => ['integer','exists: elitevw_master_productkeys_producttypes,id'],
+            // remove stray space after ":" and point to your actual table:
+            'product_type_ids.*'  => ['integer','exists:elitevw_master_product_types,id'],
         ]);
 
-        $st = SeriesType::create([
+        $sc = SeriesConfiguration::create([
             'series_type' => $validated['series_type'],
         ]);
 
-        $st->productTypes()->sync($validated['product_type_ids']);
+        $sc->productTypes()->sync($validated['product_type_ids']);
 
-        return redirect()->route('master.series-configuration.index')->with('success', 'Series Type created.');
+        return redirect()->route('master.series-configuration.index')
+            ->with('success', 'Series Type created.');
     }
 
     public function edit($id)
     {
-        $seriesType   = SeriesType::with('productTypes')->findOrFail($id);
+        $seriesType   = SeriesConfiguration::with('productTypes')->findOrFail($id);
         $productTypes = ProductType::orderBy('product_type')->get();
 
+        // Partial too
         return view('master.series.series_configuration.edit', compact('seriesType', 'productTypes'));
     }
 
@@ -55,25 +59,26 @@ class SeriesConfigurationController extends Controller
         $validated = $request->validate([
             'series_type'         => ['required','string','max:255'],
             'product_type_ids'    => ['required','array','min:1'],
-            'product_type_ids.*'  => ['integer','exists: elitevw_master_productkeys_producttypes,id'],
+            'product_type_ids.*'  => ['integer','exists:elitevw_master_product_types,id'],
         ]);
 
-        $st = SeriesType::findOrFail($id);
-        $st->update([
-            'series_id'   => $validated['series_id'],
+        $sc = SeriesConfiguration::findOrFail($id);
+        $sc->update([
             'series_type' => $validated['series_type'],
         ]);
 
-        $st->productTypes()->sync($validated['product_type_ids']);
+        $sc->productTypes()->sync($validated['product_type_ids']);
 
-        return redirect()->route('master.series-configuration.index')->with('success', 'Series Type updated.');
+        return redirect()->route('master.series-configuration.index')
+            ->with('success', 'Series Type updated.');
     }
 
     public function destroy($id)
     {
-        $seriesType = SeriesType::findOrFail($id);
-        $seriesType->delete();
+        $sc = SeriesConfiguration::findOrFail($id);
+        $sc->delete();
 
-        return redirect()->route('master.series-configuration.index')->with('success', 'Series Type deleted.');
+        return redirect()->route('master.series-configuration.index')
+            ->with('success', 'Series Type deleted.');
     }
 }
