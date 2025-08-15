@@ -1,91 +1,100 @@
 @extends('layouts.app')
 
-@section('page-title')
-    {{ __('Configuration') }}
-@endsection
+@section('page-title', __('Series Types'))
 
 @section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item">{{ __('Master') }}</li>
-    <li class="breadcrumb-item active" aria-current="page">{{ __('Configuration') }}</li>
-@endsection
-
-@section('card-action-btn')
-    <button type="button" class="btn btn-md btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addItemModal">
-        <i class="ti ti-plus"></i> Add Configuration
-    </button>
+  <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+  <li class="breadcrumb-item">{{ __('Master') }}</li>
+  <li class="breadcrumb-item active" aria-current="page">{{ __('Series Types') }}</li>
 @endsection
 
 @section('content')
+
+<div class="mb-4"></div>
+<div class="mb-4"></div>
+
 <div class="row">
-    <div class="col-sm-12">
-        <div class="card table-card">
-            <div class="card-header">
-                <div class="row align-items-center g-2">
-                    <div class="col">
-                        <h5>{{ __('Series Configurations') }}</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body pt-0">
-                <div class="dt-responsive table-responsive">
-                    <table class="table table-hover advance-datatable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Series</th>
-                                <th>Product Type</th>
-                                <th>Series Type</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($seriesTypes as $item)
-                                <tr>
-                                    <td>{{ $item->id }}</td>
-                                    <td>{{ $item->series->series ?? '-' }}</td>
-                                    <td>{{ $item->productType->product_type ?? '-' }}</td>
-                                    <td><span class="badge bg-primary">{{ $item->series_type }}</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#editItemModal{{ $item->id }}">Edit</button>
-
-                                        <form action="{{ route('master.series-type.destroy', $item->id) }}" method="POST" class="d-inline">
-                                            @csrf @method('DELETE')
-                                            <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-
-                                <!-- Edit Modal -->
-                                <div class="modal fade" id="editItemModal{{ $item->id }}" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            @include('master.series.series_type.edit', [
-                                                'seriesType' => $item,
-                                                'series' => $series,
-                                                'productTypes' => $productTypes
-                                            ])
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+  {{-- Taskbar --}}
+  <div class="col-md-2">
+    <div class="card">
+      <div class="list-group list-group-flush">
+        <a href="{{ route('master.series-type.index') }}"
+           class="list-group-item active">
+          {{ __('All Configurations') }}
+        </a>
+      </div>
     </div>
+  </div>
+
+  <div class="col-sm-10">
+    <div class="card table-card">
+      <div class="card-header">
+        <div class="row align-items-center g-2">
+          <div class="col"><h5>{{ __('Series Types') }}</h5></div>
+          <div class="col-auto">
+            <a href="#"
+               class="btn btn-primary customModal"
+               data-size="lg"
+               data-title="{{ __('Add Series Type') }}"
+               data-url="{{ route('master.series-type.create') }}">
+              <i class="fa-solid fa-circle-plus"></i> {{ __('Create') }}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body pt-0">
+        <div class="dt-responsive table-responsive">
+          <table class="table table-hover advance-datatable">
+            <thead>
+              <tr>
+                <th>{{ __('ID') }}</th>
+                <th>{{ __('Series') }}</th>
+                <th>{{ __('Series Type') }}</th>
+                <th>{{ __('Product Types') }}</th>
+                <th>{{ __('Actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach($seriesTypes as $st)
+                <tr>
+                  <td>{{ $st->id }}</td>
+                  <td>{{ $st->series->series ?? '-' }}</td>
+                  <td><span class="badge bg-primary">{{ $st->series_type }}</span></td>
+                  <td>
+                    @forelse($st->productTypes as $pt)
+                      <span class="badge bg-secondary me-1 mb-1">{{ $pt->product_type ?? $pt->name }}</span>
+                    @empty
+                      <span class="text-muted">-</span>
+                    @endforelse
+                  </td>
+                  <td>
+                    <a href="#"
+                       class="btn btn-sm btn-info customModal"
+                       data-size="lg"
+                       data-title="{{ __('Edit Series Type') }}"
+                       data-url="{{ route('master.series-type.edit', $st->id) }}">
+                      <i data-feather="edit"></i>
+                    </a>
+
+                    <form action="{{ route('master.series-type.destroy', $st->id) }}"
+                          method="POST" style="display:inline-block;">
+                      @csrf @method('DELETE')
+                      <button type="submit" class="btn btn-sm btn-danger"
+                              onclick="return confirm('{{ __('Are you sure?') }}')">
+                        <i data-feather="trash-2"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
-<!-- Add Modal -->
-<div class="modal fade" id="addItemModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            @include('master.series.series_type.create', [
-                'series' => $series,
-                'productTypes' => $productTypes
-            ])
-        </div>
-    </div>
-</div>
 @endsection

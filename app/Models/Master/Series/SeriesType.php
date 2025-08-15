@@ -3,7 +3,6 @@
 namespace App\Models\Master\Series;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Master\ProductKeys\ProductType;
 
 class SeriesType extends Model
 {
@@ -12,16 +11,21 @@ class SeriesType extends Model
     protected $fillable = [
         'series_id',
         'series_type',
-        'product_type_id',
     ];
 
     public function series()
     {
-        return $this->belongsTo(Series::class);
+        return $this->belongsTo(\App\Models\Master\Series\Series::class);
     }
 
-    public function productType()
+    // Many Product Types (array)
+    public function productTypes()
     {
-        return $this->belongsTo(ProductType::class, 'product_type_id');
+        return $this->belongsToMany(
+            \App\Models\Master\ProductKeys\ProductType::class,
+            'elitevw_master_series_type_product_type', // pivot
+            'series_type_id',
+            'product_type_id'
+        )->withTimestamps();
     }
 }
