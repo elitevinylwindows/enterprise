@@ -49,7 +49,7 @@
                  class="form-control @error('file_path') is-invalid @enderror"
                  placeholder="{{ __('e.g., \\\\SERVER\\share\\machines\\bottero or /mnt/machines/bottero') }}"
                  value="{{ old('file_path') }}">
-          <button type="button" class="btn btn-outline-secondary" id="pickFolderBtn">
+          <button type="button" class="btn btn-outline-light" id="pickFolderBtn">
             <i class="fa-solid fa-folder-open"></i> {{ __('Choose Folder') }}
           </button>
         </div>
