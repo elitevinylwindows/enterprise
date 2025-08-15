@@ -107,6 +107,10 @@
 }
 </style>
 
+
+@endsection
+
+@push('scripts')
 <script>
       $(document).ready(function() {
 
@@ -137,5 +141,4 @@
         @endif
     });
 </script>
-
-@endsection
+@endpush
