@@ -30,7 +30,7 @@
     <div class="card table-card">
       <div class="card-header">
         <div class="row align-items-center g-2">
-          <div class="col"><h5>{{ __('Configurations - PT') }}</h5></div>
+          <div class="col"><h5>{{ __('Configurations - Product Type') }}</h5></div>
           <div class="col-auto">
             <a href="#"
                class="btn btn-primary customModal"
