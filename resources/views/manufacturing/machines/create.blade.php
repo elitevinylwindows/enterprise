@@ -24,7 +24,7 @@
         <select name="file_type"
                 class="form-select @error('file_type') is-invalid @enderror"
                 required>
-          @php($types = ['csv' => 'CSV', 'xml' => 'XML', 'image' => 'Image', 'video' => 'Video', 'other' => 'Other'])
+          @php($types = ['csv' => 'CSV', 'xml' => 'XML', 'other' => 'Other'])
           @foreach ($types as $v => $l)
             <option value="{{ $v }}" {{ old('file_type') === $v ? 'selected' : '' }}>{{ $l }}</option>
           @endforeach
@@ -38,7 +38,7 @@
     </div>
 
     <div class="row g-3 mt-2">
-      <div class="col-12">
+      <div class="col-6">
         <label class="form-label">{{ __('Description') }} <span class="text-muted small">({{ __('optional') }})</span></label>
         <textarea name="description"
                   rows="3"

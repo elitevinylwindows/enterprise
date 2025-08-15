@@ -64,6 +64,7 @@
                                 <th>{{ __('ID') }}</th>
                                 <th>{{ __('Machine') }}</th>
                                 <th>{{ __('File Type') }}</th>
+                                <th>{{ __('Local Path') }}</th>
                                 <th>{{ __('Action') }}</th>
                             </tr>
                         </thead>
@@ -73,6 +74,7 @@
                                 <td>{{ $machine->id }}</td>
                                 <td>{{ $machine->machine }}</td>
                                 <td>{{ $machine->file_type }}</td>
+                                <td>{{ $machine->local_path }}</td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-info customModal"
                                        data-size="lg"
