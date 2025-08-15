@@ -32,6 +32,7 @@
                         <thead>
                             <tr>
                                 <th>{{ __('Product Type') }}</th>
+                                <th>{{ __('Series') }}</th>
                                 <th>{{ __('Description') }}</th>
                                 <th>{{ __('Material Type') }}</th>
                                 <th>{{ __('Glazing Bead Position') }}</th>
@@ -43,6 +44,7 @@
                             @foreach($items as $item)
                                 <tr>
                                     <td>{{ $item->product_type }}</td>
+                                    <td>{{ $item->series }}</td>
                                     <td>{{ $item->description }}</td>
                                     <td>{{ $item->material_type }}</td>
                                     <td>{{ $item->glazing_bead_position }}</td>
