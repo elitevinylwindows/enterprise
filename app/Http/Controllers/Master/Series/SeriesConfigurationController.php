@@ -14,7 +14,7 @@ class SeriesConfigurationController extends Controller
         $seriesTypes  = SeriesType::with(['productTypes'])->latest()->get();
         $productTypes = ProductType::orderBy('product_type')->get();
 
-        return view('master.series.series_type.index', compact('seriesTypes', 'productTypes'));
+        return view('master.series.series_configuration.index', compact('seriesTypes', 'productTypes'));
     }
 
     public function create()
@@ -22,7 +22,7 @@ class SeriesConfigurationController extends Controller
         $series       = Series::orderBy('series')->get();
         $productTypes = ProductType::orderBy('product_type')->get();
 
-        return view('master.series.series_type.create', compact('series', 'productTypes'));
+        return view('master.series.series_configuration.create', compact('series', 'productTypes'));
     }
 
     public function store(Request $request)
@@ -39,7 +39,7 @@ class SeriesConfigurationController extends Controller
 
         $st->productTypes()->sync($validated['product_type_ids']);
 
-        return redirect()->route('master.series-type.index')->with('success', 'Series Type created.');
+        return redirect()->route('master.series-configuration.index')->with('success', 'Series Type created.');
     }
 
     public function edit($id)
@@ -47,7 +47,7 @@ class SeriesConfigurationController extends Controller
         $seriesType   = SeriesType::with('productTypes')->findOrFail($id);
         $productTypes = ProductType::orderBy('product_type')->get();
 
-        return view('master.series.series_type.edit', compact('seriesType', 'productTypes'));
+        return view('master.series.series_configuration.edit', compact('seriesType', 'productTypes'));
     }
 
     public function update(Request $request, $id)
@@ -66,7 +66,7 @@ class SeriesConfigurationController extends Controller
 
         $st->productTypes()->sync($validated['product_type_ids']);
 
-        return redirect()->route('master.series-type.index')->with('success', 'Series Type updated.');
+        return redirect()->route('master.series-configuration.index')->with('success', 'Series Type updated.');
     }
 
     public function destroy($id)
@@ -74,6 +74,6 @@ class SeriesConfigurationController extends Controller
         $seriesType = SeriesType::findOrFail($id);
         $seriesType->delete();
 
-        return redirect()->route('master.series-type.index')->with('success', 'Series Type deleted.');
+        return redirect()->route('master.series-configuration.index')->with('success', 'Series Type deleted.');
     }
 }
