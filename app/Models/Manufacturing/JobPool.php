@@ -12,6 +12,7 @@ class JobPool extends Model
     protected $table = 'elitevw_manufacturing_job_pool';
 
     protected $fillable = [
+        'order_id',
         'job_order_number',
         'series',
         'qty',

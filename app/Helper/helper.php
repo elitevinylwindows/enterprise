@@ -2094,3 +2094,12 @@ if(!function_exists('sendOrderMail')) {
         Mail::to($order->customer->email)->send($mail);
     }
 }
+
+if(!function_exists('sendOrderToJobPool'))
+{
+    function sendOrderToJobPool($order)
+    {
+        // Dispatch the order to the job pool for processing
+        ProcessOrderJob::dispatch($order);
+    }
+}
