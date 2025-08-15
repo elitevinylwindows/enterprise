@@ -788,12 +788,6 @@ use Stripe\Webhook;
             Route::resource('additional-options', AdditionalOptionController::class);
         });
 
-            // Series routes
-        Route::prefix('master')->name('master.')->group(function () {
-            Route::resource('series', SeriesController::class);
-            Route::resource('series-type', SeriesTypeController::class);
-        });
-
         //Prices
         Route::prefix('master/prices')->name('prices.')->group(function () {
             Route::get('productprices', [ProductPricesController::class, 'index'])->name('productprices.index');

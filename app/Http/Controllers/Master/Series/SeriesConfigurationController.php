@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Master\Series;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Master\Series\SeriesType;
+use App\Models\Master\Series\SeriesConfiguration;
 use App\Models\Master\ProductKeys\ProductType;
 
 class SeriesConfigurationController extends Controller
