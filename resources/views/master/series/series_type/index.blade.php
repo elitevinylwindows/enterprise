@@ -50,8 +50,7 @@
               <tr>
                 <th>{{ __('ID') }}</th>
                 <th>{{ __('Series') }}</th>
-                <th>{{ __('Series Type') }}</th>
-                <th>{{ __('Product Types') }}</th>
+                <th>{{ __('Configuration') }}</th>
                 <th>{{ __('Actions') }}</th>
               </tr>
             </thead>
@@ -61,13 +60,7 @@
                   <td>{{ $st->id }}</td>
                   <td>{{ $st->series->series ?? '-' }}</td>
                   <td><span class="badge bg-primary">{{ $st->series_type }}</span></td>
-                  <td>
-                    @forelse($st->productTypes as $pt)
-                      <span class="badge bg-secondary me-1 mb-1">{{ $pt->product_type ?? $pt->name }}</span>
-                    @empty
-                      <span class="text-muted">-</span>
-                    @endforelse
-                  </td>
+                 
                   <td>
                     <a href="#"
                        class="btn btn-sm btn-info customModal"
