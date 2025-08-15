@@ -54,7 +54,7 @@
                                 <th>{{ __('Color Code') }}</th>
                                 <th>{{ __('Department') }}</th>
                                 <th>{{ __('Status') }}</th>
-                                <th>{{ __('Status Code') }}</th>
+                                <th>{{ __('Status Abbreviation') }}</th>
                                 <th>{{ __('Action') }}</th>
                             </tr>
                         </thead>
@@ -68,6 +68,7 @@
                                 </td>
                                 <td>{{ $color->department }}</td>
                                 <td>{{ $color->status }}</td>
+                                <td>{{ $color->status_abbr }}</td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-info customModal"
                                        data-size="lg"
