@@ -22,7 +22,7 @@
             <div class="card-header">
                 <div class="row align-items-center g-2">
                     <div class="col">
-                        <h5>{{ __('Producttype') }}</h5>
+                        <h5>{{ __('Product Type') }}</h5>
                     </div>
                 </div>
             </div>
