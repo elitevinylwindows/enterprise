@@ -1,7 +1,7 @@
-<form action="{{ route('master.series-type.update', $seriesType->id) }}" method="POST">
+{{-- resources/views/master/series/series_type/edit.blade.php --}}
+<form method="POST" action="{{ route('master.series-type.update', $seriesType->id) }}">
   @csrf
   @method('PUT')
-
 
   <div class="modal-body">
     {{-- Series --}}
@@ -12,30 +12,46 @@
               data-configs-url="{{ route('master.series-type.configs', ':id') }}"
               required>
         @foreach($series as $s)
-          <option value="{{ $s->id }}" @selected(old('series_id', $seriesType->series_id)==$s->id)>{{ $s->series }}</option>
+          <option value="{{ $s->id }}" @selected(old('series_id', $seriesType->series_id) == $s->id)>
+            {{ $s->series }}
+          </option>
         @endforeach
       </select>
       @error('series_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+      <div class="form-text">{{ __('Choose a series to load its available configurations below.') }}</div>
     </div>
 
-    {{-- Series Type text --}}
+    {{-- Configuration (Series Type) --}}
     <div class="mb-3">
-      <label class="form-label" for="series_type">{{ __('Series Type') }}</label>
-      <input type="text" name="series_type" id="series_type"
-             class="form-control @error('series_type') is-invalid @enderror"
-             value="{{ old('series_type', $seriesType->series_type) }}" required>
-      @error('series_type') <div class="invalid-feedback">{{ $message }}</div> @enderror
+      <label class="form-label" for="series_type">{{ __('Configuration') }}</label>
+      <div class="input-group">
+        <input
+          type="text"
+          name="series_type"
+          id="series_type"
+          class="form-control @error('series_type') is-invalid @enderror"
+          value="{{ old('series_type', $seriesType->series_type) }}"
+          placeholder="{{ __('e.g., XO, PW6-32') }}"
+          required
+        >
+        <button type="button" class="btn btn-outline-secondary" id="btnClearCfg">
+          {{ __('Clear') }}
+        </button>
+        @error('series_type') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+      </div>
+      <div class="form-text">{{ __('Click a configuration from the list to fill this field, or type your own.') }}</div>
     </div>
 
-    {{-- Configs list (filtered) --}}
+    {{-- Configurations list (filtered by selected series) --}}
     <div class="mb-2">
       <label class="form-label">{{ __('Available Configurations for this Series') }}</label>
-      <input type="text" class="form-control form-control-sm mb-2" id="cfgSearchEdit{{ $seriesType->id }}"
+      <input type="text" class="form-control form-control-sm mb-2" id="cfgSearchEdit"
              placeholder="{{ __('Search configurations…') }}" disabled>
-      <div id="cfgListEdit{{ $seriesType->id }}" class="border rounded p-2 bg-light"
-           style="max-height: 240px; overflow: auto;">
+      <div id="cfgListEdit" class="border rounded p-2 bg-light"
+           style="max-height: 260px; overflow: auto;">
         <div class="text-muted small py-2">{{ __('Select a series to load configurations…') }}</div>
       </div>
+      <div class="form-text">{{ __('Click a row to use that configuration.') }}</div>
     </div>
   </div>
 
@@ -47,59 +63,83 @@
 
 <script>
 (() => {
-  const wrapId    = '{{ $seriesType->id }}';
-  const seriesSel = document.querySelector(`#editModal{{ $seriesType->id }} #series_id`);
-  const listBox   = document.getElementById(`cfgListEdit{{ $seriesType->id }}`);
-  const searchInp = document.getElementById(`cfgSearchEdit{{ $seriesType->id }}`);
-  const stInput   = document.querySelector(`#editModal{{ $seriesType->id }} #series_type`);
+  const seriesSel   = document.getElementById('series_id');
+  const listBox     = document.getElementById('cfgListEdit');
+  const searchInput = document.getElementById('cfgSearchEdit');
+  const stInput     = document.getElementById('series_type');
+  const btnClear    = document.getElementById('btnClearCfg');
 
-  function render(items){
+  function renderConfigs(items){
     if(!items || !items.length){
       listBox.innerHTML = '<div class="text-muted small py-2">{{ __('No configurations found for this series.') }}</div>';
       return;
     }
-    const html = items.map(it => `
-      <label class="d-flex align-items-center justify-content-between gap-2 py-2 px-2 bg-white rounded mb-1 cfg-row"
-             style="cursor:pointer;border:1px solid rgba(0,0,0,.06)">
-        <div class="small"><strong>${it.label}</strong></div>
-        <span class="badge bg-secondary">{{ __('Use') }}</span>
-      </label>
-    `).join('');
+
+    const current = (stInput.value || '').trim().toLowerCase();
+
+    const html = items.map(it => {
+      const label = (it.label || '').trim();
+      const isCurrent = label.toLowerCase() === current;
+      return `
+        <label class="d-flex align-items-center justify-content-between gap-2 py-2 px-2 bg-white rounded mb-1 cfg-row"
+               style="cursor:pointer;border:1px solid rgba(0,0,0,.06)">
+          <div class="small">
+            <strong>${label}</strong>
+          </div>
+          <span class="badge ${isCurrent ? 'bg-primary' : 'bg-secondary'}">
+            ${isCurrent ? '{{ __('Selected') }}' : '{{ __('Use') }}'}
+          </span>
+        </label>
+      `;
+    }).join('');
     listBox.innerHTML = html;
 
     listBox.querySelectorAll('.cfg-row').forEach(el => {
       el.addEventListener('click', () => {
         const label = el.querySelector('strong')?.textContent || '';
         stInput.value = label;
+        // re-render to reflect "Selected"
+        renderConfigs(items);
       });
     });
   }
 
   function enableSearch(){
-    searchInp.disabled = false;
-    searchInp.value = '';
-    searchInp.oninput = () => {
-      const term = searchInp.value.trim().toLowerCase();
+    searchInput.disabled = false;
+    searchInput.value = '';
+    searchInput.oninput = () => {
+      const term = searchInput.value.trim().toLowerCase();
       listBox.querySelectorAll('.cfg-row').forEach(row => {
         row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
       });
     };
   }
 
-  function load(){
+  function loadConfigs(){
     const id   = seriesSel.value;
     const tmpl = seriesSel.getAttribute('data-configs-url');
     const url  = tmpl.replace(':id', encodeURIComponent(id));
+
     listBox.innerHTML = '<div class="text-muted small py-2">{{ __('Loading…') }}</div>';
-    searchInp.disabled = true;
+    searchInput.disabled = true;
+
     fetch(url, { headers: { 'Accept': 'application/json' } })
       .then(r => r.json())
-      .then(j => { render(j?.data || []); enableSearch(); })
-      .catch(() => { listBox.innerHTML = '<div class="text-danger small py-2">{{ __('Error loading configurations.') }}</div>'; });
+      .then(j => {
+        const items = (j && j.data) ? j.data : [];
+        renderConfigs(items);
+        enableSearch();
+      })
+      .catch(() => {
+        listBox.innerHTML = '<div class="text-danger small py-2">{{ __('Error loading configurations.') }}</div>';
+      });
   }
 
-  // Load immediately with current series
-  if (seriesSel?.value) load();
-  seriesSel?.addEventListener('change', load);
+  // events
+  seriesSel?.addEventListener('change', loadConfigs);
+  btnClear?.addEventListener('click', () => { stInput.value = ''; stInput.focus(); });
+
+  // preload based on current series selection
+  if (seriesSel?.value) loadConfigs();
 })();
 </script>
