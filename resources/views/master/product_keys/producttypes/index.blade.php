@@ -11,7 +11,7 @@
 
 @section('card-action-btn')
     <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
-        <i data-feather="plus"></i> {{ __('Add Product type') }}
+        <i data-feather="plus"></i> {{ __('Add Product Type') }}
     </a>
 @endsection
 
