@@ -532,6 +532,8 @@ use Stripe\Webhook;
             Route::resource('series', SeriesController::class);
             Route::resource('series-type', SeriesTypeController::class);
             Route::resource('series-configuration', SeriesConfigurationController::class);
+            Route::get('series-type/configs-by-series/{series}', [SeriesTypeController::class, 'configsBySeries'])
+        ->name('series-type.configs');
         });
 
         //Prices
