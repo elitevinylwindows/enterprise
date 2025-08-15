@@ -1,3 +1,4 @@
+{{-- resources/views/master/series/series_type/index.blade.php --}}
 @extends('layouts.app')
 
 @section('page-title', __('Series Types'))
@@ -13,14 +14,30 @@
 <div class="mb-4"></div>
 <div class="mb-4"></div>
 
+@php
+  // for highlighting the active filter in the left menu
+  $activeSeriesId = request('series_id');
+@endphp
+
 <div class="row">
-  {{-- Taskbar --}}
+  {{-- Taskbar Card --}}
   <div class="col-md-2">
     <div class="card">
       <div class="list-group list-group-flush">
-        <a href="{{ route('master.series-type.index') }}" class="list-group-item active">
-          {{ __('All Configurations') }}
+        <a href="{{ route('master.series-type.index') }}"
+           class="list-group-item {{ $activeSeriesId ? '' : 'active' }}">
+          {{ __('All Series Types') }}
         </a>
+
+        {{-- Optional: list each Series as a filter (only if $series is provided) --}}
+        @isset($series)
+          @foreach($series as $s)
+            <a href="{{ route('master.series-type.index', ['series_id' => $s->id]) }}"
+               class="list-group-item {{ (string)$activeSeriesId === (string)$s->id ? 'active' : '' }}">
+              {{ $s->series }}
+            </a>
+          @endforeach
+        @endisset
       </div>
     </div>
   </div>
@@ -49,8 +66,8 @@
               <tr>
                 <th>{{ __('ID') }}</th>
                 <th>{{ __('Series') }}</th>
-                <th>{{ __('Configuration') }}</th>
-                <th>{{ __('Actions') }}</th>
+                <th>{{ __('Series Type') }}</th>
+                <th class="text-end">{{ __('Actions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -58,19 +75,24 @@
                 <tr>
                   <td>{{ $st->id }}</td>
                   <td>{{ $st->series->series ?? '-' }}</td>
-                  <td><span class="badge bg-primary">{{ $st->series_type }}</span></td>
                   <td>
+                    <span class="badge bg-primary">{{ $st->series_type }}</span>
+                  </td>
+                  <td class="text-end">
                     <a href="#"
-                       class="btn btn-sm btn-info customModal"
+                       class="btn btn-sm btn-info customModal me-1"
                        data-size="lg"
                        data-title="{{ __('Edit Series Type') }}"
                        data-url="{{ route('master.series-type.edit', $st->id) }}">
                       <i data-feather="edit"></i>
                     </a>
 
-                    <form action="{{ route('master.series-type.destroy', $st->id) }}" method="POST" style="display:inline-block;">
-                      @csrf @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-danger"
+                    <form action="{{ route('master.series-type.destroy', $st->id) }}"
+                          method="POST" class="d-inline">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit"
+                              class="btn btn-sm btn-danger"
                               onclick="return confirm('{{ __('Are you sure?') }}')">
                         <i data-feather="trash-2"></i>
                       </button>
