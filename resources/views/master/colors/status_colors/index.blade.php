@@ -111,29 +111,30 @@
       $(document).ready(function() {
 
         @if($errors->any())
-        @foreach($errors->all() as $error)
-        toastr.error('{{ $error }}', 'Error', {
-            timeOut: 3000
-            , progressBar: true
-            , closeButton: true
-        });
-        @endforeach
+            @foreach($errors->all() as $error)
+            toastr.error('{{ $error }}', 'Error', {
+                timeOut: 3000
+                , progressBar: true
+                , closeButton: true
+            });
+            @endforeach
         @endif
 
         @if(session('error'))
-        toastr.error('{{ session('
-            error ') }}', 'Error', {
+            toastr.error('{{ session('
+                error ') }}', 'Error', {
+                    timeOut: 3000
+                    , progressBar: true
+                    , closeButton: true
+                });
+        @endif
+        @if(session('success'))
+            toastr.success('{{ session('success ') }}', 'Success', {
                 timeOut: 3000
                 , progressBar: true
                 , closeButton: true
             });
         @endif
-        @if(session('success'))
-        toastr.success('{{ session('success ') }}', 'Success', {
-            timeOut: 3000
-            , progressBar: true
-            , closeButton: true
-        });
     });
 </script>
 
