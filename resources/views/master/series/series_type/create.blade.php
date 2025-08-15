@@ -1,11 +1,6 @@
 <form action="{{ route('master.series-type.store') }}" method="POST">
   @csrf
 
-  <div class="modal-header">
-    <h5 class="modal-title">{{ __('Add Series Type') }}</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-  </div>
-
   <div class="modal-body">
     {{-- Series --}}
     <div class="mb-3">
