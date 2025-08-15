@@ -30,7 +30,7 @@ class SeriesTypeController extends Controller
     {
         $request->validate([
             'series_id' => 'required|exists:elitevw_master_series,id',
-            'product_type_id' => 'required|exists:elitevw_master_producttypes,id',
+            'product_type_id' => 'required|exists:elitevw_master_productkeys_producttypes,id',
             'series_type' => 'required|string|max:255',
         ]);
 
@@ -56,7 +56,7 @@ class SeriesTypeController extends Controller
     {
         $request->validate([
             'series_id' => 'required|exists:elitevw_master_series,id',
-            'product_type_id' => 'required|exists:elitevw_master_producttypes,id',
+            'product_type_id' => 'required|exists:elitevw_master_productkeys_producttypes,id',
             'series_type' => 'required|string|max:255',
         ]);
 
