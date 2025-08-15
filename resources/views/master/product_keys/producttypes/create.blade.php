@@ -25,7 +25,7 @@
         </div>
 
         <div class="form-group mb-3">
-            <label for="product_id">Product ID</label>
+            <label for="product_id">Price Schema Product ID</label>
             <input type="text" name="product_id" class="form-control">
         </div>
     </div>

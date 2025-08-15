@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('page-title')
-    {{ __('Producttype') }}
+    {{ __('Product Type') }}
 @endsection
 
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="#">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ __('Producttype') }}</li>
+    <li class="breadcrumb-item active" aria-current="page">{{ __('Product Type') }}</li>
 @endsection
 
 @section('card-action-btn')

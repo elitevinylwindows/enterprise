@@ -26,7 +26,7 @@
             <input type="text" name="glazing_bead_position" class="form-control" value="{{ $productType->glazing_bead_position }}">
         </div>
         <div class="form-group mb-3">
-            <label>Product ID</label>
+            <label>Price Schema Product ID</label>
             <input type="text" name="product_id" class="form-control" value="{{ $productType->product_id }}">
         </div>
     </div>
