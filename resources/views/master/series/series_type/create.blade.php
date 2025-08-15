@@ -24,31 +24,6 @@
       @error('series_type') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 
-    {{-- Product Types (searchable multi-checkbox list) --}}
-    <div class="mb-2">
-      <label class="form-label">{{ __('Product Types') }}</label>
-      <input type="text" class="form-control form-control-sm mb-2" id="ptSearchCreate"
-             placeholder="{{ __('Search product types…') }}">
-      <div id="ptListCreate" class="border rounded p-2" style="max-height: 220px; overflow: auto;">
-        @php($oldPT = collect(old('product_type_ids', []))->map('strval')->all())
-        @foreach($productTypes as $pt)
-          @php($id = (string)$pt->id)
-          <label class="d-flex align-items-center gap-2 py-1 product-type-item">
-            <input type="checkbox" name="product_type_ids[]" value="{{ $pt->id }}"
-                   {{ in_array($id, $oldPT) ? 'checked' : '' }}>
-            <span class="small">
-              <strong>{{ $pt->product_type }}</strong>
-              @if(!empty($pt->description)) – <span class="text-muted">{{ $pt->description }}</span>@endif
-            </span>
-          </label>
-        @endforeach
-      </div>
-      @error('product_type_ids') <div class="text-danger small">{{ $message }}</div> @enderror
-      @error('product_type_ids.*') <div class="text-danger small">{{ $message }}</div> @enderror
-      <div class="form-text">{{ __('Use the search box to filter; select one or more.') }}</div>
-    </div>
-  </div>
-
   <div class="modal-footer">
     <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
