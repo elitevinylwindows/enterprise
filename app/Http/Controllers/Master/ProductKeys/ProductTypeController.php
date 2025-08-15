@@ -24,6 +24,7 @@ class ProducttypeController extends Controller
 {
     $request->validate([
         'product_type' => 'required|string|max:255',
+        'series' => 'required|string|max:255',
         'description' => 'required|string|max:255',
         'material_type' => 'nullable|string|max:255',
         'glazing_bead_position' => 'nullable|string|max:255',
@@ -32,13 +33,14 @@ class ProducttypeController extends Controller
 
     \App\Models\Master\ProductKeys\ProductType::create($request->only([
         'product_type',
+        'series',
         'description',
         'material_type',
         'glazing_bead_position',
         'product_id',
     ]));
 
-    return redirect()->back()->with('success', 'Product type created successfully.');
+    return redirect()->back()->with('success', 'Product Type created successfully.');
 }
 
 public function edit($id)
@@ -51,6 +53,7 @@ public function update(Request $request, $id)
 {
     $request->validate([
         'product_type' => 'required|string|max:255',
+        'series' => 'required|string|max:255',
         'description' => 'required|string|max:255',
         'material_type' => 'nullable|string|max:255',
         'glazing_bead_position' => 'nullable|string|max:255',
@@ -60,6 +63,7 @@ public function update(Request $request, $id)
     $productType = \App\Models\Master\ProductKeys\ProductType::findOrFail($id);
     $productType->update($request->only([
         'product_type',
+        'series',
         'description',
         'material_type',
         'glazing_bead_position',
