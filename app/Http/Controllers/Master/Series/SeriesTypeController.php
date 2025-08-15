@@ -11,19 +11,18 @@ use App\Models\Master\ProductKeys\ProductType;
 
 class SeriesTypeController extends Controller
 {
-    public function index(Request $request)
-    {
-        $q = SeriesType::with('series')->latest();
+    public function index()
+{
+    $seriesTypes = \App\Models\Master\Series\SeriesType::with('series')
+        ->orderByDesc('id')
+        ->get();
 
-        if ($request->filled('series_id')) {
-            $q->where('series_id', $request->integer('series_id'));
-        }
+    // If you show filters on the left:
+    $series = \App\Models\Master\Series\Series::orderBy('series')->get();
 
-        $seriesTypes = $q->get();
-        $series      = Series::orderBy('series')->get();   // <- needed for the left filter list
+    return view('master.series.series_type.index', compact('seriesTypes','series'));
+}
 
-        return view('master.series.series_type.index', compact('seriesTypes', 'series'));
-    }
 
     public function create()
     {
@@ -108,36 +107,25 @@ public function store(Request $request)
             ->with('success', 'Series Type deleted.');
     }
 
-    /**
-     * JSON for the modal “Available Configurations for this Series”.
-     * Assumes SeriesConfiguration has a `series_id` and `series_type` column.
-     */
-    // app/Http/Controllers/Master/Series/SeriesTypeController.php
-
-
+ 
 
 
 public function configsBySeries(Series $series)
 {
-    // Get ProductType IDs for this series (matches column "series" in producttypes table)
-    $ptIds = ProductType::where('series', $series->series)->pluck('id');
+    // product type IDs for this series (name string)
+    $ptIds = \App\Models\Master\ProductKeys\ProductType::where('series', $series->series)->pluck('id');
 
-    // Return configs that are linked to any of those PTs either:
-    //  a) directly via configs.product_type_id, or
-    //  b) via the pivot table.
-    $configs = SeriesConfiguration::query()
-        ->whereIn('product_type_id', $ptIds) // direct FK
-        ->orWhereHas('productTypes', function ($q) use ($ptIds) {
-            $q->whereIn('elitevw_master_productkeys_producttypes.id', $ptIds);
-        })
+    // configurations linked via the direct foreign key
+    $configs = \App\Models\Master\Series\SeriesConfiguration::whereIn('product_type_id', $ptIds)
         ->orderBy('series_type')
         ->get(['id','series_type']);
 
     return response()->json([
         'success' => true,
-        'data' => $configs->map(fn ($c) => ['id' => $c->id, 'label' => $c->series_type]),
+        'data'    => $configs->map(fn ($c) => ['id' => $c->id, 'label' => $c->series_type]),
     ]);
 }
+
 
 
 }
