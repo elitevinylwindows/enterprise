@@ -22,7 +22,7 @@ class SeriesConfigurationController extends Controller
         $series       = Series::orderBy('series')->get();
         $productTypes = ProductType::orderBy('product_type')->get();
 
-        return view('master.series.series_configuration.create', compact('series', 'productTypes'));
+        return view('master.series.series-configuration.create', compact('series', 'productTypes'));
     }
 
     public function store(Request $request)
