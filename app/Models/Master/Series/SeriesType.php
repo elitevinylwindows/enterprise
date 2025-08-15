@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SeriesType extends Model
 {
+    // Adjust if your actual table name differs
     protected $table = 'elitevw_master_series_types';
 
     protected $fillable = [
@@ -15,17 +16,6 @@ class SeriesType extends Model
 
     public function series()
     {
-        return $this->belongsTo(\App\Models\Master\Series\Series::class);
-    }
-
-    // Many Product Types (array)
-    public function productTypes()
-    {
-        return $this->belongsToMany(
-            \App\Models\Master\ProductKeys\ProductType::class,
-            'elitevw_master_series_type_product_type', // pivot
-            'series_type_id',
-            'product_type_id'
-        )->withTimestamps();
+        return $this->belongsTo(Series::class, 'series_id');
     }
 }

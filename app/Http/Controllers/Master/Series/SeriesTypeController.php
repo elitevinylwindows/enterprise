@@ -6,80 +6,74 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Master\Series\Series;
 use App\Models\Master\Series\SeriesType;
-use App\Models\Master\ProductKeys\ProductType;
 
 class SeriesTypeController extends Controller
 {
     public function index()
     {
-        $seriesTypes  = SeriesType::with(['series', 'productTypes'])->latest()->get();
-        $series       = Series::orderBy('series')->get();
-        $productTypes = ProductType::orderBy('product_type')->get();
+        $seriesTypes = SeriesType::with('series')->latest()->get();
+        // If you need series list in the index for anything else, you can fetch it here:
+        // $series = Series::orderBy('series')->get();
 
-        return view('master.series.series_type.index', compact('seriesTypes', 'series', 'productTypes'));
+        return view('master.series.series_type.index', compact('seriesTypes'));
     }
 
     public function create()
     {
-        $series       = Series::orderBy('series')->get();
-        $productTypes = ProductType::orderBy('product_type')->get();
-
-        return view('master.series.series_type.create', compact('series', 'productTypes'));
+        $series = Series::orderBy('series')->get();
+        // Return a PARTIAL (no @extends) so customModal can load it
+        return view('master.series.series_type.create', compact('series'));
     }
 
     public function store(Request $request)
     {
+        $seriesTable = (new Series)->getTable();
+
         $validated = $request->validate([
-            'series_id'           => ['required','exists:elitevw_master_series,id'],
-            'series_type'         => ['required','string','max:255'],
-            'product_type_ids'    => ['required','array','min:1'],
-            'product_type_ids.*'  => ['integer','exists: elitevw_master_productkeys_producttypes,id'],
+            'series_id'   => ['required', 'integer', 'exists:'.$seriesTable.',id'],
+            'series_type' => ['required', 'string', 'max:255'],
         ]);
 
-        $st = SeriesType::create([
-            'series_id'   => $validated['series_id'],
-            'series_type' => $validated['series_type'],
-        ]);
+        SeriesType::create($validated);
 
-        $st->productTypes()->sync($validated['product_type_ids']);
-
-        return redirect()->route('master.series-type.index')->with('success', 'Series Type created.');
+        return redirect()
+            ->route('master.series-type.index')
+            ->with('success', 'Series Type created.');
     }
 
     public function edit($id)
     {
-        $seriesType   = SeriesType::with('productTypes')->findOrFail($id);
-        $series       = Series::orderBy('series')->get();
-        $productTypes = ProductType::orderBy('product_type')->get();
+        $seriesType = SeriesType::findOrFail($id);
+        $series     = Series::orderBy('series')->get();
 
-        return view('master.series.series_type.edit', compact('seriesType', 'series', 'productTypes'));
+        // Return a PARTIAL (no @extends)
+        return view('master.series.series_type.edit', compact('seriesType', 'series'));
     }
 
     public function update(Request $request, $id)
     {
+        $seriesTable = (new Series)->getTable();
+
         $validated = $request->validate([
-            'series_id'           => ['required','exists:elitevw_master_series,id'],
-            'series_type'         => ['required','string','max:255'],
-            'product_type_ids'    => ['required','array','min:1'],
-            'product_type_ids.*'  => ['integer','exists: elitevw_master_productkeys_producttypes,id'],
+            'series_id'   => ['required', 'integer', 'exists:'.$seriesTable.',id'],
+            'series_type' => ['required', 'string', 'max:255'],
         ]);
 
         $st = SeriesType::findOrFail($id);
-        $st->update([
-            'series_id'   => $validated['series_id'],
-            'series_type' => $validated['series_type'],
-        ]);
+        $st->update($validated);
 
-        $st->productTypes()->sync($validated['product_type_ids']);
-
-        return redirect()->route('master.series-type.index')->with('success', 'Series Type updated.');
+        return redirect()
+            ->route('master.series-type.index')
+            ->with('success', 'Series Type updated.');
     }
 
     public function destroy($id)
     {
-        $seriesType = SeriesType::findOrFail($id);
-        $seriesType->delete();
+        $st = SeriesType::findOrFail($id);
+        $st->delete();
 
-        return redirect()->route('master.series-type.index')->with('success', 'Series Type deleted.');
+        return redirect()
+            ->route('master.series-type.index')
+            ->with('success', 'Series Type deleted.');
     }
 }

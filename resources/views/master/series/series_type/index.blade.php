@@ -5,7 +5,7 @@
 @section('breadcrumb')
   <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
   <li class="breadcrumb-item">{{ __('Master') }}</li>
-  <li class="breadcrumb-item active" aria-current="page">{{ __('Series Configurations') }}</li>
+  <li class="breadcrumb-item active" aria-current="page">{{ __('Series Types') }}</li>
 @endsection
 
 @section('content')
@@ -18,9 +18,8 @@
   <div class="col-md-2">
     <div class="card">
       <div class="list-group list-group-flush">
-        <a href="{{ route('master.series-type.index') }}"
-           class="list-group-item active">
-          {{ __('All Series Configurations') }}
+        <a href="{{ route('master.series-type.index') }}" class="list-group-item active">
+          {{ __('All Configurations') }}
         </a>
       </div>
     </div>
@@ -60,7 +59,6 @@
                   <td>{{ $st->id }}</td>
                   <td>{{ $st->series->series ?? '-' }}</td>
                   <td><span class="badge bg-primary">{{ $st->series_type }}</span></td>
-                 
                   <td>
                     <a href="#"
                        class="btn btn-sm btn-info customModal"
@@ -70,8 +68,7 @@
                       <i data-feather="edit"></i>
                     </a>
 
-                    <form action="{{ route('master.series-type.destroy', $st->id) }}"
-                          method="POST" style="display:inline-block;">
+                    <form action="{{ route('master.series-type.destroy', $st->id) }}" method="POST" style="display:inline-block;">
                       @csrf @method('DELETE')
                       <button type="submit" class="btn btn-sm btn-danger"
                               onclick="return confirm('{{ __('Are you sure?') }}')">
