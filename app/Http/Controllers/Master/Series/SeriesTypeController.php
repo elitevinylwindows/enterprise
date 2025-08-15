@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Master\Series\Series;
 use App\Models\Master\Series\SeriesType;
 use App\Models\Master\Series\SeriesConfiguration;
+use App\Models\Master\ProductKeys\ProductType;
 
 class SeriesTypeController extends Controller
 {
@@ -78,18 +79,26 @@ class SeriesTypeController extends Controller
      * JSON for the modal “Available Configurations for this Series”.
      * Assumes SeriesConfiguration has a `series_id` and `series_type` column.
      */
-    public function configsBySeries(Series $series)
-    {
-        $configs = SeriesConfiguration::where('series_id', $series->id)
-            ->orderBy('series_type')
-            ->get(['id','series_type']);
+    // app/Http/Controllers/Master/Series/SeriesTypeController.php
 
-        return response()->json([
-            'success' => true,
-            'data' => $configs->map(fn($c) => [
-                'id'    => $c->id,
-                'label' => $c->series_type,
-            ]),
-        ]);
-    }
+
+
+public function configsBySeries(Series $series)
+{
+    // Get Product Types that belong to this series (by name string)
+    $ptIds = ProductType::where('series', $series->series)->pluck('id');
+
+    // Find configurations attached (via pivot) to any of those product types
+    $configs = SeriesConfiguration::whereHas('productTypes', function ($q) use ($ptIds) {
+            $q->whereIn('elitevw_master_product_types.id', $ptIds);
+        })
+        ->orderBy('series_type')
+        ->get(['id', 'series_type']);
+
+    return response()->json([
+        'success' => true,
+        'data'    => $configs->map(fn ($c) => ['id' => $c->id, 'label' => $c->series_type]),
+    ]);
+}
+
 }
