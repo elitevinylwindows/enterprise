@@ -198,87 +198,119 @@ class InvoiceController extends Controller
             'deposit_card_cvv.digits_between' => 'The CVV must be between 3 and 4 digits.',
         ]);
 
-        try{
-            DB::beginTransaction();
-            $firstServe = new FirstServe();
-            $invoice = Invoice::findOrFail($id);
+        try {
+                DB::beginTransaction();
+                $firstServe = new FirstServe();
+                $invoice = Invoice::findOrFail($id);
 
-            $amount = $validated['amount_calculated'] ?? $validated['fixed_amount'] ?? 0;
+                // Calculate payment amount
+                $amount = $validated['amount_calculated'] ?? $validated['fixed_amount'] ?? 0;
 
-            $totalPaid = InvoicePayment::where('invoice_id', $invoice->id)
-                ->whereIn('payment_type', ['deposit', 'payment'])
-                ->sum('payment_amount');
-            
-            $fullyPaid = $totalPaid >= floatval($invoice->total) ? true : false;
-            if($request->charge_card == "true") {
-                if($amount <= $invoice->remaining_amount) {
-                    $charge = $firstServe->chargeCard($invoice->customer, $amount, $validated['deposit_saved_card_id'], $invoice->invoice_number, $invoice->order->order_number);
+                // Validate amount
+                if ($amount <= 0) {
+                    return redirect()->back()->with('error', 'Invalid payment amount.');
+                }
 
-                    if($charge['status'] == 'Approved') {
-                        $payment = InvoicePayment::create([
-                            'invoice_id' => $invoice->id,
-                            'payment_type' => $request->is_deposit === 'true' ? 'deposit' : 'payment',
-                            'deposit_type' => $request->ipm_deposit_type,
-                            'deposit_method' => $request->ipm_deposit_method,
-                            'deposit_card_number' => $request->deposit_card_number,
-                            'deposit_card_cvv' => $request->deposit_card_cvv,
-                            'deposit_card_expiry' => $request->deposit_card_expiry,
-                            'deposit_card_zip' => $request->deposit_card_zip,
-                            'amount_calculated' => $request->amount_calculated ?? 0,
-                            'fixed_amount' => $request->fixed_amount ?? 0,
-                            'percentage' => $request->percentage ?? 0,
-                            'payment_amount' => $amount,
-                            'status' => 'Approved',
-                            'deposit_bank_account' => $request->deposit_bank_account,
-                            'deposit_bank_routing' => $request->deposit_bank_routing,
-                        ]);
-                    }
-
-                    $fullyPaid = $totalPaid >= floatval($invoice->total) ? true : false;
-                    $invoice->remaining_amount = $totalPaid < floatval($invoice->total) ? floatval($invoice->total) - $totalPaid : 0;
-                    $invoice->paid_amount = $totalPaid >= floatval($invoice->total) ? floatval($invoice->total) : $totalPaid;
-                    
-                    $invoice->status = $invoice->remaining_amount <= 0 ? 'fully_paid' : 'partially_paid';
-                    $invoice->save();
+                $totalPaid = InvoicePayment::where('invoice_id', $invoice->id)
+                    ->whereIn('payment_type', ['deposit', 'payment'])
+                    ->sum('payment_amount');
                 
-                } else {
+                $remainingAmount = $invoice->total - $totalPaid;
+                
+                if ($amount > $remainingAmount) {
                     return redirect()->back()->with('error', 'Payment amount exceeds remaining invoice amount.');
                 }
-            } else {
-                if(!$fullyPaid) {
-                    $firstServeInvoice = $firstServe->updateInvoiceAmounts($invoice, $amount);
-                    if ($firstServeInvoice) {
-                        $remainingAmount = $invoice->total - $amount;
 
-                        $invoice->update([
-                            'gateway_response' => json_encode($firstServeInvoice),
-                            'serve_invoice_id' => $firstServeInvoice['id'],
-                            'payment_link' => $firstServeInvoice['payment_link'],
-                            'payment_link' => $firstServeInvoice['payment_link'],
-                            'required_payment' => $amount,
-                            'remaining_amount' => $remainingAmount,
-                        ]);
-                        
-                        $mail = new InvoiceMail($invoice);
-                        Mail::to($invoice->customer->email)->send($mail);
+                // Case 1: Charge Card Selected
+                if ($request->charge_card == "true") {
+                    $cardId = null;
+
+                    // Case 1A: New Card
+                    if ($request->filled('deposit_card_number') && $request->filled('deposit_card_expiry')) {
+                        $cardId = $this->addPaymentMethodToCustomer(
+                            $invoice->customer,
+                            $request->deposit_card_number,
+                            $request->deposit_card_expiry,
+                            $request->deposit_card_zip
+                        );
                     }
+                    // Case 1B: Saved Card
+                    else {
+                        $cardId = $request->deposit_saved_card_id;
+                    }
+
+                    if (!$cardId) {
+                        throw new \Exception("No valid payment method selected");
+                    }
+
+                    // Process payment
+                    $charge = $firstServe->chargeCard(
+                        $invoice->customer,
+                        $amount,
+                        $cardId,
+                        $invoice->invoice_number,
+                        $invoice->order->order_number
+                    );
+
+                    // Update invoice status
+                    $newTotalPaid = $totalPaid + $amount;
+                    $newRemaining = $invoice->total - $newTotalPaid;
+                    
+                    $invoice->update([
+                        'paid_amount' => $newTotalPaid,
+                        'remaining_amount' => $newRemaining,
+                        'status' => $newRemaining <= 0 ? 'fully_paid' : 'partially_paid'
+                    ]);
+
+                } 
+                // Case 2: No Immediate Charge
+                else {
+                    // Case 2A: New Card (save only)
+                    if ($request->filled('deposit_card_number') && $request->filled('deposit_card_expiry')) {
+                        $cardId = $this->addPaymentMethodToCustomer(
+                            $invoice->customer,
+                            $request->deposit_card_number,
+                            $request->deposit_card_expiry,
+                            $request->deposit_card_zip
+                        );
+                    }
+                    // Case 2B: Saved Card
+                    else {
+                        $cardId = $request->deposit_saved_card_id;
+                    }
+
+                    if (!$cardId) {
+                        throw new \Exception("No valid payment method selected");
+                    }
+
+                    // Update invoice in payment gateway
+                    $firstServeInvoice = $firstServe->updateInvoiceAmounts($invoice, $amount);
+                    
+                    $remainingAfterDeposit = $invoice->total - $amount;
+                    
+                    $invoice->update([
+                        'gateway_response' => json_encode($firstServeInvoice),
+                        'serve_invoice_id' => $firstServeInvoice['id'],
+                        'payment_link' => $firstServeInvoice['payment_link'],
+                        'required_payment' => $amount,
+                        'remaining_amount' => $remainingAfterDeposit,
+                        'status' => $remainingAfterDeposit > 0 ? 'partially_paid' : 'fully_paid'
+                    ]);
+
+                    // Send payment link to customer
+                    $mail = new InvoiceMail($invoice);
+                    Mail::to($invoice->customer->email)->send($mail);
                 }
+
+                DB::commit();
+                return redirect()->route('sales.invoices.index')->with('success', 'Operation completed successfully.');
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error("Payment Processing Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+                
+                return redirect()->back()->with('error', 'Operation failed: ' . $e->getMessage());
             }
-
-            if($request->deposit_card_number && $request->deposit_card_expiry && $request->deposit_card_zip) {
-                $this->addPaymentMethodToCustomer($invoice->customer, $request->deposit_card_number, $request->deposit_card_expiry, $request->deposit_card_zip);
-            }
-
-            DB::commit();
-
-            return redirect()->route('sales.invoices.index')->with('success', 'Payment recorded successfully.');
-        }catch (\Exception $e) {
-            DB::rollBack();
-            dd($e);
-            $error = json_decode($e->getResponse()->getBody()->getContents(), true);
-            Log::error($error['error_message']);
-            return redirect()->back()->with('error', 'Payment failed: ' . $error['error_message']);
-        }
     }
 
     public function getCustomer($customer_number)
@@ -304,7 +336,7 @@ class InvoiceController extends Controller
     {
         // Get invoice data
         $invoiceData = [
-            'customer_name' => $invoice->customer->name,
+           + 'customer_name' => $invoice->customer->name,
             'invoice_number' => $invoice->invoice_number, // Match your DB field
             'date' => $invoice->invoice_date,
             'items' => $invoice->items->map(function ($item) {
