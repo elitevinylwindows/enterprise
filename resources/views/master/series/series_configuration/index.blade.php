@@ -71,11 +71,11 @@
                        class="btn btn-sm btn-info customModal"
                        data-size="lg"
                        data-title="{{ __('Edit Series Type') }}"
-                       data-url="{{ route('master.series-type.edit', $st->id) }}">
+                       data-url="{{ route('master.series-configuration.edit', $st->id) }}">
                       <i data-feather="edit"></i>
                     </a>
 
-                    <form action="{{ route('master.series-type.destroy', $st->id) }}"
+                    <form action="{{ route('master.series-configuration.destroy', $st->id) }}"
                           method="POST" style="display:inline-block;">
                       @csrf @method('DELETE')
                       <button type="submit" class="btn btn-sm btn-danger"
