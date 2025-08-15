@@ -42,7 +42,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header" style="background-color: #a80000; padding: 40px; text-align: center; color: white; font-size: 24px;">
-                            <img src="{{ asset(Storage::url('upload/logo/')) . '/logo.png' }}" style="height: 100px;" alt="">
+                            <img src="{{ asset(Storage::url('upload/logo/')) . '/white_logo.png' }}" style="height: 200px;" alt="">
                         </td>
                     </tr>
 

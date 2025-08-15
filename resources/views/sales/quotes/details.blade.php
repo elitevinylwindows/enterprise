@@ -644,7 +644,6 @@
         const price = form.querySelector('[name="price"]').value;
         const discount = $("#discount").val() || 0;
         const total = (qty * parseFloat(price)).toFixed(2);
-        const item_comment = form.querySelector('[name="item_comment"]').value;
         const internal_note = form.querySelector('[name="internal_note"]').value;
 
         const formData = new FormData();
@@ -660,7 +659,6 @@
         formData.append('price', price);
         formData.append('discount', discount);
         formData.append('total', total);
-        formData.append('item_comment', item_comment);
         formData.append('internal_note', internal_note);
         formData.append('color_config', colorConfigId);
         formData.append('color_exterior', colorExtId);
@@ -808,7 +806,6 @@
                     form.querySelector('[name="qty"]').value = data.item.qty;
                     form.querySelector('[name="width"]').value = data.item.width;
                     form.querySelector('[name="height"]').value = data.item.height;
-                    form.querySelector('[name="item_comment"]').value = data.item.item_comment || '';
                     form.querySelector('[name="color_config"]').value = data.item.color_config || '';
                     form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
                     form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
@@ -876,7 +873,6 @@
                     form.querySelector('[name="qty"]').value = data.item.qty;
                     form.querySelector('[name="width"]').value = data.item.width;
                     form.querySelector('[name="height"]').value = data.item.height;
-                    form.querySelector('[name="item_comment"]').value = data.item.item_comment || '';
                     form.querySelector('[name="color_config"]').value = data.item.color_config || '';
                     form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
                     form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';

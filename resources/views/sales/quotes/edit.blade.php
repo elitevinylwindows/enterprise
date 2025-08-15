@@ -263,10 +263,7 @@
                                             <span class="input-group-text">inches</span>
                                         </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label>Line Item Comment</label>
-                                        <textarea name="item_comment" class="form-control" rows="2"></textarea>
-                                    </div>
+                                   
                                 </div>
 
                                 <div class="tab-pane fade" id="color">
@@ -649,7 +646,6 @@
         const taxRate = {{ $taxRate }};
         const total = (qty * parseFloat(price)).toFixed(2);
         const tax = (taxRate *(total / 100)).toFixed(2);
-        const item_comment = form.querySelector('[name="item_comment"]').value;
         const internal_note = form.querySelector('[name="internal_note"]').value;
 
         const formData = new FormData();
@@ -666,7 +662,6 @@
         formData.append('price', price);
         formData.append('discount', discount);
         formData.append('total', total);
-        formData.append('item_comment', item_comment);
         formData.append('internal_note', internal_note);
         formData.append('color_config', colorConfigId);
         formData.append('color_exterior', colorExtId);
@@ -818,7 +813,6 @@
                     form.querySelector('[name="qty"]').value = data.item.qty;
                     form.querySelector('[name="width"]').value = data.item.width;
                     form.querySelector('[name="height"]').value = data.item.height;
-                    form.querySelector('[name="item_comment"]').value = data.item.item_comment || '';
                     form.querySelector('[name="color_config"]').value = data.item.color_config || '';
                     form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
                     form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
@@ -884,7 +878,6 @@
                     form.querySelector('[name="qty"]').value = data.item.qty;
                     form.querySelector('[name="width"]').value = data.item.width;
                     form.querySelector('[name="height"]').value = data.item.height;
-                    form.querySelector('[name="item_comment"]').value = data.item.item_comment || '';
                     form.querySelector('[name="color_config"]').value = data.item.color_config || '';
                     form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
                     form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';

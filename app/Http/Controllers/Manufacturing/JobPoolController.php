@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Manufacturing;
 
 use App\Http\Controllers\Controller;
+use App\Models\Inventory\Product;
 use App\Models\Manufacturing\JobPool;
+use App\Models\Master\Colors\StatusColor;
+use App\Models\ProductionStatus;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -32,13 +35,15 @@ class JobPoolController extends Controller
 
     public function create()
     {
-        // Return your modal form view
-        return view('manufacturing.job_pool.create');
+        $orders = \App\Models\Sales\Order::all();
+        $statuses = StatusColor::all()->pluck('status', 'id')->toArray();
+        return view('manufacturing.job_pool.create', compact('orders', 'statuses'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'order_id'   => ['required', 'integer', 'exists:elitevw_sales_orders,id'],
             'job_order_number'   => ['required', 'string', 'max:100', 'unique:elitevw_manufacturing_job_pool,job_order_number'],
             'series'             => ['nullable', 'string', 'max:100'],
             'qty'                => ['required', 'integer', 'min:0'],
@@ -70,6 +75,7 @@ class JobPoolController extends Controller
     public function update(Request $request, JobPool $job_pool)
     {
         $validated = $request->validate([
+            'order_id'   => ['required', 'integer', 'exists:elitevw_sales_orders,id'],
             'job_order_number'   => ['required', 'string', 'max:100', Rule::unique('elitevw_manufacturing_job_pool', 'job_order_number')->ignore($job_pool->id)],
             'series'             => ['nullable', 'string', 'max:100'],
             'qty'                => ['required', 'integer', 'min:0'],
