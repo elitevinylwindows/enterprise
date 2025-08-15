@@ -123,13 +123,14 @@
                 </a>
 
                 {{-- Email --}}
-                <a class="avtar avtar-xs btn-link-warning text-warning customModal"
-                   data-bs-toggle="tooltip"
-                   data-bs-original-title="Email"
-                   href="{{ route('sales.orders.email', $order->id) }}"
-                   data-title="Send Email">
-                    <i data-feather="mail"></i>
+                <a class="avtar avtar-xs btn-link-warning text-warning emailButton" data-bs-toggle="tooltip" 
+                    data-bs-original-title="Email" href="#" data-size="md" 
+                    data-url="{{ route('sales.orders.email', $order->id) }}" 
+                    data-title="Send Email">
+                    <i data-feather="mail" id="emailIcon"></i>
+                    <span class="spinner-border spinner-border-sm d-none" id="emailSpinner"></span>
                 </a>
+                
 
                 @if(!$order->invoice)
                 {{-- Convert to Invoice --}}
@@ -185,8 +186,7 @@
 <script>
     $(document).ready(function() {
 
-        // Add click handler for the email button
-        $('.emailButton').on('click', function(e) {
+         $('.emailButton').on('click', function(e) {
             e.preventDefault();
 
             const $button = $(this);
