@@ -8,7 +8,10 @@
             <label for="product_type">Product Type</label>
             <input type="text" name="product_type" class="form-control" required>
         </div>
-
+        <div class="form-group mb-3">
+            <label for="description">Series</label>
+            <input type="text" name="description" class="form-control" required>
+        </div>
         <div class="form-group mb-3">
             <label for="description">Description</label>
             <input type="text" name="description" class="form-control" required>

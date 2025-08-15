@@ -10,7 +10,10 @@
             <label>Product Type</label>
             <input type="text" name="product_type" class="form-control" value="{{ $productType->product_type }}" required>
         </div>
-
+        <div class="form-group mb-3">
+            <label>Series</label>
+            <input type="text" name="description" class="form-control" value="{{ $productType->description }}" required>
+        </div>
         <div class="form-group mb-3">
             <label>Description</label>
             <input type="text" name="description" class="form-control" value="{{ $productType->description }}" required>
