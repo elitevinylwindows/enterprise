@@ -54,6 +54,7 @@
                                 <th>{{ __('Color Code') }}</th>
                                 <th>{{ __('Department') }}</th>
                                 <th>{{ __('Status') }}</th>
+                                <th>{{ __('Status Code') }}</th>
                                 <th>{{ __('Action') }}</th>
                             </tr>
                         </thead>

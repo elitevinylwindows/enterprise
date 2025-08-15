@@ -48,6 +48,15 @@
                required>
         @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror
       </div>
+       <div class="col-12">
+        <label class="form-label">{{ __('Status (Abbreviation)') }}</label>
+        <input type="text"
+               name="status_abbr"
+               class="form-control @error('status_abbr') is-invalid @enderror"
+               value="{{ old('status_abbr') }}"
+               required>
+        @error('status_abbr') <div class="invalid-feedback">{{ $message }}</div> @enderror
+      </div>
     </div>
   </div>
 

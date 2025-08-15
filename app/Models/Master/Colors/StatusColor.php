@@ -17,6 +17,7 @@ class StatusColor extends Model
         'color_code',   // HEX like #FF0000
         'department',   // e.g., Glass, Frame, Shipping
         'status',       // free text e.g., Queued, On Hold
+        'status_abbr',  // e.g., Q, OH
     ];
 
     /**
