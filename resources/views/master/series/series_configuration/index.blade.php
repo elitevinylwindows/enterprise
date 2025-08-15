@@ -36,7 +36,7 @@
                class="btn btn-primary customModal"
                data-size="lg"
                data-title="{{ __('Add Series Type') }}"
-               data-url="{{ route('master.series-type.create') }}">
+               data-url="{{ route('master.series-configuration.create') }}">
               <i class="fa-solid fa-circle-plus"></i> {{ __('Create') }}
             </a>
           </div>
