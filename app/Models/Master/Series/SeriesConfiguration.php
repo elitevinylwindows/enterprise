@@ -1,24 +1,31 @@
 <?php
 
-// App/Models/Master/Series/SeriesConfiguration.php
+// app/Models/Master/Series/SeriesConfiguration.php
 namespace App\Models\Master\Series;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Master\ProductKeys\ProductType;
 
 class SeriesConfiguration extends Model
 {
     protected $table = 'elitevw_master_series_configurations';
 
-    protected $fillable = [
-        'series_type', 'category', 'image', 'product_type_id',
-    ];
+    protected $fillable = ['series_type', 'category', 'image', 'product_type_id'];
 
-    // Each configuration belongs to one product type (via the column in your table)
-    public function productType()
+    // many-to-many via pivot
+    public function productTypes()
     {
-        return $this->belongsTo(\App\Models\Master\ProductKeys\ProductType::class, 'product_type_id');
+        return $this->belongsToMany(
+            ProductType::class,
+            'elitevw_master_series_type_product_type',
+            'series_type_id',
+            'product_type_id'
+        )->withTimestamps();
     }
 
-    // ❌ REMOVE any belongsToMany() here that references:
-    // elitevw_master_series_type_product_type (series_type_id/product_type_id)
+    // optional direct FK
+    public function productType()
+    {
+        return $this->belongsTo(ProductType::class, 'product_type_id');
+    }
 }
