@@ -32,7 +32,7 @@ class StatusColorController extends Controller
             'color_code' => ['required', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
             'department' => ['required', 'string', 'max:100'],
             'status'     => ['required', 'string', 'max:100'],
-            'status_abbr' => ['required', 'string', 'max:10', Rule::unique('status_colors')->where(function ($query) use ($request) {
+            'status_abbr' => ['required', 'string', 'max:10', Rule::unique('elitevw_master_colors_status_colors')->where(function ($query) use ($request) {
                 return $query->where('department', $request->department);
             })],
         ]);
@@ -65,7 +65,7 @@ class StatusColorController extends Controller
             'color_code' => ['required', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
             'department' => ['required', 'string', 'max:100'],
             'status'     => ['required', 'string', 'max:100'],
-            'status_abbr' => ['required', 'string', 'max:10', Rule::unique('status_colors')->ignore($status_color->id)->where(function ($query) use ($request) {
+            'status_abbr' => ['required', 'string', 'max:10', Rule::unique('elitevw_master_colors_status_colors')->ignore($status_color->id)->where(function ($query) use ($request) {
                 return $query->where('department', $request->department);
             })],
         ]);
