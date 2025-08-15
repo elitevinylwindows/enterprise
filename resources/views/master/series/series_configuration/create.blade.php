@@ -1,4 +1,4 @@
-<form action="{{ route('master.series-type.store') }}" method="POST">
+<form action="{{ route('master.series-configuration.store') }}" method="POST">
   @csrf
 
   <div class="modal-body">
