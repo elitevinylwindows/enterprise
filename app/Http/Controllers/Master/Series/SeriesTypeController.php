@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Master\Series\Series;
 use App\Models\Master\Series\SeriesType;
+use App\Models\Master\Series\SeriesConfiguration; // hasManyToMany productTypes()
+use App\Models\Master\ProductKeys\ProductType;
 
 class SeriesTypeController extends Controller
 {
@@ -24,6 +26,33 @@ class SeriesTypeController extends Controller
         // Return a PARTIAL (no @extends) so customModal can load it
         return view('master.series.series_type.create', compact('series'));
     }
+
+
+
+
+public function configsBySeries(Series $series)
+{
+    // ProductTypes that belong to this series (name field)
+    $ptIds = ProductType::where('series', $series->series)->pluck('id');
+
+    // Configs (SeriesConfiguration) linked to those product types via the pivot
+    // Assumes SeriesConfiguration::productTypes() belongsToMany(ProductType::class, 'elitevw_master_series_type_product_type', 'series_type_id', 'product_type_id')
+    $configs = SeriesConfiguration::whereHas('productTypes', function ($q) use ($ptIds) {
+            $q->whereIn('elitevw_master_product_types.id', $ptIds);
+        })
+        ->orderBy('series_type')
+        ->get(['id','series_type']);
+
+    return response()->json([
+        'success' => true,
+        'data'    => $configs->map(fn ($c) => [
+            'id'    => $c->id,
+            'label' => $c->series_type,
+        ]),
+    ]);
+}
+
+
 
     public function store(Request $request)
     {
