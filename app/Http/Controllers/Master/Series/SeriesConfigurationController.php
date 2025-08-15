@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Master\Series;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Master\Series\SeriesConfiguration;
-use App\Models\Master\ProductKeys\ProductType;
+use App\Models\Master\ProductKeys\ProductType; // make sure this import exists
+use Illuminate\Validation\Rule;
 
 class SeriesConfigurationController extends Controller
 {
@@ -27,23 +28,42 @@ class SeriesConfigurationController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'series_type'         => ['required','string','max:255'],
-            'product_type_ids'    => ['required','array','min:1'],
-            // remove stray space after ":" and point to your actual table:
-            'product_type_ids.*'  => ['integer','exists:elitevw_master_product_types,id'],
-        ]);
+{
+    $ptTable = (new ProductType)->getTable(); // <- resolves actual table name
 
-        $sc = SeriesConfiguration::create([
-            'series_type' => $validated['series_type'],
-        ]);
+    $validated = $request->validate([
+        'series_type'         => ['required','string','max:255'],
+        'product_type_ids'    => ['required','array','min:1'],
+        'product_type_ids.*'  => ['integer', 'exists:'.$ptTable.',id'],
+    ]);
 
-        $sc->productTypes()->sync($validated['product_type_ids']);
+    $sc = SeriesConfiguration::create([
+        'series_type' => $validated['series_type'],
+    ]);
 
-        return redirect()->route('master.series-configuration.index')
-            ->with('success', 'Series Type created.');
-    }
+    $sc->productTypes()->sync($validated['product_type_ids']);
+
+    return redirect()->route('master.series-configuration.index')
+        ->with('success', 'Series Type created.');
+}
+
+public function update(Request $request, $id)
+{
+    $ptTable = (new ProductType)->getTable();
+
+    $validated = $request->validate([
+        'series_type'         => ['required','string','max:255'],
+        'product_type_ids'    => ['required','array','min:1'],
+        'product_type_ids.*'  => ['integer', 'exists:'.$ptTable.',id'],
+    ]);
+
+    $sc = SeriesConfiguration::findOrFail($id);
+    $sc->update(['series_type' => $validated['series_type']]);
+    $sc->productTypes()->sync($validated['product_type_ids']);
+
+    return redirect()->route('master.series-configuration.index')
+        ->with('success', 'Series Type updated.');
+}
 
     public function edit($id)
     {
@@ -54,24 +74,7 @@ class SeriesConfigurationController extends Controller
         return view('master.series.series_configuration.edit', compact('seriesType', 'productTypes'));
     }
 
-    public function update(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'series_type'         => ['required','string','max:255'],
-            'product_type_ids'    => ['required','array','min:1'],
-            'product_type_ids.*'  => ['integer','exists:elitevw_master_product_types,id'],
-        ]);
-
-        $sc = SeriesConfiguration::findOrFail($id);
-        $sc->update([
-            'series_type' => $validated['series_type'],
-        ]);
-
-        $sc->productTypes()->sync($validated['product_type_ids']);
-
-        return redirect()->route('master.series-configuration.index')
-            ->with('success', 'Series Type updated.');
-    }
+    
 
     public function destroy($id)
     {
