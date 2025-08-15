@@ -148,6 +148,7 @@ use App\Http\Controllers\BillOfMaterials\Menu\{
 
 use App\Http\Controllers\Master\Series\{
     SeriesController,
+    SeriesConfigurationController,
     SeriesTypeController
 };
 
@@ -530,6 +531,7 @@ use Stripe\Webhook;
         Route::prefix('master')->name('master.')->group(function () {
             Route::resource('series', SeriesController::class);
             Route::resource('series-type', SeriesTypeController::class);
+            Route::resource('series-configuration', SeriesConfigurationController::class);
         });
 
         //Prices
