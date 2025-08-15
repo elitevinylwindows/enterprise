@@ -518,6 +518,167 @@
 
 
 
+
+
+
+
+@if (Gate::check('manage manufacturing'))
+<!-- Manufacturing Section Label -->
+<li class="pc-item pc-caption d-flex justify-content-between align-items-center">
+    <div>
+        <label>{{ __('Manufacturing') }}</label>
+        <i class="ti ti-chart-arcs"></i>
+    </div>
+    <i class="ti ti-plus text-muted pe-2" style="font-size: 0.9rem;"></i>
+</li>
+
+<!-- Manufacturing -->
+ <li class="pc-item {{ in_array($routeName, ['manufacturing.dashboard']) ? 'active' : '' }}">
+                            <a href="{{ route('manufacturing.dashboard') }}" class="pc-link">
+                                <span class="pc-micon"><i class="fa-solid fa-grip"></i></span>
+                                <span class="pc-mtext">{{ __('Dashboard') }}</span>
+                            </a>
+                        </li>
+
+<!-- <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-grip"></i></span>
+        <span class="pc-mtext ms-2">Terminals</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+        <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
+            <a href="" class="pc-link">
+                <span class="pc-mtext">Dashboard</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
+                <span class="pc-mtext">Screen Cutting</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
+                <span class="pc-mtext">Window Cutting</span>
+            </a>
+        </li>
+    </ul>
+</li>-->
+<li class="pc-item pc-hasmenu {{ request()->routeIs('manufacturing.machines.*') || request()->routeIs('manufacturing.stations.*') || request()->routeIs('manufacturing.capacity.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-wrench"></i></span>
+        <span class="pc-mtext ms-2">Equipment</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+        <li class="pc-item {{ request()->routeIs('manufacturing.capacity.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.capacity.index') }}" class="pc-link">
+                <span class="pc-mtext">Capacity</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('manufacturing.machines.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.machines.index') }}" class="pc-link">
+                <span class="pc-mtext">Machines</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('manufacturing.stations.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.stations.index') }}" class="pc-link">
+                <span class="pc-mtext">Stations</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('manufacturing.lines.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.lines.index') }}" class="pc-link">
+                <span class="pc-mtext">Lines</span>
+            </a>
+        </li>
+    </ul>
+</li>
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('manufacturing.job_planning.*') || request()->routeIs('manufacturing.tempered.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-check-to-slot"></i></span>
+        <span class="pc-mtext ms-2">Work Orders</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+        <li class="pc-item {{ request()->routeIs('manufacturing.job_pool.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.job_pool.index') }}" class="pc-link">
+                <span class="pc-mtext">Job Pool</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('manufacturing.job_planning.*') ? 'active' : '' }}">
+            <a href="{{ route('manufacturing.job_planning.index') }}" class="pc-link">
+                <span class="pc-mtext">Job Planning</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('manufacturing.tempered.*') ? 'active' : '' }}">
+            <a href="" class="pc-link">
+                <span class="pc-mtext">Tempered</span>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+
+<!-- Manufacturing Menu -->
+<li class="pc-item pc-hasmenu {{ request()->routeIs('production.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-code-fork"></i></span>
+        <span class="pc-mtext ms-2">Production</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Dashboard</span>
+                <span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('manufacturing.machines.index') }}">Machines</a></li>
+                <li><a class="pc-link" href="{{ route('pages.index') }}">Stations</a></li>
+                <li><a class="pc-link" href="{{ route('FAQ.index') }}">FAQ</a></li>
+            </ul>
+        </li>
+    </ul>
+</li>
+
+<li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-worm"></i></span>
+        <span class="pc-mtext ms-2">Reports</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
+
+    <ul class="pc-submenu">
+        <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.customers.index') }}" class="pc-link">
+                <span class="pc-mtext">Machines</span>
+            </a>
+        </li>
+        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
+            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
+                <span class="pc-mtext">Stations</span>
+            </a>
+        </li>
+    </ul>
+</li>
+
+@endif
+
+
+
+
+
+
+
+
+
+
 <li class="pc-item pc-caption d-flex justify-content-between align-items-center">
     <div>
         <label>{{ __('Admin Views') }}</label>
@@ -1001,153 +1162,6 @@
 @endif
 
 
-@if (Gate::check('manage manufacturing'))
-<!-- Manufacturing Section Label -->
-<li class="pc-item pc-caption d-flex justify-content-between align-items-center">
-    <div>
-        <label>{{ __('Manufacturing') }}</label>
-        <i class="ti ti-chart-arcs"></i>
-    </div>
-    <i class="ti ti-plus text-muted pe-2" style="font-size: 0.9rem;"></i>
-</li>
-
-<!-- Manufacturing -->
- <li class="pc-item {{ in_array($routeName, ['manufacturing.dashboard']) ? 'active' : '' }}">
-                            <a href="{{ route('manufacturing.dashboard') }}" class="pc-link">
-                                <span class="pc-micon"><i class="fa-solid fa-grip"></i></span>
-                                <span class="pc-mtext">{{ __('Dashboard') }}</span>
-                            </a>
-                        </li>
-
-<!-- <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
-    <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="fa-solid fa-grip"></i></span>
-        <span class="pc-mtext ms-2">Terminals</span>
-        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
-    </a>
-
-    <ul class="pc-submenu">
-        <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
-            <a href="" class="pc-link">
-                <span class="pc-mtext">Dashboard</span>
-            </a>
-        </li>
-        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
-            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
-                <span class="pc-mtext">Screen Cutting</span>
-            </a>
-        </li>
-        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
-            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
-                <span class="pc-mtext">Window Cutting</span>
-            </a>
-        </li>
-    </ul>
-</li>-->
-<li class="pc-item pc-hasmenu {{ request()->routeIs('manufacturing.machines.*') || request()->routeIs('manufacturing.stations.*') || request()->routeIs('manufacturing.capacity.*') ? 'active pc-trigger' : '' }}">
-    <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="fa-solid fa-wrench"></i></span>
-        <span class="pc-mtext ms-2">Equipment</span>
-        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
-    </a>
-
-    <ul class="pc-submenu">
-        <li class="pc-item {{ request()->routeIs('manufacturing.capacity.*') ? 'active' : '' }}">
-            <a href="{{ route('manufacturing.capacity.index') }}" class="pc-link">
-                <span class="pc-mtext">Capacity</span>
-            </a>
-        </li>
-        <li class="pc-item {{ request()->routeIs('manufacturing.machines.*') ? 'active' : '' }}">
-            <a href="{{ route('manufacturing.machines.index') }}" class="pc-link">
-                <span class="pc-mtext">Machines</span>
-            </a>
-        </li>
-        <li class="pc-item {{ request()->routeIs('manufacturing.stations.*') ? 'active' : '' }}">
-            <a href="{{ route('manufacturing.stations.index') }}" class="pc-link">
-                <span class="pc-mtext">Stations</span>
-            </a>
-        </li>
-        <li class="pc-item {{ request()->routeIs('manufacturing.lines.*') ? 'active' : '' }}">
-            <a href="{{ route('manufacturing.lines.index') }}" class="pc-link">
-                <span class="pc-mtext">Lines</span>
-            </a>
-        </li>
-    </ul>
-</li>
-
-<li class="pc-item pc-hasmenu {{ request()->routeIs('manufacturing.job_planning.*') || request()->routeIs('manufacturing.tempered.*') ? 'active pc-trigger' : '' }}">
-    <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="fa-solid fa-check-to-slot"></i></span>
-        <span class="pc-mtext ms-2">Work Orders</span>
-        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
-    </a>
-
-    <ul class="pc-submenu">
-        <li class="pc-item {{ request()->routeIs('manufacturing.job_pool.*') ? 'active' : '' }}">
-            <a href="{{ route('manufacturing.job_pool.index') }}" class="pc-link">
-                <span class="pc-mtext">Job Pool</span>
-            </a>
-        </li>
-        <li class="pc-item {{ request()->routeIs('manufacturing.job_planning.*') ? 'active' : '' }}">
-            <a href="{{ route('manufacturing.job_planning.index') }}" class="pc-link">
-                <span class="pc-mtext">Job Planning</span>
-            </a>
-        </li>
-        <li class="pc-item {{ request()->routeIs('manufacturing.tempered.*') ? 'active' : '' }}">
-            <a href="" class="pc-link">
-                <span class="pc-mtext">Tempered</span>
-            </a>
-        </li>
-    </ul>
-</li>
-
-
-
-<!-- Manufacturing Menu -->
-<li class="pc-item pc-hasmenu {{ request()->routeIs('production.*') ? 'active pc-trigger' : '' }}">
-    <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="fa-solid fa-code-fork"></i></span>
-        <span class="pc-mtext ms-2">Production</span>
-        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
-    </a>
-
-    <ul class="pc-submenu">
-        <li class="pc-item pc-hasmenu">
-            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
-                <span>Dashboard</span>
-                <span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>
-            </a>
-            <ul class="pc-submenu" style="display: none;">
-                <li><a class="pc-link" href="{{ route('manufacturing.machines.index') }}">Machines</a></li>
-                <li><a class="pc-link" href="{{ route('pages.index') }}">Stations</a></li>
-                <li><a class="pc-link" href="{{ route('FAQ.index') }}">FAQ</a></li>
-            </ul>
-        </li>
-    </ul>
-</li>
-
-<li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
-    <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="fa-solid fa-worm"></i></span>
-        <span class="pc-mtext ms-2">Reports</span>
-        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
-    </a>
-
-    <ul class="pc-submenu">
-        <li class="pc-item {{ request()->routeIs('master.customers.*') ? 'active' : '' }}">
-            <a href="{{ route('master.customers.index') }}" class="pc-link">
-                <span class="pc-mtext">Machines</span>
-            </a>
-        </li>
-        <li class="pc-item {{ request()->routeIs('master.suppliers.*') ? 'active' : '' }}">
-            <a href="{{ route('master.suppliers.index') }}" class="pc-link">
-                <span class="pc-mtext">Stations</span>
-            </a>
-        </li>
-    </ul>
-</li>
-
-@endif
 
 
 <!-- Settings Section -->
