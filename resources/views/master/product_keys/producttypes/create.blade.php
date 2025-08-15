@@ -9,9 +9,17 @@
             <input type="text" name="product_type" class="form-control" required>
         </div>
         <div class="form-group mb-3">
-            <label for="description">Series</label>
-            <input type="text" name="description" class="form-control" required>
-        </div>
+  <label for="series">Series</label>
+  <select name="series" id="series" class="form-control" required>
+    <option value="" disabled {{ old('series', $row->series ?? '')==='' ? 'selected' : '' }}>Select series…</option>
+    <option value="DYNAMIC"  {{ old('series', $row->series ?? '')==='DYNAMIC'  ? 'selected' : '' }}>DYNAMIC</option>
+    <option value="PRESTIGE" {{ old('series', $row->series ?? '')==='PRESTIGE' ? 'selected' : '' }}>PRESTIGE</option>
+    <option value="VIP"      {{ old('series', $row->series ?? '')==='VIP'      ? 'selected' : '' }}>VIP</option>
+    <option value="OBSIDIAN" {{ old('series', $row->series ?? '')==='OBSIDIAN' ? 'selected' : '' }}>OBSIDIAN</option>
+  </select>
+  @error('series') <div class="text-danger small">{{ $message }}</div> @enderror
+</div>
+
         <div class="form-group mb-3">
             <label for="description">Description</label>
             <input type="text" name="description" class="form-control" required>
