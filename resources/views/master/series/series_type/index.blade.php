@@ -5,7 +5,7 @@
 @section('breadcrumb')
   <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
   <li class="breadcrumb-item">{{ __('Master') }}</li>
-  <li class="breadcrumb-item active" aria-current="page">{{ __('Series Types') }}</li>
+  <li class="breadcrumb-item active" aria-current="page">{{ __('Series Configurations') }}</li>
 @endsection
 
 @section('content')
@@ -20,7 +20,7 @@
       <div class="list-group list-group-flush">
         <a href="{{ route('master.series-type.index') }}"
            class="list-group-item active">
-          {{ __('All Configurations') }}
+          {{ __('All Series Configurations') }}
         </a>
       </div>
     </div>
