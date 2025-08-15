@@ -16,10 +16,10 @@ class ProducttypeController extends Controller
     }
 
     public function create()
-    {
-        $series = Series::orderBy('series')->get(); // <-- pass series list
-        return view('master.product_keys.producttypes.create', compact('series'));
-    }
+{
+    $series = Series::orderBy('series')->get();
+    return view('master.product_keys.producttypes.create', compact('series'));
+}
 
     public function store(Request $request)
     {
