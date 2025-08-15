@@ -16,7 +16,6 @@ class SeriesConfigurationController extends Controller
         $productTypes = ProductType::orderBy('product_type')->get();
 
         return view('master.series.series_configuration.index', compact('seriesTypes', 'productTypes'));
-        // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ underscore folder
     }
 
     public function create()
