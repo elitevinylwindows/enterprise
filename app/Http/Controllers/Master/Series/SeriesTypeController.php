@@ -83,22 +83,28 @@ class SeriesTypeController extends Controller
 
 
 
+
 public function configsBySeries(Series $series)
 {
-    // Get Product Types that belong to this series (by name string)
+    // Get ProductType IDs for this series (matches column "series" in producttypes table)
     $ptIds = ProductType::where('series', $series->series)->pluck('id');
 
-    // Find configurations attached (via pivot) to any of those product types
-    $configs = SeriesConfiguration::whereHas('productTypes', function ($q) use ($ptIds) {
-            $q->whereIn('elitevw_master_product_types.id', $ptIds);
+    // Return configs that are linked to any of those PTs either:
+    //  a) directly via configs.product_type_id, or
+    //  b) via the pivot table.
+    $configs = SeriesConfiguration::query()
+        ->whereIn('product_type_id', $ptIds) // direct FK
+        ->orWhereHas('productTypes', function ($q) use ($ptIds) {
+            $q->whereIn('elitevw_master_productkeys_producttypes.id', $ptIds);
         })
         ->orderBy('series_type')
-        ->get(['id', 'series_type']);
+        ->get(['id','series_type']);
 
     return response()->json([
         'success' => true,
-        'data'    => $configs->map(fn ($c) => ['id' => $c->id, 'label' => $c->series_type]),
+        'data' => $configs->map(fn ($c) => ['id' => $c->id, 'label' => $c->series_type]),
     ]);
 }
+
 
 }
