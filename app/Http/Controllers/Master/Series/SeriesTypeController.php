@@ -32,18 +32,51 @@ class SeriesTypeController extends Controller
         return view('master.series.series_type.create', compact('series'));
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'series_id'   => ['required','integer','exists:'.(new Series)->getTable().',id'],
-            'series_type' => ['required','string','max:255'],
-        ]);
+    // App\Http\Controllers\Master\Series\SeriesTypeController.php
 
-        SeriesType::create($validated);
+public function store(Request $request)
+{
+    $seriesTable = (new \App\Models\Master\Series\Series)->getTable();
+    $cfgTable    = (new \App\Models\Master\Series\SeriesConfiguration)->getTable();
 
-        return redirect()->route('master.series-type.index')
-            ->with('success', 'Series Type created.');
+    $validated = $request->validate([
+        'series_id'           => ['required','integer',"exists:{$seriesTable},id"],
+        'config_ids'          => ['nullable','array'],
+        'config_ids.*'        => ['integer',"exists:{$cfgTable},id"],
+        'series_type_custom'  => ['nullable','string','max:255'],
+    ]);
+
+    $labels = collect();
+
+    // From selected configs
+    if (!empty($validated['config_ids'])) {
+        $cfgs = \App\Models\Master\Series\SeriesConfiguration::whereIn('id', $validated['config_ids'])->pluck('series_type');
+        $labels = $labels->merge($cfgs);
     }
+
+    // Optional custom
+    if (!empty($validated['series_type_custom'])) {
+        $labels->push(trim($validated['series_type_custom']));
+    }
+
+    $labels = $labels
+        ->filter(fn($v) => $v !== null && $v !== '')
+        ->map(fn($v) => trim($v))
+        ->unique();
+
+    $created = 0;
+    foreach ($labels as $label) {
+        $row = \App\Models\Master\Series\SeriesType::firstOrCreate(
+            ['series_id' => $validated['series_id'], 'series_type' => $label]
+        );
+        if ($row->wasRecentlyCreated) $created++;
+    }
+
+    return redirect()
+        ->route('master.series-type.index')
+        ->with('success', $created ? __(':n series type(s) created.', ['n' => $created]) : __('Nothing to create.'));
+}
+
 
     public function edit($id)
     {

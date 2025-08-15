@@ -40,10 +40,25 @@
            style="max-height: 260px; overflow: auto;">
         <div class="text-muted small py-2">{{ __('Select a series to load configurations…') }}</div>
       </div>
-
       @error('config_ids') <div class="text-danger small">{{ $message }}</div> @enderror
       @error('config_ids.*') <div class="text-danger small">{{ $message }}</div> @enderror
-      <div class="form-text">{{ __('Check one or more configurations to create Series Types in bulk.') }}</div>
+      <div class="form-text">{{ __('Tick one or more configurations.') }}</div>
+    </div>
+
+    {{-- Selected preview (read-only) --}}
+    <div class="mb-3">
+      <label class="form-label mb-1">{{ __('Selected Series Types') }}</label>
+      <div id="selectedChips" class="d-flex flex-wrap gap-1"></div>
+    </div>
+
+    {{-- Optional custom series type --}}
+    <div class="mb-1">
+      <label class="form-label" for="series_type_custom">{{ __('Custom Series Type (optional)') }}</label>
+      <input type="text" name="series_type_custom" id="series_type_custom"
+             class="form-control @error('series_type_custom') is-invalid @enderror"
+             placeholder="e.g., XO, PW6-32">
+      @error('series_type_custom') <div class="invalid-feedback">{{ $message }}</div> @enderror
+      <div class="form-text">{{ __('If entered, this will also be created for the selected series.') }}</div>
     </div>
 
   </div>
@@ -61,20 +76,35 @@
   const searchInput = document.getElementById('cfgSearchCreate');
   const btnAll      = document.getElementById('cfgSelectAll');
   const btnClear    = document.getElementById('cfgClearAll');
+  const chips       = document.getElementById('selectedChips');
+
+  function rebuildChips(){
+    const rows = listBox.querySelectorAll('.config-row .cfg-check:checked');
+    const names = Array.from(rows).map(chk => chk.getAttribute('data-label'));
+    chips.innerHTML = names.length
+      ? names.map(n => `<span class="badge bg-primary-subtle text-primary border">${n}</span>`).join(' ')
+      : `<span class="text-muted small">{{ __('None selected') }}</span>`;
+  }
 
   function render(items){
     if(!items || !items.length){
       listBox.innerHTML = '<div class="text-muted small py-2">{{ __('No configurations found for this series.') }}</div>';
+      rebuildChips();
       return;
     }
     const html = items.map(it => `
       <label class="d-flex align-items-center gap-2 py-1 px-1 bg-white rounded mb-1 config-row"
              style="cursor:pointer;border:1px solid rgba(0,0,0,.06)">
-        <input type="checkbox" class="cfg-check" name="config_ids[]" value="${it.id}">
+        <input type="checkbox" class="cfg-check" name="config_ids[]" value="${it.id}" data-label="${it.label}">
         <span class="small"><strong>${it.label}</strong></span>
       </label>
     `).join('');
     listBox.innerHTML = html;
+
+    listBox.querySelectorAll('.cfg-check').forEach(chk => {
+      chk.addEventListener('change', rebuildChips);
+    });
+    rebuildChips();
   }
 
   function enableSearch(){
@@ -92,9 +122,12 @@
     listBox.querySelectorAll('.config-row .cfg-check').forEach(chk => {
       if (chk.closest('.config-row').style.display !== 'none') chk.checked = true;
     });
+    rebuildChips();
   });
+
   btnClear.addEventListener('click', () => {
     listBox.querySelectorAll('.cfg-check').forEach(chk => chk.checked = false);
+    rebuildChips();
   });
 
   seriesSel?.addEventListener('change', () => {
