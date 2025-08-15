@@ -11,9 +11,18 @@
             <input type="text" name="product_type" class="form-control" value="{{ $productType->product_type }}" required>
         </div>
         <div class="form-group mb-3">
-            <label>Series</label>
-            <input type="text" name="description" class="form-control" value="{{ $productType->description }}" required>
-        </div>
+  <label for="series">Series</label>
+  <select name="series" id="series" class="form-control" required>
+    @php($current = old('series', $model->series ?? ''))
+    <option value="" disabled {{ $current==='' ? 'selected' : '' }}>Select series…</option>
+    <option value="DYNAMIC"  {{ $current==='DYNAMIC'  ? 'selected' : '' }}>DYNAMIC</option>
+    <option value="PRESTIGE" {{ $current==='PRESTIGE' ? 'selected' : '' }}>PRESTIGE</option>
+    <option value="VIP"      {{ $current==='VIP'      ? 'selected' : '' }}>VIP</option>
+    <option value="OBSIDIAN" {{ $current==='OBSIDIAN' ? 'selected' : '' }}>OBSIDIAN</option>
+  </select>
+  @error('series') <div class="text-danger small">{{ $message }}</div> @enderror
+</div>
+
         <div class="form-group mb-3">
             <label>Description</label>
             <input type="text" name="description" class="form-control" value="{{ $productType->description }}" required>
