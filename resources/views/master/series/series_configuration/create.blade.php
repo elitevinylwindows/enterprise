@@ -1,25 +1,26 @@
 <form action="{{ route('master.series-configuration.store') }}" method="POST">
   @csrf
+  <div class="modal-header">
+    <h5 class="modal-title">{{ __('Add Series Type') }}</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
 
   <div class="modal-body">
-    {{-- Series Type (single) --}}
     <div class="mb-3">
-      <label class="form-label" for="series_type">{{ __('Series Type') }}</label>
-      <input type="text" name="series_type" id="series_type"
-             class="form-control @error('series_type') is-invalid @enderror"
-             value="{{ old('series_type') }}" placeholder="e.g., XO, PW6-32" required>
+      <label class="form-label">{{ __('Series Type') }}</label>
+      <input type="text" name="series_type" class="form-control @error('series_type') is-invalid @enderror"
+             placeholder="e.g., XO, PW6-32" value="{{ old('series_type') }}" required>
       @error('series_type') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 
-    {{-- Product Types (searchable multi-checkbox list) --}}
     <div class="mb-2">
       <label class="form-label">{{ __('Product Types') }}</label>
       <input type="text" class="form-control form-control-sm mb-2" id="ptSearchCreate"
              placeholder="{{ __('Search product types…') }}">
-      <div id="ptListCreate" class="border rounded p-2" style="max-height: 220px; overflow: auto;">
+      <div id="ptListCreate" class="border rounded p-2" style="max-height:220px;overflow:auto;">
         @php($oldPT = collect(old('product_type_ids', []))->map('strval')->all())
         @foreach($productTypes as $pt)
-          @php($id = (string)$pt->id)
+          @php($id = (string) $pt->id)
           <label class="d-flex align-items-center gap-2 py-1 product-type-item">
             <input type="checkbox" name="product_type_ids[]" value="{{ $pt->id }}"
                    {{ in_array($id, $oldPT) ? 'checked' : '' }}>
