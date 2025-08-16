@@ -13,15 +13,16 @@ class SeriesConfiguration extends Model
     protected $fillable = ['series_type', 'category', 'image', 'product_type_id'];
 
     // many-to-many via pivot
-    public function productTypes()
-    {
-        return $this->belongsToMany(
-            ProductType::class,
-            'elitevw_master_series_configuration_product_type',
-            'series_type_id',
-            'product_type_id'
-        )->withTimestamps();
-    }
+   public function productTypes()
+{
+    return $this->belongsToMany(
+        \App\Models\Master\ProductKeys\ProductType::class,
+        'elitevw_master_series_configuration_product_type', // pivot table
+        'series_configuration_id',                          // this model's FK
+        'product_type_id'                                   // related model's FK
+    )->withTimestamps();
+}
+
 
     // optional direct FK
     public function productType()
