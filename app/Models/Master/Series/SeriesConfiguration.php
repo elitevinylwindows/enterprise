@@ -17,7 +17,7 @@ class SeriesConfiguration extends Model
     {
         return $this->belongsToMany(
             ProductType::class,
-            'elitevw_master_series_type_product_type',
+            'elitevw_master_series_configuration_product_type',
             'series_type_id',
             'product_type_id'
         )->withTimestamps();
