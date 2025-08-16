@@ -11,76 +11,69 @@ class SeriesConfigurationController extends Controller
 {
     public function index()
     {
-        $seriesTypes  = SeriesConfiguration::with('productTypes')->latest()->get();
+        $seriesTypes  = SeriesType::with(['productTypes'])->latest()->get();
         $productTypes = ProductType::orderBy('product_type')->get();
 
         return view('master.series.series_configuration.index', compact('seriesTypes', 'productTypes'));
-        // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ underscore folder
     }
 
     public function create()
     {
+        $series       = Series::orderBy('series')->get();
         $productTypes = ProductType::orderBy('product_type')->get();
 
-        // Return a PARTIAL (no @extends) because customModal will inject it
-        return view('master.series.series_configuration.create', compact('productTypes'));
+        return view('master.series.series-configuration.create', compact('series', 'productTypes'));
     }
 
     public function store(Request $request)
-{
-    $ptTable = (new ProductType)->getTable(); // <- resolves actual table name
+    {
+        $validated = $request->validate([
+            'series_type'         => ['required','string','max:255'],
+            'product_type_ids'    => ['required','array','min:1'],
+            'product_type_ids.*'  => ['integer','exists: elitevw_master_productkeys_producttypes,id'],
+        ]);
 
-    $validated = $request->validate([
-        'series_type'         => ['required','string','max:255'],
-        'product_type_ids'    => ['required','array','min:1'],
-        'product_type_ids.*'  => ['integer', 'exists:'.$ptTable.',id'],
-    ]);
+        $st = SeriesType::create([
+            'series_type' => $validated['series_type'],
+        ]);
 
-    $sc = SeriesConfiguration::create([
-        'series_type' => $validated['series_type'],
-    ]);
+        $st->productTypes()->sync($validated['product_type_ids']);
 
-    $sc->productTypes()->sync($validated['product_type_ids']);
-
-    return redirect()->route('master.series-configuration.index')
-        ->with('success', 'Series Type created.');
-}
-
-public function update(Request $request, $id)
-{
-    $ptTable = (new ProductType)->getTable();
-
-    $validated = $request->validate([
-        'series_type'         => ['required','string','max:255'],
-        'product_type_ids'    => ['required','array','min:1'],
-        'product_type_ids.*'  => ['integer', 'exists:'.$ptTable.',id'],
-    ]);
-
-    $sc = SeriesConfiguration::findOrFail($id);
-    $sc->update(['series_type' => $validated['series_type']]);
-    $sc->productTypes()->sync($validated['product_type_ids']);
-
-    return redirect()->route('master.series-configuration.index')
-        ->with('success', 'Series Type updated.');
-}
+        return redirect()->route('master.series-configuration.index')->with('success', 'Series Type created.');
+    }
 
     public function edit($id)
     {
-        $seriesType   = SeriesConfiguration::with('productTypes')->findOrFail($id);
+        $seriesType   = SeriesType::with('productTypes')->findOrFail($id);
         $productTypes = ProductType::orderBy('product_type')->get();
 
-        // Partial too
         return view('master.series.series_configuration.edit', compact('seriesType', 'productTypes'));
     }
 
-    
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'series_type'         => ['required','string','max:255'],
+            'product_type_ids'    => ['required','array','min:1'],
+            'product_type_ids.*'  => ['integer','exists: elitevw_master_productkeys_producttypes,id'],
+        ]);
+
+        $st = SeriesType::findOrFail($id);
+        $st->update([
+            'series_id'   => $validated['series_id'],
+            'series_type' => $validated['series_type'],
+        ]);
+
+        $st->productTypes()->sync($validated['product_type_ids']);
+
+        return redirect()->route('master.series-configuration.index')->with('success', 'Series Type updated.');
+    }
 
     public function destroy($id)
     {
-        $sc = SeriesConfiguration::findOrFail($id);
-        $sc->delete();
+        $seriesType = SeriesType::findOrFail($id);
+        $seriesType->delete();
 
-        return redirect()->route('master.series-configuration.index')
-            ->with('success', 'Series Type deleted.');
+        return redirect()->route('master.series-configuration.index')->with('success', 'Series Type deleted.');
     }
 }
