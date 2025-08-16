@@ -107,25 +107,36 @@ public function store(Request $request)
             ->with('success', 'Series Type deleted.');
     }
 
- 
+    /**
+     * JSON for the modal “Available Configurations for this Series”.
+     * Assumes SeriesConfiguration has a `series_id` and `series_type` column.
+     */
+    // app/Http/Controllers/Master/Series/SeriesTypeController.php
+
+
 
 
 public function configsBySeries(Series $series)
 {
-    // product type IDs for this series (name string)
-    $ptIds = \App\Models\Master\ProductKeys\ProductType::where('series', $series->series)->pluck('id');
+    // Get ProductType IDs for this series (matches column "series" in producttypes table)
+    $ptIds = ProductType::where('series', $series->series)->pluck('id');
 
-    // configurations linked via the direct foreign key
-    $configs = \App\Models\Master\Series\SeriesConfiguration::whereIn('product_type_id', $ptIds)
+    // Return configs that are linked to any of those PTs either:
+    //  a) directly via configs.product_type_id, or
+    //  b) via the pivot table.
+    $configs = SeriesConfiguration::query()
+        ->whereIn('product_type_id', $ptIds) // direct FK
+        ->orWhereHas('productTypes', function ($q) use ($ptIds) {
+            $q->whereIn('elitevw_master_productkeys_producttypes.id', $ptIds);
+        })
         ->orderBy('series_type')
         ->get(['id','series_type']);
 
     return response()->json([
         'success' => true,
-        'data'    => $configs->map(fn ($c) => ['id' => $c->id, 'label' => $c->series_type]),
+        'data' => $configs->map(fn ($c) => ['id' => $c->id, 'label' => $c->series_type]),
     ]);
 }
-
 
 
 }
