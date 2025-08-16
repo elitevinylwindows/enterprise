@@ -32,7 +32,7 @@ class SeriesConfigurationController extends Controller
             'series_type'         => ['required','string','max:255'],
             'product_type_ids'    => ['required','array','min:1'],
             // remove stray space after ":" and point to your actual table:
-            'product_type_ids.*'  => ['integer','exists:elitevw_master_product_types,id'],
+            'product_type_ids.*'  => ['integer','exists:elitevw_master_productkeys_producttypes,id'],
         ]);
 
         $sc = SeriesConfiguration::create([
@@ -59,7 +59,7 @@ class SeriesConfigurationController extends Controller
         $validated = $request->validate([
             'series_type'         => ['required','string','max:255'],
             'product_type_ids'    => ['required','array','min:1'],
-            'product_type_ids.*'  => ['integer','exists:elitevw_master_product_types,id'],
+            'product_type_ids.*'  => ['integer','exists:elitevw_master_productkeys_producttypes,id'],
         ]);
 
         $sc = SeriesConfiguration::findOrFail($id);
