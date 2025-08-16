@@ -117,15 +117,18 @@ public function store(Request $request)
 
 
 
-public function configsBySeries(\App\Models\Master\Series\Series $series)
+public function configsBySeries(Series $series)
 {
-    $ptTable = (new \App\Models\Master\ProductKeys\ProductType)->getTable(); // elitevw_master_productkeys_producttypes
-    $ptIds   = \App\Models\Master\ProductKeys\ProductType::where('series', $series->series)->pluck('id');
+    // Get ProductType IDs for this series (matches column "series" in producttypes table)
+    $ptIds = ProductType::where('series', $series->series)->pluck('id');
 
-    $configs = \App\Models\Master\Series\SeriesConfiguration::query()
-        ->whereIn('product_type_id', $ptIds) // direct FK on configurations table (if you use it)
-        ->orWhereHas('productTypes', function ($q) use ($ptIds, $ptTable) {
-            $q->whereIn("$ptTable.id", $ptIds);
+    // Return configs that are linked to any of those PTs either:
+    //  a) directly via configs.product_type_id, or
+    //  b) via the pivot table.
+    $configs = SeriesConfiguration::query()
+        ->whereIn('product_type_id', $ptIds) // direct FK
+        ->orWhereHas('productTypes', function ($q) use ($ptIds) {
+            $q->whereIn('elitevw_master_productkeys_producttypes.id', $ptIds);
         })
         ->orderBy('series_type')
         ->get(['id','series_type']);
@@ -135,7 +138,6 @@ public function configsBySeries(\App\Models\Master\Series\Series $series)
         'data' => $configs->map(fn ($c) => ['id' => $c->id, 'label' => $c->series_type]),
     ]);
 }
-
 
 
 }
