@@ -1,9 +1,6 @@
 <form action="{{ route('master.series-type.store') }}" method="POST">
   @csrf
 
-  <div class="modal-header">
-    <h5 class="modal-title">{{ __('Add Series Types') }}</h5>
-  </div>
 
   <div class="modal-body">
 
