@@ -11,18 +11,19 @@ use App\Models\Master\ProductKeys\ProductType;
 
 class SeriesTypeController extends Controller
 {
-    public function index()
-{
-    $seriesTypes = \App\Models\Master\Series\SeriesType::with('series')
-        ->orderByDesc('id')
-        ->get();
+    public function index(Request $request)
+    {
+        $q = SeriesType::with('series')->latest();
 
-    // If you show filters on the left:
-    $series = \App\Models\Master\Series\Series::orderBy('series')->get();
+        if ($request->filled('series_id')) {
+            $q->where('series_id', $request->integer('series_id'));
+        }
 
-    return view('master.series.series_type.index', compact('seriesTypes','series'));
-}
+        $seriesTypes = $q->get();
+        $series      = Series::orderBy('series')->get();   // <- needed for the left filter list
 
+        return view('master.series.series_type.index', compact('seriesTypes', 'series'));
+    }
 
     public function create()
     {
@@ -116,18 +117,15 @@ public function store(Request $request)
 
 
 
-public function configsBySeries(Series $series)
+public function configsBySeries(\App\Models\Master\Series\Series $series)
 {
-    // Get ProductType IDs for this series (matches column "series" in producttypes table)
-    $ptIds = ProductType::where('series', $series->series)->pluck('id');
+    $ptTable = (new \App\Models\Master\ProductKeys\ProductType)->getTable(); // elitevw_master_productkeys_producttypes
+    $ptIds   = \App\Models\Master\ProductKeys\ProductType::where('series', $series->series)->pluck('id');
 
-    // Return configs that are linked to any of those PTs either:
-    //  a) directly via configs.product_type_id, or
-    //  b) via the pivot table.
-    $configs = SeriesConfiguration::query()
-        ->whereIn('product_type_id', $ptIds) // direct FK
-        ->orWhereHas('productTypes', function ($q) use ($ptIds) {
-            $q->whereIn('elitevw_master_productkeys_producttypes.id', $ptIds);
+    $configs = \App\Models\Master\Series\SeriesConfiguration::query()
+        ->whereIn('product_type_id', $ptIds) // direct FK on configurations table (if you use it)
+        ->orWhereHas('productTypes', function ($q) use ($ptIds, $ptTable) {
+            $q->whereIn("$ptTable.id", $ptIds);
         })
         ->orderBy('series_type')
         ->get(['id','series_type']);
@@ -137,6 +135,7 @@ public function configsBySeries(Series $series)
         'data' => $configs->map(fn ($c) => ['id' => $c->id, 'label' => $c->series_type]),
     ]);
 }
+
 
 
 }
