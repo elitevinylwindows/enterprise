@@ -1,12 +1,11 @@
-{{-- resources/views/master/series/series_type/index.blade.php --}}
 @extends('layouts.app')
 
-@section('page-title', __('Series Types'))
+@section('page-title', __('Configurations - PT'))
 
 @section('breadcrumb')
   <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
   <li class="breadcrumb-item">{{ __('Master') }}</li>
-  <li class="breadcrumb-item active" aria-current="page">{{ __('Series Types') }}</li>
+  <li class="breadcrumb-item active" aria-current="page">{{ __('Configurations - PT') }}</li>
 @endsection
 
 @section('content')
@@ -14,30 +13,15 @@
 <div class="mb-4"></div>
 <div class="mb-4"></div>
 
-@php
-  // for highlighting the active filter in the left menu
-  $activeSeriesId = request('series_id');
-@endphp
-
 <div class="row">
-  {{-- Taskbar Card --}}
+  {{-- Taskbar --}}
   <div class="col-md-2">
     <div class="card">
       <div class="list-group list-group-flush">
         <a href="{{ route('master.series-type.index') }}"
-           class="list-group-item {{ $activeSeriesId ? '' : 'active' }}">
-          {{ __('All Series Types') }}
+           class="list-group-item active">
+          {{ __('All Configurations') }}
         </a>
-
-        {{-- Optional: list each Series as a filter (only if $series is provided) --}}
-        @isset($series)
-          @foreach($series as $s)
-            <a href="{{ route('master.series-type.index', ['series_id' => $s->id]) }}"
-               class="list-group-item {{ (string)$activeSeriesId === (string)$s->id ? 'active' : '' }}">
-              {{ $s->series }}
-            </a>
-          @endforeach
-        @endisset
       </div>
     </div>
   </div>
@@ -46,13 +30,13 @@
     <div class="card table-card">
       <div class="card-header">
         <div class="row align-items-center g-2">
-          <div class="col"><h5>{{ __('Series Types') }}</h5></div>
+          <div class="col"><h5>{{ __('Configurations - Product Type') }}</h5></div>
           <div class="col-auto">
             <a href="#"
                class="btn btn-primary customModal"
                data-size="lg"
                data-title="{{ __('Add Series Type') }}"
-               data-url="{{ route('master.series-type.create') }}">
+               data-url="{{ route('master.series-configuration.create') }}">
               <i class="fa-solid fa-circle-plus"></i> {{ __('Create') }}
             </a>
           </div>
@@ -65,34 +49,36 @@
             <thead>
               <tr>
                 <th>{{ __('ID') }}</th>
-                <th>{{ __('Series') }}</th>
                 <th>{{ __('Series Type') }}</th>
-                <th class="text-end">{{ __('Actions') }}</th>
+                <th>{{ __('Product Types') }}</th>
+                <th>{{ __('Actions') }}</th>
               </tr>
             </thead>
             <tbody>
               @foreach($seriesTypes as $st)
                 <tr>
                   <td>{{ $st->id }}</td>
-                  <td>{{ $st->series->series ?? '-' }}</td>
+                  <td><span class="badge bg-primary">{{ $st->series_type }}</span></td>
                   <td>
-                    <span class="badge bg-primary">{{ $st->series_type }}</span>
+                    @forelse($st->productTypes as $pt)
+                      <span class="badge bg-secondary me-1 mb-1">{{ $pt->product_type ?? $pt->name }}</span>
+                    @empty
+                      <span class="text-muted">-</span>
+                    @endforelse
                   </td>
-                  <td class="text-end">
+                  <td>
                     <a href="#"
-                       class="btn btn-sm btn-info customModal me-1"
+                       class="btn btn-sm btn-info customModal"
                        data-size="lg"
                        data-title="{{ __('Edit Series Type') }}"
-                       data-url="{{ route('master.series-type.edit', $st->id) }}">
+                       data-url="{{ route('master.series-configuration.edit', $st->id) }}">
                       <i data-feather="edit"></i>
                     </a>
 
-                    <form action="{{ route('master.series-type.destroy', $st->id) }}"
-                          method="POST" class="d-inline">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit"
-                              class="btn btn-sm btn-danger"
+                    <form action="{{ route('master.series-configuration.destroy', $st->id) }}"
+                          method="POST" style="display:inline-block;">
+                      @csrf @method('DELETE')
+                      <button type="submit" class="btn btn-sm btn-danger"
                               onclick="return confirm('{{ __('Are you sure?') }}')">
                         <i data-feather="trash-2"></i>
                       </button>

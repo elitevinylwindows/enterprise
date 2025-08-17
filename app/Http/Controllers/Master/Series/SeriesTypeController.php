@@ -6,75 +6,138 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Master\Series\Series;
 use App\Models\Master\Series\SeriesType;
+use App\Models\Master\Series\SeriesConfiguration;
 use App\Models\Master\ProductKeys\ProductType;
 
 class SeriesTypeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $seriesTypes = SeriesType::with(['series', 'productType'])->get();
-        $series = Series::all();
-        $productTypes = ProductType::all();
+        $q = SeriesType::with('series')->latest();
 
-        return view('master.series.series_type.index', compact('seriesTypes', 'series', 'productTypes'));
+        if ($request->filled('series_id')) {
+            $q->where('series_id', $request->integer('series_id'));
+        }
+
+        $seriesTypes = $q->get();
+        $series      = Series::orderBy('series')->get();   // <- needed for the left filter list
+
+        return view('master.series.series_type.index', compact('seriesTypes', 'series'));
     }
 
     public function create()
     {
-        $series = Series::all();
-        $productTypes = ProductType::all();
-        return view('master.series.series_type.create', compact('series', 'productTypes'));
+        $series = Series::orderBy('series')->get();
+        // return PARTIAL (no @extends) for customModal
+        return view('master.series.series_type.create', compact('series'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'series_id' => 'required|exists:elitevw_master_series,id',
-            'product_type_id' => 'required|exists:elitevw_master_product_types,id',
-            'series_type' => 'required|string|max:255',
-        ]);
+    // App\Http\Controllers\Master\Series\SeriesTypeController.php
 
-        SeriesType::create([
-            'series_id' => $request->series_id,
-            'product_type_id' => $request->product_type_id,
-            'series_type' => $request->series_type,
-        ]);
+public function store(Request $request)
+{
+    $seriesTable = (new \App\Models\Master\Series\Series)->getTable();
+    $cfgTable    = (new \App\Models\Master\Series\SeriesConfiguration)->getTable();
 
-        return redirect()->back()->with('success', 'Series Type saved.');
+    $validated = $request->validate([
+        'series_id'           => ['required','integer',"exists:{$seriesTable},id"],
+        'config_ids'          => ['nullable','array'],
+        'config_ids.*'        => ['integer',"exists:{$cfgTable},id"],
+        'series_type_custom'  => ['nullable','string','max:255'],
+    ]);
+
+    $labels = collect();
+
+    // From selected configs
+    if (!empty($validated['config_ids'])) {
+        $cfgs = \App\Models\Master\Series\SeriesConfiguration::whereIn('id', $validated['config_ids'])->pluck('series_type');
+        $labels = $labels->merge($cfgs);
     }
+
+    // Optional custom
+    if (!empty($validated['series_type_custom'])) {
+        $labels->push(trim($validated['series_type_custom']));
+    }
+
+    $labels = $labels
+        ->filter(fn($v) => $v !== null && $v !== '')
+        ->map(fn($v) => trim($v))
+        ->unique();
+
+    $created = 0;
+    foreach ($labels as $label) {
+        $row = \App\Models\Master\Series\SeriesType::firstOrCreate(
+            ['series_id' => $validated['series_id'], 'series_type' => $label]
+        );
+        if ($row->wasRecentlyCreated) $created++;
+    }
+
+    return redirect()
+        ->route('master.series-type.index')
+        ->with('success', $created ? __(':n series type(s) created.', ['n' => $created]) : __('Nothing to create.'));
+}
+
 
     public function edit($id)
     {
         $seriesType = SeriesType::findOrFail($id);
-        $series = Series::all();
-        $productTypes = ProductType::all();
-
-        return view('master.series.series_type.edit', compact('seriesType', 'series', 'productTypes'));
+        $series     = Series::orderBy('series')->get();
+        // return PARTIAL (no @extends) for customModal
+        return view('master.series.series_type.edit', compact('seriesType','series'));
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'series_id' => 'required|exists:elitevw_master_series,id',
-            'product_type_id' => 'required|exists:elitevw_master_product_types,id',
-            'series_type' => 'required|string|max:255',
+        $validated = $request->validate([
+            'series_id'   => ['required','integer','exists:'.(new Series)->getTable().',id'],
+            'series_type' => ['required','string','max:255'],
         ]);
 
-        $seriesType = SeriesType::findOrFail($id);
-        $seriesType->update([
-            'series_id' => $request->series_id,
-            'product_type_id' => $request->product_type_id,
-            'series_type' => $request->series_type,
-        ]);
+        $st = SeriesType::findOrFail($id);
+        $st->update($validated);
 
-        return redirect()->route('master.series-type.index')->with('success', 'Series Type updated successfully.');
+        return redirect()->route('master.series-type.index')
+            ->with('success', 'Series Type updated.');
     }
 
     public function destroy($id)
     {
-        $seriesType = SeriesType::findOrFail($id);
-        $seriesType->delete();
+        SeriesType::findOrFail($id)->delete();
 
-        return redirect()->route('master.series-type.index')->with('success', 'Series Type deleted successfully.');
+        return redirect()->route('master.series-type.index')
+            ->with('success', 'Series Type deleted.');
     }
+
+    /**
+     * JSON for the modal “Available Configurations for this Series”.
+     * Assumes SeriesConfiguration has a `series_id` and `series_type` column.
+     */
+    // app/Http/Controllers/Master/Series/SeriesTypeController.php
+
+
+
+
+public function configsBySeries(Series $series)
+{
+    // Get ProductType IDs for this series (matches column "series" in producttypes table)
+    $ptIds = ProductType::where('series', $series->series)->pluck('id');
+
+    // Return configs that are linked to any of those PTs either:
+    //  a) directly via configs.product_type_id, or
+    //  b) via the pivot table.
+    $configs = SeriesConfiguration::query()
+        ->whereIn('product_type_id', $ptIds) // direct FK
+        ->orWhereHas('productTypes', function ($q) use ($ptIds) {
+            $q->whereIn('elitevw_master_productkeys_producttypes.id', $ptIds);
+        })
+        ->orderBy('series_type')
+        ->get(['id','series_type']);
+
+    return response()->json([
+        'success' => true,
+        'data' => $configs->map(fn ($c) => ['id' => $c->id, 'label' => $c->series_type]),
+    ]);
+}
+
+
 }

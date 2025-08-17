@@ -871,7 +871,8 @@
     </a>
     <ul class="pc-submenu" style="display: none;">
         <li><a class="pc-link" href="{{ route('master.series.index') }}">Series</a></li>
-        <li><a class="pc-link" href="{{ route('master.series-type.index') }}">Configuration</a></li>
+        <li><a class="pc-link" href="{{ route('master.series-configuration.index') }}">Configuration</a></li>
+        <li><a class="pc-link" href="{{ route('master.series-type.index') }}">Series Type</a></li>
     </ul>
 </li>
 
