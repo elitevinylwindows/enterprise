@@ -3,6 +3,7 @@
 namespace App\Models\Sales;
 
 use App\Models\Master\Customers\Customer;
+use App\Models\QuoteItemModification;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

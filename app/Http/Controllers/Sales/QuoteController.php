@@ -169,7 +169,9 @@ public function index(Request $request)
                 'custom_lock_position' => 'nullable|boolean',
                 'custom_vent_latch' => 'nullable|boolean',
                 'knocked_down' => 'nullable|boolean',
+                'is_modification' => 'nullable',
             ]);
+
             $isUpdate = false;
             // Check if item already exists
             if (isset($validated['item_id'])) {
@@ -225,7 +227,6 @@ public function index(Request $request)
                 $item = $existingItem;
                 $isUpdate = true;
             } else {
-
                 $item = QuoteItem::create([
                     'quote_id' => $id,
                     'series_id' => $request->series_id,
@@ -265,6 +266,8 @@ public function index(Request $request)
                         $request->custom_lock_position,
                         $request->custom_vent_latch
                     ])->filter()->count(),
+                    'is_modification' => (bool) $request->is_modification,
+                    'modification_date' => (bool) $request->is_modification ? now() : null,
                 ]);
 
                 // Update the quote's discount with the previous value before this item was added/updated
@@ -275,12 +278,22 @@ public function index(Request $request)
                 ]);
             }
 
+            $allModifications = QuoteItem::where('quote_id', $id)
+                ->where('is_modification', true)
+                ->get()
+                ->groupBy(function ($item) {
+                    return \Carbon\Carbon::parse($item->modification_date)->toDateString();
+                });
+
             return response()->json([
                 'success' => true,
+                'is_modification' => $validated['is_modification'] ?? false,
                 'item_id' => $item->id,
                 'is_update' => $isUpdate ?? false,
+                'modifications' => $allModifications ?? [],
             ]);
         } catch (\Exception $e) {
+            Log::error($e);
             \Log::error('QuoteItem store error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
@@ -301,9 +314,13 @@ public function index(Request $request)
         return view('sales.quotes.quote_items.show', compact('item'));
     }
 
-    public function getItem($id, $itemId)
+    public function getItem($id, $itemId, $type = 'quote_item')
     {
-        $item = QuoteItem::findOrFail($itemId);
+        if($type == 'quote_item') {
+            $item = QuoteItem::findOrFail($itemId);
+        } elseif($type == 'modification') {
+            $item = QuoteItem::where('id', $itemId)->where('is_modification', true)->firstOrFail();
+        }
 
         return response()->json(['success' => true, 'item' => $item]);
     }
@@ -431,7 +448,12 @@ public function index(Request $request)
     public function preview($id)
     {
         $quote = Quote::with('items')->findOrFail($id);
-        return view('sales.quotes.preview', compact('quote'));
+
+        $modificationsByDate = $quote->modifications->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->created_at)->toDateString();
+        });
+
+        return view('sales.quotes.preview', compact('quote', 'modificationsByDate'));
     }
 
     public function download($id)
@@ -638,14 +660,19 @@ public function index(Request $request)
 
     public function edit($id)
     {
-        $quote = Quote::with('items')->findOrFail($id);
+        $quote = Quote::with(['items'])->findOrFail($id);
+
+        // Group modifications by created date (Y-m-d)
+        $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
         $seriesList = DB::table('elitevw_master_series')->pluck('series', 'id');
 
         $colorConfigurations = \App\Models\Master\Colors\ColorConfiguration::all();
         $exteriorColors = \App\Models\Master\Colors\ExteriorColor::all();
         $interiorColors = \App\Models\Master\Colors\InteriorColor::all();
         $laminateColors = \App\Models\Master\Colors\LaminateColor::all();
-        $quoteItems = QuoteItem::where('quote_id', $quote->id)->get();
+        $quoteItems = QuoteItem::where('quote_id', $quote->id)->where('is_modification', false)->get();
 
         $rawSeries = \App\Models\Master\Series\Series::all();
         $taxCode = TaxCode::where('city', $quote->customer->billing_city)->first();
@@ -664,7 +691,8 @@ public function index(Request $request)
             'interiorColors',
             'laminateColors',
             'quoteItems',
-            'taxRate'
+            'taxRate',
+            'modificationsByDate'
         ));
     }
 
@@ -686,17 +714,31 @@ public function index(Request $request)
         }
     }
 
-    public function destroyItem($id, $itemId)
+    public function destroyItem($id, $itemId, $type)
     {
-        $item = QuoteItem::find($itemId);
-        if(!$item) {
-            return response()->json(['success' => false, 'message' => 'Item not found.'], 404);
-        }
-        $item->quote->update([
-            'discount' => $item->quote->discount - $item->discount,
-        ]);
-        $item->delete();
+        if($type == 'quote_item') 
+        {
 
+            $item = QuoteItem::find($itemId);
+            if(!$item) {
+                return response()->json(['success' => false, 'message' => 'Item not found.'], 404);
+            }
+            $item->quote->update([
+                'discount' => $item->quote->discount - $item->discount,
+            ]);
+            $item->delete();
+        } else if($type == 'modification') {
+            $item = QuoteItem::where('id', $itemId)->where('is_modification', true)->first();
+            if(!$item) {
+                return response()->json(['success' => false, 'message' => 'Item not found.'], 404);
+            }
+
+            $item->quote->update([
+                'discount' => $item->quote->discount - $item->discount,
+            ]);
+            $item->delete();
+
+        }
         return response()->json(['success' => true, 'message' => 'Item deleted successfully.']);
     }
 

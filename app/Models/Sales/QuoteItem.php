@@ -40,7 +40,9 @@ class QuoteItem extends Model
         'knocked_down',
         'series_id',
         'series_type',
-        'discount'
+        'discount',
+        'is_modification',
+        'modification_date'
     ];
 
 

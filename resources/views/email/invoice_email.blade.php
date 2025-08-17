@@ -78,16 +78,6 @@
                                 </tr>
                             </table>
 
-                            {{-- Payment Button --}}
-                            <p style="text-align: center; margin: 30px 0;">
-                                <a href="{{ $invoice->payment_link }}" class="button" target="_blank" style="display: inline-block; padding: 12px 24px; background-color: #28a745; color: #fff; text-decoration: none; border-radius: 6px;">
-                                    {{ __('Pay Invoice Now') }}
-                                </a>
-                            </p>
-
-                            <p>{{ __('If the button above doesn’t work, you can also access the invoice directly using the link below:') }}</p>
-                            <p><a href="{{ $invoice->payment_link }}" target="_blank">{{ $invoice->payment_link }}</a></p>
-
                             <p>{{ __('Please make the payment by the due date to avoid any late charges. If you have any questions, feel free to contact our support team.') }}</p>
 
                             {{-- Footer --}}

@@ -118,7 +118,7 @@
 
                 <tbody>
                     @foreach ($quoteItems as $item)
-                    <tr data-id="{{ $item->id }}">
+                    <tr data-id="{{ $item->id }}" data-type="quote_item">
                         <td style="text-wrap:auto">{{ $item->description }}</td>
                         <td><input type="number" name="qty[]" value="{{ $item->qty }}" class="form-control form-control-sm qty-input" style="width: 60px;" data-id="{{ $item->id }}" data-price="{{ $item->price }}"></td>
                         <td>{{ $item->width }}" x {{ $item->height }}"</td>
@@ -128,22 +128,67 @@
                         <td class="item-total" data-id="{{ $item->id }}">${{ number_format($item->total, 2) }}</td>
                         <td><img src="{{ $item->image_url ?? 'https://via.placeholder.com/40' }}" class="img-thumbnail" alt="Item"></td>
                         <td class="text-nowrap">
-                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item" data-id="{{ $item->id }}">
+                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item"  data-type="quote_item" data-id="{{ $item->id }}">
                                 <i data-feather="eye"></i>
                             </a>
-                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item" data-id="{{ $item->id }}">
+                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item"  data-type="quote_item" data-id="{{ $item->id }}">
                                 <i data-feather="edit"></i>
                             </a>
-                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row" data-id="{{ $item->id }}">
+                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row"  data-type="quote_item" data-id="{{ $item->id }}">
                                 <i data-feather="trash-2"></i>
                             </a>
                         </td>
                     </tr>
                     @endforeach
                 </tbody>
-
-
             </table>
+            @if(!$modificationsByDate->isEmpty())
+                @foreach ($modificationsByDate as $date => $modifications)
+                    <table class="table table-bordered table-striped mt-4 modificationsTable" data-mod-date="{{ $date }}">
+                        <thead class="table-light">
+                            <tr>
+                                <th colspan="9" class="text-center">Modifications ({{ $date }})</th>
+                            </tr>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Size</th>
+                                <th>Glass</th>
+                                <th>Grid</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                                <th>Image</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($modifications as $modification)
+                                <tr data-id="{{ $modification->id }}" data-type="modification">
+                                    <td style="text-wrap:auto">{{ $modification->description }}</td>
+                                    <td>{{ $modification->qty }}</td>
+                                    <td>{{ $modification->width }}" x {{ $modification->height }}"</td>
+                                    <td>{{ $modification->glass }}</td>
+                                    <td>{{ $modification->grid }}</td>
+                                    <td>${{ number_format($modification->price, 2) }}</td>
+                                    <td>${{ number_format($modification->total, 2) }}</td>
+                                    <td><img src="{{ $modification->image_url ?? 'https://via.placeholder.com/40' }}" class="img-thumbnail" alt="Item"></td>
+                                    <td class="text-nowrap">
+                                        <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item"  data-type="modification" data-id="{{ $modification->id }}">
+                                            <i data-feather="eye"></i>
+                                        </a>
+                                        <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item"  data-type="modification" data-id="{{ $modification->id }}">
+                                            <i data-feather="edit"></i>
+                                        </a>
+                                        <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row" data-type="modification" data-id="{{ $modification->id }}">
+                                            <i data-feather="trash-2"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endforeach
+            @endif
             <!-- Totals -->
             <div class="row mt-4">
                 <div class="col-md-6 offset-md-6">
@@ -680,6 +725,7 @@
         formData.append('custom_lock_position', form.querySelector('[name="custom_lock_position"]').checked ? 1 : 0);
         formData.append('custom_vent_latch', form.querySelector('[name="custom_vent_latch"]').checked ? 1 : 0);
         formData.append('knocked_down', form.querySelector('[name="knocked_down"]').checked ? 1 : 0);
+        formData.append('is_modification', true);
 
 
         const quoteId = document.getElementById('quoteId').value;
@@ -696,14 +742,14 @@
             .then(data => {
                 if(data.success) {
                     const currentModal = document.getElementById('addItemModal');
-                        // close modal if open
+                    // close modal if open
                     const currentModalInstance = bootstrap.Modal.getInstance(currentModal) ?? new bootstrap.Modal(currentModal);
                     if (currentModalInstance) {
                         currentModalInstance.hide();
                     }
 
                     const row = `
-                        <tr data-id="${data.item_id}">
+                        <tr data-id="${data.item_id}" data-type="quote_item">
                             <td style="text-wrap:auto">${itemDesc}</td>
                             <td><input type="number" name="qty[]" value="${qty}" min="1" class="form-control form-control-sm qty-input" style="width: 60px;" data-price="${price}" data-id="${data.item_id}"></td>
                             <td>${size}</td>
@@ -713,13 +759,13 @@
                             <td class="item-total" data-id="${data.item_id}">$${total}</td>
                             <td><img src="https://via.placeholder.com/40" class="img-thumbnail" alt="Item"></td>
                             <td class="text-nowrap">
-                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item" data-id="${data.item_id}">
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item" data-type="quote_item" data-id="${data.item_id}">
                                     <i data-feather="eye"></i>
                                 </a>
-                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item" data-id="${data.item_id}">
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item" data-type="quote_item" data-id="${data.item_id}">
                                     <i data-feather="edit"></i>
                                 </a>
-                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row" data-id="${data.item_id}">
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row" data-type="quote_item" data-id="${data.item_id}">
                                     <i data-feather="trash-2"></i>
                                 </a>
                             </td>
@@ -737,6 +783,79 @@
                         }
 
                         document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
+                    }
+
+                    // Handle modifications if present
+                    if (data.modifications && typeof data.modifications === 'object') {
+                        Object.entries(data.modifications).forEach(([date, items]) => {
+                            // Try to find an existing table for this date
+                            let modTable = document.querySelector(`table[data-mod-date="${date}"]`);
+                            if (!modTable) {
+                                // Create a new modifications table for this date
+                                const mainTable = document.getElementById('quoteDetailsTable');
+                                modTable = document.createElement('table');
+                                modTable.className = 'table table-bordered table-striped mt-4 modificationsTable';
+                                modTable.setAttribute('data-mod-date', date);
+                                modTable.innerHTML = `
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th colspan="9" class="text-center">Modifications (${date})</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Qty</th>
+                                            <th>Size</th>
+                                            <th>Glass</th>
+                                            <th>Grid</th>
+                                            <th>Price</th>
+                                            <th>Total</th>
+                                            <th>Image</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                `;
+                                // Insert after the main table or after the last modifications table
+                                let insertAfter = mainTable;
+                                const allModTables = document.querySelectorAll('table.modificationsTable');
+                                if (allModTables.length > 0) {
+                                    insertAfter = allModTables[allModTables.length - 1];
+                                }
+                                insertAfter.parentNode.insertBefore(modTable, insertAfter.nextSibling);
+                            }
+                            // Append new rows to the tbody of the found/created table
+                            const tbody = modTable.querySelector('tbody');
+                            items.forEach(mod => {
+                                // Check if row already exists (avoid duplicates)
+                                if (!tbody.querySelector(`tr[data-id="${mod.id}"]`)) {
+                                    const row = document.createElement('tr');
+                                    row.setAttribute('data-type', 'modification');
+                                    row.setAttribute('data-id', mod.id);
+                                    row.innerHTML = `
+                                        <td style="text-wrap:auto">${mod.description}</td>
+                                        <td>${mod.qty}</td>
+                                        <td>${mod.width}" x ${mod.height}"</td>
+                                        <td>${mod.glass}</td>
+                                        <td>${mod.grid}</td>
+                                        <td>$${parseFloat(mod.price).toFixed(2)}</td>
+                                        <td>$${parseFloat(mod.total).toFixed(2)}</td>
+                                        <td><img src="${mod.image_url ?? 'https://via.placeholder.com/40'}" class="img-thumbnail" alt="Item"></td>
+                                        <td class="text-nowrap">
+                                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item"  data-type="modification" data-id="${mod.id}">
+                                                <i data-feather="eye"></i>
+                                            </a>
+                                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item"  data-type="modification" data-id="${mod.id}">
+                                                <i data-feather="edit"></i>
+                                            </a>
+                                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row" data-type="modification" data-id="${mod.id}">
+                                                <i data-feather="trash-2"></i>
+                                            </a>
+                                        </td>
+                                    `;
+                                    tbody.appendChild(row);
+                                }
+                            });
+                        });
                     }
                     console.log('Modal closed');
                 } else {
@@ -765,11 +884,12 @@
         if (e.target.closest('.remove-row')) {
             const row = e.target.closest('tr');
             const itemId = row.getAttribute('data-id');
+            const type = row.getAttribute('data-type');
             const quoteId = "{{ $quote->id }}";
             if (!itemId) return;
 
             if (!confirm('Are you sure you want to delete this item?')) return;
-            fetch(`/sales/quotes/${quoteId}/items/${itemId}`, {
+            fetch(`/sales/quotes/${quoteId}/items/${itemId}/${type}`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -791,6 +911,9 @@
         }
 
     });
+
+   
+
 
     // open modal in view mode
     document.querySelector('#quoteDetailsTable tbody').addEventListener('click', function(e) {
@@ -927,6 +1050,166 @@
                 })
                 .catch(() => alert('Server error'));
         }
+    });
+
+    // Use event delegation for all .modificationsTable tables (multiple tables possible)
+    document.querySelectorAll('.modificationsTable').forEach(function(table) {
+        table.querySelector('tbody').addEventListener('click', function(e) {
+            if (e.target.closest('.remove-row')) {
+                const row = e.target.closest('tr');
+                const itemId = row.getAttribute('data-id');
+                const type = row.getAttribute('data-type');
+                const quoteId = "{{ $quote->id }}";
+                if (!itemId) return;
+
+                if (!confirm('Are you sure you want to delete this item?')) return;
+                fetch(`/sales/quotes/${quoteId}/items/${itemId}/${type}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        row.remove();
+                        calculateTotals();
+                        document.getElementById('seriesSelect').value = '';
+                        document.getElementById('seriesTypeSelect').value = '';
+                    } else {
+                        alert('Failed to delete item.');
+                    }
+                })
+                .catch(() => alert('Server error'));
+            }
+        });
+
+        table.querySelector('tbody').addEventListener('click', function(e) {
+            const viewBtn = e.target.closest('.view-quote-item');
+            if (viewBtn && viewBtn.classList.contains('view-quote-item')) {
+                const itemId = viewBtn.getAttribute('data-id');
+                const type = viewBtn.getAttribute('data-type');
+                if (!itemId) return;
+                const quoteId = "{{ $quote->id }}";
+                fetch(`/sales/quotes/view/${quoteId}/items/${itemId}/${type}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data.success || !data.item) {
+                            alert('Failed to load item.');
+                            return;
+                        }
+                        const form = document.getElementById('quoteItemForm');
+                        form.querySelector('[name="qty"]').value = data.item.qty;
+                        form.querySelector('[name="width"]').value = data.item.width;
+                        form.querySelector('[name="height"]').value = data.item.height;
+                        form.querySelector('[name="color_config"]').value = data.item.color_config || '';
+                        form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
+                        form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
+                        form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
+                        form.querySelector('[name="spacer"]').value = data.item.spacer || '';
+                        form.querySelector('[name="tempered"]').value = data.item.tempered || '';
+                        form.querySelector('[name="specialty_glass"]').value = data.item.specialty_glass || '';
+                        form.querySelector('[name="grid_pattern"]').value = data.item.grid_pattern || '';
+                        form.querySelector('[name="grid_profile"]').value = data.item.grid_profile || '';
+                        form.querySelector('[name="internal_note"]').value = data.item.internal_note || '';
+                        form.querySelector('[name="retrofit_bottom_only"]').checked = !!data.item.retrofit_bottom_only;
+                        form.querySelector('[name="no_logo_lock"]').checked = !!data.item.no_logo_lock;
+                        form.querySelector('[name="double_lock"]').checked = !!data.item.double_lock;
+                        form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
+                        form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
+                        form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
+                        form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                        setTimeout(() => {
+                            form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                            form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                            form.querySelector('[name="color_interior"]').disabled = true;
+                            form.querySelector('[name="color_exterior"]').disabled = true;
+                        }, 500);
+                        Array.from(form.elements).forEach(el => {
+                            if (!(el.classList && el.classList.contains('btn-close'))) {
+                                el.disabled = true;
+                            }
+                        });
+                        document.getElementById('saveQuoteItem').style.display = 'none';
+                         if(type == 'modification') {
+                            document.getElementById('modalTitle').textContent = 'View Modification Item';
+                        } else {
+                            document.getElementById('modalTitle').textContent = 'View Quote Item';
+                        }
+                        const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+                        modal.show();
+                    })
+                    .catch(() => alert('Server error'));
+            }
+        });
+
+        table.querySelector('tbody').addEventListener('click', function(e) {
+            const editBtn = e.target.closest('.edit-quote-item');
+            if (editBtn && editBtn.classList.contains('edit-quote-item')) {
+                const itemId = editBtn.getAttribute('data-id');
+                const type = editBtn.getAttribute('data-type');
+                if (!itemId) return;
+                const quoteId = "{{ $quote->id }}";
+                fetch(`/sales/quotes/view/${quoteId}/items/${itemId}/${type}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data.success || !data.item) {
+                            alert('Failed to load item.');
+                            return;
+                        }
+                        const form = document.getElementById('quoteItemForm');
+                        form.querySelector('[name="item_id"]').value = data.item.id;
+                        form.querySelector('[name="qty"]').value = data.item.qty;
+                        form.querySelector('[name="width"]').value = data.item.width;
+                        form.querySelector('[name="height"]').value = data.item.height;
+                        form.querySelector('[name="color_config"]').value = data.item.color_config || '';
+                        form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
+                        form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
+                        form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
+                        form.querySelector('[name="spacer"]').value = data.item.spacer || '';
+                        form.querySelector('[name="tempered"]').value = data.item.tempered || '';
+                        form.querySelector('[name="specialty_glass"]').value = data.item.specialty_glass || '';
+                        form.querySelector('[name="grid_pattern"]').value = data.item.grid_pattern || '';
+                        form.querySelector('[name="grid_profile"]').value = data.item.grid_profile || '';
+                        form.querySelector('[name="internal_note"]').value = data.item.internal_note || '';
+                        form.querySelector('[name="retrofit_bottom_only"]').checked = !!data.item.retrofit_bottom_only;
+                        form.querySelector('[name="no_logo_lock"]').checked = !!data.item.no_logo_lock;
+                        form.querySelector('[name="double_lock"]').checked = !!data.item.double_lock;
+                        form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
+                        form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
+                        form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
+                        const seriesSelect = $('#seriesSelect');
+                        seriesSelect.val(data.item.series_id ?? '');
+                        document.getElementById('seriesSelect').dispatchEvent(new Event('change'));
+                        setTimeout(() => {
+                            form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                            form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                        }, 500);
+                        setTimeout(() => {
+                            const seriesTypeSelect = document.getElementById('seriesTypeSelect');
+                            Array.from(seriesTypeSelect.options).forEach(opt => {
+                                if (opt.value == (data.item.series_type ?? '')) {
+                                    seriesTypeSelect.value = opt.value;
+                                }
+                            });
+                            document.getElementById('seriesTypeSelect').dispatchEvent(new Event('change'));
+                        }, 1000);
+                        form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                        
+                        if(type == 'modification') {
+                            document.getElementById('modalTitle').textContent = 'Edit Modification Item';
+                            document.getElementById('saveQuoteItem').textContent = 'Update Modification Item';
+                        } else {
+                            document.getElementById('modalTitle').textContent = 'Edit Quote Item';
+                            document.getElementById('saveQuoteItem').textContent = 'Update Quote Item';
+                        }
+
+                        const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+                        modal.show();
+                    })
+                    .catch(() => alert('Server error'));
+            }
+        });
     });
 
     // When modal closes, re-enable fields and show add button

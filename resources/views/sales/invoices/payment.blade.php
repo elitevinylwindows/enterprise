@@ -61,16 +61,6 @@
             </div>
             <div class="row g-3 mt-1">
                 <div class="mt-4">
-                    <label class="form-label me-3">Want to Charge Card?</label>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="charge_card" id="charge_card"
-                            value="true" checked>
-                        <label class="form-check-label" for="charge_card">Yes/No</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row g-3 mt-1">
-                <div class="mt-4">
                     <label class="form-label me-3">Payment Method</label>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="ipm_deposit_method" id="ipmDepMethodCard"

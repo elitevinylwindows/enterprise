@@ -351,9 +351,9 @@ use Stripe\Webhook;
 
 
             // Item routes - static before dynamic
-            Route::get('quotes/view/{id}/items/{itemId}', [QuoteController::class, 'getItem'])->name('quotes.items.view');
+            Route::get('quotes/view/{id}/items/{itemId}/{type?}', [QuoteController::class, 'getItem'])->name('quotes.items.view');
             Route::post('quotes/{id}/items', [QuoteController::class, 'storeItem'])->name('quotes.storeItem');
-            Route::delete('quotes/{id}/items/{itemId}', [QuoteController::class, 'destroyItem'])->name('quotes.items.destroy');
+            Route::delete('quotes/{id}/items/{itemId}/{type}', [QuoteController::class, 'destroyItem'])->name('quotes.items.destroy');
             Route::get('quotes/items/{id}/edit', [QuoteController::class, 'editItem'])->name('quotes.items.edit');
             Route::get('quotes/items/{id}', [QuoteController::class, 'showItem'])->name('quotes.items.show');
 
