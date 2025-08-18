@@ -281,7 +281,7 @@
                                     <div class="mb-3">
                                         <label>Color Code (Exterior)</label>
                                         <select class="form-control" name="color_exterior" id="colorExteriorDropdown">
-                                            <option value="">Select Exterior Color</option>
+                                            <option value="" selected>Select Exterior Color</option>
                                             @foreach($exteriorColors as $color)
                                             <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
                                             @endforeach
@@ -294,7 +294,7 @@
                                     <div class="mb-3">
                                         <label>Color Code (Interior)</label>
                                         <select class="form-control" name="color_interior" id="colorInteriorDropdown">
-                                            <option value="">Select Interior Color</option>
+                                            <option value="" selected>Select Interior Color</option>
                                             @foreach($interiorColors as $color)
                                             <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
                                             @endforeach
@@ -349,78 +349,77 @@
                                     </div>
 
                                     {{-- Tempered option selector --}}
-<div class="mb-3">
-  <label class="form-label">Tempered Glass Option</label>
-  <select class="form-control" name="tempered" id="temperedOption" required>
-    <option value="" disabled {{ old('tempered') ? '' : 'selected' }}>Select…</option>
-    <option value="All"    {{ old('tempered') === 'All' ? 'selected' : '' }}>All</option>
-    <option value="Select" {{ old('tempered') === 'Select' ? 'selected' : '' }}>Select</option>
-  </select>
-</div>
+                                    <div class="mb-3">
+                                    <label class="form-label">Tempered Glass Option</label>
+                                    <select class="form-control" name="tempered" id="temperedOption" required>
+                                        <option value="" disabled {{ old('tempered') ? '' : 'selected' }}>Select…</option>
+                                        <option value="All"    {{ old('tempered') === 'All' ? 'selected' : '' }}>All</option>
+                                        <option value="Select" {{ old('tempered') === 'Select' ? 'selected' : '' }}>Select</option>
+                                    </select>
+                                    </div>
 
-{{-- Appears based on choice above --}}
-<div id="temperedMatrix" class="border rounded p-3 mb-3 d-none">
-  <div class="fw-semibold mb-2">Apply Tempered to:</div>
+                                    {{-- Appears based on choice above --}}
+                                    <div id="temperedMatrix" class="border rounded p-3 mb-3 d-none">
+                                    <div class="fw-semibold mb-2">Apply Tempered to:</div>
 
-  <div class="row g-3">
-    {{-- Glass Field 1 --}}
-    <div class="col-12 col-md-6">
-      <div class="small text-muted mb-1">Glass Field 1</div>
+                                    <div class="row g-3">
+                                        {{-- Glass Field 1 --}}
+                                        <div class="col-12 col-md-6">
+                                        <div class="small text-muted mb-1">Glass Field 1</div>
 
-      <div class="form-check">
-        <input class="form-check-input tempered-box" type="checkbox" id="gf1_i" name="tempered_fields[]"
-               value="gf1_i"
-               {{ in_array('gf1_i', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
-        <label class="form-check-label" for="gf1_i">Interior</label>
-      </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tempered-box" type="checkbox" id="gf1_i" name="tempered_fields[]"
+                                                value="gf1_i"
+                                                {{ in_array('gf1_i', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="gf1_i">Interior</label>
+                                        </div>
 
-      <div class="form-check">
-        <input class="form-check-input tempered-box" type="checkbox" id="gf1_e" name="tempered_fields[]"
-               value="gf1_e"
-               {{ in_array('gf1_e', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
-        <label class="form-check-label" for="gf1_e">Exterior</label>
-      </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tempered-box" type="checkbox" id="gf1_e" name="tempered_fields[]"
+                                                value="gf1_e"
+                                                {{ in_array('gf1_e', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="gf1_e">Exterior</label>
+                                        </div>
 
-      <div class="form-check">
-        <input class="form-check-input tempered-box" type="checkbox" id="gf1_b" name="tempered_fields[]"
-               value="gf1_b"
-               {{ in_array('gf1_b', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
-        <label class="form-check-label" for="gf1_b">Both</label>
-      </div>
-    </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tempered-box" type="checkbox" id="gf1_b" name="tempered_fields[]"
+                                                value="gf1_b"
+                                                {{ in_array('gf1_b', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="gf1_b">Both</label>
+                                        </div>
+                                        </div>
 
-    {{-- Glass Field 2 --}}
-    <div class="col-12 col-md-6">
-      <div class="small text-muted mb-1">Glass Field 2</div>
+                                        {{-- Glass Field 2 --}}
+                                        <div class="col-12 col-md-6">
+                                        <div class="small text-muted mb-1">Glass Field 2</div>
 
-      <div class="form-check">
-        <input class="form-check-input tempered-box" type="checkbox" id="gf2_i" name="tempered_fields[]"
-               value="gf2_i"
-               {{ in_array('gf2_i', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
-        <label class="form-check-label" for="gf2_i">Interior</label>
-      </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tempered-box" type="checkbox" id="gf2_i" name="tempered_fields[]"
+                                                value="gf2_i"
+                                                {{ in_array('gf2_i', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="gf2_i">Interior</label>
+                                        </div>
 
-      <div class="form-check">
-        <input class="form-check-input tempered-box" type="checkbox" id="gf2_e" name="tempered_fields[]"
-               value="gf2_e"
-               {{ in_array('gf2_e', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
-        <label class="form-check-label" for="gf2_e">Exterior</label>
-      </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tempered-box" type="checkbox" id="gf2_e" name="tempered_fields[]"
+                                                value="gf2_e"
+                                                {{ in_array('gf2_e', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="gf2_e">Exterior</label>
+                                        </div>
 
-      <div class="form-check">
-        <input class="form-check-input tempered-box" type="checkbox" id="gf2_b" name="tempered_fields[]"
-               value="gf2_b"
-               {{ in_array('gf2_b', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
-        <label class="form-check-label" for="gf2_b">Both</label>
-      </div>
-    </div>
-  </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input tempered-box" type="checkbox" id="gf2_b" name="tempered_fields[]"
+                                                value="gf2_b"
+                                                {{ in_array('gf2_b', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="gf2_b">Both</label>
+                                        </div>
+                                        </div>
+                                    </div>
 
-  {{-- We’ll put hidden clones here when “All” (so values submit even if disabled) --}}
-  <div id="temperedGhosts" class="d-none"></div>
-</div>
-
-
+                                    {{-- We’ll put hidden clones here when “All” (so values submit even if disabled) --}}
+                                    <div id="temperedGhosts" class="d-none"></div>
+                                    </div>
+                                   
                                     <div class="mb-3">
                                         <label>Specialty Glass</label>
                                         <select class="form-control" name="specialty_glass">
@@ -730,7 +729,7 @@
         formData.append('total', total);
         formData.append('internal_note', internal_note);
         formData.append('color_config', colorConfigId);
-        formData.append('color_exterior', colorExtId);
+        formData.append('color_exterior', colorExtIwd);
         formData.append('color_interior', colorIntId);
         formData.append('frame_type', frameType);
         formData.append('fin_type', finType);
@@ -1188,9 +1187,28 @@ updateWindowPreview();
 
     document.getElementById('addItemModal').addEventListener('shown.bs.modal', function() {
         const value = $('#colorConfigDropdown').val();
-        const [exterior, interior] = value.split('-');
+        const [exterior, interior] = value ? value.split('-') : [null, null];
         const exteriorDropdown = document.getElementById('colorExteriorDropdown');
         const interiorDropdown = document.getElementById('colorInteriorDropdown');
+
+        // If value is not set, select the first option (not placeholder)
+        if (!value) {
+            if (exteriorDropdown.options.length > 1) {
+                exteriorDropdown.selectedIndex = 0;
+            } else {
+                exteriorDropdown.selectedIndex = 0;
+            }
+            if (interiorDropdown.options.length > 1) {
+                interiorDropdown.selectedIndex = 0;
+            } else {
+                interiorDropdown.selectedIndex = 0;
+            }
+            exteriorDropdown.disabled = false;
+            interiorDropdown.disabled = false;
+            exteriorDropdown.classList.remove('readonly');
+            interiorDropdown.classList.remove('readonly');
+            return;
+        }
 
         exteriorDropdown.value = '';
         interiorDropdown.value = '';
@@ -1229,7 +1247,6 @@ updateWindowPreview();
                 interiorDropdown.classList.add('readonly');
             }
         }
-
     });
 
 
@@ -1529,6 +1546,33 @@ updateWindowPreview();
 
     }
 
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const temperedSelect = document.getElementById('temperedSelect');
+        const insideTempered = document.getElementById('inside_tempered');
+        const outsideTempered = document.getElementById('outside_tempered');
+
+        function updateTemperedCheckboxes() {
+            if (temperedSelect.value === 'All') {
+                insideTempered.checked = true;
+                outsideTempered.checked = true;
+                insideTempered.disabled = true;
+                outsideTempered.disabled = true;
+                insideTempered.tabIndex = -1;
+                outsideTempered.tabIndex = -1;
+            } else {
+                insideTempered.disabled = false;
+                outsideTempered.disabled = false;
+                insideTempered.tabIndex = 0;
+                outsideTempered.tabIndex = 0;
+            }
+        }
+
+        temperedSelect.addEventListener('change', updateTemperedCheckboxes);
+
+        // Initial state
+        updateTemperedCheckboxes();
+    });
 
     // Save draft button click event
     document.getElementById('saveDraftButton').addEventListener('click', function() {

@@ -106,7 +106,7 @@ public function index(Request $request)
         // The 'series_type' column is a JSON array, so we use whereJsonContains for matching
         $seriesType = DB::table('elitevw_master_series_types')
             ->where('series_id', $request->series_id)
-            ->whereJsonContains('series_type', $request->series_type)
+            ->where('series_type', $request->series_type)
             ->first();
 
         $price = DB::table('elitevw_master_price_price_matrices')
