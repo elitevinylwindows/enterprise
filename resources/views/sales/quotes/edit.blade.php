@@ -1174,163 +1174,168 @@
     });
 
     // Use event delegation for all .modificationsTable tables (multiple tables possible)
-    document.querySelectorAll('.modificationsTable').forEach(function(table) {
-        table.querySelector('tbody').addEventListener('click', function(e) {
-            if (e.target.closest('.remove-row')) {
-                const row = e.target.closest('tr');
-                const itemId = row.getAttribute('data-id');
-                const type = row.getAttribute('data-type');
-                const quoteId = "{{ $quote->id }}";
-                if (!itemId) return;
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-row')) {
+            const row = e.target.closest('tr');
+            const itemId = row.getAttribute('data-id');
+            const type = row.getAttribute('data-type');
+            const quoteId = "{{ $quote->id }}";
+            if (!itemId) return;
 
-                if (!confirm('Are you sure you want to delete this item?')) return;
-                fetch(`/sales/quotes/${quoteId}/items/${itemId}/${type}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            if (!confirm('Are you sure you want to delete this item?')) return;
+            fetch(`/sales/quotes/${quoteId}/items/${itemId}/${type}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // If this was the last row in its table, remove the table as well
+                    const tbody = row.closest('tbody');
+                    row.remove();
+
+                    if (tbody && tbody.children.length === 0) {
+                        const table = tbody.closest('table');
+                        if (table) table.remove();
                     }
-                })
+                    calculateTotals();
+                    document.getElementById('seriesSelect').value = '';
+                    document.getElementById('seriesTypeSelect').value = '';
+                } else {
+                    alert('Failed to delete item.');
+                }
+            })
+            .catch(() => alert('Server error'));
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        const viewBtn = e.target.closest('.view-quote-item');
+        if (viewBtn && viewBtn.classList.contains('view-quote-item')) {
+            const itemId = viewBtn.getAttribute('data-id');
+            const type = viewBtn.getAttribute('data-type');
+            if (!itemId) return;
+            const quoteId = "{{ $quote->id }}";
+            fetch(`/sales/quotes/view/${quoteId}/items/${itemId}/${type}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) {
-                        row.remove();
-                        calculateTotals();
-                        document.getElementById('seriesSelect').value = '';
-                        document.getElementById('seriesTypeSelect').value = '';
-                    } else {
-                        alert('Failed to delete item.');
+                    if (!data.success || !data.item) {
+                        alert('Failed to load item.');
+                        return;
                     }
+                    const form = document.getElementById('quoteItemForm');
+                    form.querySelector('[name="qty"]').value = data.item.qty;
+                    form.querySelector('[name="width"]').value = data.item.width;
+                    form.querySelector('[name="height"]').value = data.item.height;
+                    form.querySelector('[name="color_config"]').value = data.item.color_config || '';
+                    form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
+                    form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
+                    form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
+                    form.querySelector('[name="spacer"]').value = data.item.spacer || '';
+                    form.querySelector('[name="tempered"]').value = data.item.tempered || '';
+                    form.querySelector('[name="specialty_glass"]').value = data.item.specialty_glass || '';
+                    form.querySelector('[name="grid_pattern"]').value = data.item.grid_pattern || '';
+                    form.querySelector('[name="grid_profile"]').value = data.item.grid_profile || '';
+                    form.querySelector('[name="internal_note"]').value = data.item.internal_note || '';
+                    form.querySelector('[name="retrofit_bottom_only"]').checked = !!data.item.retrofit_bottom_only;
+                    form.querySelector('[name="no_logo_lock"]').checked = !!data.item.no_logo_lock;
+                    form.querySelector('[name="double_lock"]').checked = !!data.item.double_lock;
+                    form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
+                    form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
+                    form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
+                    form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                    setTimeout(() => {
+                        form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                        form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                        form.querySelector('[name="color_interior"]').disabled = true;
+                        form.querySelector('[name="color_exterior"]').disabled = true;
+                    }, 500);
+                    Array.from(form.elements).forEach(el => {
+                        if (!(el.classList && el.classList.contains('btn-close'))) {
+                            el.disabled = true;
+                        }
+                    });
+                    document.getElementById('saveQuoteItem').style.display = 'none';
+                        if(type == 'modification') {
+                        document.getElementById('modalTitle').textContent = 'View Modification Item';
+                    } else {
+                        document.getElementById('modalTitle').textContent = 'View Quote Item';
+                    }
+                    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+                    modal.show();
                 })
                 .catch(() => alert('Server error'));
-            }
-        });
+        }
+    });
 
-        table.querySelector('tbody').addEventListener('click', function(e) {
-            const viewBtn = e.target.closest('.view-quote-item');
-            if (viewBtn && viewBtn.classList.contains('view-quote-item')) {
-                const itemId = viewBtn.getAttribute('data-id');
-                const type = viewBtn.getAttribute('data-type');
-                if (!itemId) return;
-                const quoteId = "{{ $quote->id }}";
-                fetch(`/sales/quotes/view/${quoteId}/items/${itemId}/${type}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (!data.success || !data.item) {
-                            alert('Failed to load item.');
-                            return;
-                        }
-                        const form = document.getElementById('quoteItemForm');
-                        form.querySelector('[name="qty"]').value = data.item.qty;
-                        form.querySelector('[name="width"]').value = data.item.width;
-                        form.querySelector('[name="height"]').value = data.item.height;
-                        form.querySelector('[name="color_config"]').value = data.item.color_config || '';
-                        form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
-                        form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
-                        form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
-                        form.querySelector('[name="spacer"]').value = data.item.spacer || '';
-                        form.querySelector('[name="tempered"]').value = data.item.tempered || '';
-                        form.querySelector('[name="specialty_glass"]').value = data.item.specialty_glass || '';
-                        form.querySelector('[name="grid_pattern"]').value = data.item.grid_pattern || '';
-                        form.querySelector('[name="grid_profile"]').value = data.item.grid_profile || '';
-                        form.querySelector('[name="internal_note"]').value = data.item.internal_note || '';
-                        form.querySelector('[name="retrofit_bottom_only"]').checked = !!data.item.retrofit_bottom_only;
-                        form.querySelector('[name="no_logo_lock"]').checked = !!data.item.no_logo_lock;
-                        form.querySelector('[name="double_lock"]').checked = !!data.item.double_lock;
-                        form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
-                        form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
-                        form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
-                        form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
-                        setTimeout(() => {
-                            form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
-                            form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
-                            form.querySelector('[name="color_interior"]').disabled = true;
-                            form.querySelector('[name="color_exterior"]').disabled = true;
-                        }, 500);
-                        Array.from(form.elements).forEach(el => {
-                            if (!(el.classList && el.classList.contains('btn-close'))) {
-                                el.disabled = true;
+    document.addEventListener('click', function(e) {
+        const editBtn = e.target.closest('.edit-quote-item');
+        if (editBtn && editBtn.classList.contains('edit-quote-item')) {
+            const itemId = editBtn.getAttribute('data-id');
+            const type = editBtn.getAttribute('data-type');
+            if (!itemId) return;
+            const quoteId = "{{ $quote->id }}";
+            fetch(`/sales/quotes/view/${quoteId}/items/${itemId}/${type}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success || !data.item) {
+                        alert('Failed to load item.');
+                        return;
+                    }
+                    const form = document.getElementById('quoteItemForm');
+                    form.querySelector('[name="item_id"]').value = data.item.id;
+                    form.querySelector('[name="qty"]').value = data.item.qty;
+                    form.querySelector('[name="width"]').value = data.item.width;
+                    form.querySelector('[name="height"]').value = data.item.height;
+                    form.querySelector('[name="color_config"]').value = data.item.color_config || '';
+                    form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
+                    form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
+                    form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
+                    form.querySelector('[name="spacer"]').value = data.item.spacer || '';
+                    form.querySelector('[name="tempered"]').value = data.item.tempered || '';
+                    form.querySelector('[name="specialty_glass"]').value = data.item.specialty_glass || '';
+                    form.querySelector('[name="grid_pattern"]').value = data.item.grid_pattern || '';
+                    form.querySelector('[name="grid_profile"]').value = data.item.grid_profile || '';
+                    form.querySelector('[name="internal_note"]').value = data.item.internal_note || '';
+                    form.querySelector('[name="retrofit_bottom_only"]').checked = !!data.item.retrofit_bottom_only;
+                    form.querySelector('[name="no_logo_lock"]').checked = !!data.item.no_logo_lock;
+                    form.querySelector('[name="double_lock"]').checked = !!data.item.double_lock;
+                    form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
+                    form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
+                    form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
+                    const seriesSelect = $('#seriesSelect');
+                    seriesSelect.val(data.item.series_id ?? '');
+                    document.getElementById('seriesSelect').dispatchEvent(new Event('change'));
+                    setTimeout(() => {
+                        form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
+                        form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
+                    }, 500);
+                    setTimeout(() => {
+                        const seriesTypeSelect = document.getElementById('seriesTypeSelect');
+                        Array.from(seriesTypeSelect.options).forEach(opt => {
+                            if (opt.value == (data.item.series_type ?? '')) {
+                                seriesTypeSelect.value = opt.value;
                             }
                         });
-                        document.getElementById('saveQuoteItem').style.display = 'none';
-                         if(type == 'modification') {
-                            document.getElementById('modalTitle').textContent = 'View Modification Item';
-                        } else {
-                            document.getElementById('modalTitle').textContent = 'View Quote Item';
-                        }
-                        const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
-                        modal.show();
-                    })
-                    .catch(() => alert('Server error'));
-            }
-        });
+                        document.getElementById('seriesTypeSelect').dispatchEvent(new Event('change'));
+                    }, 1000);
+                    form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                    
+                    if(type == 'modification') {
+                        document.getElementById('modalTitle').textContent = 'Edit Modification Item';
+                        document.getElementById('saveQuoteItem').textContent = 'Update Modification Item';
+                    } else {
+                        document.getElementById('modalTitle').textContent = 'Edit Quote Item';
+                        document.getElementById('saveQuoteItem').textContent = 'Update Quote Item';
+                    }
 
-        table.querySelector('tbody').addEventListener('click', function(e) {
-            const editBtn = e.target.closest('.edit-quote-item');
-            if (editBtn && editBtn.classList.contains('edit-quote-item')) {
-                const itemId = editBtn.getAttribute('data-id');
-                const type = editBtn.getAttribute('data-type');
-                if (!itemId) return;
-                const quoteId = "{{ $quote->id }}";
-                fetch(`/sales/quotes/view/${quoteId}/items/${itemId}/${type}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (!data.success || !data.item) {
-                            alert('Failed to load item.');
-                            return;
-                        }
-                        const form = document.getElementById('quoteItemForm');
-                        form.querySelector('[name="item_id"]').value = data.item.id;
-                        form.querySelector('[name="qty"]').value = data.item.qty;
-                        form.querySelector('[name="width"]').value = data.item.width;
-                        form.querySelector('[name="height"]').value = data.item.height;
-                        form.querySelector('[name="color_config"]').value = data.item.color_config || '';
-                        form.querySelector('[name="frame_type"]').value = data.item.frame_type || '';
-                        form.querySelector('[name="fin_type"]').value = data.item.fin_type || '';
-                        form.querySelector('[name="glass_type"]').value = data.item.glass_type || '';
-                        form.querySelector('[name="spacer"]').value = data.item.spacer || '';
-                        form.querySelector('[name="tempered"]').value = data.item.tempered || '';
-                        form.querySelector('[name="specialty_glass"]').value = data.item.specialty_glass || '';
-                        form.querySelector('[name="grid_pattern"]').value = data.item.grid_pattern || '';
-                        form.querySelector('[name="grid_profile"]').value = data.item.grid_profile || '';
-                        form.querySelector('[name="internal_note"]').value = data.item.internal_note || '';
-                        form.querySelector('[name="retrofit_bottom_only"]').checked = !!data.item.retrofit_bottom_only;
-                        form.querySelector('[name="no_logo_lock"]').checked = !!data.item.no_logo_lock;
-                        form.querySelector('[name="double_lock"]').checked = !!data.item.double_lock;
-                        form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
-                        form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
-                        form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
-                        const seriesSelect = $('#seriesSelect');
-                        seriesSelect.val(data.item.series_id ?? '');
-                        document.getElementById('seriesSelect').dispatchEvent(new Event('change'));
-                        setTimeout(() => {
-                            form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
-                            form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
-                        }, 500);
-                        setTimeout(() => {
-                            const seriesTypeSelect = document.getElementById('seriesTypeSelect');
-                            Array.from(seriesTypeSelect.options).forEach(opt => {
-                                if (opt.value == (data.item.series_type ?? '')) {
-                                    seriesTypeSelect.value = opt.value;
-                                }
-                            });
-                            document.getElementById('seriesTypeSelect').dispatchEvent(new Event('change'));
-                        }, 1000);
-                        form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
-                        
-                        if(type == 'modification') {
-                            document.getElementById('modalTitle').textContent = 'Edit Modification Item';
-                            document.getElementById('saveQuoteItem').textContent = 'Update Modification Item';
-                        } else {
-                            document.getElementById('modalTitle').textContent = 'Edit Quote Item';
-                            document.getElementById('saveQuoteItem').textContent = 'Update Quote Item';
-                        }
-
-                        const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
-                        modal.show();
-                    })
-                    .catch(() => alert('Server error'));
-            }
-        });
+                    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+                    modal.show();
+                })
+                .catch(() => alert('Server error'));
+        }
     });
 
     // When modal closes, re-enable fields and show add button
