@@ -152,6 +152,10 @@ use App\Http\Controllers\Master\Series\{
     SeriesTypeController
 };
 
+use App\Http\Controllers\Miscellaneous\{
+    ParkingController
+};
+
 use App\Http\Controllers\Sales\{
     QuoteController,
     SalesSettingsController,
@@ -544,6 +548,12 @@ Route::delete('series-type/destroy-by-series/{series}', [SeriesTypeController::c
     ->name('series-type.destroy-by-series');
 
         });
+
+
+Route::prefix('miscellaneous')->name('misc.')->group(function () {
+    Route::resource('parking', \App\Http\Controllers\Miscellaneous\ParkingController::class)->names('parking');
+});
+
 
         //Prices
         Route::prefix('master/prices')->name('prices.')->group(function () {

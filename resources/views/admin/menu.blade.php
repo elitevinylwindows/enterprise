@@ -684,7 +684,7 @@
 </li>
 @if (Gate::check('manage miscellaneous'))
 <li class="pc-item pc-hasmenu {{ request()->routeIs('miscellaneous.*') ? 'active pc-trigger' : '' }}">
-    <a href="#" class="pc-link d-flex align-items-center">
+    <a href="{{ route('parking.index') }}" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-square-parking"></i></span>
         <span class="pc-mtext ms-2">Parking</span>
     </a>
