@@ -63,13 +63,18 @@
                         <thead>
                             <tr>
                                 <th>{{ __('ID') }}</th>
-                                <th>{{ __('Job Order #') }}</th>
+                                <th>{{ __('Order #') }}</th>
+                                <th>{{ __('Customer #') }}</th>
+                                <th>{{ __('Customer Name') }}</th>
                                 <th>{{ __('Series') }}</th>
+                                <th>{{ __('Color') }}</th>
+                                <th>{{ __('Frame Type') }}</th>
                                 <th>{{ __('Qty') }}</th>
                                 <th>{{ __('Line') }}</th>
                                 <th>{{ __('Delivery Date') }}</th>
                                 <th>{{ __('Type') }}</th>
                                 <th>{{ __('Production Status') }}</th>
+                                <th>{{ __('Profile') }}</th>
                                 <th>{{ __('Entry Date') }}</th>
                                 <th>{{ __('Last Transaction Date') }}</th>
                                 <th>{{ __('Action') }}</th>
@@ -79,8 +84,12 @@
                             @foreach ($jobs as $job)
                             <tr>
                                 <td>{{ $job->id }}</td>
-                                <td>{{ $job->job_order_number }}</td>
+                                <td>{{ $job->order->order_number }}</td>
+                                <td>{{ $job->customer_number }}</td>
+                                <td>{{ $job->customer_name }}</td>
                                 <td>{{ $job->series }}</td>
+                                <td>{{ $job->color }}</td>
+                                <td>{{ $job->frame_type }}</td>
                                 <td>{{ $job->qty }}</td>
                                 <td>{{ $job->line }}</td>
                                 <td>{{ optional($job->delivery_date)->format('Y-m-d') }}</td>
@@ -90,6 +99,7 @@
                                         {{ ucfirst($job->production_status) }}
                                     </span>
                                 </td>
+                                <td>{{ $job->profile }}</td>
                                 <td>{{ optional($job->entry_date)->format('Y-m-d') }}</td>
                                 <td>{{ optional($job->last_transaction_date)->format('Y-m-d H:i') }}</td>
                                 <td>

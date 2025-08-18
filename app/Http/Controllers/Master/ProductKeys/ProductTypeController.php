@@ -28,6 +28,7 @@ class ProducttypeController extends Controller
             'product_type' => 'required|string|max:255',
             'series'       => 'required|string|max:255', // storing the series *name* string
             'description'  => 'required|string|max:255',
+            'type' => 'nullable|string|max:255',
             'material_type' => 'nullable|string|max:255',
             'glazing_bead_position' => 'nullable|string|max:255',
             'product_id'   => 'required|string|max:255',
@@ -37,6 +38,7 @@ class ProducttypeController extends Controller
             'product_type',
             'series',                 // we store the selected series name
             'description',
+            'type',
             'material_type',
             'glazing_bead_position',
             'product_id',
@@ -58,6 +60,7 @@ class ProducttypeController extends Controller
             'product_type' => 'required|string|max:255',
             'series'       => 'required|string|max:255',
             'description'  => 'required|string|max:255',
+            'type' => 'nullable|string|max:255',
             'material_type' => 'nullable|string|max:255',
             'glazing_bead_position' => 'nullable|string|max:255',
             'product_id'   => 'required|string|max:255',
@@ -68,6 +71,7 @@ class ProducttypeController extends Controller
             'product_type',
             'series',                 // store selected series name
             'description',
+            'type',
             'material_type',
             'glazing_bead_position',
             'product_id',
