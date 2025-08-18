@@ -319,7 +319,10 @@ class InvoiceController extends Controller
     public function show($id)
     {
         $invoice = Invoice::with(['customer', 'order', 'quote'])->findOrFail($id);
-        return view('sales.invoices.show', compact('invoice'));
+        $modificationsByDate = $invoice->order->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
+        return view('sales.invoices.show', compact('invoice', 'modificationsByDate'));
     }
 
     public function syncToQuickbooks(Invoice $invoice)
