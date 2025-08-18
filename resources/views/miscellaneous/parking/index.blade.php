@@ -62,9 +62,16 @@
                   </div>
                 </div>
 
-                <a class="avtar avtar-xs btn-link-primary text-light customModal" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="#" data-size="xl" data-url="{{ route('sales.invoices.edit', $invoice->id) }}" data-title="Edit Invoice">
-                                        <i data-feather="edit"></i>
-                                    </a>
+                <a href="#"
+   class="avtar avtar-xs btn-link-primary text-primary customModal"
+   data-bs-toggle="tooltip"
+   data-bs-original-title="{{ __('Edit') }}"
+   data-size="xl"
+   data-url="{{ route('misc.parking.edit', $a->id) }}"
+   data-title="{{ __('Edit Parking') }}">
+    <i data-feather="edit"></i>
+</a>
+
               </div>
 
               <div class="mt-3">
