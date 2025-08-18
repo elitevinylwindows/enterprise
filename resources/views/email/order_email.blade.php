@@ -74,7 +74,7 @@
                                 </tr>
                             </table>
 
-                            <p>{{ __('We will notify you when your order is shipped. If you have any questions, feel free to reach out to our support team.') }}</p>
+                            <p>{{ __('We will notify you when your order is ready for pickup. If you have any questions, feel free to reach out to our support team.') }}</p>
 
                             {{-- Footer --}}
                             <div class="footer" style="margin-top: 30px;">
