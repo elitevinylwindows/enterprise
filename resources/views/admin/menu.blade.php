@@ -679,16 +679,14 @@
  <li class="pc-item pc-caption d-flex justify-content-between align-items-center">
     <div>
         <label>{{ __('Miscellaneous') }}</label>
-        <i class="fa-solid fa-network-wired"></i>
     </div>
     <i class="ti ti-plus text-muted pe-2" style="font-size: 0.9rem;"></i>
 </li>
 @if (Gate::check('manage miscellaneous'))
 <li class="pc-item pc-hasmenu {{ request()->routeIs('miscellaneous.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="fa-solid fa-network-wired"></i></span>
+        <span class="pc-micon"><i class="fa-solid fa-square-parking"></i></span>
         <span class="pc-mtext ms-2">Parking</span>
-        <span class="ms-auto"><i class="fa-solid fa-square-parking"></i></span>
     </a>
     <ul class="pc-submenu">
          <li class="pc-item pc-hasmenu">
