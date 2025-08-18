@@ -216,7 +216,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($order->items->where('is_modifications', 0) as $key => $item)
+            @foreach($order->items->where('is_modification', 0) as $key => $item)
             <tr>
                 <td>{{ $key + 1 }}</td>
                 <td>{{ $item->series?->series.'-'.$item->series_type ?? 'N/A' }}</td>
