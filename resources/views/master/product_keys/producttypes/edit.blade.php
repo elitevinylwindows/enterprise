@@ -58,27 +58,26 @@
 
 
 <div class="form-group mb-3">
-    <label for="line" class="form-label">Line</label>
+    <label for="line_id" class="form-label">Line</label>
     <select
-        name="line"
-        id="line"
-        class="form-select @error('line') is-invalid @enderror"
+        name="line_id"
+        id="line_id"
+        class="form-select @error('line_id') is-invalid @enderror"
         required
     >
-        <option value="" disabled @selected(! old('line', $productType->line ?? ''))>
+        <option value="" disabled @selected(! old('line_id', $productType->line_id ?? ''))>
             Select line
         </option>
 
-        @foreach($lines as $ln)
-            <option value="{{ $ln->id }}"
-                @selected(old('line', $productType->line ?? '') == $ln->id)>
-                {{ $ln->name }}
+        @foreach($lines as $line)
+            <option value="{{ $line->id }}"
+                @selected(old('line_id', $productType->line_id ?? '') == $line->id)>
+                {{ $line->line }}
             </option>
         @endforeach
     </select>
-    @error('line') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    @error('line_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
 </div>
-
 
 
 
