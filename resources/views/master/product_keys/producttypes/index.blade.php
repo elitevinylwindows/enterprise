@@ -45,7 +45,7 @@
                   <td>{{ $item->series }}</td>
                   <td>{{ $item->description }}</td>
                   <td>{{ $item->type }}</td>
-                  <td>{{ $item->line }}</td>
+                  <td>{{ $item->line?->line ?? '-' }}</td>
                   <td>{{ $item->material_type }}</td>
                   <td>{{ $item->glazing_bead_position }}</td>
                   <td>{{ $item->product_id }}</td>
