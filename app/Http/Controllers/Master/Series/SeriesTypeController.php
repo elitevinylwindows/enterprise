@@ -8,6 +8,9 @@ use App\Models\Master\Series\Series;
 use App\Models\Master\Series\SeriesType;
 use App\Models\Master\Series\SeriesConfiguration;
 use App\Models\Master\ProductKeys\ProductType;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+
 
 class SeriesTypeController extends Controller
 {
@@ -35,6 +38,102 @@ public function index(\Illuminate\Http\Request $request)
         'seriesList'     => $seriesList,   // for the sidebar
         'activeSeriesId' => $activeSeriesId,
     ]);
+}
+
+
+
+public function manage(Series $series)
+{
+    // ProductTypes tied to this Series (by name on product types table)
+    $ptIds = ProductType::where('series', $series->series)->pluck('id');
+
+    // All configurations connected to these PTs (either direct FK or via pivot if you’re using it)
+    $configs = SeriesConfiguration::query()
+        ->whereIn('product_type_id', $ptIds) // direct FK path
+        ->orWhereHas('productTypes', function ($q) use ($ptIds) {
+            $q->whereIn((new ProductType)->getTable().'.id', $ptIds);
+        })
+        ->orderBy('series_type')
+        ->get(['id','series_type']);
+
+    // Already chosen types for this series (strings)
+    $chosenLabels = SeriesType::where('series_id', $series->id)
+        ->pluck('series_type')
+        ->map('trim')
+        ->all();
+
+    // return a PARTIAL (no @extends) for your customModal loader
+    return view('master.series.series_type.manage', [
+        'series'        => $series,
+        'configs'       => $configs,
+        'chosenLabels'  => $chosenLabels,
+    ]);
+}
+
+public function manageUpdate(Request $request, Series $series)
+{
+    $cfgTable = (new SeriesConfiguration)->getTable();
+
+    $validated = $request->validate([
+        'config_ids'   => ['nullable','array'],
+        'config_ids.*' => ['integer', 'exists:'.$cfgTable.',id'],
+    ]);
+
+    // Selected labels from checkboxes
+    $selectedLabels = SeriesConfiguration::whereIn('id', Arr::wrap($validated['config_ids'] ?? []))
+        ->pluck('series_type')
+        ->map(fn($s) => trim((string)$s))
+        ->filter()
+        ->unique()
+        ->values();
+
+    // Current labels in DB for this series
+    $currentLabels = SeriesType::where('series_id', $series->id)
+        ->pluck('series_type')
+        ->map(fn($s) => trim((string)$s))
+        ->values();
+
+    // Universe of config labels for this Series (used to avoid deleting custom free-typed ones)
+    $universe = SeriesConfiguration::query()
+        ->orderBy('series_type')
+        ->pluck('series_type')
+        ->map(fn($s) => trim((string)$s))
+        ->unique();
+
+    // What to add (in selected but not in current)
+    $toAdd = $selectedLabels->diff($currentLabels);
+
+    // What to remove (in current AND in universe of known configs, but NOT selected)
+    // -> avoids deleting any custom labels you might have added previously by typing
+    $toRemove = $currentLabels->intersect($universe)->diff($selectedLabels);
+
+    DB::transaction(function () use ($series, $toAdd, $toRemove) {
+        foreach ($toAdd as $label) {
+            SeriesType::firstOrCreate([
+                'series_id'   => $series->id,
+                'series_type' => $label,
+            ]);
+        }
+
+        if ($toRemove->isNotEmpty()) {
+            SeriesType::where('series_id', $series->id)
+                ->whereIn('series_type', $toRemove->all())
+                ->delete();
+        }
+    });
+
+    return redirect()
+        ->route('master.series-type.index', ['series_id' => $series->id])
+        ->with('success', __('Series Types updated.'));
+}
+
+public function destroyBySeries(Series $series)
+{
+    SeriesType::where('series_id', $series->id)->delete();
+
+    return redirect()
+        ->route('master.series-type.index', ['series_id' => $series->id])
+        ->with('success', __('All Series Types removed for this series.'));
 }
 
 
