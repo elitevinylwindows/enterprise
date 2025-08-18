@@ -15,29 +15,25 @@
 <div class="mb-4"></div>
 
 @php
-  // for highlighting the active filter in the left menu
-  $activeSeriesId = request('series_id');
+  $active = (string)($activeSeriesId ?? '');
 @endphp
 
 <div class="row">
-  {{-- Taskbar Card --}}
+  {{-- Taskbar Card (filters by Series) --}}
   <div class="col-md-2">
     <div class="card">
       <div class="list-group list-group-flush">
         <a href="{{ route('master.series-type.index') }}"
-           class="list-group-item {{ $activeSeriesId ? '' : 'active' }}">
-          {{ __('All Series Types') }}
+           class="list-group-item {{ $active === '' ? 'active' : '' }}">
+          {{ __('All Series') }}
         </a>
 
-        {{-- Optional: list each Series as a filter (only if $series is provided) --}}
-        @isset($series)
-          @foreach($series as $s)
-            <a href="{{ route('master.series-type.index', ['series_id' => $s->id]) }}"
-               class="list-group-item {{ (string)$activeSeriesId === (string)$s->id ? 'active' : '' }}">
-              {{ $s->series }}
-            </a>
-          @endforeach
-        @endisset
+        @foreach($seriesList as $s)
+          <a href="{{ route('master.series-type.index', ['series_id' => $s->id]) }}"
+             class="list-group-item {{ $active === (string)$s->id ? 'active' : '' }}">
+            {{ $s->series }}
+          </a>
+        @endforeach
       </div>
     </div>
   </div>
@@ -52,7 +48,8 @@
                class="btn btn-primary customModal"
                data-size="lg"
                data-title="{{ __('Add Series Type') }}"
-               data-url="{{ route('master.series-type.create') }}">
+               {{-- Pass selected series to preselect in the modal --}}
+               data-url="{{ route('master.series-type.create', ['series_id' => $activeSeriesId]) }}">
               <i class="fa-solid fa-circle-plus"></i> {{ __('Create') }}
             </a>
           </div>
@@ -66,40 +63,44 @@
               <tr>
                 <th>{{ __('ID') }}</th>
                 <th>{{ __('Series') }}</th>
-                <th>{{ __('Series Type') }}</th>
+                <th>{{ __('Series Types') }}</th>
                 <th class="text-end">{{ __('Actions') }}</th>
               </tr>
             </thead>
             <tbody>
-              @foreach($seriesTypes as $st)
+              @forelse($series as $s)
                 <tr>
-                  <td>{{ $st->id }}</td>
-                  <td>{{ $st->series->series ?? '-' }}</td>
+                  <td>{{ $s->id }}</td>
+                  <td class="fw-semibold">{{ $s->series }}</td>
                   <td>
-                    <span class="badge bg-primary">{{ $st->series_type }}</span>
+                    @forelse($s->seriesTypes as $st)
+                      <span class="badge bg-secondary me-1 mb-1">{{ $st->series_type }}</span>
+                    @empty
+                      <span class="text-muted">-</span>
+                    @endforelse
                   </td>
                   <td class="text-end">
+                    {{-- Quick add preselected to this series --}}
                     <a href="#"
-                       class="btn btn-sm btn-info customModal me-1"
+                       class="btn btn-sm btn-primary customModal me-1"
                        data-size="lg"
-                       data-title="{{ __('Edit Series Type') }}"
-                       data-url="{{ route('master.series-type.edit', $st->id) }}">
-                      <i data-feather="edit"></i>
+                       data-title="{{ __('Add Series Type') }}"
+                       data-url="{{ route('master.series-type.create', ['series_id' => $s->id]) }}">
+                      <i class="fa-solid fa-plus"></i>
                     </a>
 
-                    <form action="{{ route('master.series-type.destroy', $st->id) }}"
-                          method="POST" class="d-inline">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit"
-                              class="btn btn-sm btn-danger"
-                              onclick="return confirm('{{ __('Are you sure?') }}')">
-                        <i data-feather="trash-2"></i>
-                      </button>
-                    </form>
+                    {{-- Optional: link to filter view of just this series --}}
+                    <a href="{{ route('master.series-type.index', ['series_id' => $s->id]) }}"
+                       class="btn btn-sm btn-outline-secondary">
+                      {{ __('View Only This') }}
+                    </a>
                   </td>
                 </tr>
-              @endforeach
+              @empty
+                <tr>
+                  <td colspan="4" class="text-center text-muted">{{ __('No series found.') }}</td>
+                </tr>
+              @endforelse
             </tbody>
           </table>
         </div>
