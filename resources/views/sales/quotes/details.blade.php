@@ -729,7 +729,7 @@
         formData.append('total', total);
         formData.append('internal_note', internal_note);
         formData.append('color_config', colorConfigId);
-        formData.append('color_exterior', colorExtIwd);
+        formData.append('color_exterior', colorExtId);
         formData.append('color_interior', colorIntId);
         formData.append('frame_type', frameType);
         formData.append('fin_type', finType);
