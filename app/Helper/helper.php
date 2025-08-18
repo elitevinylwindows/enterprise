@@ -2154,7 +2154,7 @@ if(!function_exists('checkLastTransactionAndSendToJobPool'))
 {
     function checkLastTransactionAndSendToJobPool()
     {
-        $orders = Order::whereHas('invoices', function ($query) {
+        $orders = Order::whereHas('invoice', function ($query) {
             $query->whereHas('payments', function ($query) {
                 $query->where('status', 'completed');
             });
