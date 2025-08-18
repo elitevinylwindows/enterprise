@@ -755,6 +755,7 @@
         const total = (qty * parseFloat(price)).toFixed(2);
         const tax = (taxRate *(total / 100)).toFixed(2);
         const internal_note = form.querySelector('[name="internal_note"]').value;
+        const temperedFields = [];
 
         const formData = new FormData();
 
