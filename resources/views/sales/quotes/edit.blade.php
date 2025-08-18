@@ -393,12 +393,13 @@
                                         </select>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label>Tempered Glass Option</label>
-                                        <select class="form-control" name="tempered" id="temperedSelect">
-                                            <option value="All">All</option>
-                                            <option value="Select">Select</option>
-                                        </select>
+                                   <div class="mb-3">
+                                    <label class="form-label">Tempered Glass Option</label>
+                                    <select class="form-control" name="tempered" id="temperedOption" required>
+                                        <option value="" disabled {{ old('tempered') ? '' : 'selected' }}>Select…</option>
+                                        <option value="All"    {{ old('tempered') === 'All' ? 'selected' : '' }}>All</option>
+                                        <option value="Select" {{ old('tempered') === 'Select' ? 'selected' : '' }}>Select</option>
+                                    </select>
                                     </div>
 
                                      {{-- Appears based on choice above --}}
@@ -1117,6 +1118,30 @@
                     // Trigger change to load dependent series_type_id options
                     document.getElementById('seriesSelect').dispatchEvent(new Event('change'));
 
+                    if (data.item.tempered_fields) {
+                        $('#temperedMatrix').removeClass('d-none');
+
+                        let temperedFields = [];
+                        try {
+                            // If already array, use as is; if string, parse
+                            temperedFields = Array.isArray(data.item.tempered_fields)
+                                ? data.item.tempered_fields
+                                : JSON.parse(data.item.tempered_fields);
+                        } catch (e) {
+                            temperedFields = [];
+                        }
+                        // Uncheck all first
+                        form.querySelectorAll('input[name="tempered_fields[]"]').forEach(cb => {
+                            cb.checked = false;
+                        });
+                        // Check those present in the array
+                        temperedFields.forEach(val => {
+                            const cb = form.querySelector(`input[name="tempered_fields[]"][value="${val}"]`);
+                            if (cb) cb.checked = true;
+                        });
+
+                    }
+                    
                     setTimeout(() => {
                         form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
                         form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';

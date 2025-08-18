@@ -904,6 +904,28 @@
 
                     form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
 
+                    if (data.item.tempered_fields) {
+                        let temperedFields = [];
+                        try {
+                            // If already array, use as is; if string, parse
+                            temperedFields = Array.isArray(data.item.tempered_fields)
+                                ? data.item.tempered_fields
+                                : JSON.parse(data.item.tempered_fields);
+                        } catch (e) {
+                            temperedFields = [];
+                        }
+                        // Uncheck all first
+                        form.querySelectorAll('input[name="tempered_fields[]"]').forEach(cb => {
+                            cb.checked = false;
+                        });
+                        // Check those present in the array
+                        temperedFields.forEach(val => {
+                            const cb = form.querySelector(`input[name="tempered_fields[]"][value="${val}"]`);
+                            if (cb) cb.checked = true;
+                        });
+                        $('#temperedMatrix').removeClass('d-none');
+                    }
+                    
                     setTimeout(() => {
                         form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
                         form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
