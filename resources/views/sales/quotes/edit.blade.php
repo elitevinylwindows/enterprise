@@ -845,15 +845,17 @@
 
                     calculateTotals();
 
-                    if(data.is_update == false) {
-                        document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
-                    } else {
-                        const existingRow = document.querySelector(`#quoteDetailsTable tbody tr[data-id="${data.item_id}"]`);
-                        if (existingRow) {
-                            existingRow.remove();
-                        }
+                    if(data.is_modification == false) {
+                        if(data.is_update == false) {
+                            document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
+                        } else {
+                            const existingRow = document.querySelector(`#quoteDetailsTable tbody tr[data-id="${data.item_id}"]`);
+                            if (existingRow) {
+                                existingRow.remove();
+                            }
 
-                        document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
+                            document.querySelector('#quoteDetailsTable tbody').insertAdjacentHTML('beforeend', row);
+                        }
                     }
 
                     // Handle modifications if present

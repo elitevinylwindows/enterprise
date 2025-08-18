@@ -2080,7 +2080,7 @@ if(!function_exists('sendOrderMail')) {
     function sendOrderMail($order)
     {
         $modificationsByDate = $order->items->where('is_modification', true)->groupBy(function ($mod) {
-            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d H:i A');
         });
 
         $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order, 'modificationsByDate' => $modificationsByDate])->setPaper('a4', 'landscape');
