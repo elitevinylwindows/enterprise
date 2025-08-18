@@ -730,7 +730,7 @@ public function index(Request $request)
         }
     }
 
-    public function destroyItem($id, $itemId, $type)
+    public function destroyItem($id, $itemId, $type = 'quote_item')
     {
         if($type == 'quote_item') 
         {
