@@ -150,7 +150,7 @@
                    data-size="xl"
                    data-url="{{ route('sales.orders.edit', $order->id) }}"
                    data-title="Rush Order">
-                    <i data-feather="edit"></i>
+                   <i class="fa-solid fa-bolt-lightning"></i>
                 </a>
 
                 {{-- Edit --}}
@@ -161,7 +161,8 @@
                    data-size="xl"
                    data-url="{{ route('sales.orders.edit', $order->id) }}"
                    data-title="Edit Order">
-                    <i class="fa-solid fa-bolt-lightning"></i>
+                   <i data-feather="edit"></i>
+                   
                 </a>
 
                 {{-- Delete --}}
