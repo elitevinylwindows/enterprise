@@ -419,18 +419,6 @@
                                     {{-- We’ll put hidden clones here when “All” (so values submit even if disabled) --}}
                                     <div id="temperedGhosts" class="d-none"></div>
                                     </div>
-
-
-                                    <div class="mb-3">
-                                        <label>Inside Tempered</label>
-                                        <input type="checkbox" class="form-check-input" value="true" name="inside_tempered" id="inside_tempered">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label>Outside Tempered</label>
-                                        <input type="checkbox" class="form-check-input" value="true" name="outside_tempered" id="outside_tempered">
-                                    </div>
-
                                    
                                     <div class="mb-3">
                                         <label>Specialty Glass</label>
