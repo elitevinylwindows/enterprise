@@ -25,9 +25,9 @@ class ProductType extends Model
         )->withTimestamps();
     }
 
-    public function line()
+ public function line()
 {
-    return $this->belongsTo(Line::class);
+    return $this->belongsTo(\App\Models\Manufacturing\Line::class, 'line_id');
 }
 
 }
