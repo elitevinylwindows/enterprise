@@ -242,7 +242,7 @@ class FirstServe
         $paymentMethod = $response->getBody()->getContents();
         Log::info("Payment Method Created: " . $paymentMethod);
         return json_decode($paymentMethod, true);
-        
+
     }
 
     public function getPaymentMethods($customer)
@@ -276,7 +276,12 @@ class FirstServe
                 ],
                 'transaction_details' => [
                     'invoice_number' => $invoiceId,
-                ]
+                ],
+                'amount_details' => [
+                    'subtotal' => (float)$amount,
+                    'tax' => 0, // Assuming no tax for this transaction
+                    'shipping' => 0, // Assuming no shipping for this transaction
+                ],
             ]
         ]);
 

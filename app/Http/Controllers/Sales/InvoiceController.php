@@ -213,9 +213,9 @@ class InvoiceController extends Controller
                 $totalPaid = InvoicePayment::where('invoice_id', $invoice->id)
                     ->whereIn('payment_type', ['deposit', 'payment'])
                     ->sum('payment_amount');
-                
+
                 $remainingAmount = $invoice->total - $totalPaid;
-                
+
                 if ($amount > $remainingAmount) {
                     return redirect()->back()->with('error', 'Payment amount exceeds remaining invoice amount.');
                 }
@@ -250,7 +250,7 @@ class InvoiceController extends Controller
                 // Update invoice status
                 $newTotalPaid = $totalPaid + $amount;
                 $newRemaining = $invoice->total - $newTotalPaid;
-                
+
                 $invoice->update([
                     'paid_amount' => $newTotalPaid,
                     'remaining_amount' => $newRemaining,
@@ -265,7 +265,7 @@ class InvoiceController extends Controller
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error("Payment Processing Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
-                
+
                 return redirect()->back()->with('error', 'Operation failed: ' . $e->getMessage());
             }
     }
@@ -370,7 +370,7 @@ class InvoiceController extends Controller
             $error = json_decode($e->getResponse()->getBody()->getContents(), true);
             Log::error($error['error_details']['error']);
             return redirect()->back()->with('error', 'Failed to add payment method: ' . $error['error_details']['error']);
-            
+
         }
     }
 }
