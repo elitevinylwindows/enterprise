@@ -719,7 +719,7 @@ public function index(Request $request)
             $quote = \App\Models\Sales\Quote::with('items')->findOrFail($id);
             $order = quoteToOrder($quote);
 
-           sendOrderMail($order);
+                sendOrderMail($order);
 
             DB::commit();
         return redirect()->route('sales.orders.index', $order->id)->with('success', 'Quote converted to Order successfully.');
