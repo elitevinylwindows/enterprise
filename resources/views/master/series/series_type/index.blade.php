@@ -67,41 +67,45 @@
                 <th class="text-end">{{ __('Actions') }}</th>
               </tr>
             </thead>
-            <tbody>
-              @forelse($series as $s)
-                <tr>
-                  <td>{{ $s->id }}</td>
-                  <td class="fw-semibold">{{ $s->series }}</td>
-                  <td>
-                    @forelse($s->seriesTypes as $st)
-                      <span class="badge bg-secondary me-1 mb-1">{{ $st->series_type }}</span>
-                    @empty
-                      <span class="text-muted">-</span>
-                    @endforelse
-                  </td>
-                  <td class="text-end">
-                    {{-- Quick add preselected to this series --}}
-                    <a href="#"
-                       class="btn btn-sm btn-primary customModal me-1"
-                       data-size="lg"
-                       data-title="{{ __('Add Series Type') }}"
-                       data-url="{{ route('master.series-type.create', ['series_id' => $s->id]) }}">
-                      <i class="fa-solid fa-plus"></i>
-                    </a>
+           <tbody>
+  @forelse($series as $s)
+    <tr>
+      <td>{{ $s->id }}</td>
+      <td class="fw-semibold">{{ $s->series }}</td>
+      <td>
+        @forelse($s->seriesTypes as $st)
+          <span class="badge bg-secondary me-1 mb-1">{{ $st->series_type }}</span>
+        @empty
+          <span class="text-muted">-</span>
+        @endforelse
+      </td>
+      <td class="text-end">
+        {{-- EDIT: manage checkboxes for this series --}}
+        <a href="#"
+           class="btn btn-sm btn-info customModal me-1"
+           data-size="lg"
+           data-title="{{ __('Edit Series Types for') }} {{ $s->series }}"
+           data-url="{{ route('master.series-type.manage', $s->id) }}">
+          <i data-feather="edit"></i>
+        </a>
 
-                    {{-- Optional: link to filter view of just this series --}}
-                    <a href="{{ route('master.series-type.index', ['series_id' => $s->id]) }}"
-                       class="btn btn-sm btn-outline-secondary">
-                      {{ __('View Only This') }}
-                    </a>
-                  </td>
-                </tr>
-              @empty
-                <tr>
-                  <td colspan="4" class="text-center text-muted">{{ __('No series found.') }}</td>
-                </tr>
-              @endforelse
-            </tbody>
+        {{-- DELETE: remove all types for this series (not the series itself) --}}
+        <form action="{{ route('master.series-type.destroy-by-series', $s->id) }}"
+              method="POST" class="d-inline">
+          @csrf @method('DELETE')
+          <button type="submit" class="btn btn-sm btn-danger"
+                  onclick="return confirm('{{ __('Remove ALL types for this series?') }}')">
+            <i data-feather="trash-2"></i>
+          </button>
+        </form>
+      </td>
+    </tr>
+  @empty
+    <tr>
+      <td colspan="4" class="text-center text-muted">{{ __('No series found.') }}</td>
+    </tr>
+  @endforelse
+</tbody>
           </table>
         </div>
       </div>
