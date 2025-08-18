@@ -3,11 +3,6 @@
   @csrf
   @method('PUT')
 
-  <div class="modal-header">
-    <h5 class="modal-title">{{ __('Edit Series Types') }} — {{ $series->series }}</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-  </div>
-
   <div class="modal-body">
     {{-- Search + Select All row --}}
     <div class="d-flex flex-column flex-sm-row gap-2 align-items-sm-center mb-2">
