@@ -141,7 +141,7 @@
 
                                      {{-- Send Order to Pool without Payment --}}
                                     <a class="avtar avtar-md btn-link-success text-success customModal" data-bs-toggle="tooltip" title="Send to Pool (Not Paid)" href="#" data-size="lg" data-url="{{ route('sales.invoices.payment', $invoice->id) }}" data-title="Send to Pool (Not Paid)">
-                                        <i class="fa-solid fa-dove"></i>
+                                        <i class="fa-solid fa-heart-circle-bolt"></i>
                                     </a>
 
                                     {{-- Edit --}}
