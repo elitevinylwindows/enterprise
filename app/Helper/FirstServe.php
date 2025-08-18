@@ -271,16 +271,39 @@ class FirstServe
                 'source' =>'pm-'.$paymentMethodId,
                 'save_card' => true,
                 'charge' => true,
+                'name' => 'Card Charge',
                 'customer' => [
-                    'customer_id' =>(int) $customer->serve_customer_id
+                    'customer_id' =>(int) $customer->serve_customer_id,
+                    'email' => $customer->email,
                 ],
                 'transaction_details' => [
                     'invoice_number' => $invoiceId,
+                ],
+                'transaction_flags' =>[
+                    'is_customer_initiated' => true,
+                    'cardholder_present' => true,
+                    'card_present' => true,
                 ],
                 'amount_details' => [
                     'subtotal' => (float)$amount,
                     'tax' => 0, // Assuming no tax for this transaction
                     'shipping' => 0, // Assuming no shipping for this transaction
+                ],
+                 'billing_info' => [
+                    // Fill in address fields as required
+                    'street' => $customer->billing_address,
+                    'city' => $customer->billing_city ?: "",
+                    'state' => $customer->billing_state ?: "",
+                    'postal_code' => $customer->billing_zip ?: "",
+                    'country' => $customer->billing_country ?: ""
+                ],
+                'shipping_info' => [
+                    // Fill in address fields as required
+                    'street' => $customer->delivery_address ?: "",
+                    'city' => $customer->delivery_city ?: "",
+                    'state' => $customer->delivery_state ?: "",
+                    'postal_code' => $customer->delivery_zip ?: "",
+                    'country' => $customer->delivery_country ?: ""
                 ],
             ]
         ]);
