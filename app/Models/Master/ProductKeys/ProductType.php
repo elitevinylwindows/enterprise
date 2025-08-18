@@ -25,6 +25,9 @@ class ProductType extends Model
         )->withTimestamps();
     }
 
+      protected $casts = [
+        'line_id' => 'integer',
+    ];
     public function line()
 {
     return $this->belongsTo(Line::class);
