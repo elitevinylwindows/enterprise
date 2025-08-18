@@ -534,6 +534,15 @@ use Stripe\Webhook;
             Route::resource('series-configuration', SeriesConfigurationController::class);
             Route::get('series-type/configs-by-series/{series}', [SeriesTypeController::class, 'configsBySeries'])
         ->name('series-type.configs');
+Route::get('series-type/manage/{series}', [SeriesTypeController::class, 'manage'])
+    ->name('series-type.manage');
+
+Route::put('series-type/manage/{series}', [SeriesTypeController::class, 'manageUpdate'])
+    ->name('series-type.manage.update');
+
+Route::delete('series-type/destroy-by-series/{series}', [SeriesTypeController::class, 'destroyBySeries'])
+    ->name('series-type.destroy-by-series');
+
         });
 
         //Prices
