@@ -33,7 +33,7 @@
           <div class="input-group">
             <input type="text" name="q" class="form-control" placeholder="{{ __('Search name/email/spot…') }}"
                    value="{{ $q ?? '' }}">
-            <button class="btn btn-outline-light" type="submit">{{ __('Search') }}</button>
+            <button class="btn btn-outline-primary" type="submit">{{ __('Search') }}</button>
           </div>
         </form>
       </div>
