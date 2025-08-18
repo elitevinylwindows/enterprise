@@ -784,11 +784,13 @@ public function index(Request $request)
 
                 sendOrderMail($order);
 
-                $invoice = quoteToInvoice($quote, $order);
+                quoteToInvoice($quote, $order);
 
                 if (!$order) {
                     return redirect()->route('sales.quotes.index')->withErrors(['error' => 'Failed to convert quote to order.']);
                 }
+
+                $quote->approved_at = now();
             }
 
             $quote->status = $status;

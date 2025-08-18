@@ -11,6 +11,7 @@ use App\Models\Custom;
 use App\Models\FAQ;
 use App\Models\HomePage;
 use App\Models\LoggedHistory;
+use App\Models\Manufacturing\JobPool;
 use App\Models\Master\Prices\TaxCode;
 use App\Models\Notification;
 use App\Models\Page;
@@ -2105,7 +2106,33 @@ if(!function_exists('sendOrderToJobPool'))
 {
     function sendOrderToJobPool($order)
     {
-        // Dispatch the order to the job pool for processing
-        ProcessOrderJob::dispatch($order);
+        try{
+            DB::beginTransaction();
+            $invoice = Invoice::where('order_id', $order->id)
+                ->whereHas('payments', function ($query) {
+                    $query->where('status', 'completed');
+                });
+
+            $lastTransactionDate = $invoice->exists() ? $invoice->payments->max('created_at') : now();
+                
+            $jobPool = JobPool::create([
+                'order_id' => $order->id,
+                'job_order_number' => 'JOR-' . str_pad(JobPool::max('id') + 1, 5, '0', STR_PAD_LEFT),
+                'series' => $order->series,
+                'qty' => $order->items->sum('qty'),
+                'line' => $order->line,
+                'delivery_date' => $order->expected_delivery_date,
+                'type' => $order->type,
+                'production_status' => 'pending',
+                'entry_date' => now(),
+                'last_transaction_date' => $lastTransactionDate,
+            ]);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e);
+            Log::error('Error sending order to job pool: ' . $e->getMessage());
+        }
     }
 }
