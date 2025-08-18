@@ -55,7 +55,7 @@
 
                             <p>
                                 {{ __('Thank you for choosing') }} <strong>{{ env('APP_NAME') }}</strong>.
-                                {{ __('Your invoice has been generated. Please review the details below and proceed with the payment at your earliest convenience.') }}
+                                {{ __('Your invoice has been generated. Please review the details below and we will reach out to process payment within 48 hours.') }}
                             </p>
 
                             {{-- Invoice Summary --}}
@@ -78,7 +78,7 @@
                                 </tr>
                             </table>
 
-                            <p>{{ __('Please make the payment by the due date to avoid any late charges. If you have any questions, feel free to contact our support team.') }}</p>
+                            <p>{{ __('During this 48 hour period, your order can still be modified unless you specify otherwise. If you have any questions, feel free to contact our support team.') }}</p>
 
                             {{-- Footer --}}
                             <div class="footer" style="margin-top: 30px;">
