@@ -42,7 +42,8 @@ class QuoteItem extends Model
         'series_type',
         'discount',
         'is_modification',
-        'modification_date'
+        'modification_date',
+        'tempered_fields'
     ];
 
 

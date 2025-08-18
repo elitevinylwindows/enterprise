@@ -677,6 +677,9 @@
         const item_id = form.querySelector('[name="item_id"]').value;
         const laminateExtText = colorExt ?.selectedOptions[0] ?.text ?? '';
         const colorIntText = colorInt ?.selectedOptions[0] ?.text ?? '';
+        const temperedFields = [];
+
+       
 
         let colorDisplay = '';
         if (colorConfig.includes('LAM')) {
@@ -715,6 +718,12 @@
         const internal_note = form.querySelector('[name="internal_note"]').value;
 
         const formData = new FormData();
+
+        form.querySelectorAll('input[name="tempered_fields[]"]:checked').forEach(cb => {
+            temperedFields.push(cb.value);
+        });
+        temperedFields.forEach(val => formData.append('tempered_fields[]', val));
+
         formData.append('item_id', item_id);
         formData.append('series_id', series_id);
         formData.append('series_type', config);
@@ -959,6 +968,27 @@
                     form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
                     form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
                     form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
+                    if (data.item.tempered_fields) {
+                        let temperedFields = [];
+                        try {
+                            // If already array, use as is; if string, parse
+                            temperedFields = Array.isArray(data.item.tempered_fields)
+                                ? data.item.tempered_fields
+                                : JSON.parse(data.item.tempered_fields);
+                        } catch (e) {
+                            temperedFields = [];
+                        }
+                        // Uncheck all first
+                        form.querySelectorAll('input[name="tempered_fields[]"]').forEach(cb => {
+                            cb.checked = false;
+                        });
+                        // Check those present in the array
+                        temperedFields.forEach(val => {
+                            const cb = form.querySelector(`input[name="tempered_fields[]"][value="${val}"]`);
+                            if (cb) cb.checked = true;
+                        });
+                        $('#temperedMatrix').removeClass('d-none');
+                    }
                     // Pre-select series_id (dropdown)
                     const seriesSelect = $('#seriesSelect');
                     seriesSelect.val(data.item.series_id ?? '');
@@ -1547,33 +1577,6 @@ updateWindowPreview();
     }
 
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const temperedSelect = document.getElementById('temperedSelect');
-        const insideTempered = document.getElementById('inside_tempered');
-        const outsideTempered = document.getElementById('outside_tempered');
-
-        function updateTemperedCheckboxes() {
-            if (temperedSelect.value === 'All') {
-                insideTempered.checked = true;
-                outsideTempered.checked = true;
-                insideTempered.disabled = true;
-                outsideTempered.disabled = true;
-                insideTempered.tabIndex = -1;
-                outsideTempered.tabIndex = -1;
-            } else {
-                insideTempered.disabled = false;
-                outsideTempered.disabled = false;
-                insideTempered.tabIndex = 0;
-                outsideTempered.tabIndex = 0;
-            }
-        }
-
-        temperedSelect.addEventListener('change', updateTemperedCheckboxes);
-
-        // Initial state
-        updateTemperedCheckboxes();
-    });
-
     // Save draft button click event
     document.getElementById('saveDraftButton').addEventListener('click', function() {
         const formData = new FormData();
@@ -1662,8 +1665,6 @@ updateWindowPreview();
     // Initial calculation on page load
     document.addEventListener('DOMContentLoaded', calculateTotals);
 
-</script>
-<script>
 (function(){
   const sel     = document.getElementById('temperedOption');
   const block   = document.getElementById('temperedMatrix');

@@ -401,6 +401,67 @@
                                         </select>
                                     </div>
 
+                                     {{-- Appears based on choice above --}}
+                                    <div id="temperedMatrix" class="border rounded p-3 mb-3 d-none">
+                                        <div class="fw-semibold mb-2">Apply Tempered to:</div>
+
+                                        <div class="row g-3">
+                                            {{-- Glass Field 1 --}}
+                                            <div class="col-12 col-md-6">
+                                                <div class="small text-muted mb-1">Glass Field 1</div>
+
+                                                <div class="form-check">
+                                                    <input class="form-check-input tempered-box" type="checkbox" id="gf1_i" name="tempered_fields[]"
+                                                        value="gf1_i"
+                                                        {{ in_array('gf1_i', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="gf1_i">Interior</label>
+                                                </div>
+
+                                                <div class="form-check">
+                                                    <input class="form-check-input tempered-box" type="checkbox" id="gf1_e" name="tempered_fields[]"
+                                                        value="gf1_e"
+                                                        {{ in_array('gf1_e', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="gf1_e">Exterior</label>
+                                                </div>
+
+                                                <div class="form-check">
+                                                    <input class="form-check-input tempered-box" type="checkbox" id="gf1_b" name="tempered_fields[]"
+                                                        value="gf1_b"
+                                                        {{ in_array('gf1_b', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="gf1_b">Both</label>
+                                                </div>
+                                            </div>
+
+                                            {{-- Glass Field 2 --}}
+                                            <div class="col-12 col-md-6">
+                                                <div class="small text-muted mb-1">Glass Field 2</div>
+
+                                                <div class="form-check">
+                                                    <input class="form-check-input tempered-box" type="checkbox" id="gf2_i" name="tempered_fields[]"
+                                                        value="gf2_i"
+                                                        {{ in_array('gf2_i', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="gf2_i">Interior</label>
+                                                </div>
+
+                                                <div class="form-check">
+                                                    <input class="form-check-input tempered-box" type="checkbox" id="gf2_e" name="tempered_fields[]"
+                                                        value="gf2_e"
+                                                        {{ in_array('gf2_e', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="gf2_e">Exterior</label>
+                                                </div>
+
+                                                <div class="form-check">
+                                                    <input class="form-check-input tempered-box" type="checkbox" id="gf2_b" name="tempered_fields[]"
+                                                        value="gf2_b"
+                                                        {{ in_array('gf2_b', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="gf2_b">Both</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {{-- We’ll put hidden clones here when “All” (so values submit even if disabled) --}}
+                                        <div id="temperedGhosts" class="d-none"></div>
+                                    </div>
 
                                     <div class="mb-3">
                                         <label>Specialty Glass</label>
@@ -695,6 +756,13 @@
         const internal_note = form.querySelector('[name="internal_note"]').value;
 
         const formData = new FormData();
+
+        form.querySelectorAll('input[name="tempered_fields[]"]:checked').forEach(cb => {
+            temperedFields.push(cb.value);
+        });
+        temperedFields.forEach(val => formData.append('tempered_fields[]', val));
+
+
         formData.append('item_id', item_id);
         formData.append('series_id', series_id);
         formData.append('series_type', config);
@@ -953,6 +1021,30 @@
                     form.querySelector('[name="custom_lock_position"]').checked = !!data.item.custom_lock_position;
                     form.querySelector('[name="custom_vent_latch"]').checked = !!data.item.custom_vent_latch;
                     form.querySelector('[name="knocked_down"]').checked = !!data.item.knocked_down;
+
+                    if (data.item.tempered_fields) {
+                        $('#temperedMatrix').removeClass('d-none');
+
+                        let temperedFields = [];
+                        try {
+                            // If already array, use as is; if string, parse
+                            temperedFields = Array.isArray(data.item.tempered_fields)
+                                ? data.item.tempered_fields
+                                : JSON.parse(data.item.tempered_fields);
+                        } catch (e) {
+                            temperedFields = [];
+                        }
+                        // Uncheck all first
+                        form.querySelectorAll('input[name="tempered_fields[]"]').forEach(cb => {
+                            cb.checked = false;
+                        });
+                        // Check those present in the array
+                        temperedFields.forEach(val => {
+                            const cb = form.querySelector(`input[name="tempered_fields[]"][value="${val}"]`);
+                            if (cb) cb.checked = true;
+                        });
+
+                    }
 
                     form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
                    
@@ -1703,32 +1795,6 @@
         });
     }
 
-      document.addEventListener('DOMContentLoaded', function() {
-        const temperedSelect = document.getElementById('temperedSelect');
-        const insideTempered = document.getElementById('inside_tempered');
-        const outsideTempered = document.getElementById('outside_tempered');
-
-        function updateTemperedCheckboxes() {
-            if (temperedSelect.value === 'All') {
-                insideTempered.checked = true;
-                outsideTempered.checked = true;
-                insideTempered.disabled = true;
-                outsideTempered.disabled = true;
-                insideTempered.tabIndex = -1;
-                outsideTempered.tabIndex = -1;
-            } else {
-                insideTempered.disabled = false;
-                outsideTempered.disabled = false;
-                insideTempered.tabIndex = 0;
-                outsideTempered.tabIndex = 0;
-            }
-        }
-
-        temperedSelect.addEventListener('change', updateTemperedCheckboxes);
-
-        // Initial state
-        updateTemperedCheckboxes();
-    });
     
     // Save draft button click event
     document.getElementById('saveDraftButton').addEventListener('click', function() {
@@ -1818,6 +1884,70 @@
 
     // Initial calculation on page load
     document.addEventListener('DOMContentLoaded', calculateTotals);
+
+(function(){
+  const sel     = document.getElementById('temperedOption');
+  const block   = document.getElementById('temperedMatrix');
+  const ghosts  = document.getElementById('temperedGhosts');
+
+  if (!sel || !block || !ghosts) return;
+
+  const checks = block.querySelectorAll('.tempered-box');
+
+  // Preserve previously checked (validation back) if user chose Select
+  const preset = new Set(@json(old('tempered_fields', [])));
+
+  function clearGhosts(){ ghosts.innerHTML = ''; }
+
+  function ensureGhosts(){
+    clearGhosts();
+    checks.forEach(cb => {
+      const h = document.createElement('input');
+      h.type  = 'hidden';
+      h.name  = 'tempered_fields[]';
+      h.value = cb.value;
+      ghosts.appendChild(h);
+    });
+  }
+
+  function lockAll(){
+    checks.forEach(cb => {
+      cb.checked = true;
+      cb.disabled = true;
+      cb.classList.add('tempered-locked');
+    });
+    ensureGhosts(); // make sure values post while disabled
+  }
+
+  function unlockForSelect(){
+    clearGhosts();
+    checks.forEach(cb => {
+      cb.disabled = false;
+      cb.classList.remove('tempered-locked');
+      // If we have preset values from a failed validation, honor them; else start unchecked
+      cb.checked = preset.size ? preset.has(cb.value) : false;
+    });
+  }
+
+  function apply(val){
+    if (!val) {
+      block.classList.add('d-none');
+      clearGhosts();
+      return;
+    }
+    block.classList.remove('d-none');
+    if (val === 'All') lockAll();
+    else unlockForSelect();
+  }
+
+  // Init on load
+  apply(sel.value || '');
+
+  // React to changes
+  sel.addEventListener('change', function(){
+    apply(this.value || '');
+  });
+})();
 
 </script>
 
