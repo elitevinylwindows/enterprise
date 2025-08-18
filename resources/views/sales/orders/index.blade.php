@@ -142,6 +142,17 @@
                 </a>
                 @endif
 
+                {{-- Rush --}}
+                <a class="avtar avtar-xs btn-link-primary text-primary customModal"
+                   data-bs-toggle="tooltip"
+                   data-bs-original-title="Rush"
+                   href="#"
+                   data-size="xl"
+                   data-url="{{ route('sales.orders.edit', $order->id) }}"
+                   data-title="Rush Order">
+                    <i data-feather="edit"></i>
+                </a>
+
                 {{-- Edit --}}
                 <a class="avtar avtar-xs btn-link-primary text-primary customModal"
                    data-bs-toggle="tooltip"
@@ -150,7 +161,7 @@
                    data-size="xl"
                    data-url="{{ route('sales.orders.edit', $order->id) }}"
                    data-title="Edit Order">
-                    <i data-feather="edit"></i>
+                    <i class="fa-solid fa-bolt-lightning"></i>
                 </a>
 
                 {{-- Delete --}}
