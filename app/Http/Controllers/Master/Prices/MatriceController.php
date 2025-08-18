@@ -22,16 +22,15 @@ class MatriceController extends Controller
                 'elitevw_master_series_types.series_type as type'
             );
 
-        if ($request->filled('series_id')) {
-            $prices->where('elitevw_master_price_price_matrices.series_id', $request->series_id);
+        if (isset($request->series)) {
+            $prices->where('elitevw_master_price_price_matrices.series_id', $request->series);
         }
 
-        if ($request->filled('series_type_id')) {
+        if (isset($request->series_type_id)) {
             $prices->where('elitevw_master_price_price_matrices.series_type_id', $request->series_type_id);
         }
 
-$prices = $prices->get();
-
+        $prices = $prices->get();
 // Apply markup to each price record
 $prices->transform(function ($item) {
     $markup = DB::table('elitevw_master_markup')

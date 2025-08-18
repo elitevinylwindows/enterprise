@@ -15,7 +15,7 @@ class QuoteRequestController extends Controller
             $decryptedId = Crypt::decryptString($token);
             $quote = Quote::with(['items', 'customer'])->findOrFail($decryptedId);
             $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
-                return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d H:i A');
+                return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d h:i A');
             });
         } catch (\Exception $e) {
             abort(403, 'Invalid or expired token.');

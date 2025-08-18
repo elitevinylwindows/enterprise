@@ -81,7 +81,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $customers = Customer::pluck('customer_name', 'id');
         $modificationsByDate = $order->items->where('is_modification', true)->groupBy(function ($mod) {
-            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d H:i A');
+            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d h:i A');
         });
         return view('sales.orders.edit', compact('order', 'customers', 'modificationsByDate'));
     }
@@ -164,7 +164,7 @@ class OrderController extends Controller
     {
         $order = Order::with('items')->findOrFail($id);
         $modificationsByDate = $order->items->where('is_modification', true)->groupBy(function ($mod) {
-            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d H:i A');
+            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d h:i A');
         });
 
         return view('sales.orders.show', compact('order', 'modificationsByDate'));

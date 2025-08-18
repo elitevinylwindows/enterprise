@@ -2080,7 +2080,7 @@ if(!function_exists('sendOrderMail')) {
     function sendOrderMail($order)
     {
         $modificationsByDate = $order->items->where('is_modification', true)->groupBy(function ($mod) {
-            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d H:i A');
+            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d h:i A');
         });
 
         $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order, 'modificationsByDate' => $modificationsByDate])->setPaper('a4', 'landscape');
@@ -2129,11 +2129,10 @@ if(!function_exists('sendOrderToJobPool'))
                     JobPool::create([
                         'order_id'             => $order->id,
                         'job_order_number'     => 'JOR-' . str_pad(JobPool::max('id') + 1, 5, '0', STR_PAD_LEFT),
-                        'series'               => $order->series,
                         'qty'                  => $order->items->sum('qty'),
                         'line'                 => $order->line,
                         'delivery_date'        => $order->expected_delivery_date,
-                        'type'                 => $order->type,
+                        'type'                 => $order->type,  // window or door,
                         'production_status'    => 'pending',
                         'entry_date'           => now(),
                         'last_transaction_date'=> $lastTransactionDate,
