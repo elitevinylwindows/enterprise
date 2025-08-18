@@ -160,6 +160,7 @@ public function index(Request $request)
                 'glass_type' => 'nullable|string',
                 'spacer' => 'nullable|string',
                 'tempered' => 'nullable|string',
+                'tempered_fields' => 'nullable|array',
                 'specialty_glass' => 'nullable|string',
                 'grid_pattern' => 'nullable|string',
                 'grid_profile' => 'nullable|string',
@@ -196,6 +197,7 @@ public function index(Request $request)
                         'color_exterior' => $request->color_exterior,
                         'color_interior' => $request->color_interior,
                         'frame_type' => $request->frame_type,
+                        'tempered_fields' => json_encode($request->tempered_fields ?? []),
                         'fin_type' => $request->fin_type,
                         'glass_type' => $request->glass_type,
                         'spacer' => $request->spacer,
@@ -247,6 +249,7 @@ public function index(Request $request)
                     'color_interior' => $request->color_interior,
                     'frame_type' => $request->frame_type,
                     'fin_type' => $request->fin_type,
+                    'tempered_fields' => json_encode($request->tempered_fields ?? []),
                     'glass_type' => $request->glass_type,
                     'spacer' => $request->spacer,
                     'tempered' => $request->tempered,
@@ -449,9 +452,10 @@ public function index(Request $request)
     {
         $quote = Quote::with('items')->findOrFail($id);
 
-        $modificationsByDate = $quote->modifications->groupBy(function ($mod) {
-            return \Carbon\Carbon::parse($mod->created_at)->toDateString();
+        $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
         });
+        
 
         return view('sales.quotes.preview', compact('quote', 'modificationsByDate'));
     }
@@ -459,7 +463,10 @@ public function index(Request $request)
     public function download($id)
     {
         $quote = Quote::with('items')->findOrFail($id);
-        $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
+        $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
+        $pdf = Pdf::loadView('sales.quotes.preview', compact('quote', 'modificationsByDate'));
         return $pdf->download("Quote_{$id}.pdf");
     }
 
@@ -467,7 +474,11 @@ public function index(Request $request)
     {
         $quote = Quote::findOrFail($id);
 
-        $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
+        $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
+
+        $pdf = Pdf::loadView('sales.quotes.preview', compact('quote', 'modificationsByDate'));
 
         try {
             Mail::to($quote->customer->email)
@@ -753,6 +764,7 @@ public function index(Request $request)
     public function previewPDF($id)
     {
         $order = Order::findOrFail($id);
+        
         $pdf = PDF::loadView('sales.quotes.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
         return $pdf->stream('quote-' . $order->id . '.pdf');
     }
@@ -797,9 +809,13 @@ public function index(Request $request)
         $quote->total = $request->total ?? 0;
         $quote->save();
 
+         $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
+
         if($request->status === 'Quote Submitted') {
 
-            $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
+            $pdf = Pdf::loadView('sales.quotes.preview', compact('quote', 'modificationsByDate'));
 
             Mail::to($quote->customer->email)
             ->send(new QuoteEmail($quote, $pdf));
