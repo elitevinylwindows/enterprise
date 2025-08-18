@@ -34,31 +34,21 @@ public function edit($id)
 }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'product_type' => 'required|string|max:255',
-            'series'       => 'required|string|max:255', // storing the series *name* string
-            'description'  => 'required|string|max:255',
-            'type' => 'nullable|string|max:255',
-            'line' => 'nullable|string|max:255',
-            'material_type' => 'nullable|string|max:255',
-            'glazing_bead_position' => 'nullable|string|max:255',
-            'product_id'   => 'required|string|max:255',
-        ]);
+{
+    $data = $request->validate([
+        'product_type' => 'required|string|max:255',
+        'series'       => 'required|string|max:255',
+        'description'  => 'required|string|max:255',
+        'type'         => 'nullable|string|max:255', // or Rule::in(['Door','Window'])
+        'line_id'      => ['required', Rule::exists((new Line)->getTable(), 'id')], // <-- here
+        'material_type'         => 'nullable|string|max:255',
+        'glazing_bead_position' => 'nullable|string|max:255',
+        'product_id'   => 'required|string|max:255',
+    ]);
 
-        ProductType::create($request->only([
-            'product_type',
-            'series',                 // we store the selected series name
-            'description',
-            'type',
-            'line',
-            'material_type',
-            'glazing_bead_position',
-            'product_id',
-        ]));
-
-        return redirect()->back()->with('success', 'Product Type created successfully.');
-    }
+    ProductType::create($data); // includes line_id now
+    return redirect()->back()->with('success', 'Product Type created successfully.');
+}
 
    
 
@@ -69,7 +59,7 @@ public function edit($id)
             'series'       => 'required|string|max:255',
             'description'  => 'required|string|max:255',
             'type' => 'nullable|string|max:255',
-            'line' => 'nullable|string|max:255',
+            'line_id' => 'nullable|string|max:255',
             'material_type' => 'nullable|string|max:255',
             'glazing_bead_position' => 'nullable|string|max:255',
             'product_id'   => 'required|string|max:255',
@@ -81,7 +71,7 @@ public function edit($id)
             'series',                 // store selected series name
             'description',
             'type',
-            'line',
+            'line_id',
             'material_type',
             'glazing_bead_position',
             'product_id',
