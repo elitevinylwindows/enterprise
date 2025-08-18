@@ -50,7 +50,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Item</th>
-                                <th>Qty</th>
+                                 <th>Qty</th>
                                 <th>Size</th>
                                 <th>Glass</th>
                                 <th>Grid</th>
@@ -72,8 +72,8 @@
                             @endforeach
                         </tbody>
                     </table>
-                    @if(!$modificationsByDate->isEmpty())
-                    @foreach ($modificationsByDate as $date => $modifications)
+                        @if(!$modificationsByDate->isEmpty())
+                @foreach ($modificationsByDate as $date => $modifications)
                     <table class="table table-bordered table-striped mt-4 modificationsTable" data-mod-date="{{ $date }}">
                         <thead class="table-light">
                             <tr>
@@ -91,20 +91,20 @@
                         </thead>
                         <tbody>
                             @foreach ($modifications as $modification)
-                            <tr data-id="{{ $modification->id }}" data-type="modification">
-                                <td style="text-wrap:auto">{{ $modification->description }}</td>
-                                <td>{{ $modification->qty }}</td>
-                                <td>{{ $modification->width }}" x {{ $modification->height }}"</td>
-                                <td>{{ $modification->glass }}</td>
-                                <td>{{ $modification->grid }}</td>
-                                <td>${{ number_format($modification->price, 2) }}</td>
-                                <td>${{ number_format($modification->total, 2) }}</td>
-                            </tr>
+                                <tr data-id="{{ $modification->id }}" data-type="modification">
+                                    <td style="text-wrap:auto">{{ $modification->description }}</td>
+                                    <td>{{ $modification->qty }}</td>
+                                    <td>{{ $modification->width }}" x {{ $modification->height }}"</td>
+                                    <td>{{ $modification->glass }}</td>
+                                    <td>{{ $modification->grid }}</td>
+                                    <td>${{ number_format($modification->price, 2) }}</td>
+                                    <td>${{ number_format($modification->total, 2) }}</td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
-                    @endforeach
-                    @endif
+                @endforeach
+            @endif
                     <div class="mt-4">
                         <div class="col-md-6 offset-md-6">
                             <table class="table">
@@ -151,28 +151,26 @@
 @endsection
 
 @push('scripts')
-<script>
-    $(document).ready(function() {
-        // Calculate totals on page load
-        calculateTotals();
-    });
+    <script>
+        $(document).ready(function() {
+            // Calculate totals on page load
+            calculateTotals();
+        });
 
-    function calculateTotals(shipping = 0, modalOpen = false) {
+        function calculateTotals(shipping = 0, modalOpen = false) {
 
-        fetch('{{ route('
-            calculate.total ', ['
-            quote_id ' => $quote->id]) }}', {
-                method: 'POST'
-                , headers: {
-                    'Content-Type': 'application/json'
-                    , 'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-                , body: JSON.stringify({
-                    shipping: parseFloat(document.getElementById('shipping').value) || 0
-                })
-            }).then(response => response.json()).then(data => {
+         fetch('{{ route('calculate.total', ['quote_id' => $quote->id]) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                shipping: parseFloat(document.getElementById('shipping').value) || 0
+            })
+        }).then(response => response.json()).then(data => {
             if (data.success) {
-                if (modalOpen) {
+                if(modalOpen) {
                     var shipping = $('#shipping').val();
                     // If modal is open, update the totals in the modal
                     $('#discount-amount').text("$" + data.data.total_discount);
@@ -200,6 +198,5 @@
             console.error('Error fetching total:', error);
         });
     }
-
-</script>
+    </script>
 @endpush
