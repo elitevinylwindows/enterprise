@@ -21,8 +21,5 @@ class Line extends Model
         'deleted_at' => 'datetime',
     ];
 
-    public function productTypes()
-{
-    return $this->hasMany(\App\Models\Master\ProductKeys\ProductType::class, 'line_id');
-}
+    
 }
