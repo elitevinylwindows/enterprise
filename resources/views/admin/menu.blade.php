@@ -675,7 +675,21 @@
 
 
 
-
+<!-- Miscellaneous -->
+ <li class="pc-item pc-caption d-flex justify-content-between align-items-center">
+    <div>
+        <label>{{ __('Miscellaneous') }}</label>
+    </div>
+    <i class="ti ti-plus text-muted pe-2" style="font-size: 0.9rem;"></i>
+</li>
+@if (Gate::check('manage miscellaneous'))
+<li class="pc-item pc-hasmenu {{ request()->routeIs('miscellaneous.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="fa-solid fa-square-parking"></i></span>
+        <span class="pc-mtext ms-2">Parking</span>
+    </a>
+</li>
+@endif
 
 
 
@@ -689,31 +703,7 @@
 
 
 
-<!-- Miscellaneous 
-@if (Gate::check('manage miscellaneous'))
-<li class="pc-item pc-hasmenu {{ request()->routeIs('miscellaneous.*') ? 'active pc-trigger' : '' }}">
-    <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="fa-solid fa-network-wired"></i></span>
-        <span class="pc-mtext ms-2">Miscellaneous</span>
-        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
-    </a>
 
-    <ul class="pc-submenu">
-         <li class="pc-item pc-hasmenu">
-            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
-                <span>Purchasing</span>
-                <span class="ms-auto icon-wrapper">
-                    <i class="fa-solid fa-circle-plus"></i>
-                </span>
-            </a>
-            <ul class="pc-submenu" style="display: none;">
-                <li><a class="pc-link" href="#">New Quote</a></li>
-                <li><a class="pc-link" href="#">Quote History</a></li>
-            </ul>
-        </li>
-    </ul>
-</li>
-@endif-->
 
 
 <!-- Bill of Material -->
