@@ -68,7 +68,7 @@
                    data-url="{{ route('misc.parking.edit', $a->id) }}"
                    data-title="{{ __('Edit Parking') }}"
                    title="{{ __('Edit') }}">
-                  <i data-feather="edit"></i>
+                  <i data-feather="edit" class="feather-white"></i>
                 </a>
               </div>
 
