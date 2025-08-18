@@ -143,7 +143,7 @@
                 @endif
 
                 {{-- Rush --}}
-                <a class="avtar avtar-xs btn-link-primary text-primary customModal"
+                <a class="avtar avtar-md btn-link-primary text-primary customModal"
                    data-bs-toggle="tooltip"
                    data-bs-original-title="Rush"
                    href="#"
