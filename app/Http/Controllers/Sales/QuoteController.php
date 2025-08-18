@@ -456,13 +456,17 @@ public function index(Request $request)
             return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
         });
         
+
         return view('sales.quotes.preview', compact('quote', 'modificationsByDate'));
     }
 
     public function download($id)
     {
         $quote = Quote::with('items')->findOrFail($id);
-        $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
+        $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
+        $pdf = Pdf::loadView('sales.quotes.preview', compact('quote', 'modificationsByDate'));
         return $pdf->download("Quote_{$id}.pdf");
     }
 
@@ -470,7 +474,11 @@ public function index(Request $request)
     {
         $quote = Quote::findOrFail($id);
 
-        $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
+        $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
+
+        $pdf = Pdf::loadView('sales.quotes.preview', compact('quote', 'modificationsByDate'));
 
         try {
             Mail::to($quote->customer->email)
@@ -756,6 +764,7 @@ public function index(Request $request)
     public function previewPDF($id)
     {
         $order = Order::findOrFail($id);
+        
         $pdf = PDF::loadView('sales.quotes.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
         return $pdf->stream('quote-' . $order->id . '.pdf');
     }
@@ -800,9 +809,13 @@ public function index(Request $request)
         $quote->total = $request->total ?? 0;
         $quote->save();
 
+         $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
+
         if($request->status === 'Quote Submitted') {
 
-            $pdf = Pdf::loadView('sales.quotes.preview', compact('quote'));
+            $pdf = Pdf::loadView('sales.quotes.preview', compact('quote', 'modificationsByDate'));
 
             Mail::to($quote->customer->email)
             ->send(new QuoteEmail($quote, $pdf));
