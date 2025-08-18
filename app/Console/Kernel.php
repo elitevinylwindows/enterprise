@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -26,9 +27,21 @@ class Kernel extends ConsoleKernel
 
         require base_path('routes/console.php');
     }
+
+
     protected function schedule(Schedule $schedule)
-{
-    $schedule->command('purchase:auto-generate')->everyTwoMinutes();
-}
+    {
+        $schedule->command('purchase:auto-generate')->everyTwoMinutes();
+        
+        $schedule->call(function () {
+            checkLastTransactionAndSendToJobPool();
+        })->cron('* * * * *')
+            ->before(function () {
+                Log::info('checkLastTransactionAndSendToJobPool function is about to run');
+            })->after(function () {
+            Log::info('checkLastTransactionAndSendToJobPool function is executed');
+        });
+
+    }
 
 }
