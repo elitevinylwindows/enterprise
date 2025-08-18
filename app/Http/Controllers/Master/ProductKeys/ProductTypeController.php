@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Master\ProductKeys;
 
 use App\Http\Controllers\Controller;
 use App\Models\Master\ProductKeys\ProductType;
-use App\Models\Master\Series\Series; // <-- add this
+use App\Models\Master\Series\Series; 
 use Illuminate\Http\Request;
 use App\Models\Manufacturing\Line;
 
@@ -12,16 +12,25 @@ class ProducttypeController extends Controller
 {
     public function index()
 {
-    $items  = \App\Models\Master\ProductKeys\ProductType::orderBy('product_type')->get();
-    $series = Series::orderBy('series')->get(); // <-- pass series to view
-    return view('master.product_keys.producttypes.index', compact('items','series'));
+    $items  = ProductType::orderBy('product_type')->get();
+    $series = Series::orderBy('series')->get();
+    $lines  = Line::orderBy('line')->get(['id', 'line']);  
+    return view('master.product_keys.producttypes.index', compact('items','series','lines'));
 }
 
-    public function create()
+public function create()
 {
     $series = Series::orderBy('series')->get();
-     $lines = Line::orderBy('name')->get(['id', 'name']);
-    return view('master.product_keys.producttypes.create', compact('series', 'lines'));
+    $lines  = Line::orderBy('line')->get(['id', 'line']);
+    return view('master.product_keys.producttypes.create', compact('series','lines'));
+}
+
+public function edit($id)
+{
+    $productType = ProductType::findOrFail($id);
+    $series      = Series::orderBy('series')->get();
+    $lines       = Line::orderBy('line')->get(['id', 'line']);
+    return view('master.product_keys.producttypes.edit', compact('productType','series','lines'));
 }
 
     public function store(Request $request)
@@ -51,13 +60,7 @@ class ProducttypeController extends Controller
         return redirect()->back()->with('success', 'Product Type created successfully.');
     }
 
-    public function edit($id)
-    {
-        $productType = ProductType::findOrFail($id);
-        $lines = Line::orderBy('name')->get(['id', 'name']);
-        $series = Series::orderBy('series')->get(); // <-- pass series list
-        return view('master.product_keys.producttypes.edit', compact('productType', 'series', 'lines'));
-    }
+   
 
     public function update(Request $request, $id)
     {
