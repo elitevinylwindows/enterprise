@@ -42,6 +42,21 @@
             @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
 
+   <div class="form-group mb-3">
+    <label for="type" class="form-label">Type</label>
+    <select
+        name="type"
+        id="type"
+        class="form-select @error('type') is-invalid @enderror"
+    >
+        <option value="" disabled @selected(! old('type', $productType->type ?? ''))>Select type</option>
+        <option value="Door" @selected(old('type', $productType->type ?? '') === 'Door')>Door</option>
+        <option value="Window" @selected(old('type', $productType->type ?? '') === 'Window')>Window</option>
+    </select>
+    @error('type') <div class="invalid-feedback">{{ $message }}</div> @enderror
+</div>
+
+
         <div class="form-group mb-3">
             <label for="material_type">Material Type</label>
             <input type="text"
