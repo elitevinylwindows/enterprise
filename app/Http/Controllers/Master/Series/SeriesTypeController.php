@@ -11,19 +11,32 @@ use App\Models\Master\ProductKeys\ProductType;
 
 class SeriesTypeController extends Controller
 {
-    public function index(Request $request)
-    {
-        $q = SeriesType::with('series')->latest();
+    // app/Http/Controllers/Master/Series/SeriesTypeController.php
 
-        if ($request->filled('series_id')) {
-            $q->where('series_id', $request->integer('series_id'));
-        }
+public function index(\Illuminate\Http\Request $request)
+{
+    $activeSeriesId = $request->integer('series_id');
 
-        $seriesTypes = $q->get();
-        $series      = Series::orderBy('series')->get();   // <- needed for the left filter list
+    $seriesQuery = \App\Models\Master\Series\Series::with([
+        'seriesTypes' => fn ($q) => $q->orderBy('series_type'),
+    ])->orderBy('series');
 
-        return view('master.series.series_type.index', compact('seriesTypes', 'series'));
+    if ($activeSeriesId) {
+        $seriesQuery->where('id', $activeSeriesId);
     }
+
+    // for left filter menu
+    $seriesList = \App\Models\Master\Series\Series::orderBy('series')->get();
+
+    $series = $seriesQuery->get();
+
+    return view('master.series.series_type.index', [
+        'series'         => $series,       // rows for the table
+        'seriesList'     => $seriesList,   // for the sidebar
+        'activeSeriesId' => $activeSeriesId,
+    ]);
+}
+
 
     public function create()
     {
