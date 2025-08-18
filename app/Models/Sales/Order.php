@@ -2,6 +2,7 @@
 
 namespace App\Models\Sales;
 
+use App\Models\Manufacturing\JobPool;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -65,6 +66,16 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function order()
+    {
+        return $this->hasOne(Order::class, 'id', 'order_id');
+    }
+
+    public function job_pool()
+    {
+        return $this->hasOne(JobPool::class, 'order_id', 'id');
     }
 
 }

@@ -320,7 +320,7 @@ class InvoiceController extends Controller
     {
         $invoice = Invoice::with(['customer', 'order', 'quote'])->findOrFail($id);
         $modificationsByDate = $invoice->order->items->where('is_modification', true)->groupBy(function ($mod) {
-            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d H:i A');
         });
         return view('sales.invoices.show', compact('invoice', 'modificationsByDate'));
     }

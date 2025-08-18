@@ -285,7 +285,7 @@ public function index(Request $request)
                 ->where('is_modification', true)
                 ->get()
                 ->groupBy(function ($item) {
-                    return \Carbon\Carbon::parse($item->modification_date)->toDateString();
+                    return \Carbon\Carbon::parse($item->modification_date)->format('Y-m-d H:i A');
                 });
 
             return response()->json([
@@ -453,7 +453,7 @@ public function index(Request $request)
         $quote = Quote::with('items')->findOrFail($id);
 
         $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
-            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d H:i A');
         });
         
 
@@ -464,7 +464,7 @@ public function index(Request $request)
     {
         $quote = Quote::with('items')->findOrFail($id);
         $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
-            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d H:i A');
         });
         $pdf = Pdf::loadView('sales.quotes.preview', compact('quote', 'modificationsByDate'));
         return $pdf->download("Quote_{$id}.pdf");
@@ -475,7 +475,7 @@ public function index(Request $request)
         $quote = Quote::findOrFail($id);
 
         $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
-            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d H:i A');
         });
 
         $pdf = Pdf::loadView('sales.quotes.preview', compact('quote', 'modificationsByDate'));
@@ -505,7 +505,7 @@ public function index(Request $request)
         $quote = Quote::findOrFail($id);
         
         $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
-            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d H:i A');
         });
 
         return view('sales.quotes.view', compact('quote', 'modificationsByDate'));
@@ -680,7 +680,7 @@ public function index(Request $request)
 
         // Group modifications by created date (Y-m-d)
         $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
-            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d H:i A');
         });
         $seriesList = DB::table('elitevw_master_series')->pluck('series', 'id');
 
@@ -817,7 +817,7 @@ public function index(Request $request)
         $quote->save();
 
          $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
-            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+            return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d H:i A');
         });
 
         if($request->status === 'Quote Submitted') {
