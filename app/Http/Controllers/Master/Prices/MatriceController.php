@@ -13,6 +13,7 @@ class MatriceController extends Controller
 {
     public function index(Request $request)
     {
+        DB::enableQueryLog();
         $prices = DB::table('elitevw_master_price_price_matrices')
             ->leftJoin('elitevw_master_series', 'elitevw_master_price_price_matrices.series_id', '=', 'elitevw_master_series.id')
             ->leftJoin('elitevw_master_series_types', 'elitevw_master_price_price_matrices.series_type_id', '=', 'elitevw_master_series_types.id')
@@ -22,16 +23,15 @@ class MatriceController extends Controller
                 'elitevw_master_series_types.series_type as type'
             );
 
-        if ($request->filled('series_id')) {
-            $prices->where('elitevw_master_price_price_matrices.series_id', $request->series_id);
+        if (isset($request->series)) {
+            $prices->where('elitevw_master_price_price_matrices.series_id', $request->series);
         }
 
-        if ($request->filled('series_type_id')) {
+        if (isset($request->series_type_id)) {
             $prices->where('elitevw_master_price_price_matrices.series_type_id', $request->series_type_id);
         }
 
-$prices = $prices->get();
-
+        $prices = $prices->get();
 // Apply markup to each price record
 $prices->transform(function ($item) {
     $markup = DB::table('elitevw_master_markup')
