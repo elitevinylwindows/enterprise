@@ -24,6 +24,11 @@
             border-bottom: 2px solid #000000;
         }
 
+        .text-center {
+            text-align:center;
+        }
+
+
         .company-logo {
             width: 150px;
             height: auto;
