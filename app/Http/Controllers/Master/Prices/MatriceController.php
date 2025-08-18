@@ -13,7 +13,6 @@ class MatriceController extends Controller
 {
     public function index(Request $request)
     {
-        DB::enableQueryLog();
         $prices = DB::table('elitevw_master_price_price_matrices')
             ->leftJoin('elitevw_master_series', 'elitevw_master_price_price_matrices.series_id', '=', 'elitevw_master_series.id')
             ->leftJoin('elitevw_master_series_types', 'elitevw_master_price_price_matrices.series_type_id', '=', 'elitevw_master_series_types.id')
