@@ -281,7 +281,7 @@
                                     <div class="mb-3">
                                         <label>Color Code (Exterior)</label>
                                         <select class="form-control" name="color_exterior" id="colorExteriorDropdown">
-                                            <option value="">Select Exterior Color</option>
+                                            <option value="" selected>Select Exterior Color</option>
                                             @foreach($exteriorColors as $color)
                                             <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
                                             @endforeach
@@ -294,7 +294,7 @@
                                     <div class="mb-3">
                                         <label>Color Code (Interior)</label>
                                         <select class="form-control" name="color_interior" id="colorInteriorDropdown">
-                                            <option value="">Select Interior Color</option>
+                                            <option value="" selected>Select Interior Color</option>
                                             @foreach($interiorColors as $color)
                                             <option value="{{ $color->code }}" data-id="{{ $color->id }}" data-group="regular">{{ $color->name }}</option>
                                             @endforeach
@@ -351,12 +351,23 @@
 
                                     <div class="mb-3">
                                         <label>Tempered Glass Option</label>
-                                        <select class="form-control" name="tempered">
+                                        <select class="form-control" name="tempered" id="temperedSelect">
                                             <option value="All">All</option>
                                             <option value="Select">Select</option>
                                         </select>
                                     </div>
 
+                                    <div class="mb-3">
+                                        <label>Inside Tempered</label>
+                                        <input type="checkbox" class="form-check-input" value="true" name="inside_tempered" id="inside_tempered">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label>Outside Tempered</label>
+                                        <input type="checkbox" class="form-check-input" value="true" name="outside_tempered" id="outside_tempered">
+                                    </div>
+
+                                   
                                     <div class="mb-3">
                                         <label>Specialty Glass</label>
                                         <select class="form-control" name="specialty_glass">
@@ -661,7 +672,7 @@
         formData.append('total', total);
         formData.append('internal_note', internal_note);
         formData.append('color_config', colorConfigId);
-        formData.append('color_exterior', colorExtId);
+        formData.append('color_exterior', colorExtIwd);
         formData.append('color_interior', colorIntId);
         formData.append('frame_type', frameType);
         formData.append('fin_type', finType);
@@ -1119,9 +1130,28 @@ updateWindowPreview();
 
     document.getElementById('addItemModal').addEventListener('shown.bs.modal', function() {
         const value = $('#colorConfigDropdown').val();
-        const [exterior, interior] = value.split('-');
+        const [exterior, interior] = value ? value.split('-') : [null, null];
         const exteriorDropdown = document.getElementById('colorExteriorDropdown');
         const interiorDropdown = document.getElementById('colorInteriorDropdown');
+
+        // If value is not set, select the first option (not placeholder)
+        if (!value) {
+            if (exteriorDropdown.options.length > 1) {
+                exteriorDropdown.selectedIndex = 0;
+            } else {
+                exteriorDropdown.selectedIndex = 0;
+            }
+            if (interiorDropdown.options.length > 1) {
+                interiorDropdown.selectedIndex = 0;
+            } else {
+                interiorDropdown.selectedIndex = 0;
+            }
+            exteriorDropdown.disabled = false;
+            interiorDropdown.disabled = false;
+            exteriorDropdown.classList.remove('readonly');
+            interiorDropdown.classList.remove('readonly');
+            return;
+        }
 
         exteriorDropdown.value = '';
         interiorDropdown.value = '';
@@ -1160,7 +1190,6 @@ updateWindowPreview();
                 interiorDropdown.classList.add('readonly');
             }
         }
-
     });
 
 
@@ -1460,6 +1489,33 @@ updateWindowPreview();
 
     }
 
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const temperedSelect = document.getElementById('temperedSelect');
+        const insideTempered = document.getElementById('inside_tempered');
+        const outsideTempered = document.getElementById('outside_tempered');
+
+        function updateTemperedCheckboxes() {
+            if (temperedSelect.value === 'All') {
+                insideTempered.checked = true;
+                outsideTempered.checked = true;
+                insideTempered.disabled = true;
+                outsideTempered.disabled = true;
+                insideTempered.tabIndex = -1;
+                outsideTempered.tabIndex = -1;
+            } else {
+                insideTempered.disabled = false;
+                outsideTempered.disabled = false;
+                insideTempered.tabIndex = 0;
+                outsideTempered.tabIndex = 0;
+            }
+        }
+
+        temperedSelect.addEventListener('change', updateTemperedCheckboxes);
+
+        // Initial state
+        updateTemperedCheckboxes();
+    });
 
     // Save draft button click event
     document.getElementById('saveDraftButton').addEventListener('click', function() {
