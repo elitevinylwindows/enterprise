@@ -68,6 +68,7 @@
                     <div class="modal-content">
                       @include('master.product_keys.producttypes.edit', [
                         'productType' => $item,
+                        'lines' => $lines,
                         'series'      => $series,   {{-- <-- pass series --}}
                       ])
                     </div>
@@ -87,7 +88,8 @@
   <div class="modal-dialog">
     <div class="modal-content">
       @include('master.product_keys.producttypes.create', [
-        'series' => $series,  {{-- <-- pass series --}}
+        'series' => $series,  
+        'lines' => $lines
       ])
     </div>
   </div>
