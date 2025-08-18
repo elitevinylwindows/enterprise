@@ -13,4 +13,9 @@ class Series extends Model
     return $this->hasMany(\App\Models\Master\Series\SeriesType::class, 'series_id');
 }
 
+public function seriesTypes()
+    {
+        return $this->hasMany(SeriesType::class, 'series_id');
+    }
+
 }
