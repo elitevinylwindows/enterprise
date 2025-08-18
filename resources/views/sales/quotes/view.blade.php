@@ -57,6 +57,39 @@
                 @endforeach
             </tbody>
         </table>
+            @if(!$modificationsByDate->isEmpty())
+                @foreach ($modificationsByDate as $date => $modifications)
+                    <table class="table table-bordered table-striped mt-4 modificationsTable" data-mod-date="{{ $date }}">
+                        <thead class="table-light">
+                            <tr>
+                                <th colspan="9" class="text-center">Modifications ({{ $date }})</th>
+                            </tr>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Size</th>
+                                <th>Glass</th>
+                                <th>Grid</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($modifications as $modification)
+                                <tr data-id="{{ $modification->id }}" data-type="modification">
+                                    <td style="text-wrap:auto">{{ $modification->description }}</td>
+                                    <td>{{ $modification->qty }}</td>
+                                    <td>{{ $modification->width }}" x {{ $modification->height }}"</td>
+                                    <td>{{ $modification->glass }}</td>
+                                    <td>{{ $modification->grid }}</td>
+                                    <td>${{ number_format($modification->price, 2) }}</td>
+                                    <td>${{ number_format($modification->total, 2) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endforeach
+            @endif
         <div class="row mt-4">
             <div class="col-md-6 offset-md-6">
                 <table class="table">

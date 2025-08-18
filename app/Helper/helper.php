@@ -1950,6 +1950,8 @@ if(!function_exists('quoteToOrder')) {
                     'custom_vent_latch' => $item->custom_vent_latch,
                     'knocked_down' => $item->knocked_down,
                     'checked_count' => $item->checked_count,
+                    'is_modification' => (bool) $item->is_modification,
+                    'modification_date' => (bool) $item->modification_date ? $item->modification_date : null,
                 ]);
             }
             $quote->update([
@@ -2073,7 +2075,11 @@ if (!function_exists('calculateTotal')) {
 if(!function_exists('sendOrderMail')) {
     function sendOrderMail($order)
     {
-        $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order])->setPaper('a4', 'landscape');;
+        $modificationsByDate = $order->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
+
+        $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order, 'modificationsByDate' => $modificationsByDate])->setPaper('a4', 'landscape');
         $pdfPath = 'orders/order_'.$order->order_number.'.pdf';
         Storage::disk('public')->put($pdfPath, $pdf->output());
 
