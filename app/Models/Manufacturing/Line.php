@@ -20,4 +20,9 @@ class Line extends Model
     protected $casts = [
         'deleted_at' => 'datetime',
     ];
+
+    public function productTypes()
+{
+    return $this->hasMany(\App\Models\Master\ProductKeys\ProductType::class, 'line_id');
+}
 }
