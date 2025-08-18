@@ -1975,10 +1975,12 @@ if(!function_exists('quoteToInvoice')) {
     {
         try{
             DB::beginTransaction();
+            $invoiceNumber = generateInvoiceNumber();
+            Log::info('Generated Invoice Number: ' . $invoiceNumber);
             $invoice = Invoice::create([
                 'order_id' => $order->id,
                 'quote_id' => $quote->id,
-                'invoice_number' => generateInvoiceNumber(),
+                'invoice_number' => $invoiceNumber,
                 'work_order' => 'WO' . $order->id,
                 'due_date' => now()->addDays(14)->format('Y-m-d'),
                 'entered_by' => auth()->user()->name,
@@ -2023,6 +2025,7 @@ if(!function_exists('quoteToInvoice')) {
 
             return $invoice;
         } catch (\Exception $e) {
+            Log::error($e);
             DB::rollBack();
             Log::error('Error creating invoice: ' . $e->getMessage());
             return null;
@@ -2033,7 +2036,7 @@ if(!function_exists('quoteToInvoice')) {
 if(!function_exists('generateInvoiceNumber')) {
     function generateInvoiceNumber()
     {
-        $lastInvoice = Invoice::max('id')+2;
+        $lastInvoice = Invoice::max('id')+4;
         $nextId = $lastInvoice ? $lastInvoice + 1 : 1;
         return 'INV-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
     }
@@ -2154,7 +2157,7 @@ if(!function_exists('checkLastTransactionAndSendToJobPool'))
 {
     function checkLastTransactionAndSendToJobPool()
     {
-        $orders = Order::whereHas('invoices', function ($query) {
+        $orders = Order::whereHas('invoice', function ($query) {
             $query->whereHas('payments', function ($query) {
                 $query->where('status', 'completed');
             });

@@ -247,6 +247,38 @@ class InvoiceController extends Controller
                     $invoice->order->order_number
                 );
 
+                if($charge) {
+                    $depositPaid = InvoicePayment::where('invoice_id', $invoice->id)->where('payment_type', 'deposit')->first();
+                    if($depositPaid) {
+                        InvoicePayment::create([
+                            'invoice_id' => $invoice->id,
+                            'payment_type' => 'payment', // deposit or payments
+                            'deposit_type' => 'fixed', // percent or fixed
+                            'deposit_method' => 'card', // card, cash, bank
+                            'last_4' => $charge['last_4'],
+                            'card_type' => $charge['card_type'],
+                            'reference_number' => $charge['reference_number'],
+                            'payment_amount' => $charge['transaction']['amount_details']['amount'],
+                            'status' => 'completed', 
+                            'payment_method' => 'card',
+                            'gateway_response' => json_encode($charge),
+                        ]);
+                    } else {
+                        InvoicePayment::create([
+                            'invoice_id' => $invoice->id,
+                            'payment_type' => 'deposit', // deposit or payments
+                            'deposit_type' => 'fixed', // percent or fixed
+                            'deposit_method' => 'card', // card, cash, bank
+                            'last_4' => $charge['last_4'],
+                            'card_type' => $charge['card_type'],
+                            'reference_number' => $charge['reference_number'],
+                            'payment_amount' => $charge['transaction']['amount_details']['amount'],
+                            'status' => 'completed', 
+                            'payment_method' => 'card',
+                            'gateway_response' => json_encode($charge),
+                        ]);
+                    }
+                }
                 // Update invoice status
                 $newTotalPaid = $totalPaid + $amount;
                 $newRemaining = $invoice->total - $newTotalPaid;
@@ -263,6 +295,7 @@ class InvoiceController extends Controller
                 return redirect()->route('sales.invoices.index')->with('success', 'Operation completed successfully.');
 
             } catch (\Exception $e) {
+                dd($e);
                 DB::rollBack();
                 Log::error("Payment Processing Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
 
@@ -286,7 +319,10 @@ class InvoiceController extends Controller
     public function show($id)
     {
         $invoice = Invoice::with(['customer', 'order', 'quote'])->findOrFail($id);
-        return view('sales.invoices.show', compact('invoice'));
+        $modificationsByDate = $invoice->order->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
+        return view('sales.invoices.show', compact('invoice', 'modificationsByDate'));
     }
 
     public function syncToQuickbooks(Invoice $invoice)

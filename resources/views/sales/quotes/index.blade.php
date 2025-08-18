@@ -119,12 +119,10 @@
                                             <i data-feather="eye"></i>
                                         </a>
 
-                                        @if($quote->status !== 'approved')
                                         {{-- Edit --}}
                                         <a class="avtar avtar-xs btn-link-primary text-primary" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="{{ route('sales.quotes.edit', $quote->id) }}" data-title="Edit Quote">
                                             <i data-feather="edit"></i>
                                         </a>
-                                        @endif
                                         {{-- View --}}
 
                                         {{-- Email --}}
