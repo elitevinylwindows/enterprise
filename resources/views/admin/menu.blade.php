@@ -688,13 +688,6 @@
         <span class="pc-micon"><i class="fa-solid fa-square-parking"></i></span>
         <span class="pc-mtext ms-2">Parking</span>
     </a>
-    <ul class="pc-submenu">
-         <li class="pc-item pc-hasmenu">
-            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
-                <span>ParAking</span>
-            </a>
-        </li>
-    </ul>
 </li>
 @endif
 
