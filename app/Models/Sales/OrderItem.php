@@ -43,6 +43,8 @@ class OrderItem extends Model
         'knocked_down',
         'series_id',
         'series_type',
+        'modification_date',
+        'is_modification',
     ];
 
     // Relationships

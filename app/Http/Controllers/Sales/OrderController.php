@@ -80,7 +80,10 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
         $customers = Customer::pluck('customer_name', 'id');
-        return view('sales.orders.edit', compact('order', 'customers'));
+        $modificationsByDate = $order->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
+        return view('sales.orders.edit', compact('order', 'customers', 'modificationsByDate'));
     }
 
     public function update(Request $request, $id)
@@ -160,7 +163,11 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::with('items')->findOrFail($id);
-        return view('sales.orders.show', compact('order'));
+        $modificationsByDate = $order->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
+
+        return view('sales.orders.show', compact('order', 'modificationsByDate'));
     }
 
     public function convertToInvoice($orderID)

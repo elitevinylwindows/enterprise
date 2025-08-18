@@ -216,7 +216,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($order->items as $key => $item)
+            @foreach($order->items->where('is_modification', 0) as $key => $item)
             <tr>
                 <td>{{ $key + 1 }}</td>
                 <td>{{ $item->series?->series.'-'.$item->series_type ?? 'N/A' }}</td>
@@ -231,7 +231,43 @@
             @endforeach
         </tbody>
     </table>
-
+    @if(!$modificationsByDate->isEmpty())
+                @foreach ($modificationsByDate as $date => $modifications)
+                    <table class="table table-bordered table-striped mt-4 modificationsTable" data-mod-date="{{ $date }}">
+                        <thead class="table-light">
+                            <tr>
+                                <th colspan="9" class="text-center">Modifications ({{ $date }})</th>
+                            </tr>
+                            <tr>
+                               <th>Line</th>
+                                <th>Unit</th>
+                                <th>Size</th>
+                                <th>Frame Type</th>
+                                <th>Color</th>
+                                <th>Glass</th>
+                                <th>Grid</th>
+                                <th>Pattern</th>
+                                <th>Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($modifications as $modification)
+                               <tr>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td>{{ $item->series?->series.'-'.$item->series_type ?? 'N/A' }}</td>
+                                    <td>W {{ $item->width }}" x H {{ $item->height }}"</td>
+                                    <td>{{ $item->frame_type . ' ' . $item->fin_type }}</td>
+                                    <td>{{ $item->color_config ?? 'N/A' }}</td>
+                                    <td>{{ $item->glass ?? 'N/A' }}</td>
+                                    <td>{{ $item->grid ?? 'N/A' }}</td>
+                                    <td>{{ $item->grid_pattern ?? 'N/A' }}</td>
+                                    <td>{{ $item->qty }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endforeach
+            @endif
     <table class="totals-table">
         <tr>
             <td>Total Qty:</td>

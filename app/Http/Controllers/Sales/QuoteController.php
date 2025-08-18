@@ -503,7 +503,12 @@ public function index(Request $request)
     public function view($id)
     {
         $quote = Quote::findOrFail($id);
-        return view('sales.quotes.view', compact('quote'));
+        
+        $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
+            return \Carbon\Carbon::parse($mod->modification_date)->toDateString();
+        });
+
+        return view('sales.quotes.view', compact('quote', 'modificationsByDate'));
     }
 
     public function details($id)
@@ -779,11 +784,13 @@ public function index(Request $request)
 
                 sendOrderMail($order);
 
-                $invoice = quoteToInvoice($quote, $order);
+                quoteToInvoice($quote, $order);
 
                 if (!$order) {
                     return redirect()->route('sales.quotes.index')->withErrors(['error' => 'Failed to convert quote to order.']);
                 }
+
+                $quote->approved_at = now();
             }
 
             $quote->status = $status;
