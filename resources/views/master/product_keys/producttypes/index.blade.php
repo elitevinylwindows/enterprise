@@ -31,6 +31,7 @@
                 <th>{{ __('Series') }}</th>
                 <th>{{ __('Description') }}</th>
                 <th>{{ __('Type') }}</th>
+                <th>{{ __('Line') }}</th>
                 <th>{{ __('Material Type') }}</th>
                 <th>{{ __('Glazing Bead Position') }}</th>
                 <th>{{ __('Schema Product ID') }}</th>
@@ -44,6 +45,7 @@
                   <td>{{ $item->series }}</td>
                   <td>{{ $item->description }}</td>
                   <td>{{ $item->type }}</td>
+                  <td>{{ $item->line }}</td>
                   <td>{{ $item->material_type }}</td>
                   <td>{{ $item->glazing_bead_position }}</td>
                   <td>{{ $item->product_id }}</td>

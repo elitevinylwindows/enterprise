@@ -2,6 +2,7 @@
 namespace App\Models\Master\ProductKeys;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Manufacturing\Line;
 
 class ProductType extends Model
 {
@@ -9,7 +10,7 @@ class ProductType extends Model
     protected $table = 'elitevw_master_productkeys_producttypes';
 
     protected $fillable = [
-        'product_type','series','description', 'type', 
+        'product_type','series','description', 'type', 'line', 
         'material_type','glazing_bead_position','product_id'
     ];
 
@@ -23,4 +24,10 @@ class ProductType extends Model
             'series_configuration_id'                           // related model's FK
         )->withTimestamps();
     }
+
+    public function line()
+{
+    return $this->belongsTo(Line::class);
+}
+
 }

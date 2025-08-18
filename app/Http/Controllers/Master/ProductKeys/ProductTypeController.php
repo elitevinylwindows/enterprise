@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Master\ProductKeys\ProductType;
 use App\Models\Master\Series\Series; // <-- add this
 use Illuminate\Http\Request;
+use App\Models\Manufacturing\Line;
 
 class ProducttypeController extends Controller
 {
@@ -19,7 +20,8 @@ class ProducttypeController extends Controller
     public function create()
 {
     $series = Series::orderBy('series')->get();
-    return view('master.product_keys.producttypes.create', compact('series'));
+     $lines = Line::orderBy('name')->get(['id', 'name']);
+    return view('master.product_keys.producttypes.create', compact('series', 'lines'));
 }
 
     public function store(Request $request)
@@ -29,6 +31,7 @@ class ProducttypeController extends Controller
             'series'       => 'required|string|max:255', // storing the series *name* string
             'description'  => 'required|string|max:255',
             'type' => 'nullable|string|max:255',
+            'line' => 'nullable|string|max:255',
             'material_type' => 'nullable|string|max:255',
             'glazing_bead_position' => 'nullable|string|max:255',
             'product_id'   => 'required|string|max:255',
@@ -39,6 +42,7 @@ class ProducttypeController extends Controller
             'series',                 // we store the selected series name
             'description',
             'type',
+            'line',
             'material_type',
             'glazing_bead_position',
             'product_id',
@@ -50,8 +54,9 @@ class ProducttypeController extends Controller
     public function edit($id)
     {
         $productType = ProductType::findOrFail($id);
+        $lines = Line::orderBy('name')->get(['id', 'name']);
         $series = Series::orderBy('series')->get(); // <-- pass series list
-        return view('master.product_keys.producttypes.edit', compact('productType', 'series'));
+        return view('master.product_keys.producttypes.edit', compact('productType', 'series', 'lines'));
     }
 
     public function update(Request $request, $id)
@@ -61,6 +66,7 @@ class ProducttypeController extends Controller
             'series'       => 'required|string|max:255',
             'description'  => 'required|string|max:255',
             'type' => 'nullable|string|max:255',
+            'line' => 'nullable|string|max:255',
             'material_type' => 'nullable|string|max:255',
             'glazing_bead_position' => 'nullable|string|max:255',
             'product_id'   => 'required|string|max:255',
@@ -72,6 +78,7 @@ class ProducttypeController extends Controller
             'series',                 // store selected series name
             'description',
             'type',
+            'line',
             'material_type',
             'glazing_bead_position',
             'product_id',
