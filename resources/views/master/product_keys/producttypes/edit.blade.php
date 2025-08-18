@@ -72,7 +72,7 @@
         @foreach($lines as $line)
             <option value="{{ $line->id }}"
                 @selected(old('line_id', $productType->line_id ?? '') == $line->id)>
-                {{ $line->name }}
+                {{ $line->line }}
             </option>
         @endforeach
     </select>
