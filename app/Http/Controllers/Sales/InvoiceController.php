@@ -16,6 +16,7 @@ use App\Services\QuickBooksService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Services\JobPoolEnqueueService;
 
 class InvoiceController extends Controller
 {
@@ -40,6 +41,19 @@ class InvoiceController extends Controller
         ->get();
 
     return view('sales.invoices.index', compact('invoices', 'status'));
+}
+
+public function markSpecialCustomer($id)
+{
+    $invoice = Invoice::with('quote')->findOrFail($id);
+    $quote   = $invoice->quote;
+
+    $quote->is_special_customer = true;
+    $quote->save();
+
+    // Do NOT enqueue now. Special does not bypass the 48h hold.
+    // It will release automatically after 48h, or immediately if user then clicks Rush on the Order.
+    return back()->with('success', 'Marked Special Customer. Payment requirement will be bypassed on release.');
 }
 
     public function create()

@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\JobPoolEnqueueService;
+use App\Models\Sales\Invoice;
 
 
 class OrderController extends Controller
@@ -185,6 +187,43 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Failed to convert order to invoice: ' . $e->getMessage());
         }
     }
+
+
+    public function markRush($id, JobPoolEnqueueService $svc)
+{
+    $order = Order::with(['quote', 'invoice'])->findOrFail($id);
+    $quote = $order->quote;
+    $invoice = $order->invoice ?? \App\Models\Sales\Invoice::where('order_id', $order->id)->first();
+
+    // Mark rush (bypasses 48h)
+    $quote->update([
+        'is_rush'        => true,
+        'rushed_at'      => now(),
+        'editable_until' => now(), // for UI clarity
+    ]);
+
+    // Can we send right now?
+    $hasPayment = $invoice ? $svc->paymentOnFile($invoice) : false;
+    $isSpecial  = (bool) $quote->is_special_customer;
+
+    if ($hasPayment || $isSpecial) {
+        $added = $svc->enqueueFromQuote($quote);
+        $msg   = $added > 0 ? "Order rushed and {$added} item(s) sent to Job Pool." : "Order rushed. No new items to queue.";
+        return back()->with('success', $msg);
+    }
+
+    // Block: no payment and not special → show the two options
+    // You can link these routes in your UI if you want quick actions
+    $takePaymentUrl = $invoice ? route('sales.invoices.payment', $invoice->id) : null;
+    $markSpecialUrl = $invoice ? route('sales.invoices.special', $invoice->id) : null;
+
+    $hint = [];
+    if ($takePaymentUrl) $hint[] = "Take Payment";
+    if ($markSpecialUrl) $hint[] = "Mark Special Customer (on Invoice)";
+
+    $choices = $hint ? (' Options: ' . implode(' or ', $hint) . '.') : '';
+    return back()->with('error', 'Cannot rush: no deposit on file.' . $choices);
+}
 
 public function restore($id)
 {

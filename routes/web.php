@@ -414,6 +414,11 @@ use Stripe\Webhook;
 
         });
 
+
+        Route::post('sales/orders/{order}/rush', [OrderController::class, 'markRush'])->name('sales.orders.rush');
+Route::post('sales/invoices/{invoice}/special', [InvoiceController::class, 'markSpecialCustomer'])->name('sales.invoices.special');
+
+
         //Supplier
         Route::prefix('master/suppliers')->name('master.suppliers.')->group(function () {
             Route::get('/', [SupplierController::class, 'index'])->name('index');
