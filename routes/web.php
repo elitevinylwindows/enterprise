@@ -393,7 +393,8 @@ use Stripe\Webhook;
             Route::get('orders/deleted', [OrderController::class, 'deleted'])->name('orders.deleted');
             Route::post('orders/{id}/restore', [OrderController::class, 'restore'])->name('orders.restore');
             Route::delete('orders/{id}/force-delete', [OrderController::class, 'forceDelete'])->name('orders.force-delete');
-            Route::post('orders/{id}/rush', [OrderController::class, 'markRush'])->name('orders.rush');
+            Route::post('orders/{id}/rush', [\App\Http\Controllers\Sales\OrderController::class, 'markRush'])
+    ->name('orders.rush');
 
             Route::get('orders/{id}/convert-to-invoice', [\App\Http\Controllers\Sales\OrderController::class, 'convertToInvoice'])->name('orders.convertToInvoice');
 
@@ -407,7 +408,9 @@ use Stripe\Webhook;
             Route::post('invoices/{id}/restore', [InvoiceController::class, 'restore'])->name('invoices.restore');
             Route::delete('invoices/{id}/force-delete', [InvoiceController::class, 'forceDelete'])->name('invoices.force-delete');
             Route::get('invoices/{id}/email', [InvoiceController::class, 'email'])->name('invoices.email');
-            Route::post('invoices/{id}/special', [InvoiceController::class, 'markSpecialCustomer'])->name('invoices.special');
+            Route::post('invoices/{id}/special', [\App\Http\Controllers\Sales\InvoiceController::class, 'markSpecialCustomer'])
+    ->name('invoices.special');
+
 
        Route::get('/quickbooks/wsdl', [QuickBooksController::class, 'wsdl']);
         Route::any('/quickbooks/endpoint', [QuickBooksController::class, 'handleWebConnector']);
