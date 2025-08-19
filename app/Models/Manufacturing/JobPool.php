@@ -46,4 +46,18 @@ class JobPool extends Model
 
         return $query->where('production_status', $status);
     }
-}
+
+    public function order()
+    {
+        return $this->belongsTo(\App\Models\Sales\Order::class, 'order_id');
+    }
+
+    public function item()
+    {
+        return $this->belongsTo(\App\Models\Sales\OrderItem::class, 'order_item_id');
+    }
+    
+    public function customer()
+    {
+        return $this->belongsTo(\App\Models\Master\Customers\Customer::class, 'customer_number', 'customer_number');
+    }
