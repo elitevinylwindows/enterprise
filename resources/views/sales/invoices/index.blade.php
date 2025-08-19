@@ -135,14 +135,28 @@
                                     </a>
 
                                     {{-- Take Payment --}}
-                                    <a class="avtar avtar-xs btn-link-info text-info customModal" data-bs-toggle="tooltip" title="Request Payment" href="#" data-size="lg" data-url="{{ route('sales.invoices.payment', $invoice->id) }}" data-title="Invoice Payment">
-                                        <i data-feather="credit-card"></i>
-                                    </a>
+<a class="avtar avtar-xs btn-link-info text-info customModal" 
+   data-bs-toggle="tooltip" 
+   title="Request Payment" 
+   href="#" 
+   data-size="lg" 
+   data-url="{{ route('sales.invoices.payment', $invoice->id) }}" 
+   data-title="Invoice Payment">
+    <i data-feather="credit-card"></i>
+</a>
 
-                                     {{-- Send Order to Pool without Payment --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" title="Send to Pool (Not Paid)" href="#" data-size="lg" data-url="{{ route('sales.invoices.payment', $invoice->id) }}" data-title="Send to Pool (Not Paid)">
-                                        <i data-feather="heart"></i>
-                                    </a>
+{{-- Special Customer (bypass payment only) --}}
+<form action="{{ route('sales.invoices.special', $invoice->id) }}" 
+      method="POST" 
+      class="d-inline">
+    @csrf
+    <button type="submit" 
+            class="avtar avtar-xs btn-link-success text-success" 
+            title="Special Customer (bypass payment only)">
+        <i data-feather="star"></i>
+    </button>
+</form>
+
 
                                     {{-- Edit --}}
                                     <a class="avtar avtar-xs btn-link-primary text-primary customModal" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="#" data-size="xl" data-url="{{ route('sales.invoices.edit', $invoice->id) }}" data-title="Edit Invoice">
