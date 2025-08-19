@@ -64,6 +64,7 @@
     <!-- [ Main Content ] end -->
 
     @include('admin.footer')
+@include('sales.orders.rush_block')
 
   <div class="modal fade" id="customModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
