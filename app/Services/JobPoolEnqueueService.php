@@ -49,7 +49,7 @@ class JobPoolEnqueueService
                     'color'                 => $it->color_config,                     // adjust if you prefer ext/int mix
                     'frame_type'            => $it->frame_type,
                     'qty'                   => $it->qty ?? 1,
-                    'line'                  => $$productType?->line?->line,                      // your table shows this
+                    'line'                  => $productType?->line?->line,                      // your table shows this
                     'delivery_date'         => $order->expected_delivery_date,
                     'type'                  => $productType?->type,                               // semantic tag for your filter
                     'production_status'     => 'queued',
