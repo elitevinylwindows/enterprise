@@ -120,7 +120,7 @@
                                     @else
                                     {{-- Original Action Buttons --}}
                                     {{-- View --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" data-bs-original-title="View Invoice" href="#" data-size="xl" data-url="{{ route('sales.invoices.show', $invoice->id) }}" data-title="Invoice Summary">
+                                    <a class="avtar avtar-xs btn-link-dark text-dark customModal" data-bs-toggle="tooltip" data-bs-original-title="View Invoice" href="#" data-size="xl" data-url="{{ route('sales.invoices.show', $invoice->id) }}" data-title="Invoice Summary">
                                         <i data-feather="eye"></i>
                                     </a>
 
@@ -135,12 +135,12 @@
                                     </a>
 
                                     {{-- Take Payment --}}
-                                    <a class="avtar avtar-xs btn-link-success text-success customModal" data-bs-toggle="tooltip" title="Request Payment" href="#" data-size="lg" data-url="{{ route('sales.invoices.payment', $invoice->id) }}" data-title="Invoice Payment">
+                                    <a class="avtar avtar-xs btn-link-secondary text-secondary customModal" data-bs-toggle="tooltip" title="Request Payment" href="#" data-size="lg" data-url="{{ route('sales.invoices.payment', $invoice->id) }}" data-title="Invoice Payment">
                                         <i data-feather="credit-card"></i>
                                     </a>
 
                                      {{-- Send Order to Pool without Payment --}}
-                                    <a class="avtar avtar-md btn-link-success text-success customModal" data-bs-toggle="tooltip" title="Send to Pool (Not Paid)" href="#" data-size="lg" data-url="{{ route('sales.invoices.payment', $invoice->id) }}" data-title="Send to Pool (Not Paid)">
+                                    <a class="avtar avtar-md btn-link-info text-info customModal" data-bs-toggle="tooltip" title="Send to Pool (Not Paid)" href="#" data-size="lg" data-url="{{ route('sales.invoices.payment', $invoice->id) }}" data-title="Send to Pool (Not Paid)">
                                         <i class="fa-solid fa-heart-circle-bolt"></i>
                                     </a>
 
