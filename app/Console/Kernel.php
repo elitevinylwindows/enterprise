@@ -49,7 +49,13 @@ protected function schedule(Schedule $schedule): void
 
     // 3. Release orders to job pool every 5 minutes
     $schedule->command('orders:release-to-job-pool')
-        ->everyFiveMinutes();
+        ->everyFiveMinutes()
+        ->before(function () {
+            Log::info('Releasing orders to job pool is about to run');
+        })
+        ->after(function () {
+            Log::info('Orders released to job pool successfully');
+        });
 }
 
 

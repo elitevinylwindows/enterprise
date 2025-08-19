@@ -10,6 +10,7 @@ use App\Services\JobPoolEnqueueService;
 class ReleaseOrdersToJobPool extends Command
 {
     protected $signature = 'orders:release-to-job-pool';
+    
     protected $description = 'Auto-release eligible orders to Job Pool after 48h hold, per business rules';
 
     public function handle(JobPoolEnqueueService $svc): int
