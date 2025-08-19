@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sales;
 
+use App\Console\Commands\ReleaseOrdersToJobPool;
 use App\Http\Controllers\Controller;
 use App\Mail\OrderMail;
 use Illuminate\Http\Request;
@@ -214,7 +215,8 @@ class OrderController extends Controller
         $isSpecial  = (bool) $order->invoice->is_special_customer;
 
         if ($hasPayment || $isSpecial) {
-            $added = $svc->enqueueFromQuote($quote); // or enqueueQuoteItems(...)
+            $svc  = new JobPoolEnqueueService();
+            $added = $svc->enqueueFromOrder($order); // or enqueueQuoteItems(...)
             return back()->with('success', $added > 0
                 ? "Order rushed and {$added} item(s) sent to Job Pool."
                 : "Order rushed. No new items queued."
