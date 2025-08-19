@@ -36,7 +36,10 @@ class Order extends Model
         'tax',
         'total',
         'discount',
-        'shipping'
+        'shipping',
+        'is_rush',
+        'rushed_at',
+        'editable_until'
 
     ];
 

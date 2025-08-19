@@ -43,7 +43,8 @@ class Invoice extends Model
         'required_payment_percentage',
         'deposit_amount',
         'deposit_type' ,
-        'deposit_method'
+        'deposit_method',
+        'is_special_customer'
     ];
 
     public function getPaymentTypeAttribute()

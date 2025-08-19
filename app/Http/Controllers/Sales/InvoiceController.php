@@ -21,37 +21,36 @@ use App\Services\JobPoolEnqueueService;
 class InvoiceController extends Controller
 {
     public function index(Request $request)
-{
-    $status = $request->get('status', 'all');
+    {
+        $status = $request->get('status', 'all');
 
-    $invoices = Invoice::with(['customer', 'order', 'quote'])
-        ->when($status === 'deleted', function($query) {
-            return $query->onlyTrashed();
-        })
-        ->when($status === 'fully_paid', function($query) {
-            return $query->where('status', 'fully_paid');
-        })
-        ->when($status === 'partially_paid', function($query) {
-            return $query->where('status', 'partially_paid');
-        })
-        ->when($status === 'pending', function($query) {
-            return $query->where('status', 'pending');
-        })
-        ->latest()
-        ->get();
+        $invoices = Invoice::with(['customer', 'order', 'quote'])
+            ->when($status === 'deleted', function($query) {
+                return $query->onlyTrashed();
+            })
+            ->when($status === 'fully_paid', function($query) {
+                return $query->where('status', 'fully_paid');
+            })
+            ->when($status === 'partially_paid', function($query) {
+                return $query->where('status', 'partially_paid');
+            })
+            ->when($status === 'pending', function($query) {
+                return $query->where('status', 'pending');
+            })
+            ->latest()
+            ->get();
 
-    return view('sales.invoices.index', compact('invoices', 'status'));
-}
+        return view('sales.invoices.index', compact('invoices', 'status'));
+    }
 
-public function markSpecialCustomer($id)
-{
-    $invoice = \App\Models\Sales\Invoice::with('quote')->findOrFail($id);
-    $quote   = $invoice->quote;
+    public function markSpecialCustomer($id)
+    {
+        $invoice = \App\Models\Sales\Invoice::with('quote')->findOrFail($id);
 
-    $quote->update(['is_special_customer' => true]);
+        $invoice->update(['is_special_customer' => true]);
 
-    return back()->with('success', 'Invoice marked as Special Customer. Payment requirement bypassed.');
-}
+        return back()->with('success', 'Invoice marked as Special Customer. Payment requirement bypassed.');
+    }
 
 
     public function create()

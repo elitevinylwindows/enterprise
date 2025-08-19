@@ -135,23 +135,23 @@
                                     </a>
 
                                     {{-- Take Payment --}}
-<a class="avtar avtar-xs btn-link-info text-info customModal" 
-   data-bs-toggle="tooltip" 
-   title="Request Payment" 
-   href="#" 
-   data-size="lg" 
-   data-url="{{ route('sales.invoices.payment', $invoice->id) }}" 
-   data-title="Invoice Payment">
-    <i data-feather="credit-card"></i>
-</a>
+                                    <a class="avtar avtar-xs btn-link-info text-info customModal" 
+                                    data-bs-toggle="tooltip" 
+                                    title="Request Payment" 
+                                    href="#" 
+                                    data-size="lg" 
+                                    data-url="{{ route('sales.invoices.payment', $invoice->id) }}" 
+                                    data-title="Invoice Payment">
+                                        <i data-feather="credit-card"></i>
+                                    </a>
 
-{{-- Special Order --}}
-<form action="{{ route('sales.invoices.special', $invoice->id) }}" method="POST" class="d-inline">
-  @csrf
-  <button type="submit" class="avtar avtar-xs btn-link-success text-success" title="Special Customer (bypass payment only)">
-    <i data-feather="star"></i>
-  </button>
-</form>
+                                    {{-- Special Order --}}
+                                    <form action="{{ route('sales.invoices.special', $invoice->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="avtar avtar-xs btn-link-success text-success" title="Special Customer (bypass payment only)">
+                                        <i data-feather="star"></i>
+                                    </button>
+                                    </form>
 
 
                                     {{-- Edit --}}
