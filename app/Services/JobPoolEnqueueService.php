@@ -47,7 +47,7 @@ class JobPoolEnqueueService
                     'frame_type'            => $it->frame_type,
                     'qty'                   => $it->qty ?? 1,
                     'line'                  => $it->series_type,                      // your table shows this
-                    'delivery_date'         => $order->expected_delivery,
+                    'delivery_date'         => $order->expected_delivery_date,
                     'type'                  => 'order',                               // semantic tag for your filter
                     'production_status'     => 'queued',
                     'profile'               => $it->grid_profile ?? null,             // you display profile

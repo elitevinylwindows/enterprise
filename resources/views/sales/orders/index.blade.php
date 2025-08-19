@@ -150,18 +150,19 @@
                 </button>
                 </form>
 
-
-                {{-- Edit --}}
-                <a class="avtar avtar-xs btn-link-primary text-primary customModal"
-                   data-bs-toggle="tooltip"
-                   data-bs-original-title="Edit"
-                   href="#"
-                   data-size="xl"
-                   data-url="{{ route('sales.orders.edit', $order->id) }}"
-                   data-title="Edit Order">
-                   <i data-feather="edit"></i>
-                   
-                </a>
+                @if(!$order->job_pool)
+                    {{-- Edit --}}
+                    <a class="avtar avtar-xs btn-link-primary text-primary customModal"
+                    data-bs-toggle="tooltip"
+                    data-bs-original-title="Edit"
+                    href="#"
+                    data-size="xl"
+                    data-url="{{ route('sales.orders.edit', $order->id) }}"
+                    data-title="Edit Order">
+                    <i data-feather="edit"></i>
+                    
+                    </a>
+                @endif
 
                 {{-- Delete --}}
                 <form action="{{ route('sales.orders.destroy', $order->id) }}" method="POST" style="display:inline;">
