@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sales;
 
+use App\Console\Commands\ReleaseOrdersToJobPool;
 use App\Http\Controllers\Controller;
 use App\Mail\OrderMail;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ class OrderController extends Controller
         })
         ->latest()
         ->get();
-
+   
     return view('sales.orders.index', compact('orders', 'status'));
 }
 
@@ -189,77 +190,79 @@ class OrderController extends Controller
     }
 
 
-public function markRush($id, \App\Services\JobPoolEnqueueService $svc)
-{
-    $order   = \App\Models\Sales\Order::with(['quote', 'invoice'])->findOrFail($id);
-    $quote   = $order->quote;
-    $invoice = $order->invoice ?? \App\Models\Sales\Invoice::where('order_id', $order->id)->first();
+    public function markRush($id, \App\Services\JobPoolEnqueueService $svc)
+    {
+        $order   = \App\Models\Sales\Order::with(['quote', 'invoice'])->findOrFail($id);
+        $quote   = $order->quote;
+        $invoice = $order->invoice ?? \App\Models\Sales\Invoice::where('order_id', $order->id)->first();
 
-    // If there's no invoice yet, create a pending one so payment can be taken now
-    if (!$invoice) {
-        $invoice = quoteToInvoice($quote, $order); // re-use your helper
-        // Ensure status is pending so it won't block payment logic
-        $invoice->update(['status' => 'pending']);
+        // If there's no invoice yet, create a pending one so payment can be taken now
+        if (!$invoice) {
+            $invoice = quoteToInvoice($quote, $order); // re-use your helper
+            // Ensure status is pending so it won't block payment logic
+            $invoice->update(['status' => 'pending']);
+            $order   = \App\Models\Sales\Order::with(['quote', 'invoice'])->findOrFail($id);
+        }
+
+        // Mark as rush (bypass 48h)
+        $order->update([
+            'is_rush'        => true,
+            'rushed_at'      => now(),
+            'editable_until' => now(),
+        ]);
+
+        // Payment or Special?
+        $hasPayment = $svc->paymentOnFile($invoice);
+        $isSpecial  = (bool) $order?->invoice?->is_special_customer;
+
+        if ($hasPayment || $isSpecial) {
+            $svc  = new JobPoolEnqueueService();
+            $added = $svc->enqueueFromOrder($order); // or enqueueQuoteItems(...)
+            return back()->with('success', $added > 0
+                ? "Order rushed and {$added} item(s) sent to Job Pool."
+                : "Order rushed. No new items queued."
+            );
+        }
+
+        // Build the modal payload
+        $payload = [
+            'message'     => 'Cannot rush: no deposit on file.',
+            'payment_url' => route('sales.invoices.payment', $invoice->id),   // GET → loads your modal
+            'special_url' => route('sales.invoices.special', $invoice->id),   // POST
+            'order_id'    => $order->id,
+            'invoice_id'  => $invoice->id,
+        ];
+
+        return back()
+            ->with('rush_block', $payload)
+            ->with('error', 'Cannot rush: no deposit found. Take payment or mark as Special Customer.');
     }
 
-    // Mark as rush (bypass 48h)
-    $quote->update([
-        'is_rush'        => true,
-        'rushed_at'      => now(),
-        'editable_until' => now(),
-    ]);
 
-    // Payment or Special?
-    $hasPayment = $svc->paymentOnFile($invoice);
-    $isSpecial  = (bool) $quote->is_special_customer;
+    public function restore($id)
+    {
+        Order::withTrashed()->findOrFail($id)->restore();
+        return redirect()->route('sales.orders.index', ['status' => 'deleted'])
+            ->with('success', 'Order restored successfully');
+    }
 
-    if ($hasPayment || $isSpecial) {
-        $added = $svc->enqueueFromQuote($quote); // or enqueueQuoteItems(...)
-        return back()->with('success', $added > 0
-            ? "Order rushed and {$added} item(s) sent to Job Pool."
-            : "Order rushed. No new items queued."
+    public function forceDelete($id)
+    {
+        Order::withTrashed()->findOrFail($id)->forceDelete();
+        return redirect()->route('sales.orders.index', ['status' => 'deleted'])
+            ->with('success', 'Order permanently deleted');
+    }
+
+
+    public function pdf(\App\Models\Order $order)
+    {
+        $pdfPath = $order->pdf_path; // or rebuild it the same way you did in the mail
+        abort_unless($pdfPath && Storage::disk('public')->exists($pdfPath), 404);
+
+        return response()->file(
+            Storage::disk('public')->path($pdfPath),
+            ['Content-Type' => 'application/pdf']
         );
     }
-
-    // Build the modal payload
-    $payload = [
-        'message'     => 'Cannot rush: no deposit on file.',
-        'payment_url' => route('sales.invoices.payment', $invoice->id),   // GET → loads your modal
-        'special_url' => route('sales.invoices.special', $invoice->id),   // POST
-        'order_id'    => $order->id,
-        'invoice_id'  => $invoice->id,
-    ];
-
-    return back()
-        ->with('rush_block', $payload)
-        ->with('error', 'Cannot rush: no deposit found. Take payment or mark as Special Customer.');
-}
-
-
-public function restore($id)
-{
-    Order::withTrashed()->findOrFail($id)->restore();
-    return redirect()->route('sales.orders.index', ['status' => 'deleted'])
-        ->with('success', 'Order restored successfully');
-}
-
-public function forceDelete($id)
-{
-    Order::withTrashed()->findOrFail($id)->forceDelete();
-    return redirect()->route('sales.orders.index', ['status' => 'deleted'])
-        ->with('success', 'Order permanently deleted');
-}
-
-
-public function pdf(\App\Models\Order $order)
-{
-    $pdfPath = $order->pdf_path; // or rebuild it the same way you did in the mail
-    abort_unless($pdfPath && Storage::disk('public')->exists($pdfPath), 404);
-
-    return response()->file(
-        Storage::disk('public')->path($pdfPath),
-        ['Content-Type' => 'application/pdf']
-    );
-}
 
 }

@@ -6,6 +6,7 @@ use App\Models\Sales\Order;
 use App\Models\Sales\Invoice;
 use App\Models\Sales\Quote;
 use App\Models\Manufacturing\JobPool;
+use App\Models\Master\Series\SeriesConfiguration;
 use Illuminate\Support\Facades\DB;
 
 class JobPoolEnqueueService
@@ -14,44 +15,45 @@ class JobPoolEnqueueService
      * Create Job Pool rows from a quote's items.
      * Returns number of newly created rows (dedup by quote_item_id).
      */
-    public function enqueueFromQuote(Quote $quote): int
+    public function enqueueFromOrder(Order $order): int
     {
-        $order = $quote->order; // may exist (Rush / Invoice path)
-        $cust  = $quote->customer;
+        $cust  = $order->customer;
 
-        $items = $quote->items()->get();
+        $items = $order->items()->get();
         if ($items->isEmpty()) return 0;
 
-        return DB::transaction(function () use ($quote, $order, $cust, $items) {
+        return DB::transaction(function () use ($order, $cust, $items) {
             $count = 0;
 
             foreach ($items as $it) {
                 // Dedup: do not create duplicates if already queued
-                $jobNo = 'JOB-' . $quote->id . '-' . $it->id;
+                $jobNo = 'JOB-' . $order->id . '-' . $it->id;
 
                 $exists = JobPool::query()
-                    ->where('quote_item_id', $it->id)
+                    ->where('order_item_id', $it->id)
                     ->orWhere('job_order_number', $jobNo)
                     ->exists();
 
                 if ($exists) continue;
 
+                $seriesConfiguration = SeriesConfiguration::where('series_type', $it->series_type)->first();
+                $productType = $seriesConfiguration?->productTypes?->where('series', $it->series->series)->first();
                 JobPool::create([
                     'order_id'              => $order?->id,                          // needed by your index blade
-                    'quote_item_id'         => $it->id,                               // unique guard (add migration if you haven't)
+                    'order_item_id'         => $it->id,                               // unique guard (add migration if you haven't)
                     'job_order_number'      => $jobNo,
                     // columns you show in your table
-                    'customer_number'       => $quote->customer_number,
-                    'customer_name'         => $quote->customer_name,
-                    'series'                => $it->series_id,                        // or map to readable series text if desired
+                    'customer_number'       => $order->customer->customer_number,
+                    'customer_name'         => $order->customer->customer_name,
+                    'series'                => $productType?->series,                        // or map to readable series text if desired
                     'color'                 => $it->color_config,                     // adjust if you prefer ext/int mix
                     'frame_type'            => $it->frame_type,
                     'qty'                   => $it->qty ?? 1,
-                    'line'                  => $it->series_type,                      // your table shows this
-                    'delivery_date'         => $quote->expected_delivery,
-                    'type'                  => 'order',                               // semantic tag for your filter
+                    'line'                  => $productType?->line?->line,                      // your table shows this
+                    'delivery_date'         => $order->expected_delivery_date,
+                    'type'                  => $productType?->type,                               // semantic tag for your filter
                     'production_status'     => 'queued',
-                    'profile'               => $it->grid_profile ?? null,             // you display profile
+                    'profile'               => $productType?->description ?? null,             // you display profile
                     'entry_date'            => now()->toDateString(),
                     'last_transaction_date' => now(),
                 ]);
@@ -59,18 +61,18 @@ class JobPoolEnqueueService
                 $count++;
             }
 
-            // mark quote for reference
-            $quote->update(['sent_to_job_pool_at' => now()]);
+            // mark order for reference
+            $order->update(['sent_to_job_pool_at' => now()]);
 
             return $count;
         });
     }
 
-    /** 48‑hour window satisfied if now >= created_at+48h OR quote is_rush. */
-    public function editHoldSatisfied(Quote $quote): bool
+    /** 48‑hour window satisfied if now >= created_at+48h OR order is_rush. */
+    public function editHoldSatisfied(Order $order): bool
     {
-        $end = $quote->editable_until ?? optional($quote->created_at)?->copy()->addHours(48);
-        return $quote->is_rush || (now()->greaterThanOrEqualTo($end ?? now()->addHours(48)));
+        $end = $order->editable_until ?? optional($order->created_at)?->copy()->addHours(48);
+        return $order->is_rush || (now()->greaterThanOrEqualTo($end ?? now()->addHours(48)));
     }
 
     /** Any paid/partially_paid/fully_paid or paid_amount>0 counts as "payment on file". */

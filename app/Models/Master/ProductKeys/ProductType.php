@@ -28,10 +28,11 @@ class ProductType extends Model
       protected $casts = [
         'line_id' => 'integer',
     ];
- public function line()
-{
-    return $this->belongsTo(Line::class, 'line_id');
-}
+    
+    public function line()
+    {
+        return $this->belongsTo(Line::class, 'line_id');
+    }
 
 
 }

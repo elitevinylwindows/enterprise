@@ -13,6 +13,7 @@ class JobPool extends Model
 
     protected $fillable = [
         'order_id',
+        'order_item_id',
         'job_order_number',
         'series',
         'qty',
@@ -22,6 +23,12 @@ class JobPool extends Model
         'production_status',
         'entry_date',
         'last_transaction_date',
+        'customer_number',
+        'customer_name',
+        'color',
+        'frame_type',
+        'profile'
+        
     ];
 
     protected $casts = [
@@ -38,5 +45,20 @@ class JobPool extends Model
         if ($status === 'deleted') return $query->onlyTrashed();
 
         return $query->where('production_status', $status);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(\App\Models\Sales\Order::class, 'order_id');
+    }
+
+    public function item()
+    {
+        return $this->belongsTo(\App\Models\Sales\OrderItem::class, 'order_item_id');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(\App\Models\Master\Customers\Customer::class, 'customer_number', 'customer_number');
     }
 }
