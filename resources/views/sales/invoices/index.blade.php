@@ -145,16 +145,12 @@
     <i data-feather="credit-card"></i>
 </a>
 
-{{-- Special Customer (bypass payment only) --}}
-<form action="{{ route('sales.invoices.special', $invoice->id) }}" 
-      method="POST" 
-      class="d-inline">
-    @csrf
-    <button type="submit" 
-            class="avtar avtar-xs btn-link-success text-success" 
-            title="Special Customer (bypass payment only)">
-        <i data-feather="star"></i>
-    </button>
+{{-- Special Order --}}
+<form action="{{ route('sales.invoices.special', $invoice->id) }}" method="POST" class="d-inline">
+  @csrf
+  <button type="submit" class="avtar avtar-xs btn-link-success text-success" title="Special Customer (bypass payment only)">
+    <i data-feather="star"></i>
+  </button>
 </form>
 
 
