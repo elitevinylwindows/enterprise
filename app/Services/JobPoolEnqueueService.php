@@ -53,7 +53,7 @@ class JobPoolEnqueueService
                     'delivery_date'         => $order->expected_delivery_date,
                     'type'                  => $productType?->type,                               // semantic tag for your filter
                     'production_status'     => 'queued',
-                    'profile'               => $it->grid_profile ?? null,             // you display profile
+                    'profile'               => $productType?->description ?? null,             // you display profile
                     'entry_date'            => now()->toDateString(),
                     'last_transaction_date' => now(),
                 ]);
