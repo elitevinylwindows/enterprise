@@ -91,8 +91,8 @@
                                 <td>
                                     @if($invoice->status === 'paid')
                                         <span class="badge bg-success">paid</span>
-                                    @elseif($invoice->status === 'warning')
-                                        <span class="badge bg-warning">error</span>
+                                    @elseif($invoice->status === 'partially_paid')
+                                        <span class="badge bg-warning">partially paid</span>
                                     @elseif($invoice->status === 'declined')
                                         <span class="badge bg-danger">declined</span>
                                     @else
