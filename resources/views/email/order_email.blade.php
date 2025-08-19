@@ -51,7 +51,7 @@
                         <td class="body532" style="padding: 40px; text-align: left; font-size: 16px; line-height: 1.6;">
                             <h2>{{ __('Order Confirmation') }}</h2>
 
-                            <p>{{ __('Dear') }} {{ $name }},</p>
+                            <p>{{ __('Dear') }} {{ $order->customer->customer_name }},</p>
 
                             <p>
                                 {{ __('Thank you for placing your order with') }} <strong>{{ env('APP_NAME') }}</strong>.
