@@ -56,8 +56,9 @@ class JobPool extends Model
     {
         return $this->belongsTo(\App\Models\Sales\OrderItem::class, 'order_item_id');
     }
-    
+
     public function customer()
     {
         return $this->belongsTo(\App\Models\Master\Customers\Customer::class, 'customer_number', 'customer_number');
     }
+}
