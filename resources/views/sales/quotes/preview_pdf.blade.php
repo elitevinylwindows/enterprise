@@ -259,14 +259,14 @@
                             @foreach ($modifications as $key => $modification)
                                <tr>
                                     <td>{{ $key + 1 }}</td>
-                                    <td>{{ $item->series?->series.'-'.$item->series_type ?? 'N/A' }}</td>
-                                    <td>W {{ $item->width }}" x H {{ $item->height }}"</td>
-                                    <td>{{ $item->frame_type . ' ' . $item->fin_type }}</td>
-                                    <td>{{ $item->color_config ?? 'N/A' }}</td>
-                                    <td>{{ $item->glass ?? 'N/A' }}</td>
-                                    <td>{{ $item->grid ?? 'N/A' }}</td>
-                                    <td>{{ $item->grid_pattern ?? 'N/A' }}</td>
-                                    <td>{{ $item->qty }}</td>
+                                    <td>{{ $modification->series?->series.'-'.$modification->series_type ?? 'N/A' }}</td>
+                                    <td>W {{ $modification->width }}" x H {{ $modification->height }}"</td>
+                                    <td>{{ $modification->frame_type . ' ' . $modification->fin_type }}</td>
+                                    <td>{{ $modification->color_config ?? 'N/A' }}</td>
+                                    <td>{{ $modification->glass ?? 'N/A' }}</td>
+                                    <td>{{ $modification->grid ?? 'N/A' }}</td>
+                                    <td>{{ $modification->grid_pattern ?? 'N/A' }}</td>
+                                    <td>{{ $modification->qty }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
