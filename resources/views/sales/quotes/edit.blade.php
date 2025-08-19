@@ -1464,7 +1464,7 @@
     function filterColorOptions(dropdown, group) {
         dropdown.querySelectorAll('option').forEach(opt => {
             if (!opt.value) return;
-            opt.style.display = opt.dataset.group === group ? 'block' : 'none';
+            opt.style.display = opt.dataset.group === group ? 'block' : 'block';
         });
     }
 

@@ -201,6 +201,7 @@ class OrderController extends Controller
             $invoice = quoteToInvoice($quote, $order); // re-use your helper
             // Ensure status is pending so it won't block payment logic
             $invoice->update(['status' => 'pending']);
+            $order   = \App\Models\Sales\Order::with(['quote', 'invoice'])->findOrFail($id);
         }
 
         // Mark as rush (bypass 48h)
@@ -212,7 +213,7 @@ class OrderController extends Controller
 
         // Payment or Special?
         $hasPayment = $svc->paymentOnFile($invoice);
-        $isSpecial  = (bool) $order->invoice->is_special_customer;
+        $isSpecial  = (bool) $order?->invoice?->is_special_customer;
 
         if ($hasPayment || $isSpecial) {
             $svc  = new JobPoolEnqueueService();

@@ -37,7 +37,7 @@ class JobPoolEnqueueService
                 if ($exists) continue;
 
                 $seriesConfiguration = SeriesConfiguration::where('series_type', $it->series_type)->first();
-                $productType = $seriesConfiguration->productTypes->where('series', $it->series->series)->first();
+                $productType = $seriesConfiguration?->productTypes?->where('series', $it->series->series)->first();
                 JobPool::create([
                     'order_id'              => $order?->id,                          // needed by your index blade
                     'order_item_id'         => $it->id,                               // unique guard (add migration if you haven't)
