@@ -133,6 +133,10 @@
                                     <a class="avtar avtar-xs btn-link-warning text-warning" data-bs-toggle="tooltip" data-bs-original-title="Email" href="{{route('sales.invoices.email', $invoice->id)}}" data-title="Send Email">
                                         <i data-feather="mail"></i>
                                     </a>
+                                    {{-- Call --}}
+                                    <a class="avtar avtar-xs btn-link-light text-light" data-bs-toggle="tooltip" data-bs-original-title="Call" href="{{route('sales.invoices.email', $invoice->id)}}" data-title="Call">
+                                        <i data-feather="phone-outgoing"></i>
+                                    </a>
 
                                     {{-- Take Payment --}}
 <a class="avtar avtar-xs btn-link-info text-info customModal" 
