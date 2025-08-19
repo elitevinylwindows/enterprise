@@ -24,7 +24,7 @@ class ReleaseOrdersToJobPool extends Command
                 if (!$svc->editHoldSatisfied($order)) return false;
                 $invoice = $order->invoice ?? \App\Models\Sales\Invoice::where('order_id', $order->id)->first();
                 $hasPayment = $invoice ? $svc->paymentOnFile($invoice) : false;
-                return $hasPayment || $invoice->is_special_customer;
+                return $hasPayment || $invoice?->is_special_customer;
             });
 
         $total = 0;
