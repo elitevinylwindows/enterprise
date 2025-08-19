@@ -189,33 +189,52 @@ class OrderController extends Controller
     }
 
 
-   public function markRush($id, JobPoolEnqueueService $svc)
+public function markRush($id, \App\Services\JobPoolEnqueueService $svc)
 {
-    $order = \App\Models\Sales\Order::with(['quote', 'invoice'])->findOrFail($id);
-    $quote = $order->quote;
-    $invoice = $order->invoice ?? Invoice::where('order_id', $order->id)->first();
+    $order   = \App\Models\Sales\Order::with(['quote', 'invoice'])->findOrFail($id);
+    $quote   = $order->quote;
+    $invoice = $order->invoice ?? \App\Models\Sales\Invoice::where('order_id', $order->id)->first();
 
-    // Mark order as rushed → bypass 48h hold
+    // If there's no invoice yet, create a pending one so payment can be taken now
+    if (!$invoice) {
+        $invoice = quoteToInvoice($quote, $order); // re-use your helper
+        // Ensure status is pending so it won't block payment logic
+        $invoice->update(['status' => 'pending']);
+    }
+
+    // Mark as rush (bypass 48h)
     $quote->update([
         'is_rush'        => true,
         'rushed_at'      => now(),
         'editable_until' => now(),
     ]);
 
-    // Payment or Special check
-    $hasPayment = $invoice ? $svc->paymentOnFile($invoice) : false;
+    // Payment or Special?
+    $hasPayment = $svc->paymentOnFile($invoice);
     $isSpecial  = (bool) $quote->is_special_customer;
 
     if ($hasPayment || $isSpecial) {
-        $added = $svc->enqueueQuoteItems($quote);
-        $msg   = $added > 0
+        $added = $svc->enqueueFromQuote($quote); // or enqueueQuoteItems(...)
+        return back()->with('success', $added > 0
             ? "Order rushed and {$added} item(s) sent to Job Pool."
-            : "Order rushed. No new items queued.";
-        return back()->with('success', $msg);
+            : "Order rushed. No new items queued."
+        );
     }
 
-    return back()->with('error', 'Cannot rush: no deposit found. Take payment or mark as Special Customer.');
+    // Build the modal payload
+    $payload = [
+        'message'     => 'Cannot rush: no deposit on file.',
+        'payment_url' => route('sales.invoices.payment', $invoice->id),   // GET → loads your modal
+        'special_url' => route('sales.invoices.special', $invoice->id),   // POST
+        'order_id'    => $order->id,
+        'invoice_id'  => $invoice->id,
+    ];
+
+    return back()
+        ->with('rush_block', $payload)
+        ->with('error', 'Cannot rush: no deposit found. Take payment or mark as Special Customer.');
 }
+
 
 public function restore($id)
 {
