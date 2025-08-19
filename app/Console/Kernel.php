@@ -37,18 +37,6 @@ protected function schedule(Schedule $schedule): void
     $schedule->command('purchase:auto-generate')
         ->everyTwoMinutes();
 
-    // 2. Run your closure job every minute with before/after hooks
-    $schedule->call(function () {
-        checkLastTransactionAndSendToJobPool();
-    })
-    ->cron('* * * * *')
-    ->before(function () {
-        Log::info('checkLastTransactionAndSendToJobPool function is about to run');
-    })
-    ->after(function () {
-        Log::info('checkLastTransactionAndSendToJobPool function is executed');
-    });
-
     // 3. Release orders to job pool every 5 minutes
     $schedule->command('orders:release-to-job-pool')
         ->everyFiveMinutes()
