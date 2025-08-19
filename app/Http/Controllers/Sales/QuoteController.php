@@ -798,8 +798,8 @@ public function index(Request $request)
             DB::commit();
             return redirect()->route('sales.quotes.index')->with('success', 'Quote status updated successfully.');
         } catch (\Exception $e) {
+            Log::error($e);
             DB::rollBack();
-            dd($e);
             return redirect()->route('sales.quotes.index')->withErrors(['error' => 'Failed to update quote status.']);
         }
 
