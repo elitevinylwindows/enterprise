@@ -141,14 +141,15 @@
                     <i data-feather="file-text"></i>
                 </a>
                 @endif
-
-             {{-- Rush --}}
-                <form action="{{ route('sales.orders.rush', $order->id) }}" method="POST" class="d-inline">
-                @csrf
-                <button type="submit" class="avtar avtar-xs btn-link-warning text-warning" title="Rush (bypass 48h; requires payment or Special)">
-                    <i data-feather="zap"></i>
-                </button>
-                </form>
+                
+                @if(!$order->sent_to_job_pool_at)
+                    <form action="{{ route('sales.orders.rush', $order->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="avtar avtar-xs btn-link-warning text-warning" title="Rush (bypass 48h; requires payment or Special)">
+                        <i data-feather="zap"></i>
+                    </button>
+                    </form>
+                @endif
 
                 @if(!$order->job_pool)
                     {{-- Edit --}}
