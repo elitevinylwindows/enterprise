@@ -45,16 +45,14 @@ class InvoiceController extends Controller
 
 public function markSpecialCustomer($id)
 {
-    $invoice = Invoice::with('quote')->findOrFail($id);
+    $invoice = \App\Models\Sales\Invoice::with('quote')->findOrFail($id);
     $quote   = $invoice->quote;
 
-    $quote->is_special_customer = true;
-    $quote->save();
+    $quote->update(['is_special_customer' => true]);
 
-    // Do NOT enqueue now. Special does not bypass the 48h hold.
-    // It will release automatically after 48h, or immediately if user then clicks Rush on the Order.
-    return back()->with('success', 'Marked Special Customer. Payment requirement will be bypassed on release.');
+    return back()->with('success', 'Invoice marked as Special Customer. Payment requirement bypassed.');
 }
+
 
     public function create()
     {

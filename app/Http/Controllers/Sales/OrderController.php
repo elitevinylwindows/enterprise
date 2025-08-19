@@ -189,40 +189,32 @@ class OrderController extends Controller
     }
 
 
-    public function markRush($id, JobPoolEnqueueService $svc)
+   public function markRush($id, JobPoolEnqueueService $svc)
 {
-    $order = Order::with(['quote', 'invoice'])->findOrFail($id);
+    $order = \App\Models\Sales\Order::with(['quote', 'invoice'])->findOrFail($id);
     $quote = $order->quote;
-    $invoice = $order->invoice ?? \App\Models\Sales\Invoice::where('order_id', $order->id)->first();
+    $invoice = $order->invoice ?? Invoice::where('order_id', $order->id)->first();
 
-    // Mark rush (bypasses 48h)
+    // Mark order as rushed → bypass 48h hold
     $quote->update([
         'is_rush'        => true,
         'rushed_at'      => now(),
-        'editable_until' => now(), // for UI clarity
+        'editable_until' => now(),
     ]);
 
-    // Can we send right now?
+    // Payment or Special check
     $hasPayment = $invoice ? $svc->paymentOnFile($invoice) : false;
     $isSpecial  = (bool) $quote->is_special_customer;
 
     if ($hasPayment || $isSpecial) {
-        $added = $svc->enqueueFromQuote($quote);
-        $msg   = $added > 0 ? "Order rushed and {$added} item(s) sent to Job Pool." : "Order rushed. No new items to queue.";
+        $added = $svc->enqueueQuoteItems($quote);
+        $msg   = $added > 0
+            ? "Order rushed and {$added} item(s) sent to Job Pool."
+            : "Order rushed. No new items queued.";
         return back()->with('success', $msg);
     }
 
-    // Block: no payment and not special → show the two options
-    // You can link these routes in your UI if you want quick actions
-    $takePaymentUrl = $invoice ? route('sales.invoices.payment', $invoice->id) : null;
-    $markSpecialUrl = $invoice ? route('sales.invoices.special', $invoice->id) : null;
-
-    $hint = [];
-    if ($takePaymentUrl) $hint[] = "Take Payment";
-    if ($markSpecialUrl) $hint[] = "Mark Special Customer (on Invoice)";
-
-    $choices = $hint ? (' Options: ' . implode(' or ', $hint) . '.') : '';
-    return back()->with('error', 'Cannot rush: no deposit on file.' . $choices);
+    return back()->with('error', 'Cannot rush: no deposit found. Take payment or mark as Special Customer.');
 }
 
 public function restore($id)
