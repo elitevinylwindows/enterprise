@@ -145,6 +145,7 @@
                                         <i data-feather="credit-card"></i>
                                     </a>
 
+                                    @if(!$invoice->is_special_customer)
                                     {{-- Special Order --}}
                                     <form action="{{ route('sales.invoices.special', $invoice->id) }}" method="POST" class="d-inline">
                                     @csrf
@@ -152,7 +153,7 @@
                                         <i data-feather="star"></i>
                                     </button>
                                     </form>
-
+                                    @endif
 
                                     {{-- Edit --}}
                                     <a class="avtar avtar-xs btn-link-primary text-primary customModal" data-bs-toggle="tooltip" data-bs-original-title="Edit" href="#" data-size="xl" data-url="{{ route('sales.invoices.edit', $invoice->id) }}" data-title="Edit Invoice">
