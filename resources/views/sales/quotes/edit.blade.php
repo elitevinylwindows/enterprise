@@ -1464,7 +1464,7 @@
     function filterColorOptions(dropdown, group) {
         dropdown.querySelectorAll('option').forEach(opt => {
             if (!opt.value) return;
-            opt.style.display = opt.dataset.group === group ? 'block' : 'block';
+            opt.style.display = opt.dataset.group === group ? 'block' : 'none';
         });
     }
 
@@ -1548,7 +1548,7 @@
         options.forEach(opt => {
             if (!opt.value) return; // skip placeholder
             const isVisible = opt.dataset.group === group;
-            opt.style.display = isVisible ? 'block' : 'block';
+            opt.style.display = isVisible ? 'block' : 'none';
         });
     }
 
