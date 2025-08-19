@@ -6,6 +6,7 @@ use App\Models\Sales\Order;
 use App\Models\Sales\Invoice;
 use App\Models\Sales\Quote;
 use App\Models\Manufacturing\JobPool;
+use App\Models\Master\Series\SeriesConfiguration;
 use Illuminate\Support\Facades\DB;
 
 class JobPoolEnqueueService
@@ -35,6 +36,8 @@ class JobPoolEnqueueService
 
                 if ($exists) continue;
 
+                $seriesConfiguration = SeriesConfiguration::where('series_type', $it->series_type)->first();
+                $productType = $seriesConfiguration->productTypes->where('series', $it->series->series)->first();
                 JobPool::create([
                     'order_id'              => $order?->id,                          // needed by your index blade
                     'order_item_id'         => $it->id,                               // unique guard (add migration if you haven't)
@@ -42,13 +45,13 @@ class JobPoolEnqueueService
                     // columns you show in your table
                     'customer_number'       => $order->customer->customer_number,
                     'customer_name'         => $order->customer->customer_name,
-                    'series'                => $it->series_id,                        // or map to readable series text if desired
+                    'series'                => $productType?->series,                        // or map to readable series text if desired
                     'color'                 => $it->color_config,                     // adjust if you prefer ext/int mix
                     'frame_type'            => $it->frame_type,
                     'qty'                   => $it->qty ?? 1,
-                    'line'                  => $it->series_type,                      // your table shows this
+                    'line'                  => $$productType?->line?->line,                      // your table shows this
                     'delivery_date'         => $order->expected_delivery_date,
-                    'type'                  => 'order',                               // semantic tag for your filter
+                    'type'                  => $productType?->type,                               // semantic tag for your filter
                     'production_status'     => 'queued',
                     'profile'               => $it->grid_profile ?? null,             // you display profile
                     'entry_date'            => now()->toDateString(),

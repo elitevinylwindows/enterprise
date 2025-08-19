@@ -23,12 +23,27 @@ class OrderController extends Controller
 {
     $status = $request->get('status', 'all');
 
-    $orders = Order::with('customer')
-        ->when($status === 'deleted', function($query) {
-            return $query->onlyTrashed();
-        })
-        ->latest()
-        ->get();
+    // $orders = Order::with('customer')
+    //     ->when($status === 'deleted', function($query) {
+    //         return $query->onlyTrashed();
+    //     })
+    //     ->latest()
+    //     ->get();
+     $svc = new JobPoolEnqueueService();
+         // Eligible: not already sent, 48h satisfied, and (payment present OR special)
+    $orders = Order::with(['items', 'invoice'])
+        ->get()
+        ->filter(function ($order) use ($svc) {
+            if (!$svc->editHoldSatisfied($order)) return false;
+            $invoice = $order->invoice ?? \App\Models\Sales\Invoice::where('order_id', $order->id)->first();
+            $hasPayment = $invoice ? $svc->paymentOnFile($invoice) : false;
+            return $hasPayment || $invoice?->is_special_customer;
+        });
+
+    $total = 0;
+    foreach ($orders as $order) {
+        $total += $svc->enqueueFromOrder($order);
+    }
 
     return view('sales.orders.index', compact('orders', 'status'));
 }

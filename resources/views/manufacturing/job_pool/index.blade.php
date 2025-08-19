@@ -74,7 +74,7 @@
                                 <th>{{ __('Delivery Date') }}</th>
                                 <th>{{ __('Type') }}</th>
                                 <th>{{ __('Production Status') }}</th>
-                                <th>{{ __('Profile') }}</th>
+                                <th>{{ __('Note') }}</th>
                                 <th>{{ __('Entry Date') }}</th>
                                 <th>{{ __('Last Transaction Date') }}</th>
                                 <th>{{ __('Action') }}</th>
