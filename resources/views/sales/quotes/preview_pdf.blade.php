@@ -256,7 +256,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($modifications as $modification)
+                            @foreach ($modifications as $key => $modification)
                                <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td>{{ $item->series?->series.'-'.$item->series_type ?? 'N/A' }}</td>
