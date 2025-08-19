@@ -1548,7 +1548,7 @@
         options.forEach(opt => {
             if (!opt.value) return; // skip placeholder
             const isVisible = opt.dataset.group === group;
-            opt.style.display = isVisible ? 'block' : 'none';
+            opt.style.display = isVisible ? 'block' : 'block';
         });
     }
 
