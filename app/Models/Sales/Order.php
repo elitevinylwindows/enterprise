@@ -39,7 +39,8 @@ class Order extends Model
         'shipping',
         'is_rush',
         'rushed_at',
-        'editable_until'
+        'editable_until',
+        'sent_to_job_pool_at'
 
     ];
 

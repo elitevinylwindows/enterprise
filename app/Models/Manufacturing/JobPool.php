@@ -13,6 +13,7 @@ class JobPool extends Model
 
     protected $fillable = [
         'order_id',
+        'order_item_id',
         'job_order_number',
         'series',
         'qty',
@@ -22,6 +23,12 @@ class JobPool extends Model
         'production_status',
         'entry_date',
         'last_transaction_date',
+        'customer_number',
+        'customer_name',
+        'color',
+        'frame_type',
+        'profile'
+        
     ];
 
     protected $casts = [
