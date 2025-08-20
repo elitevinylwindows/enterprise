@@ -818,12 +818,16 @@
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
+                    // Close modal and dropdown overlay if open
                     const currentModal = document.getElementById('addItemModal');
-                    // close modal if open
                     const currentModalInstance = bootstrap.Modal.getInstance(currentModal) ?? new bootstrap.Modal(currentModal);
                     if (currentModalInstance) {
                         currentModalInstance.hide();
                     }
+                    // Also close any open Bootstrap dropdowns (overlay)
+                    document.querySelectorAll('.dropdown.show .dropdown-toggle').forEach(btn => {
+                        bootstrap.Dropdown.getOrCreateInstance(btn).hide();
+                    });
 
                     const row = `
                         <tr data-id="${data.item_id}" data-type="quote_item">
@@ -936,6 +940,7 @@
                             });
                         });
                     }
+
                     console.log('Modal closed');
                 } else {
                     alert('Item failed to save.');

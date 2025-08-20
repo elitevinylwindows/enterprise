@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sales\Invoice;
 use App\Models\Sales\InvoicePayment;
+use App\Models\Sales\Quote;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -155,5 +156,62 @@ class WebhookController extends Controller
                 'gateway_response' => json_encode($data)
             ]);
         }
+    }
+
+    public function handleIncomingSms(Request $request)
+    {
+        // Log the raw request for debugging
+        Log::info('Incoming SMS Webhook:', $request->all());
+
+        // RingCentral sends data as JSON
+        $data = $request->json()->all();
+        Log::info('Parsed Incoming SMS Data:', $data);
+        // Extract the crucial information
+        $fromNumber = $data['from']['phoneNumber'] ?? null;
+        $messageText = trim($data['text'] ?? ''); // This will be "1" or "2"
+
+        if (!$fromNumber || !$messageText) {
+            Log::warning('Invalid webhook payload received.');
+            return response()->json(['error' => 'Invalid payload'], 400);
+        }
+
+        // 1. Find the quote that was sent to this phone number
+        // You need a relationship between quotes and customers
+        $quote = Quote::whereHas('customer', function ($query) use ($fromNumber) {
+                $query->where('phone', $fromNumber);
+            })
+            ->where('status', 'sent_for_approval') // Only look for quotes awaiting approval
+            ->latest() // Get the most recent one
+            ->first();
+
+        if (!$quote) {
+            Log::warning('No pending quote found for phone number: ' . $fromNumber);
+            // You could send an SMS back saying "Quote not found"
+            return response()->json(['status' => 'quote_not_found']);
+        }
+
+        // 2. Process the response
+        switch ($messageText) {
+            case '1':
+                $quote->update(['status' => 'approved']);
+                $responseMessage = "Quote #{$quote->id} has been APPROVED. Thank you!";
+                break;
+            case '2':
+                $quote->update(['status' => 'declined']);
+                $responseMessage = "Quote #{$quote->id} has been DECLINED.";
+                break;
+            default:
+                // If they send anything other than 1 or 2
+                $responseMessage = "Invalid response. Please reply only with '1' to approve or '2' to decline.";
+                break;
+        }
+
+        // 3. (Optional) Send a confirmation SMS back to the customer
+        // You would use your RingCentralService here again to send $responseMessage
+
+        Log::info("Processed SMS response for Quote #{$quote->id}. New status: {$quote->status}");
+
+        // RingCentral expects a 200 OK response
+        return response()->json(['status' => 'success']);
     }
 }

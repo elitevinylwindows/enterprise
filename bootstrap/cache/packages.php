@@ -22,6 +22,17 @@
       0 => 'Barryvdh\\DomPDF\\ServiceProvider',
     ),
   ),
+  'coxlr/laravel-ringcentral' => 
+  array (
+    'aliases' => 
+    array (
+      'RingCentral' => 'Coxlr\\RingCentral\\Facades\\RingCentral',
+    ),
+    'providers' => 
+    array (
+      0 => 'Coxlr\\RingCentral\\RingCentralServiceProvider',
+    ),
+  ),
   'kkomelin/laravel-translatable-string-exporter' => 
   array (
     'providers' => 

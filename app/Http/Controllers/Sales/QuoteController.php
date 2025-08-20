@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use App\Models\Sales\QuoteItem;
+use App\Services\RingCentralService;
 use Illuminate\Support\Facades\View;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
@@ -829,9 +830,23 @@ public function index(Request $request)
 
             Mail::to($quote->customer->email)
             ->send(new QuoteEmail($quote, $pdf));
+            if($quote->customer->billing_phone) {
+                $rcService = new RingCentralService();
+                $result = $rcService->sendQuoteApprovalSms(
+                    $quote->customer->billing_phone, // e.g., +15558675309
+                    $quote->quote_number,
+                    $quote->customer->customer_name,
+                    $quote->total
+                );
+
+                // 3. Update quote status to "sent_for_approval"
+                if ($result['data']->messageStatus) {
+                    $quote->update(['status' => 'Sent For Approval']);
+                }
+            }   
         }
 
-        return response()->json(['success' => true, 'message' => 'Quote saved as draft successfully.']);
+        return response()->json(['success' => true, 'message' => 'Quote sent for approval.']);
     }
 
     public function email($id)

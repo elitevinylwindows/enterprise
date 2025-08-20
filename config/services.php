@@ -46,4 +46,15 @@ return [
         'webhook_sandbox_secret' => env('FIRST_SERVE_SANDBOX_SIGNATURE', 'JMkVGUiVXBkNQa6lYgmztRQFJbnGO6Zx'),
         "webhook_production_secret" => env('FIRST_SERVE_PRODUCTION_SIGNATURE', 'FJqTSiCkjkMkdnknbw4RwLMuSHuXc4Pd'),
     ],
+
+    'ringcentral' => [
+        'client_id' => env('RINGCENTRAL_CLIENT_ID'),
+        'client_secret' => env('RINGCENTRAL_CLIENT_SECRET'),
+        'server_url' => env('RINGCENTRAL_SERVER_URL'),
+        'username' => env('RINGCENTRAL_USERNAME'),
+        'password' => env('RINGCENTRAL_PASSWORD'),
+        'extension' => env('RINGCENTRAL_EXTENSION'),
+        'sms_from' => env('RINGCENTRAL_SMS_FROM'),
+        'jwt_token' => env('RINGCENTRAL_JWT_TOKEN'),
+    ],
 ];

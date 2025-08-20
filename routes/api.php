@@ -17,4 +17,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'webhooks', 'as' => 'webhooks.'], function () {
     Route::post('process-invoice', [WebhookController::class, 'handle'])->name('process-invoice');
+    Route::post('incoming-sms', [WebhookController::class, 'handleIncomingSms'])->name('incoming-sms');
 });

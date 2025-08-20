@@ -48,62 +48,61 @@ class RingCentralController extends Controller
     }
 
 
+    public function call($id)
+    {
+        return $this->callDeliveryContact($id);
+    }
 
-public function call($id)
-{
-    return $this->callDeliveryContact($id);
-}
 
-
-    
+        
     public function connect()
-{
-    $authUrl = 'https://platform.ringcentral.com/restapi/oauth/authorize' .
-        '?response_type=code' .
-        '&client_id=' . urlencode(env('RINGCENTRAL_CLIENT_ID')) .
-        '&redirect_uri=' . urlencode(env('RINGCENTRAL_REDIRECT_URI')) .
-        '&state=' . csrf_token();
+    {
+        $authUrl = 'https://platform.ringcentral.com/restapi/oauth/authorize' .
+            '?response_type=code' .
+            '&client_id=' . urlencode(env('RINGCENTRAL_CLIENT_ID')) .
+            '&redirect_uri=' . urlencode(env('RINGCENTRAL_REDIRECT_URI')) .
+            '&state=' . csrf_token();
 
-    return redirect($authUrl);
-}
-
-public function callback(Request $request)
-{
-    $response = Http::asForm()->post('https://platform.ringcentral.com/restapi/oauth/token', [
-        'grant_type' => 'authorization_code',
-        'code' => $request->code,
-        'redirect_uri' => env('RINGCENTRAL_REDIRECT_URI'),
-        'client_id' => env('RINGCENTRAL_CLIENT_ID'),
-        'client_secret' => env('RINGCENTRAL_CLIENT_SECRET'),
-    ]);
-
-    if (!$response->successful()) {
-        return back()->with('error', 'OAuth failed: ' . $response->body());
+        return redirect($authUrl);
     }
 
-    $token = $response->json();
+    public function callback(Request $request)
+    {
+        $response = Http::asForm()->post('https://platform.ringcentral.com/restapi/oauth/token', [
+            'grant_type' => 'authorization_code',
+            'code' => $request->code,
+            'redirect_uri' => env('RINGCENTRAL_REDIRECT_URI'),
+            'client_id' => env('RINGCENTRAL_CLIENT_ID'),
+            'client_secret' => env('RINGCENTRAL_CLIENT_SECRET'),
+        ]);
 
-    // Retrieve user from session
-    $user = \App\Models\User::find(session('rc_user_id'));
+        if (!$response->successful()) {
+            return back()->with('error', 'OAuth failed: ' . $response->body());
+        }
 
-    if (!$user) {
-        return redirect()->route('login')->with('error', 'User session expired. Please log in again.');
+        $token = $response->json();
+
+        // Retrieve user from session
+        $user = \App\Models\User::find(session('rc_user_id'));
+
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User session expired. Please log in again.');
+        }
+
+        // Optional: Get extension info
+        $profile = Http::withToken($token['access_token'])
+            ->get('https://platform.ringcentral.com/restapi/v1.0/account/~/extension/~')
+            ->json();
+
+        $user->update([
+            'rc_access_token' => $token['access_token'],
+            'rc_refresh_token' => $token['refresh_token'],
+            'rc_token_expiry' => now()->addSeconds($token['expires_in']),
+            'rc_extension_id' => $profile['id'] ?? null,
+            'rc_email' => $profile['contact']['email'] ?? null,
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'RingCentral connected!');
     }
-
-    // Optional: Get extension info
-    $profile = Http::withToken($token['access_token'])
-        ->get('https://platform.ringcentral.com/restapi/v1.0/account/~/extension/~')
-        ->json();
-
-    $user->update([
-        'rc_access_token' => $token['access_token'],
-        'rc_refresh_token' => $token['refresh_token'],
-        'rc_token_expiry' => now()->addSeconds($token['expires_in']),
-        'rc_extension_id' => $profile['id'] ?? null,
-        'rc_email' => $profile['contact']['email'] ?? null,
-    ]);
-
-    return redirect()->route('dashboard')->with('success', 'RingCentral connected!');
-}
 
 }
