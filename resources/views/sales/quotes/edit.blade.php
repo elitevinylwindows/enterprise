@@ -165,7 +165,7 @@
                             @foreach ($modifications as $modification)
                                 <tr data-id="{{ $modification->id }}" data-type="modification">
                                     <td style="text-wrap:auto">{{ $modification->description }}</td>
-                                    <td>{{ $modification->qty }}</td>
+                                    <td><input type="number" name="qty[]" value="{{ $modification->qty }}" class="form-control form-control-sm qty-input" style="width: 60px;" data-id="{{ $modification->id }}" data-price="{{ $modification->price }}"></td>
                                     <td>{{ $modification->width }}" x {{ $modification->height }}"</td>
                                     <td>{{ $modification->glass }}</td>
                                     <td>{{ $modification->grid }}</td>
@@ -906,7 +906,7 @@
                                     row.setAttribute('data-id', mod.id);
                                     row.innerHTML = `
                                         <td style="text-wrap:auto">${mod.description}</td>
-                                        <td>${mod.qty}</td>
+                                        <td><input type="number" name="qty[]" value="${mod.qty}" class="form-control form-control-sm qty-input" style="width: 60px;" data-id="${mod.id}" data-price="${mod.price}"></td>
                                         <td>${mod.width}" x ${mod.height}"</td>
                                         <td>${mod.glass}</td>
                                         <td>${mod.grid}</td>
