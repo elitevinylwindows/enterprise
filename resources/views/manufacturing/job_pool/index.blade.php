@@ -101,7 +101,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="badge bg-light-{{ in_array(strtolower($job->production_status), ['queued','pending']) ? 'warning' : (strtolower($job->production_status) === 'completed' ? 'success' : 'info') }}">
+                                    <span class="badge bg-light-primary">
                                         {{ ucfirst($job->order->is_rush ? ' Yes' : 'No') }}
                                     </span>
                                 </td>
