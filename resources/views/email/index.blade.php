@@ -1,302 +1,207 @@
+{{-- resources/views/email/index.blade.php --}}
 @extends('layouts.app')
 
-@section('page-title', 'Email')
-
-@section('breadcrumb')
-  <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-  <li class="breadcrumb-item active">Email</li>
-@endsection
+@section('page-title', __('Email'))
 
 @section('content')
 <div class="card shadow-sm border-0">
-  <div class="card-header bg-white">
-    <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
-      <div class="d-flex align-items-center gap-2">
-        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#composeModal">
-          <i data-feather="edit-3" class="me-1"></i> Compose
-        </button>
-        <div class="vr d-none d-md-block"></div>
-        <div class="btn-group btn-group-sm" role="group" aria-label="Bulk actions">
-          <button id="selectAllBtn" class="btn btn-light" title="Select All"><i data-feather="check-square"></i></button>
-          <button class="btn btn-light" id="markReadBtn" title="Mark as read"><i data-feather="mail"></i></button>
-          <button class="btn btn-light" id="archiveBtn" title="Archive"><i data-feather="archive"></i></button>
-          <button class="btn btn-light text-danger" id="deleteBtn" title="Delete"><i data-feather="trash-2"></i></button>
-        </div>
-      </div>
-
-      <div class="d-flex flex-grow-1 flex-md-grow-0 align-items-center gap-2">
-        <div class="input-group input-group-sm">
-          <span class="input-group-text bg-light border-0"><i data-feather="search"></i></span>
-          <input type="search" class="form-control border-0" placeholder="Search mail, names, or keywords…" id="emailSearch">
-        </div>
-        <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#filterModal" title="Filters">
-          <i data-feather="sliders"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-
   <div class="card-body p-0">
-    <div class="row g-0" id="emailSplitPane">
-      <!-- Sidebar -->
-      <aside class="col-12 col-md-3 col-lg-2 border-end bg-body">
-        <nav class="list-group list-group-flush py-2">
-          <a href="#" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between active">
-            <span><i data-feather="inbox" class="me-2"></i>Inbox</span>
-            <span class="badge bg-primary rounded-pill">12</span>
-          </a>
-          <a href="#" class="list-group-item list-group-item-action"><i data-feather="send" class="me-2"></i>Sent</a>
-          <a href="#" class="list-group-item list-group-item-action"><i data-feather="file-text" class="me-2"></i>Drafts</a>
-          <a href="#" class="list-group-item list-group-item-action"><i data-feather="archive" class="me-2"></i>Archived</a>
-          <a href="#" class="list-group-item list-group-item-action"><i data-feather="trash-2" class="me-2"></i>Trash</a>
+    <div class="row g-0">
 
-          <div class="px-3 pt-3 small text-muted">Labels</div>
-          <a href="#" class="list-group-item list-group-item-action"><span class="badge bg-warning me-2">Urgent</span> Project A</a>
-          <a href="#" class="list-group-item list-group-item-action"><span class="badge bg-info me-2">Info</span> Finance</a>
-          <a href="#" class="list-group-item list-group-item-action"><span class="badge bg-success me-2">OK</span> Customers</a>
-        </nav>
-      </aside>
-
-      <!-- List -->
-      <section class="col-12 col-md-4 col-lg-4 border-end" style="min-height: 70vh;">
-        <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-body">
-          <div class="small text-muted">Showing latest</div>
-          <div class="btn-group btn-group-sm">
-            <button class="btn btn-light" id="refreshBtn" title="Refresh"><i data-feather="refresh-cw"></i></button>
-            <button class="btn btn-light" id="compactToggle" title="Compact density"><i data-feather="layout"></i></button>
+      {{-- LEFT: folders / labels --}}
+      <aside class="col-12 col-md-3 col-lg-3 border-end">
+        <div class="p-3 d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-2">
+            <span class="avatar bg-primary-subtle text-primary fw-bold">G</span>
+            <div class="small">
+              <div class="fw-semibold">Google account</div>
+              <div class="text-muted">you@company.com</div>
+            </div>
           </div>
+          <button class="btn btn-sm btn-light border">
+            <i class="ti ti-dots"></i>
+          </button>
         </div>
 
-        <ul class="list-group list-group-flush email-list" id="emailList">
-          @forelse($emails ?? [] as $email)
-            <li class="list-group-item email-item py-3 {{ $email->is_unread ? 'email-unread' : '' }}" 
-                data-id="{{ $email->id }}">
-              <div class="d-flex align-items-start gap-3">
-                <div class="form-check mt-1">
-                  <input class="form-check-input email-checkbox" type="checkbox" value="{{ $email->id }}">
-                </div>
+        <div class="px-3 pb-3">
+          <a href="#" class="btn btn-primary w-100 rounded-3">
+            <i class="ti ti-pencil me-1"></i> Compose
+          </a>
+        </div>
 
-                <div class="rounded-circle flex-shrink-0 bg-light d-flex align-items-center justify-content-center" style="width:36px;height:36px;">
-                  <span class="small fw-semibold">{{ strtoupper(substr($email->from_name ?? 'U',0,1)) }}</span>
-                </div>
-
-                <div class="flex-grow-1">
-                  <div class="d-flex justify-content-between align-items-start">
-                    <div class="d-flex align-items-center gap-2">
-                      <button class="btn btn-sm p-0 border-0 bg-transparent email-star" title="Star">
-                        <i data-feather="{{ $email->is_starred ? 'star' : 'star' }}" class="{{ $email->is_starred ? 'text-warning' : 'text-muted' }}"></i>
-                      </button>
-                      <span class="fw-semibold">{{ $email->from_name ?? $email->from_email }}</span>
-                      @if(!empty($email->labels))
-                        @foreach($email->labels as $label)
-                          <span class="badge bg-light text-dark border">{{ $label }}</span>
-                        @endforeach
-                      @endif
-                    </div>
-                    <small class="text-muted">{{ $email->sent_at?->format('M d, H:i') }}</small>
-                  </div>
-                  <div class="text-truncate">
-                    <a href="javascript:void(0)" class="stretched-link email-open text-decoration-none">
-                      <span class="me-2">{{ $email->subject }}</span>
-                      @if($email->has_attachments)
-                        <i data-feather="paperclip" class="align-text-bottom"></i>
-                      @endif
-                    </a>
-                  </div>
-                  <div class="text-muted small text-truncate">{{ $email->snippet }}</div>
-                </div>
-              </div>
-            </li>
-          @empty
-            <li class="list-group-item py-5 text-center text-muted">No emails found.</li>
-          @endforelse
+        <div class="px-2 small text-uppercase text-muted fw-semibold">Inbox</div>
+        <ul class="list-group list-group-flush mb-3 email-nav">
+          <li class="list-group-item d-flex justify-content-between align-items-center active">
+            <a href="#" class="stretched-link text-white"><i class="ti ti-inbox me-2"></i> Mail inbox</a>
+            <span class="badge bg-white text-primary fw-semibold">45</span>
+          </li>
+          <li class="list-group-item"><i class="ti ti-star me-2"></i> Starred <span class="ms-auto text-muted">12</span></li>
+          <li class="list-group-item"><i class="ti ti-send me-2"></i> Sent <span class="ms-auto text-muted">20</span></li>
+          <li class="list-group-item"><i class="ti ti-file-description me-2"></i> Drafts <span class="ms-auto text-muted">3</span></li>
+          <li class="list-group-item"><i class="ti ti-trash me-2"></i> Deleted</li>
         </ul>
 
-        @if(($emails ?? null) && method_exists($emails, 'links'))
-          <div class="px-3 py-2 border-top">
-            {{ $emails->links() }}
+        <div class="px-2 small text-uppercase text-muted fw-semibold">Labels</div>
+        <ul class="list-group list-group-flush email-nav">
+          <li class="list-group-item d-flex align-items-center">
+            <span class="dot dot-blue me-2"></span> Work <span class="ms-auto text-muted">32</span>
+          </li>
+          <li class="list-group-item d-flex align-items-center">
+            <span class="dot dot-violet me-2"></span> Team events <span class="ms-auto text-muted">42</span>
+          </li>
+          <li class="list-group-item d-flex align-items-center">
+            <span class="dot dot-amber me-2"></span> Applications <span class="ms-auto text-muted">12</span>
+          </li>
+        </ul>
+
+        <div class="p-3">
+          <div class="small text-uppercase text-muted fw-semibold mb-2">Upcoming meetings</div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-secondary-subtle text-secondary">15 min</span>
+            <div class="small">
+              <div class="fw-semibold">Design Team Meeting</div>
+              <div class="text-muted">09:30 – 09:45 AM</div>
+            </div>
           </div>
-        @endif
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-secondary-subtle text-secondary">60 min</span>
+            <div class="small">
+              <div class="fw-semibold">Interview block</div>
+              <div class="text-muted">11:30 – 12:30 PM</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {{-- MIDDLE: message list --}}
+      <section class="col-12 col-md-4 col-lg-4 border-end d-flex flex-column">
+        <div class="p-3 border-bottom d-flex align-items-center gap-2">
+          <div class="form-check me-2">
+            <input class="form-check-input" type="checkbox" id="checkAll">
+          </div>
+          <div class="ms-auto d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-light border"><i class="ti ti-refresh"></i></button>
+            <button class="btn btn-sm btn-light border"><i class="ti ti-adjustments"></i></button>
+            <div class="input-group input-group-sm" style="max-width: 240px;">
+              <span class="input-group-text bg-transparent border-end-0"><i class="ti ti-search"></i></span>
+              <input type="search" class="form-control border-start-0" placeholder="Search mail…">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-grow-1 overflow-auto" style="max-height: calc(100vh - 240px);">
+          {{-- repeatable message row --}}
+          @for ($i = 0; $i < 10; $i++)
+          <a href="#" class="list-group-item list-group-item-action py-3 px-3 d-block email-row">
+            <div class="d-flex align-items-center">
+              <div class="form-check me-2">
+                <input class="form-check-input" type="checkbox">
+              </div>
+              <div class="avatar avatar-sm bg-light rounded-circle me-2 fw-semibold">M</div>
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fw-semibold">Megan Jackson</span>
+                  <span class="text-muted">· New project lead</span>
+                  <span class="ms-auto small text-muted">Today, 11:30am</span>
+                </div>
+                <div class="text-muted small mt-1 text-truncate">
+                  Hey Edward, just getting in touch because I wanted to get…
+                </div>
+                <div class="mt-2 d-flex align-items-center gap-2">
+                  <span class="badge bg-secondary-subtle text-secondary">Work</span>
+                  <span class="badge bg-secondary-subtle text-secondary">Inbox</span>
+                  <i class="ti ti-paperclip small text-muted"></i>
+                </div>
+              </div>
+            </div>
+          </a>
+          @endfor
+        </div>
       </section>
 
-      <!-- Preview -->
-      <article class="col-12 col-md-5 col-lg-6" id="emailPreview">
-        <div class="h-100 d-flex flex-column">
-          <div class="border-bottom px-3 py-3 d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-2">
-              <button class="btn btn-sm btn-light d-md-none" id="backToList"><i data-feather="chevron-left"></i></button>
-              <h5 class="mb-0 fw-semibold" id="previewSubject">Select an email</h5>
+      {{-- RIGHT: reader / composer --}}
+      <section class="col-12 col-md-5 col-lg-5 d-flex flex-column">
+        <div class="p-3 border-bottom">
+          <div class="d-flex align-items-start justify-content-between">
+            <div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-warning-subtle text-warning">M</span>
+                <h6 class="mb-0">New project lead</h6>
+              </div>
+              <div class="small text-muted mt-1">megan@company.com • To you • Cc: Team</div>
             </div>
-            <div class="btn-group btn-group-sm">
-              <button class="btn btn-light" id="replyBtn"><i data-feather="corner-up-left"></i></button>
-              <button class="btn btn-light" id="forwardBtn"><i data-feather="corner-up-right"></i></button>
-              <button class="btn btn-light" id="printBtn"><i data-feather="printer"></i></button>
-              <button class="btn btn-light text-danger" id="previewDeleteBtn"><i data-feather="trash-2"></i></button>
+            <div class="d-flex align-items-center gap-1">
+              <button class="btn btn-sm btn-light border"><i class="ti ti-archive"></i></button>
+              <button class="btn btn-sm btn-light border"><i class="ti ti-trash"></i></button>
+              <button class="btn btn-sm btn-light border"><i class="ti ti-mail-reply"></i></button>
+              <button class="btn btn-sm btn-light border"><i class="ti ti-dots"></i></button>
             </div>
           </div>
 
-          <div class="px-3 py-2 small text-muted border-bottom" id="previewMeta">
-            <div><strong id="previewFrom">—</strong> <span id="previewFromEmail" class="text-muted"></span></div>
-            <div>To: <span id="previewTo">—</span></div>
-            <div>Date: <span id="previewDate">—</span></div>
-          </div>
-
-          <div class="p-3 overflow-auto" style="min-height: 40vh;" id="previewBody">
-            <div class="text-muted">Nothing selected.</div>
-          </div>
-
-          <div class="border-top p-3 d-flex align-items-center gap-2">
-            <button class="btn btn-sm btn-outline-secondary"><i data-feather="mail"></i> Mark as unread</button>
-            <button class="btn btn-sm btn-outline-secondary"><i data-feather="archive"></i> Archive</button>
-            <button class="btn btn-sm btn-outline-danger ms-auto"><i data-feather="trash-2"></i> Delete</button>
+          <div class="d-flex flex-wrap gap-2 mt-3">
+            <span class="badge bg-secondary-subtle text-secondary">Inbox</span>
+            <span class="badge bg-secondary-subtle text-secondary">Design</span>
+            <span class="badge bg-secondary-subtle text-secondary">Review</span>
+            <span class="badge bg-secondary-subtle text-secondary">Team</span>
           </div>
         </div>
-      </article>
+
+        <div class="flex-grow-1 overflow-auto p-3" style="max-height: calc(100vh - 340px);">
+          <div class="mb-3">
+            <div class="small text-muted">Today, 5 min ago</div>
+            <div class="border rounded p-3 mt-2 bg-body">
+              Thanks for sending over the documents. We’re good to go on this end —
+              very excited to start working with you!
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="fw-semibold mb-2">Attachments</div>
+            <div class="d-flex flex-wrap gap-2">
+              <a href="#" class="btn btn-sm btn-outline-secondary"><i class="ti ti-file-image me-1"></i>Projects 7.png</a>
+              <a href="#" class="btn btn-sm btn-outline-secondary"><i class="ti ti-file-description me-1"></i>Concept brief.pdf</a>
+              <a href="#" class="btn btn-sm btn-outline-secondary"><i class="ti ti-file-video me-1"></i>Instruction.mp4</a>
+            </div>
+          </div>
+        </div>
+
+        {{-- Quick reply --}}
+        <div class="border-top p-3">
+          <form>
+            <div class="mb-2 small text-muted">
+              To: <span class="fw-semibold">Megan Jackson</span>
+            </div>
+            <div class="form-control mb-2" contenteditable="true" style="min-height:120px;">
+              Good morning, Megan! Thank you for your response…
+            </div>
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="btn-group">
+                <button class="btn btn-primary"><i class="ti ti-send me-1"></i>Send</button>
+                <button class="btn btn-outline-secondary"><i class="ti ti-paperclip"></i></button>
+                <button class="btn btn-outline-secondary"><i class="ti ti-mood-smile"></i></button>
+                <button class="btn btn-outline-secondary"><i class="ti ti-calendar"></i></button>
+                <button class="btn btn-outline-secondary"><i class="ti ti-file"></i></button>
+                <button class="btn btn-outline-secondary"><i class="ti ti-dots"></i></button>
+              </div>
+              <div class="small text-muted">Saved as draft</div>
+            </div>
+          </form>
+        </div>
+      </section>
+
     </div>
-  </div>
-</div>
-
-{{-- Compose Modal --}}
-<div class="modal fade" id="composeModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <form class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title"><i data-feather="edit-3" class="me-2"></i>New Message</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-2">
-          <label class="form-label">To</label>
-          <input type="email" class="form-control" placeholder="name@example.com">
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Subject</label>
-          <input type="text" class="form-control" placeholder="Subject">
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Message</label>
-          <textarea class="form-control" rows="10" placeholder="Write your message…"></textarea>
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Attachments</label>
-          <input type="file" class="form-control" multiple>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary"><i data-feather="send" class="me-1"></i> Send</button>
-        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Discard</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-{{-- Filter Modal --}}
-<div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <form class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title"><i data-feather="sliders" class="me-2"></i>Filters</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Status</label>
-            <select class="form-select">
-              <option value="">Any</option>
-              <option>Unread</option>
-              <option>Starred</option>
-              <option>Has attachments</option>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Date</label>
-            <select class="form-select">
-              <option>Any time</option>
-              <option>Last 24 hours</option>
-              <option>Last 7 days</option>
-              <option>Last 30 days</option>
-            </select>
-          </div>
-          <div class="col-12">
-            <label class="form-label">From</label>
-            <input type="text" class="form-control" placeholder="name@example.com">
-          </div>
-          <div class="col-12">
-            <label class="form-label">Has words</label>
-            <input type="text" class="form-control" placeholder="invoice, quote, meeting…">
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary">Apply</button>
-        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Reset</button>
-      </div>
-    </form>
   </div>
 </div>
 @endsection
 
 @push('styles')
 <style>
-  /* Compact density toggle */
-  .email-list.compact .email-item { padding-top:.5rem!important; padding-bottom:.5rem!important; }
-  .email-unread { background: var(--bs-light-bg-subtle, #f8f9fa); }
-  @media (max-width: 767.98px){
-    #emailPreview { display:none; }
-    #emailSplitPane.show-preview #emailPreview { display:block; }
-    #emailSplitPane.show-preview section.col-md-4 { display:none; }
-  }
+  .email-nav .list-group-item { border: 0; border-radius: .75rem; margin: .15rem .5rem; }
+  .email-nav .list-group-item.active { background: var(--bs-primary); }
+  .email-row:hover { background: var(--bs-light); }
+  .avatar { width: 34px; height: 34px; display: inline-grid; place-items: center; border-radius: 50%; }
+  .dot { width:10px; height:10px; border-radius:50%; display:inline-block }
+  .dot-blue{ background:#3b82f6 } .dot-violet{ background:#8b5cf6 } .dot-amber{ background:#f59e0b }
+  @media (max-width: 991.98px){ .email-row .text-truncate{max-width: 60vw;} }
 </style>
-@endpush
-
-@push('scripts')
-<script>
-  feather.replace();
-
-  // Demo JS wiring (stubbed)
-  const splitPane = document.getElementById('emailSplitPane');
-  const list = document.getElementById('emailList');
-  const backBtn = document.getElementById('backToList');
-  const compactToggle = document.getElementById('compactToggle');
-
-  // Toggle compact density
-  compactToggle?.addEventListener('click', () => {
-    list.classList.toggle('compact');
-  });
-
-  // Mobile back to list
-  backBtn?.addEventListener('click', () => {
-    splitPane.classList.remove('show-preview');
-  });
-
-  // Open preview (demo: replace with AJAX fetch for email body/meta)
-  list?.addEventListener('click', (e) => {
-    const a = e.target.closest('.email-open, .email-item');
-    if (!a) return;
-    const item = e.target.closest('.email-item');
-    if (!item) return;
-
-    // Example: populate preview with placeholders (replace with real data)
-    document.getElementById('previewSubject').textContent = item.querySelector('.text-truncate a')?.innerText?.trim() || 'Subject';
-    document.getElementById('previewFrom').textContent = item.querySelector('.fw-semibold')?.innerText || 'Sender';
-    document.getElementById('previewFromEmail').textContent = ' <sender@example.com>';
-    document.getElementById('previewTo').textContent = 'me@company.com';
-    document.getElementById('previewDate').textContent = new Date().toLocaleString();
-    document.getElementById('previewBody').innerHTML = `<p class="mb-2 text-muted small">Preview content goes here.</p><p>${item.querySelector('.text-muted.small')?.innerText || ''}</p>`;
-
-    // Mark read UI state
-    item.classList.remove('email-unread');
-
-    // Mobile: switch pane
-    splitPane.classList.add('show-preview');
-  });
-
-  // Bulk select
-  document.getElementById('selectAllBtn')?.addEventListener('click', () => {
-    document.querySelectorAll('.email-checkbox').forEach(cb => cb.checked = true);
-  });
-
-  // TODO: bind real routes for mark read/archive/delete/refresh
-</script>
 @endpush
