@@ -768,10 +768,13 @@ public function index(Request $request)
 
     public function previewPDF($id)
     {
-        $quote = Quote::findOrFail($id);
+        $quote = Quote::find($id);
         $order = $quote->order ?? null;
-        $pdf = PDF::loadView('sales.quotes.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
-        return $pdf->stream('quote-' . $order->id . '.pdf');
+        if($order) {
+            $pdf = PDF::loadView('sales.quotes.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
+            return $pdf->stream('quote-' . $order->id . '.pdf');
+        }
+        return redirect()->back()->withErrors(['error' => 'Quote not found or has no associated order.']);
     }
 
     public function updateStatus($id, $status)
