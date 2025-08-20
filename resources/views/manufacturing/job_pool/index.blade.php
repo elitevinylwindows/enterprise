@@ -74,6 +74,7 @@
                                 <th>{{ __('Delivery Date') }}</th>
                                 <th>{{ __('Type') }}</th>
                                 <th>{{ __('Production Status') }}</th>
+                                <th>{{ __('Is Rush') }}</th>
                                 <th>{{ __('Note') }}</th>
                                 <th>{{ __('Entry Date') }}</th>
                                 <th>{{ __('Last Transaction Date') }}</th>
@@ -97,6 +98,11 @@
                                 <td>
                                     <span class="badge bg-light-{{ in_array(strtolower($job->production_status), ['queued','pending']) ? 'warning' : (strtolower($job->production_status) === 'completed' ? 'success' : 'info') }}">
                                         {{ ucfirst($job->production_status) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light-{{ in_array(strtolower($job->production_status), ['queued','pending']) ? 'warning' : (strtolower($job->production_status) === 'completed' ? 'success' : 'info') }}">
+                                        {{ ucfirst($job->order->is_rush ? ' Yes' : 'No') }}
                                     </span>
                                 </td>
                                 <td>{{ $job->profile }}</td>
