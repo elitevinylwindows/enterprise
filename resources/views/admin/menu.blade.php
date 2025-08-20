@@ -26,12 +26,12 @@
                         <span class="pc-mtext">{{ __('Dashboard') }}</span>
                     </a>
                 </li>
-                <li class="pc-item {{ in_array($routeName, ['dashboard', 'home', '']) ? 'active' : '' }}">
-                    <a href="{{ route('dashboard') }}" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-mail"></i></span>
-                        <span class="pc-mtext">{{ __('Email') }}</span>
-                    </a>
-                </li>
+                <li class="pc-item {{ in_array($routeName, ['email.index']) ? 'active' : '' }}">
+    <a href="{{ route('email.index') }}" class="pc-link">
+        <span class="pc-micon"><i class="ti ti-mail"></i></span>
+        <span class="pc-mtext">{{ __('Email') }}</span>
+    </a>
+</li>
                 @if (\Auth::user()->type == 'super admin')
                     @if (Gate::check('manage user'))
                         <li class="pc-item {{ in_array($routeName, ['users.index', 'users.show']) ? 'active' : '' }}">
