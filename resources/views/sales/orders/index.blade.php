@@ -122,6 +122,7 @@
                     <i data-feather="eye"></i>
                 </a>
 
+                
                 {{-- Email --}}
                 <a class="avtar avtar-xs btn-link-warning text-warning emailButton" data-bs-toggle="tooltip" 
                     data-bs-original-title="Email" href="#" data-size="md" 
@@ -150,6 +151,14 @@
                     </button>
                     </form>
                 @endif
+
+       {{-- Rush --}}
+<form action="{{ route('sales.orders.rush', $order->id) }}" method="POST" class="d-inline">
+  @csrf
+  <button type="submit" class="avtar avtar-xs btn-link-info text-info" title="Rush (bypass 48h; requires payment or Special)">
+    <i data-feather="zap"></i>
+  </button>
+</form>
 
                 @if(!$order->job_pool)
                     {{-- Edit --}}

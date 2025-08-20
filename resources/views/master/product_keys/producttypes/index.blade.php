@@ -94,4 +94,16 @@
     </div>
   </div>
 </div>
+
+<!-- Duplicate Modal -->
+<div class="modal fade" id="duplicateModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      @include('master.product_keys.producttypes.create', [
+        'series' => $series,  
+        'lines' => $lines
+      ])
+    </div>
+  </div>
+</div>
 @endsection
