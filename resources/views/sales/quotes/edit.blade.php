@@ -824,10 +824,7 @@
                     if (currentModalInstance) {
                         currentModalInstance.hide();
                     }
-                    // Also close any open Bootstrap dropdowns (overlay)
-                    document.querySelectorAll('.dropdown.show .dropdown-toggle').forEach(btn => {
-                        bootstrap.Dropdown.getOrCreateInstance(btn).hide();
-                    });
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
 
                     const row = `
                         <tr data-id="${data.item_id}" data-type="quote_item">
