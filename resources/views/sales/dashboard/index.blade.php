@@ -144,14 +144,20 @@
 
 <div class="row">
     {{-- Left Column Card (Sidebar content or metrics) --}}
-    <div class="col-md-12">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5>{{ __('Chart') }}</h5>
-            </div>
+    <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div>
+                            <h5 class="mb-1">{{ __('Delivery History') }}</h5>
+                            {{-- <p class="text-muted mb-2">{{ __('Users and Payments Overview') }}</p> --}}
+                        </div>
 
+                    </div>
+                    <div id="deliveries_chart"></div>
+                </div>
+            </div>
         </div>
-    </div>
     <div class="mb-4"></div> {{-- Space --}}
 
     {{-- Left Column Card (Sidebar content or metrics) --}}
