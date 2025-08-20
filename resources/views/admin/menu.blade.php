@@ -29,7 +29,7 @@
                 <li class="pc-item {{ in_array($routeName, ['email.index']) ? 'active' : '' }}">
     <a href="{{ route('email.index') }}" class="pc-link">
         <span class="pc-micon"><i class="ti ti-mail"></i></span>
-        <span class="pc-mtext">{{ __('Email') }}</span>
+        <span class="pc-mtext">{{ __('Elite Email') }}</span>
     </a>
 </li>
                 @if (\Auth::user()->type == 'super admin')
