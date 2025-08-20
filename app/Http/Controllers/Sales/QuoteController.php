@@ -768,8 +768,8 @@ public function index(Request $request)
 
     public function previewPDF($id)
     {
-        $order = Order::findOrFail($id);
-        
+        $quote = Quote::findOrFail($id);
+        $order = $quote->order ?? null;
         $pdf = PDF::loadView('sales.quotes.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
         return $pdf->stream('quote-' . $order->id . '.pdf');
     }
