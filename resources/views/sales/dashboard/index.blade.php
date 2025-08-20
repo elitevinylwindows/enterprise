@@ -113,7 +113,7 @@
 
 
 
-    <div class="col-lg-12 col-md-12">
+  <!--  <div class="col-lg-12 col-md-12">
         <div class="card">
             <div class="card-body">
                 <div class="d-flex align-items-start justify-content-between">
@@ -128,7 +128,7 @@
         </div>
     </div>
 
-</div>
+</div>-->
 
 
 
