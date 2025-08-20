@@ -204,6 +204,8 @@
             </div>
         </div>
 
+        
+
         {{-- Bottom Right Card --}}
         <div class="card">
             <div class="card-header">
@@ -213,7 +215,7 @@
                  <table class="table">
                     <thead>
                         <tr>
-                            <th>{{ __('Quote Number') }}</th>
+                            <th>{{ __('Order Number') }}</th>
                             <th>{{ __('Customer') }}</th>
                             <th>{{ __('Entry Date') }}</th>
                             <th>{{ __('Status') }}</th>
@@ -236,6 +238,40 @@
                 </table>
             </div>
         </div>
+
+         {{-- Top Right Card --}}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>{{ __('Recent Invoices') }}</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>{{ __('Invoice Number') }}</th>
+                            <th>{{ __('Customer') }}</th>
+                            <th>{{ __('Entry Date') }}</th>
+                            <th>{{ __('Status') }}</th>
+                            <th>{{ __('Valid Until') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($recentQuotes as $quote)
+                        <tr>
+                            <td>{{ $quote->quote_number }}</td>
+                            <td>{{ $quote->customer->customer_name }}</td>
+                            <td>{{ $quote->created_at->format('d M Y') }}</td>
+                            <td>{{ $quote->status }}</td>
+                            <td>{{ $quote->valid_until }}</td>
+                        </tr>
+                        @empty
+                        <p>No recent quotes available.</p>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 </div>
 
