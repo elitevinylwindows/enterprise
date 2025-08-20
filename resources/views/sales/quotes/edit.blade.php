@@ -170,7 +170,7 @@
                                     <td>{{ $modification->glass }}</td>
                                     <td>{{ $modification->grid }}</td>
                                     <td>${{ number_format($modification->price, 2) }}</td>
-                                    <td>${{ number_format($modification->total, 2) }}</td>
+                                    <td class="item-total" data-id="{{ $modification->id }}">${{ number_format($modification->total, 2) }}</td>
                                     <td><img src="{{ $modification->image_url ?? 'https://via.placeholder.com/40' }}" class="img-thumbnail" alt="Item"></td>
                                     <td class="text-nowrap">
                                         <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item"  data-type="modification" data-id="{{ $modification->id }}">
