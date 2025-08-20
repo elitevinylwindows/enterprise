@@ -43,25 +43,13 @@
                     </li>
                 @endif
 
-                <li class="dropdown pc-h-item" data-bs-toggle="tooltip" data-bs-original-title="{{ __('Quote') }}"
-                    data-bs-placement="bottom">
-                    <a class="pc-head-link head-link-primary dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown"
-                        href="{{ route('sales.quote.create}}" role="button" aria-haspopup="false" aria-expanded="false">
-                        <i class="ti ti-receipt"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
-                        @foreach ($languages as $language)
-                            @if ($language != 'en')
-                                <a href="{{ route('language.change', $language) }}"
-                                    class="dropdown-item {{ $userLang == $language ? 'active' : '' }}">
-                                    <span class="align-middle">{{ ucfirst($language) }}</span>
-                                </a>
-                            @endif
-                        @endforeach
+                <li class="pc-h-item" data-bs-toggle="tooltip" data-bs-original-title="{{ __('New Quote') }}" data-bs-placement="bottom">
+    <a class="pc-head-link head-link-primary me-0" 
+       href="{{ route('sales.quotes.create') }}">
+        <i class="ti ti-receipt"></i>
+    </a>
+</li>
 
-
-                    </div>
-                </li>
 
 
                  <li class="dropdown pc-h-item" data-bs-toggle="tooltip" data-bs-original-title="{{ __('Language') }}"
