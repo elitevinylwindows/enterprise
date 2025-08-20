@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Order #{{ $quote->quote_number }}</title>
+    <title>Order #{{ $order->order_number }}</title>
     <style>
         @page {
             margin: 0.1cm;
@@ -157,9 +157,14 @@
             </td>
             <td style="vertical-align: top; text-align: left; font-size: 12px; line-height: 1.4; margin-left:20%">
                 <div style="font-size: 14px; font-weight: bold;">
-                    Quotation# <span style="text-decoration: underline;">{{ $quote->quote_number ?? '-' }}</span>
+                    Quotation# <span style="text-decoration: underline;">{{ $order->quote->quote_number ?? '-' }}</span>
                 </div>
-                Due/Delivery Date: {{ $quote->expected_delivery ?? '' }}
+                Commercial Order#: {{ $order->commercial_order ?? '' }}<br>
+                Internal Order#: {{ $order->internal_order ?? '' }}<br>
+                Sales Person: {{ $order->sales_person ?? '' }}<br>
+                Direct Line: {{ $order->direct_line ?? '' }}<br>
+                PO#: {{ $order->po_number ?? '' }}<br>
+                Due/Delivery Date: {{ $order->due_date ?? '' }}
             </td>
         </tr>
     </table>
@@ -170,21 +175,21 @@
             <td class="col-6">
                 <div class="address-box">
                     <div class="section-title">Billing Address</div>
-                    {{ $quote->customer->billing_address ?? $quote->customer->billing_address }}<br>
-                    {{ $quote->customer->billing_city ?? $quote->customer->billing_city }},
-                    {{ $quote->customer->billing_state ?? $quote->customer->billing_state }}
-                    {{ $quote->customer->billing_zip ?? $quote->customer->billing_zip }}<br>
-                    {{ $quote->customer->billing_phone }}
+                    {{ $order->customer->billing_address ?? $order->customer->billing_address }}<br>
+                    {{ $order->customer->billing_city ?? $order->customer->billing_city }},
+                    {{ $order->customer->billing_state ?? $order->customer->billing_state }}
+                    {{ $order->customer->billing_zip ?? $order->customer->billing_zip }}<br>
+                    {{ $order->customer->billing_phone }}
                 </div>
             </td>
             <td class="col-6">
                 <div class="address-box delivery">
                     <div class="section-title ">Delivery Address</div>
-                    {{ $quote->customer->delivery_address ?? $quote->customer->delivery_address }}<br>
-                    {{ $quote->customer->delivery_city ?? $quote->customer->delivery_city }},
-                    {{ $quote->customer->delivery_state ?? $quote->customer->delivery_state }}
-                    {{ $quote->customer->delivery_zip ?? $quote->customer->delivery_zip }}<br>
-                    {{ $quote->customer->delivery_phone }}
+                    {{ $order->customer->delivery_address ?? $order->customer->delivery_address }}<br>
+                    {{ $order->customer->delivery_city ?? $order->customer->delivery_city }},
+                    {{ $order->customer->delivery_state ?? $order->customer->delivery_state }}
+                    {{ $order->customer->delivery_zip ?? $order->customer->delivery_zip }}<br>
+                    {{ $order->customer->delivery_phone }}
                 </div>
             </td>
         </tr>
@@ -195,7 +200,7 @@
                 <td class="col-6">
                     <div class="meta-item">
                         <strong>Order Summary:</strong><br>
-                        Note: {{ $quote->comment ?? '-' }}
+                        Note: {{ $order->internal_notes ?? '-' }}
                     </div>
                 </td>
             </tr>
@@ -216,7 +221,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($quote->items->where('is_modification', 0) as $key => $item)
+            @foreach($order->items->where('is_modification', 0) as $key => $item)
             <tr>
                 <td>{{ $key + 1 }}</td>
                 <td>{{ $item->series?->series.'-'.$item->series_type ?? 'N/A' }}</td>
@@ -271,27 +276,27 @@
     <table class="totals-table">
         <tr>
             <td>Total Qty:</td>
-            <td>{{ $quote->items->sum('qty') }}</td>
+            <td>{{ $order->items->sum('qty') }}</td>
         </tr>
         <tr>
             <td>Subtotal:</td>
-            <td>${{ number_format($quote->items->sum('total'), 2) }}</td>
+            <td>${{ number_format($order->items->sum('total'), 2) }}</td>
         </tr>
         <tr>
             <td>Discount:</td>
-            <td>-${{ number_format($quote->discount, 2) }}</td>
+            <td>-${{ number_format($order->discount, 2) }}</td>
         </tr>
         <tr>
             <td>Shipping:</td>
-            <td>${{ number_format($quote->shipping, 2) }}</td>
+            <td>${{ number_format($order->shipping, 2) }}</td>
         </tr>
         <tr>
             <td>Tax:</td>
-            <td>${{ number_format($quote->tax, 2) }}</td>
+            <td>${{ number_format($order->tax, 2) }}</td>
         </tr>
         <tr class="grand-total">
             <td><strong>Total:</strong></td>
-            <td>${{ number_format(($quote->items->sum('total') - $quote->discount) + $quote->shipping + $quote->tax, 2) }}</td>
+            <td>${{ number_format(($order->items->sum('total') - $order->discount) + $order->shipping + $order->tax, 2) }}</td>
         </tr>
     </table>
 

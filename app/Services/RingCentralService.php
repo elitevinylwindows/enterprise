@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use RingCentral\SDK\SDK;
 
 class RingCentralService
@@ -40,15 +41,18 @@ class RingCentralService
         return $response->json();
     }
 
-    public function sendQuoteApprovalSms(string $toPhoneNumber, string $quoteId, string $customerName, float $amount): array
+    public function sendQuoteApprovalSms(string $toPhoneNumber, string $quoteId, string $customerName, $pdfPath): array
     {
-        $formattedAmount = number_format($amount, 2);
-        
-        // Craft the message. Keep it concise due to SMS character limits.
-        $message = "Hi $customerName, your quote #$quoteId for $$formattedAmount is ready.\n";
-        $message .= "Please review and reply with:\n";
-        $message .= "1 to APPROVE\n";
-        $message .= "2 to DECLINE";
+        $fullPath = Storage::disk('public')->path($pdfPath);
+
+        $message = "Dear $customerName, your Quote from Elite Vinyl Windows is ready #$quoteId.\n";
+        $message .= "PDF: " . $fullPath . "\n";
+        $message .= "Please click the link below to view:\n";
+        $message .= route('sales.quotes.pdf', ['id' => $quoteId]) . "\n";
+        $message .= "Reply with;\n";
+        $message .= "1 to Approve the Quote\n";
+        $message .= "2 to Decline the Quote\n";
+        $message .= "3 to Request for Modification\n";
 
         try {
             $response = $this->platform->post('/account/~/extension/~/sms', [

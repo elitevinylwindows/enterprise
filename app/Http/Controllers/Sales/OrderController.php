@@ -153,7 +153,7 @@ class OrderController extends Controller
     {
         try{
             $order = Order::findOrFail($id);
-            $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order]);
+            $pdf = Pdf::loadView('sales.order.preview_pdf', ['order' => $order]);
             sendOrderMail($order);
             return response()->json(['success' => true, 'message' => 'Order emailed successfully.']);
         } catch (\Exception $e) {
