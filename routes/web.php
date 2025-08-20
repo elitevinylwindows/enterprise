@@ -227,6 +227,7 @@ use App\Http\Controllers\Manufacturing\{
     StationController
 };
 
+use App\Http\Controllers\EmailController;
 
 // Purchasing Controllers
 use App\Http\Controllers\Purchasing\{
@@ -337,6 +338,14 @@ use Stripe\Webhook;
             Route::get('{id}/history/show', [UserController::class, 'loggedHistoryShow'])->name('logged.history.show');
             Route::delete('{id}/history', [UserController::class, 'loggedHistoryDestroy'])->name('logged.history.destroy');
         });
+
+
+
+
+Route::prefix('email')->name('email.')->group(function () {
+    Route::get('/', [EmailController::class, 'index'])->name('index');
+});
+
 
 
         //Sales

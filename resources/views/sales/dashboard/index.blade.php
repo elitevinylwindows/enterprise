@@ -113,7 +113,7 @@
 
 
 
-    <div class="col-lg-12 col-md-12">
+  <!--  <div class="col-lg-12 col-md-12">
         <div class="card">
             <div class="card-body">
                 <div class="d-flex align-items-start justify-content-between">
@@ -128,7 +128,7 @@
         </div>
     </div>
 
-</div>
+</div>-->
 
 
 
@@ -144,14 +144,20 @@
 
 <div class="row">
     {{-- Left Column Card (Sidebar content or metrics) --}}
-    <div class="col-md-12">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5>{{ __('Chart') }}</h5>
-            </div>
+    <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div>
+                            <h5 class="mb-1">{{ __('Delivery History') }}</h5>
+                            {{-- <p class="text-muted mb-2">{{ __('Users and Payments Overview') }}</p> --}}
+                        </div>
 
+                    </div>
+                    <div id="deliveries_chart"></div>
+                </div>
+            </div>
         </div>
-    </div>
     <div class="mb-4"></div> {{-- Space --}}
 
     {{-- Left Column Card (Sidebar content or metrics) --}}
@@ -204,6 +210,8 @@
             </div>
         </div>
 
+        
+
         {{-- Bottom Right Card --}}
         <div class="card">
             <div class="card-header">
@@ -213,7 +221,7 @@
                  <table class="table">
                     <thead>
                         <tr>
-                            <th>{{ __('Quote Number') }}</th>
+                            <th>{{ __('Order Number') }}</th>
                             <th>{{ __('Customer') }}</th>
                             <th>{{ __('Entry Date') }}</th>
                             <th>{{ __('Status') }}</th>
@@ -236,6 +244,40 @@
                 </table>
             </div>
         </div>
+
+         {{-- Top Right Card --}}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>{{ __('Recent Invoices') }}</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>{{ __('Invoice Number') }}</th>
+                            <th>{{ __('Customer') }}</th>
+                            <th>{{ __('Entry Date') }}</th>
+                            <th>{{ __('Status') }}</th>
+                            <th>{{ __('Valid Until') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($recentQuotes as $quote)
+                        <tr>
+                            <td>{{ $quote->quote_number }}</td>
+                            <td>{{ $quote->customer->customer_name }}</td>
+                            <td>{{ $quote->created_at->format('d M Y') }}</td>
+                            <td>{{ $quote->status }}</td>
+                            <td>{{ $quote->valid_until }}</td>
+                        </tr>
+                        @empty
+                        <p>No recent quotes available.</p>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 </div>
 

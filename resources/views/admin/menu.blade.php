@@ -26,6 +26,12 @@
                         <span class="pc-mtext">{{ __('Dashboard') }}</span>
                     </a>
                 </li>
+                <li class="pc-item {{ in_array($routeName, ['email.index']) ? 'active' : '' }}">
+    <a href="{{ route('email.index') }}" class="pc-link">
+        <span class="pc-micon"><i class="ti ti-mail"></i></span>
+        <span class="pc-mtext">{{ __('Elite Email') }}</span>
+    </a>
+</li>
                 @if (\Auth::user()->type == 'super admin')
                     @if (Gate::check('manage user'))
                         <li class="pc-item {{ in_array($routeName, ['users.index', 'users.show']) ? 'active' : '' }}">
@@ -846,7 +852,7 @@
 <li><a class="pc-link" href="{{ route('color-options.interior-colors.index') }}">Interior Colors</a></li>
 <li><a class="pc-link" href="{{ route('color-options.laminate-colors.index') }}">Laminate Colors</a></li>
 <li><a class="pc-link" href="{{ route('color-options.status-colors.index') }}">Status Colors</a></li>
-                <li><a class="pc-link" href="#">System Colors</a></li>
+                <!--<li><a class="pc-link" href="#">System Colors</a></li>-->
                 
 
             </ul>
@@ -909,7 +915,7 @@
         </ul>
     </li>
 
-                <li><a class="pc-link" href="{{ route('products.product_classes.index') }}">Product Classes</a></li>
+                <!--<li><a class="pc-link" href="{{ route('products.product_classes.index') }}">Product Classes</a></li>
 <li><a class="pc-link" href="{{ route('products.basic_products.index') }}">Basic Products</a></li>
 <li><a class="pc-link" href="{{ route('products.grille_patterns.index') }}">Grille Patterns</a></li>
 <li><a class="pc-link" href="{{ route('products.profile_records.index') }}">Profile Records</a></li>
@@ -918,7 +924,7 @@
 <li><a class="pc-link" href="{{ route('products.sealing_assignment.index') }}">Sealing Assignment</a></li>
 <li><a class="pc-link" href="{{ route('products.reinforcement_assignments.index') }}">Reinforcement Assignments</a></li>
 <li><a class="pc-link" href="{{ route('products.hardware_types.index') }}">Hardware Types</a></li>
-<li><a class="pc-link" href="{{ route('products.system_color.index') }}">System / Color</a></li>
+<li><a class="pc-link" href="{{ route('products.system_color.index') }}">System / Color</a></li>-->
 
 
             </ul>
@@ -932,10 +938,10 @@
                 </span>
             </a>
             <ul class="pc-submenu" style="display: none;">
-                <li><a class="pc-link" href="{{ route('product_keys.producttypes.index') }}">Product Types</a></li>
+<li><a class="pc-link" href="{{ route('product_keys.producttypes.index') }}">Product Types</a></li>
 <li><a class="pc-link" href="{{ route('product_keys.productareas.index') }}">Product Areas</a></li>
 <li><a class="pc-link" href="{{ route('product_keys.productsystems.index') }}">Product Systems</a></li>
-<li><a class="pc-link" href="{{ route('product_keys.manufacturersystems.index') }}">Manufacturer Systems</a></li>
+<!--<li><a class="pc-link" href="{{ route('product_keys.manufacturersystems.index') }}">Manufacturer Systems</a></li>
 <li><a class="pc-link" href="{{ route('product_keys.specialshapemacros.index') }}">Special Shape Macros</a></li>
 <li><a class="pc-link" href="{{ route('product_keys.shapecatalog.index') }}">Shape Catalog</a></li>
 <li><a class="pc-link" href="{{ route('product_keys.drawingobjects.index') }}">Drawing Objects</a></li>
@@ -943,7 +949,7 @@
                 <li><a class="pc-link" href="#">Color Groups</a></li>
                 <li><a class="pc-link" href="#">Color Classes</a></li>
                 <li><a class="pc-link" href="#">Color Levels</a></li>
-                <li><a class="pc-link" href="#">System / Color</a></li>
+                <li><a class="pc-link" href="#">System / Color</a></li>-->
 
             </ul>
         </li>
@@ -961,27 +967,29 @@
                 <li><a class="pc-link" href="#">Customer Prices</a></li>
 <li><a class="pc-link" href="{{ route('prices.productprices.index') }}">Add-On Prices</a></li>
                 <li><a class="pc-link" href="{{ route('master.prices.markup.index') }}">Markup</a></li>
-                <li><a class="pc-link" href="#">Schema</a></li>
+                <!--<li><a class="pc-link" href="#">Schema</a></li>
                 <li><a class="pc-link" href="#">Price Group</a></li>
                 <li><a class="pc-link" href="#">Global Discount</a></li>
                 <li><a class="pc-link" href="#">Price Cycle</a></li>
-                <li><a class="pc-link" href="#">Generation</a></li>
+                <li><a class="pc-link" href="#">Generation</a></li>-->
                 <li><a class="pc-link" href="#">Currencies</a></li>
-                <li><a class="pc-link" href="#">Exchange Rates</a></li>
+                <!--<li><a class="pc-link" href="#">Exchange Rates</a></li>
                 <li><a class="pc-link" href="#">FinAc Accounts</a></li>
                 <li><a class="pc-link" href="#">Acc Assignment</a></li>
                 <li><a class="pc-link" href="#">Global Discount</a></li>
                 <li><a class="pc-link" href="#">Calc Schemes</a></li>
                 <li><a class="pc-link" href="#">Calc Set</a></li>
                 <li><a class="pc-link" href="#">Commissions</a></li>
-                <li><a class="pc-link" href="{{ route('master.prices.tax_codes.index') }}">Tax Codes</a></li>
                 <li><a class="pc-link" href="#">Tax Classes</a></li>
                 <li><a class="pc-link" href="#">Exchange Rules</a></li>
-                <li><a class="pc-link" href="#">Tax Rules</a></li>
+                <li><a class="pc-link" href="#">Tax Rules</a></li>-->
+
+                <li><a class="pc-link" href="{{ route('master.prices.tax_codes.index') }}">Tax Codes</a></li>
+                
             </ul>
         </li>
         
-         <li class="pc-item pc-hasmenu">
+         <!--<li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Prices Addons</span>
                 <span class="ms-auto icon-wrapper">
@@ -992,7 +1000,7 @@
                 <li><a class="pc-link" href="#">Schema</a></li>
                 <li><a class="pc-link" href="">Price Addon Formula</a></li>
             </ul>
-        </li>
+        </li>-->
     </ul>
 </li>
 @endif
