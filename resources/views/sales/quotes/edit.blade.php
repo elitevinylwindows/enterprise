@@ -117,29 +117,35 @@
                 </thead>
 
                 <tbody>
-                    @foreach ($quoteItems as $item)
-                    <tr data-id="{{ $item->id }}" data-type="quote_item">
-                        <td style="text-wrap:auto">{{ $item->description }}</td>
-                        <td><input type="number" name="qty[]" value="{{ $item->qty }}" class="form-control form-control-sm qty-input" style="width: 60px;" data-id="{{ $item->id }}" data-price="{{ $item->price }}"></td>
-                        <td>{{ $item->width }}" x {{ $item->height }}"</td>
-                        <td>{{ $item->glass }}</td>
-                        <td>{{ $item->grid }}</td>
-                        <td>${{ number_format($item->price, 2) }}</td>
-                        <td class="item-total" data-id="{{ $item->id }}">${{ number_format($item->total, 2) }}</td>
-                        <td><img src="{{ $item->image_url ?? 'https://via.placeholder.com/40' }}" class="img-thumbnail" alt="Item"></td>
-                        <td class="text-nowrap">
-                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item"  data-type="quote_item" data-id="{{ $item->id }}">
-                                <i data-feather="eye"></i>
-                            </a>
-                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item"  data-type="quote_item" data-id="{{ $item->id }}">
-                                <i data-feather="edit"></i>
-                            </a>
-                            <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row"  data-type="quote_item" data-id="{{ $item->id }}">
-                                <i data-feather="trash-2"></i>
-                            </a>
-                        </td>
-                    </tr>
+                    @if($quoteItems->isEmpty())
+                        <tr>
+                            <td colspan="9" class="text-center">No items added yet.</td>
+                        </tr>
+                    @else
+                        @foreach ($quoteItems as $item)
+                            <tr data-id="{{ $item->id }}" data-type="quote_item">
+                                <td style="text-wrap:auto">{{ $item->description }}</td>
+                                <td><input type="number" name="qty[]" value="{{ $item->qty }}" class="form-control form-control-sm qty-input" style="width: 60px;" data-id="{{ $item->id }}" data-price="{{ $item->price }}"></td>
+                                <td>{{ $item->width }}" x {{ $item->height }}"</td>
+                            <td>{{ $item->glass }}</td>
+                            <td>{{ $item->grid }}</td>
+                            <td>${{ number_format($item->price, 2) }}</td>
+                            <td class="item-total" data-id="{{ $item->id }}">${{ number_format($item->total, 2) }}</td>
+                            <td><img src="{{ $item->image_url ?? 'https://via.placeholder.com/40' }}" class="img-thumbnail" alt="Item"></td>
+                            <td class="text-nowrap">
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item"  data-type="quote_item" data-id="{{ $item->id }}">
+                                    <i data-feather="eye"></i>
+                                </a>
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item"  data-type="quote_item" data-id="{{ $item->id }}">
+                                    <i data-feather="edit"></i>
+                                </a>
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row"  data-type="quote_item" data-id="{{ $item->id }}">
+                                    <i data-feather="trash-2"></i>
+                                </a>
+                            </td>
+                        </tr>
                     @endforeach
+                    @endif
                 </tbody>
             </table>
             @if(!$modificationsByDate->isEmpty())
