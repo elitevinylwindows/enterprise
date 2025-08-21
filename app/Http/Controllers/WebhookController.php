@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Sales\Invoice;
 use App\Models\Sales\InvoicePayment;
 use App\Models\Sales\Quote;
+use App\Services\RingCentralService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -177,13 +178,13 @@ class WebhookController extends Controller
             foreach ($payload['body']['changes'] as $change) {
                 if ($change['type'] === 'SMS' && !empty($change['newMessageIds'])) {
                     foreach ($change['newMessageIds'] as $messageId) {
+                        $ringCentralService = new RingCentralService();
                         // fetch full SMS message from RingCentral
-                        $message = $this->platform->get("/account/~/extension/~/message-store/{$messageId}");
-                        $messageData = $message->json();
+                        $messageData = $ringCentralService->getSmsMessage($messageId);
 
                         Log::info("Received SMS Message:", $messageData);
 
-                        // extract text + sender
+                        // extract text + sender666666666
                         $from = $messageData['from']['phoneNumber'] ?? 'Unknown';
                         $text = $messageData['subject'] ?? '';
 

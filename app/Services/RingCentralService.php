@@ -108,4 +108,16 @@ class RingCentralService
             return [];
         }
     }
+
+    public function getSmsMessage($messageId)
+    {
+        try {
+            $message = $this->platform->get("/account/~/extension/~/message-store/{$messageId}");
+            $messageData = $message->json();
+            return $messageData;
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch SMS message: ' . $e->getMessage());
+            return null;
+        }
+    }
 }
