@@ -55,8 +55,6 @@ class RingCentralService
             ]
         ]);
 
-        dd($subscription->json());
-
         $fullPath = Storage::disk('public')->url($pdfPath);
 
         $message = "Dear $customerName, your Quote from Elite Vinyl Windows is ready #$quoteId.\n";
