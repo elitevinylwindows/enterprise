@@ -160,9 +160,7 @@ class WebhookController extends Controller
 
     public function handleIncomingSms(Request $request)
     {
-         $data = $request->all();
-        Log::info('Incoming SMS webhook event:', $data);
-           // Check if it's a validation request
+         // Check if it's a validation request
         if ($request->hasHeader('Validation-Token')) {
             $token = $request->header('Validation-Token');
             Log::info("RingCentral validation token received: $token");
@@ -176,38 +174,7 @@ class WebhookController extends Controller
         $payload = $request->all();
         Log::info('RingCentral webhook event:', $payload);
 
-
-        // RingCentral sends verification payloads first
-        if (isset($data['validationToken'])) {
-            return response($data['validationToken'], 200)
-                ->header('Content-Type', 'text/plain');
-        }
-
-        // Actual message events
-        if (isset($data['body']['changes'])) {
-            foreach ($data['body']['changes'] as $change) {
-                if ($change['type'] === 'SMS') {
-                    $message = $change['newValue']['subject'] ?? '';
-
-                    Log::info("Incoming SMS: " . $message);
-
-                    switch (trim($message)) {
-                        case '1':
-                            Log::info("Quote Approved ✅");
-                            break;
-                        case '2':
-                            Log::info("Quote Declined ❌");
-                            break;
-                        case '3':
-                            Log::info("Quote Modification Requested ✏️");
-                            break;
-                        default:
-                            Log::info("Unknown reply: " . $message);
-                    }
-                }
-            }
-        }
-
+        // Process SMS reply etc.
         return response()->json(['status' => 'ok']);
     }
 }
