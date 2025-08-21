@@ -182,8 +182,8 @@ class WebhookController extends Controller
                         // fetch full SMS message from RingCentral
                         $messageData = $ringCentralService->getSmsMessage($messageId);
 
-                        Log::info("Received SMS Message:", $messageData);
-
+                        Log::info("Received SMS Message: ". json_encode($messageData));
+                        
                         // extract text + sender666666666
                         $from = $messageData['from']['phoneNumber'] ?? 'Unknown';
                         $text = $messageData['subject'] ?? '';

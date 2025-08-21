@@ -104,7 +104,7 @@ class RingCentralService
             
         } catch (\Exception $e) {
         dd($e);
-            \Log::error('Failed to get SMS numbers: ' . $e->getMessage());
+            Log::error('Failed to get SMS numbers: ' . $e->getMessage());
             return [];
         }
     }
