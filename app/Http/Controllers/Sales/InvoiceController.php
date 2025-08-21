@@ -55,7 +55,6 @@ class InvoiceController extends Controller
     public function markRush($id, \App\Services\JobPoolEnqueueService $svc)
     {
         $invoice   = Invoice::with(['quote', 'order'])->findOrFail($id);
-        $quote   = $invoice->quote;
         $order   = $invoice->order;
 
         // Mark as rush (bypass 48h)

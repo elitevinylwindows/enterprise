@@ -148,7 +148,16 @@
                                     data-title="Invoice Payment">
                                         <i data-feather="credit-card"></i>
                                     </a>
-
+                                    
+                                     @if(!$invoice->order->sent_to_job_pool_at)
+                                        <form action="{{ route('sales.invoices.rush', $invoice->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="avtar avtar-xs btn-link-warning text-warning" title="Rush (bypass 48h; requires payment or Special)">
+                                            <i data-feather="zap"></i>
+                                        </button>
+                                        </form>
+                                    @endif
+                                    
                                     @if(!$invoice->is_special_customer)
                                     {{-- Special Order --}}
                                     <form action="{{ route('sales.invoices.special', $invoice->id) }}" method="POST" class="d-inline">

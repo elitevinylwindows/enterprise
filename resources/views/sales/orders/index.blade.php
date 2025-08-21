@@ -143,7 +143,7 @@
                 </a>
                 @endif
                 
-                @if(!$order->sent_to_job_pool_at)
+                @if(!$order->is_rush)
                     <form action="{{ route('sales.orders.rush', $order->id) }}" method="POST" class="d-inline">
                     @csrf
                     <button type="submit" class="avtar avtar-xs btn-link-warning text-warning" title="Rush (bypass 48h; requires payment or Special)">
