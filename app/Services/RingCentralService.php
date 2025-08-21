@@ -28,6 +28,7 @@ class RingCentralService
             dd($e);
            $this->platform->login( [ "jwt" => config('services.ringcentral.jwt_token') ] );
         }
+        
     }
 
     public function initiateCall($from, $to)
@@ -43,6 +44,19 @@ class RingCentralService
 
     public function sendQuoteApprovalSms(string $toPhoneNumber, string $quoteId, string $customerName, $pdfPath): array
     {
+
+         $subscription = $this->platform->post('/restapi/v1.0/subscription', [
+            'eventFilters' => [
+                '/restapi/v1.0/account/~/extension/~/message-store', // incoming/outgoing SMS
+            ],
+            'deliveryMode' => [
+                'transportType' => 'WebHook',
+                'address'       => 'https://app.elitevinylwindows.com/api/webhooks/incoming-sms'
+            ]
+        ]);
+
+        dd($subscription->json());
+
         $fullPath = Storage::disk('public')->url($pdfPath);
 
         $message = "Dear $customerName, your Quote from Elite Vinyl Windows is ready #$quoteId.\n";
