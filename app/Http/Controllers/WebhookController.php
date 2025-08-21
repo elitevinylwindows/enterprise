@@ -161,6 +161,21 @@ class WebhookController extends Controller
     public function handleIncomingSms(Request $request)
     {
          $data = $request->all();
+        Log::info('Incoming SMS webhook event:', $data);
+           // Check if it's a validation request
+        if ($request->hasHeader('Validation-Token')) {
+            $token = $request->header('Validation-Token');
+            Log::info("RingCentral validation token received: $token");
+
+            // Respond with the same token in the header
+            return response('', 200)
+                ->header('Validation-Token', $token);
+        }
+
+        // Otherwise, it's a real event notification
+        $payload = $request->all();
+        Log::info('RingCentral webhook event:', $payload);
+
 
         // RingCentral sends verification payloads first
         if (isset($data['validationToken'])) {
