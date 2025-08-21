@@ -189,7 +189,7 @@ class WebhookController extends Controller
                         if (!empty($conversationData)) {
                             // Latest inbound message (first one)
                             $latest = $conversationData[0];
-
+                            Log::info("Latest reply ". json_encode($latest));
                             $messageId   = $latest->id;
                             $from        = $latest->from->phoneNumber ?? 'Unknown';
                             $text        = trim($latest->subject ?? '');
@@ -201,7 +201,7 @@ class WebhookController extends Controller
                             switch ($text) {
                                 case '1':
                                     Log::info("Received Quote Approval command from {$from}");
-
+                                    Log::info("messageId: {$messageId}");
                                     Quote::where('ringcentral_message_id', $messageId)
                                         ->update(['status' => 'approved']);
 
