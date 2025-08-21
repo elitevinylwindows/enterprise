@@ -192,28 +192,34 @@ class WebhookController extends Controller
                             Log::info("Latest reply ". json_encode($latest));
                             $messageId   = $latest->id;
                             $from        = $latest->from->phoneNumber ?? 'Unknown';
+                            $to        = $latest->to[0]->phoneNumber ?? 'Unknown';
                             $text        = trim($latest->subject ?? '');
                             $createdAt   = $latest->creationTime;
 
                             Log::info("Latest inbound reply from {$from} at {$createdAt}: {$text}");
-
+                            $response = explode(' ', $text);
                             // Handle commands
-                            switch ($text) {
+                            switch ($response[0]) {
                                 case '1':
                                     Log::info("Received Quote Approval command from {$from}");
                                     Log::info("messageId: {$messageId}");
-                                    Quote::where('ringcentral_message_id', $messageId)
+                                    Quote::where('ringcentral_message_id', $latest->conversation->id)
+                                        ->orWhere('quote_number', $response[1])
                                         ->update(['status' => 'approved']);
-
+                                    // Optionally, you can also send a confirmation SMS back
+                                    $ringCentralService->sendGeneralSms($to, "Your quote #$response[1] has been approved successfully.");
                                     break;
                                 case '2':
                                     Log::info("Received Quote Decline command from {$from}");
-                                    Quote::where('ringcentral_message_id', $messageId)
-                                    ->update(['status' => 'declined']);
+                                    Quote::where('ringcentral_message_id', $latest->conversation->id)
+                                        ->orWhere('quote_number', $response[1])
+                                        ->update(['status' => 'declined']);
+                                    $ringCentralService->sendGeneralSms($to, "Your quote #$response[1] has been declined.");
                                     break;
                                 case '3':
                                     Log::info("Received Quote Modification request from {$from}");
-                                    Quote::where('ringcentral_message_id', $messageId)
+                                    Quote::where('ringcentral_message_id', $latest->conversation->id)
+                                        ->orWhere('quote_number', $response[1])
                                         ->update(['status' => 'modification_requested']);
                                     break;
                                 default:

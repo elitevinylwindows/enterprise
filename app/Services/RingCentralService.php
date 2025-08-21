@@ -61,9 +61,8 @@ class RingCentralService
         $message .= "Please click the link below to view:\n";
         $message .= "PDF: " . $fullPath . "\n";
         $message .= "Reply with;\n";
-        $message .= "1 to Approve the Quote\n";
-        $message .= "2 to Decline the Quote\n";
-        $message .= "3 to Request for Modification\n";
+        $message .= "Reply \"1 $quoteId\" to approve, \"2 $quoteId\" to decline\n";
+        $message .= "Reply \"3 $quoteId\" to Request for Modification\n";
 
         try {
             $response = $this->platform->post('/account/~/extension/~/sms', [
@@ -80,6 +79,37 @@ class RingCentralService
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
+
+    public function sendGeneralSms(string $toPhoneNumber, string $message): array
+    {
+
+         $subscription = $this->platform->post('/restapi/v1.0/subscription', [
+            'eventFilters' => [
+                '/restapi/v1.0/account/~/extension/~/message-store', // incoming/outgoing SMS
+            ],
+            'deliveryMode' => [
+                'transportType' => 'WebHook',
+                'address'       => 'https://app.elitevinylwindows.com/api/webhooks/incoming-sms'
+            ]
+        ]);
+
+        try {
+            $response = $this->platform->post('/account/~/extension/~/sms', [
+                'from' => ['phoneNumber' => config('services.ringcentral.sms_from')],
+                'to'   => [['phoneNumber' => $toPhoneNumber]], // Format: +1234567890
+                'text' => $message
+            ]);
+
+            return ['success' => true, 'data' => $response->json()];
+
+        } catch (\RingCentral\SDK\Http\ApiException $e) {
+            dd($e);
+            Log::error('RingCentral SMS Failed: ' . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    
 
     public function getSmsEnabledNumbers()
     {

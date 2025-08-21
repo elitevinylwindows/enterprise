@@ -978,7 +978,7 @@ public function index(Request $request)
                     $pdfPath
                 );
 
-        $quote->update(['ringcentral_message_id' => $result['data']->id]);
+        $quote->update(['ringcentral_message_id' => $result['data']->conversation->id]);
         dd($result);
     }
 }
