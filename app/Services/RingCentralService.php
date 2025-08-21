@@ -130,7 +130,7 @@ class RingCentralService
                 'availability'   => 'Alive'
             ]);
 
-            return $response->json()['records'] ?? [];
+            return $response->json()->records ?? [];
         } catch (\Exception $e) {
             Log::error('Failed to fetch conversation: ' . $e->getMessage());
             return null;

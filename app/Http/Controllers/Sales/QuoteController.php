@@ -979,5 +979,6 @@ public function index(Request $request)
                 );
 
         $quote->update(['ringcentral_message_id' => $result['data']->id]);
+        dd($result);
     }
 }
