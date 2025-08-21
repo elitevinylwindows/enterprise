@@ -978,6 +978,6 @@ public function index(Request $request)
                     $pdfPath
                 );
 
-        dd($result);
+        $quote->update(['ringcentral_message_id' => $result['data']->id]);
     }
 }

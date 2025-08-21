@@ -201,12 +201,20 @@ class WebhookController extends Controller
                             switch ($text) {
                                 case '1':
                                     Log::info("Received Quote Approval command from {$from}");
+
+                                    Quote::where('ringcentral_message_id', $messageId)
+                                        ->update(['status' => 'approved']);
+
                                     break;
                                 case '2':
                                     Log::info("Received Quote Decline command from {$from}");
+                                    Quote::where('ringcentral_message_id', $messageId)
+                                    ->update(['status' => 'declined']);
                                     break;
                                 case '3':
                                     Log::info("Received Quote Modification request from {$from}");
+                                    Quote::where('ringcentral_message_id', $messageId)
+                                        ->update(['status' => 'modification_requested']);
                                     break;
                                 default:
                                     // Unknown command
