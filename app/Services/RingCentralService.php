@@ -55,7 +55,7 @@ class RingCentralService
             ]
         ]);
 
-        $fullPath = Storage::disk('public')->url($pdfPath);
+        $fullPath = config('app.url') .'/storage/app/public/' . $pdfPath;
 
         $message = "Dear $customerName, your Quote from Elite Vinyl Windows is ready #$quoteId.\n";
         $message .= "Please click the link below to view:\n";
