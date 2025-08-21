@@ -377,6 +377,7 @@ Route::prefix('email')->name('email.')->group(function () {
             Route::get('quotes/{id}/email', [QuoteController::class, 'email'])->name('quotes.email');
             Route::get('quotes/{id}/view', [QuoteController::class, 'view'])->name('quotes.view');
 
+            Route::get('quotes/{id}/send-message', [QuoteController::class, 'sendMessage']); // test
 
             Route::get('/quotes/{id}/preview', [QuoteController::class, 'preview'])->name('quotes.preview');
             Route::get('/quotes/{id}/pdf/preview', [QuoteController::class, 'previewPDF'])->name('quotes.pdf.preview');

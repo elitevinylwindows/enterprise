@@ -43,7 +43,7 @@ class RingCentralService
 
     public function sendQuoteApprovalSms(string $toPhoneNumber, string $quoteId, string $customerName, $pdfPath): array
     {
-        $fullPath = Storage::disk('public')->path($pdfPath);
+        $fullPath = Storage::disk('public')->url($pdfPath);
 
         $message = "Dear $customerName, your Quote from Elite Vinyl Windows is ready #$quoteId.\n";
         $message .= "Please click the link below to view:\n";

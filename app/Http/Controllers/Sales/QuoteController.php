@@ -964,4 +964,20 @@ public function index(Request $request)
 
     }
 
+    public function sendMessage($id)
+    {
+        $quote = Quote::findOrFail($id);
+        $rcService = new RingCentralService();
+        
+        $pdfPath = 'quotes/quote_'.$quote->quote_number.'.pdf';
+
+        $result = $rcService->sendQuoteApprovalSms(
+                    $quote->customer->billing_phone, // e.g., +15558675309
+                    $quote->quote_number,
+                    $quote->customer->customer_name,
+                    $pdfPath
+                );
+
+        dd($result);
+    }
 }
