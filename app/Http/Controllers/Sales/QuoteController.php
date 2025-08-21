@@ -824,7 +824,8 @@ public function index(Request $request)
             $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['quote' => $quote, 'modificationsByDate' => $modificationsByDate])->setPaper('a4', 'landscape');
             $pdfPath = 'quotes/quote_'.$quote->quote_number.'.pdf';
 
-            
+            Storage::disk('public')->put($pdfPath, $pdf->output());
+
             Mail::to($quote->customer->email)
             ->send(new QuoteEmail($quote, $pdfPath));
 
