@@ -170,11 +170,41 @@ class WebhookController extends Controller
                 ->header('Validation-Token', $token);
         }
 
-        // Otherwise, it's a real event notification
         $payload = $request->all();
         Log::info('RingCentral webhook event:', $payload);
 
-        // Process SMS reply etc.
+        if (isset($payload['body']['changes'])) {
+            foreach ($payload['body']['changes'] as $change) {
+                if ($change['type'] === 'SMS' && !empty($change['newMessageIds'])) {
+                    foreach ($change['newMessageIds'] as $messageId) {
+                        // fetch full SMS message from RingCentral
+                        $message = $this->platform->get("/account/~/extension/~/message-store/{$messageId}");
+                        $messageData = $message->json();
+
+                        Log::info("Received SMS Message:", $messageData);
+
+                        // extract text + sender
+                        $from = $messageData['from']['phoneNumber'] ?? 'Unknown';
+                        $text = $messageData['subject'] ?? '';
+
+                        // Now handle reply (1, 2, 3)
+                        if (trim($text) === '1') {
+                            // Approve quote
+                            Log::info("Quote Approved by {$from}");
+                        } elseif (trim($text) === '2') {
+                            // Decline
+                            Log::info("Quote Declined by {$from}");
+                        } elseif (trim($text) === '3') {
+                            // Modification requested
+                            Log::info("Quote Modification requested by {$from}");
+                        } else {
+                            Log::info("Unrecognized reply: {$text}");
+                        }
+                    }
+                }
+            }
+        }
+
         return response()->json(['status' => 'ok']);
     }
 }
