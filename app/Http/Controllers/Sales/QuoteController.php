@@ -971,8 +971,6 @@ public function index(Request $request)
         
         $pdfPath = 'quotes/quote_'.$quote->quote_number.'.pdf';
 
-        $messageData = $rcService->getSmsMessage("5128778780708793437");
-        dd($messageData);
         $result = $rcService->sendQuoteApprovalSms(
                     $quote->customer->billing_phone, // e.g., +15558675309
                     $quote->quote_number,

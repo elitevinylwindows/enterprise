@@ -112,21 +112,27 @@ class RingCentralService
     public function getSmsMessage($messageId)
     {
         try {
-
-            $response = $this->platform->get("/account/~/extension/~/message-store", [
-                'conversationId' => $messageId,
-                'direction'      => 'Inbound',   // only inbound replies
-                'dateFrom'       => now()->subDay()->toIso8601String(), // optional filter
-            ]);
-
-$messages = $response->json();
-    return $messages;
-
-            // $message = $this->platform->get("/account/~/extension/~/message-store/{$messageId}");
-            // $messageData = $message->json();
-            // return $messageData;
+            $message = $this->platform->get("/account/~/extension/~/message-store/{$messageId}");
+            $messageData = $message->json();
+            return $messageData;
         } catch (\Exception $e) {
             Log::error('Failed to fetch SMS message: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function getConversation($conversationId)
+    {
+        try {
+            $response = $this->platform->get("/account/~/extension/~/message-store", [
+                'conversationId' => $conversationId,
+                'direction'      => 'Inbound',
+                'availability'   => 'Alive'
+            ]);
+
+            return $response->json()['records'] ?? [];
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch conversation: ' . $e->getMessage());
             return null;
         }
     }

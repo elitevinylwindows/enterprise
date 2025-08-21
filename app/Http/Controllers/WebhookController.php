@@ -183,23 +183,36 @@ class WebhookController extends Controller
                         $messageData = $ringCentralService->getSmsMessage($messageId);
 
                         Log::info("Received SMS Message: ". json_encode($messageData));
-                        
-                        // extract text + sender666666666
-                        $from = $messageData['from']['phoneNumber'] ?? 'Unknown';
-                        $text = $messageData['subject'] ?? '';
 
-                        // Now handle reply (1, 2, 3)
-                        if (trim($text) === '1') {
-                            // Approve quote
-                            Log::info("Quote Approved by {$from}");
-                        } elseif (trim($text) === '2') {
-                            // Decline
-                            Log::info("Quote Declined by {$from}");
-                        } elseif (trim($text) === '3') {
-                            // Modification requested
-                            Log::info("Quote Modification requested by {$from}");
-                        } else {
-                            Log::info("Unrecognized reply: {$text}");
+                        $conversationData = $ringCentralService->getConversation($messageData['conversation']['id'] ?? '');
+
+                        if (!empty($conversationData)) {
+                            // Latest inbound message (first one)
+                            $latest = $conversationData[0];
+
+                            $messageId   = $latest['id'];
+                            $from        = $latest['from']['phoneNumber'] ?? 'Unknown';
+                            $text        = trim($latest['subject'] ?? '');
+                            $createdAt   = $latest['creationTime'];
+
+                            Log::info("Latest inbound reply from {$from} at {$createdAt}: {$text}");
+
+                            // Handle commands
+                            switch ($text) {
+                                case '1':
+                                    Log::info("Received Quote Approval command from {$from}");
+                                    break;
+                                case '2':
+                                    Log::info("Received Quote Decline command from {$from}");
+                                    break;
+                                case '3':
+                                    Log::info("Received Quote Modification request from {$from}");
+                                    break;
+                                default:
+                                    // Unknown command
+                                    Log::info("Received Unknown command from {$from}");
+                                    break;
+                            }
                         }
                     }
                 }
