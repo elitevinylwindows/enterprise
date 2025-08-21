@@ -184,16 +184,16 @@ class WebhookController extends Controller
 
                         Log::info("Received SMS Message: ". json_encode($messageData));
 
-                        $conversationData = $ringCentralService->getConversation($messageData['conversation']['id'] ?? '');
+                        $conversationData = $ringCentralService->getConversation($messageData->conversation->id ?? '');
 
                         if (!empty($conversationData)) {
                             // Latest inbound message (first one)
                             $latest = $conversationData[0];
 
-                            $messageId   = $latest['id'];
-                            $from        = $latest['from']['phoneNumber'] ?? 'Unknown';
-                            $text        = trim($latest['subject'] ?? '');
-                            $createdAt   = $latest['creationTime'];
+                            $messageId   = $latest->id;
+                            $from        = $latest->from->phoneNumber ?? 'Unknown';
+                            $text        = trim($latest->subject ?? '');
+                            $createdAt   = $latest->creationTime;
 
                             Log::info("Latest inbound reply from {$from} at {$createdAt}: {$text}");
 
