@@ -46,9 +46,8 @@ class RingCentralService
         $fullPath = Storage::disk('public')->path($pdfPath);
 
         $message = "Dear $customerName, your Quote from Elite Vinyl Windows is ready #$quoteId.\n";
-        $message .= "PDF: " . $fullPath . "\n";
         $message .= "Please click the link below to view:\n";
-        $message .= route('sales.quotes.pdf', ['id' => $quoteId]) . "\n";
+        $message .= "PDF: " . $fullPath . "\n";
         $message .= "Reply with;\n";
         $message .= "1 to Approve the Quote\n";
         $message .= "2 to Decline the Quote\n";
