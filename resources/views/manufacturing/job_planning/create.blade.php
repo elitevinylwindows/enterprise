@@ -2,7 +2,7 @@
 <form id="jobPlanningQueueForm" method="POST" action="{{ route('manufacturing.job_planning.queue') }}">
     @csrf
 
-    <div class="px-4 pt-3"> {{-- padding inside modal body --}}
+    <div class="px-4 pt-3">
 
         {{-- FILTERS CARD --}}
         <div class="card mb-4">
@@ -19,7 +19,14 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">{{ __('Series') }}</label>
-                        <input type="text" class="form-control" name="series" id="series" placeholder="{{ __('e.g. LAM-WH') }}">
+                        <select class="form-select" name="series" id="series">
+                            <option value="">{{ __('All Series') }}</option>
+                            @foreach($series as $s)
+                                <option value="{{ $s->series_code }}">
+                                    {{ $s->series_code }} @if(!empty($s->series_name)) — {{ $s->series_name }} @endif
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="col-12"></div>
@@ -27,11 +34,17 @@
                     <div class="col-md-9">
                         <label class="form-label d-block mb-2">{{ __('Color') }}</label>
                         <div class="d-flex flex-wrap gap-3">
-                            @php $colors = ['White' => 'white', 'Black' => 'black', 'Almond' => 'almond']; @endphp
-                            @foreach($colors as $label => $val)
+                            @foreach($colors as $c)
+                                @php
+                                    $code = $c->color_code;
+                                    $label = $c->color_name ?: $c->color_code;
+                                @endphp
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input color-filter" type="checkbox" value="{{ $val }}" id="color_{{ $val }}">
-                                    <label class="form-check-label" for="color_{{ $val }}">{{ $label }}</label>
+                                    <input class="form-check-input color-filter" type="checkbox"
+                                           value="{{ $code }}" id="color_{{ \Illuminate\Support\Str::slug($code,'_') }}">
+                                    <label class="form-check-label" for="color_{{ \Illuminate\Support\Str::slug($code,'_') }}">
+                                        {{ $label }}
+                                    </label>
                                 </div>
                             @endforeach
                             <div class="form-check form-check-inline">
@@ -54,7 +67,10 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center px-3 px-md-4">
                 <span class="fw-semibold">{{ __('Results') }}</span>
-                <small class="text-muted"><span id="resultCount">0</span> {{ __('item(s)') }}</small>
+                <div class="d-flex align-items-center gap-3 small text-muted">
+                    <span id="resultCount">0</span> {{ __('item(s)') }}
+                    <span class="badge bg-light-primary text-primary" id="qtyCapHint">{{ __('Qty cap: 0/50') }}</span>
+                </div>
             </div>
             <div class="card-body px-3 pb-3">
                 <div class="table-responsive">
@@ -90,12 +106,18 @@
             </div>
         </div>
 
-        {{-- Hidden inputs for selected IDs (populated by JS) --}}
-        <div id="selectedContainer"></div>
+        {{-- Hidden inputs --}}
+        <div id="selectedContainer">
+            <input type="hidden" name="selected_qty_total" id="selected_qty_total" value="0">
+        </div>
     </div>
 </form>
 
+
+
 @push('scripts')
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
 (function() {
   const btnSearch = document.getElementById('btnSearchJobs');
