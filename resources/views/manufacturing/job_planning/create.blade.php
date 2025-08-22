@@ -4,51 +4,74 @@
 
     <div class="px-4 pt-3"> {{-- padding inside modal body --}}
 
-        {{-- FILTERS CARD --}}
-        <div class="card mb-4">
-            <div class="card-header fw-semibold px-3 px-md-4">{{ __('Filter') }}</div>
-            <div class="card-body px-3 px-md-4">
-                <div class="row g-3 align-items-end">
-                    <div class="col-md-3">
-                        <label class="form-label">{{ __('Date From') }}</label>
-                        <input type="date" class="form-control" name="date_from" id="date_from" value="{{ now()->toDateString() }}">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">{{ __('Date To') }}</label>
-                        <input type="date" class="form-control" name="date_to" id="date_to" value="{{ now()->toDateString() }}">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">{{ __('Series') }}</label>
-                        <input type="text" class="form-control" name="series" id="series" placeholder="{{ __('e.g. LAM-WH') }}">
-                    </div>
 
-                    <div class="col-12"></div>
+{{-- FILTERS CARD --}}
+<div class="card mb-4">
+    <div class="card-header fw-semibold px-3 px-md-4">{{ __('Filter') }}</div>
+    <div class="card-body px-3 px-md-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">{{ __('Date From') }}</label>
+                <input type="date" class="form-control" name="date_from" id="date_from"
+                       value="{{ now()->toDateString() }}">
+            </div>
 
-                    <div class="col-md-9">
-                        <label class="form-label d-block mb-2">{{ __('Color') }}</label>
-                        <div class="d-flex flex-wrap gap-3">
-                            @php $colors = ['White' => 'white', 'Black' => 'black', 'Almond' => 'almond']; @endphp
-                            @foreach($colors as $label => $val)
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input color-filter" type="checkbox" value="{{ $val }}" id="color_{{ $val }}">
-                                    <label class="form-check-label" for="color_{{ $val }}">{{ $label }}</label>
-                                </div>
-                            @endforeach
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="color_all" checked>
-                                <label class="form-check-label" for="color_all">{{ __('All') }}</label>
-                            </div>
+            <div class="col-md-3">
+                <label class="form-label">{{ __('Date To') }}</label>
+                <input type="date" class="form-control" name="date_to" id="date_to"
+                       value="{{ now()->toDateString() }}">
+            </div>
+
+            {{-- Series Dropdown --}}
+            <div class="col-md-3">
+                <label class="form-label">{{ __('Series') }}</label>
+                <select class="form-select" name="series" id="series">
+                    <option value="">{{ __('All Series') }}</option>
+                    @foreach($series as $s)
+                        <option value="{{ $s->series }}">{{ $s->series }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-12"></div>
+
+            {{-- Colors from Config --}}
+            <div class="col-md-9">
+                <label class="form-label d-block mb-2">{{ __('Color') }}</label>
+                <div class="d-flex flex-wrap gap-3">
+                    @foreach($colors as $c)
+                        @php
+                            $code  = $c->code;
+                            $label = $c->name;
+                            $safeId = 'color_' . preg_replace('/[^a-z0-9_]+/i','_', $code);
+                        @endphp
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input color-filter" type="checkbox" value="{{ $code }}" id="{{ $safeId }}">
+                            <label class="form-check-label" for="{{ $safeId }}">{{ $label }}</label>
                         </div>
-                    </div>
-
-                    <div class="col-md-3 text-md-end">
-                        <button type="button" id="btnSearchJobs" class="btn btn-primary">
-                            <i class="fa-solid fa-magnifying-glass"></i> {{ __('Search') }}
-                        </button>
+                    @endforeach
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="color_all" checked>
+                        <label class="form-check-label" for="color_all">{{ __('All') }}</label>
                     </div>
                 </div>
             </div>
+
+            <div class="col-md-3 text-md-end">
+                <button type="button" id="btnSearchJobs" class="btn btn-primary">
+                    <i class="fa-solid fa-magnifying-glass"></i> {{ __('Search') }}
+                </button>
+            </div>
         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
 
         {{-- RESULTS CARD --}}
         <div class="card">
