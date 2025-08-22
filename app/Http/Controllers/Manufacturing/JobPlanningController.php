@@ -176,10 +176,23 @@ public function download(Request $request, $job)
     }
 
     // Returns the modal body above
-public function create()
+public function create(Request $request)
 {
-    return view('manufacturing.job_planning.create');
+    // Pull from your master tables
+    $series = \DB::table('elitevw_master_series')
+        ->select('series')
+        ->orderBy('series')
+        ->get();
+
+    $colors = \DB::table('elitevw_master_colors_color_configurations')
+        ->select('code', 'name')
+        ->orderBy('name')
+        ->get();
+
+    // IMPORTANT: return the partial (no @extends in the blade)
+    return view('manufacturing.job_planning.create', compact('series', 'colors'));
 }
+
 
 public function lookup(Request $req)
 {
