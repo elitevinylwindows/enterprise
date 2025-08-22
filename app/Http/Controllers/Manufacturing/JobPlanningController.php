@@ -181,55 +181,103 @@ public function create()
     return view('manufacturing.job_planning.create');
 }
 
-/** Lookup jobs to send (JSON) */
-public function lookup(Request $request)
+public function lookup(Request $req)
 {
-    $dateFrom = $request->date_from ? date('Y-m-d', strtotime($request->date_from)) : null;
-    $dateTo   = $request->date_to   ? date('Y-m-d', strtotime($request->date_to))   : null;
-    $series   = trim((string) $request->series);
-    $colors   = (array) $request->get('colors', []);
+    $req->validate([
+        'date_from' => 'nullable|date',
+        'date_to'   => 'nullable|date|after_or_equal:date_from',
+        'series'    => 'nullable|string|max:100',
+        'colors'    => 'nullable|array',
+        'colors.*'  => 'string|max:50',
+    ]);
 
-    // Pull "created/draft" jobs (not yet queued)
-    $q = \App\Models\Manufacturing\JobPool::query()
-        ->whereIn('production_status', ['created', 'draft']);
+    $q = \App\Models\Manufacturing\JobPool::query();
+    if ($req->filled('date_from')) $q->whereDate('delivery_date','>=',$req->date('date_from'));
+    if ($req->filled('date_to'))   $q->whereDate('delivery_date','<=',$req->date('date_to'));
+    if ($req->filled('series'))    $q->where('series','like',trim($req->series).'%');
+    if ($req->colors)              $q->whereIn(\DB::raw('LOWER(color)'), array_map('strtolower',$req->colors));
 
-    if ($dateFrom) $q->whereDate('delivery_date', '>=', $dateFrom);
-    if ($dateTo)   $q->whereDate('delivery_date', '<=', $dateTo);
-    if ($series !== '') $q->where('series', 'like', "%{$series}%");
-    if (!empty($colors)) $q->whereIn('color', $colors);
+    $rows = $q->orderBy('delivery_date')->orderBy('order_id')->limit(500)->get();
 
-    $rows = $q->latest('id')->limit(500)->get()->map(function($j){
+    $data = $rows->map(function ($r) {
         return [
-            'id' => $j->id,
-            'job_order_number' => $j->job_order_number,
-            'delivery_date' => optional($j->delivery_date)->format('Y-m-d'),
-            'customer_number' => $j->customer_number,
-            'customer_name' => $j->customer_name,
-            'line' => $j->line,
-            'series' => $j->series,
-            'color' => $j->color,
-            'qty' => $j->qty,
+            'id'                    => $r->id,
+            'job_order_number'      => optional($r->order)->order_number ?? $r->order_id,
+            'series'                => $r->series,
+            'qty'                   => (int)($r->qty ?? 0),
+            'line'                  => $r->line,
+            'delivery_date'         => optional($r->delivery_date)->format('Y-m-d'),
+            'type'                  => $r->type,
+            'production_status'     => $r->production_status,
+            'entry_date'            => optional($r->entry_date)->format('Y-m-d'),
+            'last_transaction_date' => optional($r->last_transaction_date)->format('Y-m-d H:i'),
         ];
     });
 
-    return response()->json(['success' => true, 'data' => $rows]);
+    return response()->json(['success' => true, 'data' => $data]);
 }
 
-/** Bulk send selected to production queue */
-public function queue(Request $request)
+public function queue(Request $req)
 {
-    $ids = (array) $request->get('selected_ids', []);
-    if (empty($ids)) {
-        return back()->with('error', 'No jobs selected.');
+    $req->validate([
+        'selected_ids'       => 'required|array|min:1',
+        'selected_ids.*'     => 'integer',
+        'selected_qty_total' => 'nullable|integer|min:1|max:50',
+    ], ['selected_ids.required' => 'Please select at least one job.']);
+
+    $ids  = $req->input('selected_ids', []);
+    $jobs = \App\Models\Manufacturing\JobPool::whereIn('id',$ids)->get()->keyBy('id');
+
+    $totalQty = 0; $ordered = [];
+    foreach ($ids as $id) {
+        if (!isset($jobs[$id])) return back()->with('error',"Job ID {$id} not found.");
+        $j = $jobs[$id]; $q = (int)($j->qty ?? 0);
+        $totalQty += $q; $ordered[] = $j;
     }
+    if ($totalQty > 50) return back()->with('error',"Total Qty {$totalQty} exceeds max 50.");
 
-    \App\Models\Manufacturing\JobPool::whereIn('id', $ids)->update([
-        'production_status' => 'queued',
-        'last_transaction_date' => now(),
-        'updated_at' => now()
-    ]);
+    $plannedDate = collect($ordered)->pluck('delivery_date')->filter()->sort()->first() ?: now();
 
-    return redirect()->route('manufacturing.job_planning.index')->with('success', 'Selected jobs sent to Production Queue.');
+    \DB::beginTransaction();
+    try {
+        $plan = \App\Models\Manufacturing\JobPlan::create([
+            'planned_date'  => $plannedDate,
+            'total_qty'     => $totalQty,
+            'status'        => 'queued',
+            'created_by_id' => auth()->id(),
+        ]);
+
+        $seq = 1;
+        foreach ($ordered as $job) {
+            \App\Models\Manufacturing\JobPlanItem::create([
+                'job_plan_id'   => $plan->id,
+                'job_pool_id'   => $job->id,
+                'order_id'      => $job->order_id ?? null,
+                'order_number'  => optional($job->order)->order_number,
+                'series'        => $job->series,
+                'color'         => $job->color,
+                'frame_type'    => $job->frame_type,
+                'qty'           => (int)($job->qty ?? 0),
+                'line'          => $job->line,
+                'delivery_date' => $job->delivery_date,
+                'type'          => $job->type,
+                'seq'           => $seq++,
+            ]);
+
+            $job->update([
+                'production_status'     => 'in_production',
+                'last_transaction_date' => now(),
+            ]);
+        }
+
+        \DB::commit();
+        return redirect()->route('manufacturing.job_planning.show', $plan->id)
+            ->with('success', "Job plan #{$plan->id} created (qty {$totalQty}).");
+    } catch (\Throwable $e) {
+        \DB::rollBack(); report($e);
+        return back()->with('error','Failed to create job plan: '.$e->getMessage());
+    }
 }
+
 
 }
