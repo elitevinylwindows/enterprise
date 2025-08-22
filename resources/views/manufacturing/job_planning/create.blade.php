@@ -1,4 +1,6 @@
-{{-- Modal body for Job Planning Create / Send to Production (PARTIAL for customModal) --}}
+{{-- resources/views/manufacturing/job_planning/create.blade.php --}}
+{{-- IMPORTANT: This is a PARTIAL (no @extends/@section). Loaded via .customModal --}}
+
 <form id="jobPlanningQueueForm" method="POST" action="{{ route('manufacturing.job_planning.queue') }}">
     @csrf
 
@@ -17,6 +19,8 @@
                         <label class="form-label">{{ __('Date To') }}</label>
                         <input type="date" class="form-control" name="date_to" id="date_to" value="{{ now()->toDateString() }}">
                     </div>
+
+                    {{-- SERIES DROPDOWN (from elitevw_master_series) --}}
                     <div class="col-md-3">
                         <label class="form-label">{{ __('Series') }}</label>
                         <select class="form-select" name="series" id="series">
@@ -31,12 +35,13 @@
 
                     <div class="col-12"></div>
 
+                    {{-- COLORS (from elitevw_master_colors_color_configurations) --}}
                     <div class="col-md-9">
                         <label class="form-label d-block mb-2">{{ __('Color') }}</label>
                         <div class="d-flex flex-wrap gap-3">
                             @foreach($colors as $c)
                                 @php
-                                    $code = $c->color_code;
+                                    $code  = $c->color_code;
                                     $label = $c->color_name ?: $c->color_code;
                                 @endphp
                                 <div class="form-check form-check-inline">
@@ -106,17 +111,22 @@
             </div>
         </div>
 
-        {{-- Hidden inputs --}}
+        {{-- Hidden inputs for selected IDs (DOM order) + total qty --}}
         <div id="selectedContainer">
             <input type="hidden" name="selected_qty_total" id="selected_qty_total" value="0">
         </div>
     </div>
 </form>
 
-
+@push('styles')
+<style>
+  #jobResultsTable tbody tr { cursor: grab; }
+  #jobResultsTable tbody tr.dragging { opacity: .6; }
+</style>
+@endpush
 
 @push('scripts')
-
+{{-- Optional smoother drag; fallback included if blocked --}}
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
 (function() {
@@ -155,7 +165,7 @@
     if (e.target.checked) document.querySelectorAll('.color-filter').forEach(cb => cb.checked = false);
   });
 
-  // ——— rendering ———
+  // -------- render rows --------
   function renderRows(rows) {
     tableBody.innerHTML = '';
     let html = '';
@@ -187,18 +197,15 @@
     tableBody.insertAdjacentHTML('beforeend', html);
     resultCount.textContent = rows.length;
 
-    // bind selection change
     tableBody.querySelectorAll('.row-check').forEach(cb => cb.addEventListener('change', onRowCheckChange));
 
-    // reset controls
     checkAll.checked = false;
     updateSelection();
 
-    // enable drag
     enableDrag();
   }
 
-  // ——— selection + cap ———
+  // -------- selection & qty cap --------
   function getSelectedTotalQty() {
     let sum = 0;
     tableBody.querySelectorAll('tr').forEach(tr => {
@@ -219,10 +226,7 @@
 
   function onRowCheckChange(e) {
     const cb = e.target;
-    const tr = cb.closest('tr');
-    const qty = parseInt(tr?.dataset?.qty || '0', 10) || 0;
     const current = getSelectedTotalQty();
-
     if (cb.checked && current > MAX_QTY) {
       cb.checked = false;
       alert(`Cannot exceed total Qty ${MAX_QTY}.`);
@@ -252,7 +256,7 @@
     if (qtyCapHint) qtyCapHint.textContent = `Qty cap: ${totalQty}/${MAX_QTY}`;
   }
 
-  // Check-all respects the cap (checks until it hits 50)
+  // check-all respects the cap
   checkAll.addEventListener('change', () => {
     if (!checkAll.checked) {
       tableBody.querySelectorAll('.row-check').forEach(cb => cb.checked = false);
@@ -264,18 +268,14 @@
       const cb = tr.querySelector('.row-check');
       const q = parseInt(tr.dataset.qty || '0', 10) || 0;
       if (cb) {
-        if (running + q <= MAX_QTY) {
-          cb.checked = true;
-          running += q;
-        } else {
-          cb.checked = false;
-        }
+        if (running + q <= MAX_QTY) { cb.checked = true; running += q; }
+        else { cb.checked = false; }
       }
     });
     updateSelection();
   });
 
-  // ——— drag & drop ———
+  // -------- drag & drop --------
   function enableDrag() {
     if (window.Sortable) {
       Sortable.create(tableBody, { animation: 150, onSort: updateSelection });
@@ -284,9 +284,7 @@
     // native fallback
     let dragEl = null;
     tableBody.querySelectorAll('tr').forEach(tr => {
-      tr.addEventListener('dragstart', (e) => {
-        dragEl = tr; tr.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move';
-      });
+      tr.addEventListener('dragstart', (e) => { dragEl = tr; tr.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
       tr.addEventListener('dragend', () => { tr.classList.remove('dragging'); dragEl = null; updateSelection(); });
       tr.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -299,7 +297,7 @@
     });
   }
 
-  // ——— search ———
+  // -------- search (AJAX to JobPool via JobPlanningController@lookup) --------
   btnSearch.addEventListener('click', () => {
     const params = new URLSearchParams();
     params.append('date_from', document.getElementById('date_from').value || '');
@@ -315,87 +313,13 @@
     .catch(() => renderRows([]));
   });
 
-  // safety: block submits over cap
+  // safety: block submit over cap
   form.addEventListener('submit', (e) => {
     if (getSelectedTotalQty() > MAX_QTY) {
       e.preventDefault();
       alert(`Total Qty exceeds ${MAX_QTY}. Please adjust your selection.`);
     }
   });
-})();
-</script>
-<script>
-(function () {
-  const modalEl     = document.getElementById('ajaxModal');
-  const dialogEl    = document.getElementById('ajaxModalDialog');
-  const titleEl     = document.getElementById('ajaxModalTitle');
-  const bodyEl      = document.getElementById('ajaxModalBody');
-  const footerEl    = document.getElementById('ajaxModalFooter');
-  const bsModal     = () => new bootstrap.Modal(modalEl, { backdrop: 'static' });
-
-  // Map size token to Bootstrap dialog class
-  function setDialogSize(size) {
-    dialogEl.className = 'modal-dialog'; // reset
-    if (!size) return;
-    const s = (size+'').toLowerCase();
-    if (s === 'sm') dialogEl.classList.add('modal-sm');
-    else if (s === 'lg') dialogEl.classList.add('modal-lg');
-    else if (s === 'xl') dialogEl.classList.add('modal-xl');
-  }
-
-  // Global delegated click handler
-  document.addEventListener('click', function (e) {
-    const trigger = e.target.closest('.customModal');
-    if (!trigger) return;
-
-    e.preventDefault();
-
-    const url   = trigger.getAttribute('data-url');
-    const title = trigger.getAttribute('data-title') || 'Modal';
-    const size  = trigger.getAttribute('data-size') || 'lg';
-
-    if (!url) {
-      console.error('customModal missing data-url');
-      return;
-    }
-
-    // Prep modal
-    titleEl.textContent = title;
-    setDialogSize(size);
-    bodyEl.innerHTML = `
-      <div class="text-center py-5">
-        <div class="spinner-border" role="status" aria-hidden="true"></div>
-        <div class="mt-2 small text-muted">{{ __('Loading…') }}</div>
-      </div>`;
-
-    // Show immediately (then fill)
-    bsModal().show();
-
-    // Fetch partial
-    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' } })
-      .then(async (r) => {
-        if (!r.ok) {
-          const text = await r.text();
-          throw new Error(text || ('HTTP ' + r.status));
-        }
-        return r.text();
-      })
-      .then(html => {
-        bodyEl.innerHTML = html;
-
-        // Reinit feather icons inside modal (if you use feather)
-        if (window.feather && typeof window.feather.replace === 'function') {
-          window.feather.replace();
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        bodyEl.innerHTML = `
-          <div class="alert alert-danger mb-0">
-            {{ __('Failed to load content.') }}
-          </div>`;
-      });
-  }, false);
 })();
 </script>
 @endpush
