@@ -324,5 +324,78 @@
   });
 })();
 </script>
+<script>
+(function () {
+  const modalEl     = document.getElementById('ajaxModal');
+  const dialogEl    = document.getElementById('ajaxModalDialog');
+  const titleEl     = document.getElementById('ajaxModalTitle');
+  const bodyEl      = document.getElementById('ajaxModalBody');
+  const footerEl    = document.getElementById('ajaxModalFooter');
+  const bsModal     = () => new bootstrap.Modal(modalEl, { backdrop: 'static' });
 
+  // Map size token to Bootstrap dialog class
+  function setDialogSize(size) {
+    dialogEl.className = 'modal-dialog'; // reset
+    if (!size) return;
+    const s = (size+'').toLowerCase();
+    if (s === 'sm') dialogEl.classList.add('modal-sm');
+    else if (s === 'lg') dialogEl.classList.add('modal-lg');
+    else if (s === 'xl') dialogEl.classList.add('modal-xl');
+  }
+
+  // Global delegated click handler
+  document.addEventListener('click', function (e) {
+    const trigger = e.target.closest('.customModal');
+    if (!trigger) return;
+
+    e.preventDefault();
+
+    const url   = trigger.getAttribute('data-url');
+    const title = trigger.getAttribute('data-title') || 'Modal';
+    const size  = trigger.getAttribute('data-size') || 'lg';
+
+    if (!url) {
+      console.error('customModal missing data-url');
+      return;
+    }
+
+    // Prep modal
+    titleEl.textContent = title;
+    setDialogSize(size);
+    bodyEl.innerHTML = `
+      <div class="text-center py-5">
+        <div class="spinner-border" role="status" aria-hidden="true"></div>
+        <div class="mt-2 small text-muted">{{ __('Loading…') }}</div>
+      </div>`;
+
+    // Show immediately (then fill)
+    bsModal().show();
+
+    // Fetch partial
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' } })
+      .then(async (r) => {
+        if (!r.ok) {
+          const text = await r.text();
+          throw new Error(text || ('HTTP ' + r.status));
+        }
+        return r.text();
+      })
+      .then(html => {
+        bodyEl.innerHTML = html;
+
+        // Reinit feather icons inside modal (if you use feather)
+        if (window.feather && typeof window.feather.replace === 'function') {
+          window.feather.replace();
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        bodyEl.innerHTML = `
+          <div class="alert alert-danger mb-0">
+            {{ __('Failed to load content.') }}
+          </div>`;
+      });
+  }, false);
+})();
+</script>
 @endpush
