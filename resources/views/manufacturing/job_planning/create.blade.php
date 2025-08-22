@@ -35,27 +35,29 @@
 
             <div class="col-12"></div>
 
-            {{-- Colors from Config --}}
-            <div class="col-md-9">
-                <label class="form-label d-block mb-2">{{ __('Color') }}</label>
-                <div class="d-flex flex-wrap gap-3">
-                    @foreach($colors as $c)
-                        @php
-                            $code  = $c->code;
-                            $label = $c->name;
-                            $safeId = 'color_' . preg_replace('/[^a-z0-9_]+/i','_', $code);
-                        @endphp
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input color-filter" type="checkbox" value="{{ $code }}" id="{{ $safeId }}">
-                            <label class="form-check-label" for="{{ $safeId }}">{{ $label }}</label>
-                        </div>
-                    @endforeach
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="color_all" checked>
-                        <label class="form-check-label" for="color_all">{{ __('All') }}</label>
-                    </div>
-                </div>
+           {{-- Colors from Config --}}
+<div class="col-md-9">
+    <label class="form-label d-block mb-2">{{ __('Color') }}</label>
+    <div class="d-flex flex-wrap gap-3">
+        @foreach($colors as $c)
+            @php
+                $code  = $c->code;
+                $label = $c->name;
+                $safeId = 'color_' . preg_replace('/[^a-z0-9_]+/i','_', strtolower($code));
+            @endphp
+            <div class="form-check form-check-inline">
+                <input class="form-check-input color-filter" type="checkbox" value="{{ $code }}" id="{{ $safeId }}">
+                <label class="form-check-label" for="{{ $safeId }}">{{ $code }} – {{ $label }}</label>
             </div>
+        @endforeach
+
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="color_all" checked>
+            <label class="form-check-label" for="color_all">{{ __('All') }}</label>
+        </div>
+    </div>
+</div>
+
 
             <div class="col-md-3 text-md-end">
                 <button type="button" id="btnSearchJobs" class="btn btn-primary">
