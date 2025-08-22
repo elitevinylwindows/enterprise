@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Manufacturing\JobPlanning;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Illuminate\Support\Facades\DB;
 
 
 class JobPlanningController extends Controller
@@ -176,18 +175,10 @@ public function download(Request $request, $job)
         return view('manufacturing.job_planning.payment', compact('job'));
     }
 
+    // Returns the modal body above
 public function create()
 {
-    $series = DB::table('elitevw_master_series')
-        ->select('series_code','series_name')
-        ->orderBy('series_code')->get();
-
-    $colors = DB::table('elitevw_master_colors_color_configurations')
-        ->select('color_code','color_name')
-        ->orderBy('color_name')->get();
-
-    // Return a PARTIAL (no @extends in this blade)
-    return view('manufacturing.job_planning.create', compact('series','colors'));
+    return view('manufacturing.job_planning.create');
 }
 
 public function lookup(Request $req)
