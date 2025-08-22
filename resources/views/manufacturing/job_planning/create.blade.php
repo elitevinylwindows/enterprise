@@ -47,7 +47,7 @@
             @endphp
             <div class="form-check form-check-inline">
                 <input class="form-check-input color-filter" type="checkbox" value="{{ $code }}" id="{{ $safeId }}">
-                <label class="form-check-label" for="{{ $safeId }}">{{ $code }} – {{ $label }}</label>
+                <label class="form-check-label" for="{{ $safeId }}">{{ $code }}</label>
             </div>
         @endforeach
 
