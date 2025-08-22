@@ -98,48 +98,54 @@
 @push('scripts')
 <script>
 (function() {
-    const btnSearch = document.getElementById('btnSearchJobs');
-    const tableBody = document.querySelector('#jobResultsTable tbody');
-    const checkAll = document.getElementById('checkAll');
-    const resultCount = document.getElementById('resultCount');
-    const btnSendQueue = document.getElementById('btnSendQueue');
-    const selectedContainer = document.getElementById('selectedContainer');
-    const selectionHint = document.getElementById('selectionHint');
+  const btnSearch = document.getElementById('btnSearchJobs');
+  const tableBody = document.querySelector('#jobResultsTable tbody');
+  const checkAll = document.getElementById('checkAll');
+  const resultCount = document.getElementById('resultCount');
+  const btnSendQueue = document.getElementById('btnSendQueue');
+  const selectedContainer = document.getElementById('selectedContainer');
+  const selectionHint = document.getElementById('selectionHint');
+  const qtyCapHint = document.getElementById('qtyCapHint');
+  const totalQtyInput = document.getElementById('selected_qty_total');
+  const form = document.getElementById('jobPlanningQueueForm');
+  const MAX_QTY = 50;
 
-    // helpers
-    const showRouteTpl = `{{ route('manufacturing.job_planning.show', ':id') }}`;
-    function statusBadge(s) {
-      const v = (s || '').toLowerCase();
-      const cls = v === 'completed' ? 'success'
-               : (v === 'queued' || v === 'pending') ? 'warning'
-               : 'info';
-      const label = (s || '-').toString().replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase());
-      return `<span class="badge bg-light-${cls}">${label}</span>`;
-    }
+  const showRouteTpl = `{{ route('manufacturing.job_planning.show', ':id') }}`;
 
-    function getSelectedColors() {
-        if (document.getElementById('color_all').checked) return [];
-        const vals = [];
-        document.querySelectorAll('.color-filter:checked').forEach(cb => vals.push(cb.value));
-        return vals;
-    }
+  function statusBadge(s) {
+    const v = (s || '').toLowerCase();
+    const cls = v === 'completed' ? 'success'
+             : (v === 'queued' || v === 'pending') ? 'warning'
+             : 'info';
+    const label = (s || '-').toString().replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+    return `<span class="badge bg-light-${cls}">${label}</span>`;
+  }
 
-    // "All" toggle clears specific colors
-    document.getElementById('color_all').addEventListener('change', (e) => {
-        if (e.target.checked) document.querySelectorAll('.color-filter').forEach(cb => cb.checked = false);
-    });
+  function getSelectedColors() {
+    if (document.getElementById('color_all').checked) return [];
+    const vals = [];
+    document.querySelectorAll('.color-filter:checked').forEach(cb => vals.push(cb.value));
+    return vals;
+  }
 
-    function renderRows(rows) {
-        tableBody.innerHTML = '';
-        let html = '';
-        rows.forEach(r => {
-            html += `
-<tr>
+  // "All" toggle clears specific colors
+  document.getElementById('color_all').addEventListener('change', (e) => {
+    if (e.target.checked) document.querySelectorAll('.color-filter').forEach(cb => cb.checked = false);
+  });
+
+  // ——— rendering ———
+  function renderRows(rows) {
+    tableBody.innerHTML = '';
+    let html = '';
+    rows.forEach(r => {
+      const qty = parseInt(r.qty ?? 0, 10) || 0;
+      html += `
+<tr draggable="true" data-id="${r.id}" data-qty="${qty}">
   <td><input type="checkbox" class="row-check" value="${r.id}"></td>
   <td>${r.id ?? '-'}</td>
   <td>${r.job_order_number ?? '-'}</td>
   <td>${r.series ?? '-'}</td>
-  <td class="text-end">${r.qty ?? 0}</td>
+  <td class="text-end">${qty}</td>
   <td>${r.line ?? '-'}</td>
   <td>${r.delivery_date ?? '-'}</td>
   <td>${r.type ?? '-'}</td>
@@ -155,51 +161,146 @@
     </a>
   </td>
 </tr>`;
-        });
-        tableBody.insertAdjacentHTML('beforeend', html);
-        resultCount.textContent = rows.length;
+    });
+    tableBody.insertAdjacentHTML('beforeend', html);
+    resultCount.textContent = rows.length;
 
-        // bind selection change
-        tableBody.querySelectorAll('.row-check').forEach(cb => cb.addEventListener('change', updateSelection));
+    // bind selection change
+    tableBody.querySelectorAll('.row-check').forEach(cb => cb.addEventListener('change', onRowCheckChange));
 
-        // reset controls
-        checkAll.checked = false;
-        updateSelection();
+    // reset controls
+    checkAll.checked = false;
+    updateSelection();
+
+    // enable drag
+    enableDrag();
+  }
+
+  // ——— selection + cap ———
+  function getSelectedTotalQty() {
+    let sum = 0;
+    tableBody.querySelectorAll('tr').forEach(tr => {
+      const cb = tr.querySelector('.row-check');
+      if (cb?.checked) sum += parseInt(tr.dataset.qty || '0', 10) || 0;
+    });
+    return sum;
+  }
+
+  function getSelectedIdsInDOMOrder() {
+    const ids = [];
+    tableBody.querySelectorAll('tr').forEach(tr => {
+      const cb = tr.querySelector('.row-check');
+      if (cb?.checked) ids.push(tr.getAttribute('data-id'));
+    });
+    return ids;
+  }
+
+  function onRowCheckChange(e) {
+    const cb = e.target;
+    const tr = cb.closest('tr');
+    const qty = parseInt(tr?.dataset?.qty || '0', 10) || 0;
+    const current = getSelectedTotalQty();
+
+    if (cb.checked && current > MAX_QTY) {
+      cb.checked = false;
+      alert(`Cannot exceed total Qty ${MAX_QTY}.`);
     }
+    updateSelection();
+  }
 
-    checkAll.addEventListener('change', () => {
-        tableBody.querySelectorAll('.row-check').forEach(cb => cb.checked = checkAll.checked);
-        updateSelection();
+  function updateSelection() {
+    // rebuild hidden inputs in DOM order
+    selectedContainer.querySelectorAll('input[name="selected_ids[]"]').forEach(el => el.remove());
+    const ids = getSelectedIdsInDOMOrder();
+    ids.forEach(id => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'selected_ids[]';
+      input.value = id;
+      selectedContainer.appendChild(input);
     });
 
-    function updateSelection() {
-        const selected = Array.from(tableBody.querySelectorAll('.row-check:checked')).map(cb => cb.value);
-        selectedContainer.innerHTML = '';
-        selected.forEach(id => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'selected_ids[]';
-            input.value = id;
-            selectedContainer.appendChild(input);
-        });
-        btnSendQueue.disabled = selected.length === 0;
-        selectionHint.textContent = selected.length ? `${selected.length} selected` : '{{ __('Select jobs to send') }}';
+    const totalQty = getSelectedTotalQty();
+    totalQtyInput.value = String(totalQty);
+
+    btnSendQueue.disabled = (ids.length === 0) || (totalQty === 0) || (totalQty > MAX_QTY);
+    selectionHint.textContent = ids.length
+      ? `${ids.length} selected | qty ${totalQty}/${MAX_QTY}`
+      : '{{ __('Select jobs to send') }}';
+    if (qtyCapHint) qtyCapHint.textContent = `Qty cap: ${totalQty}/${MAX_QTY}`;
+  }
+
+  // Check-all respects the cap (checks until it hits 50)
+  checkAll.addEventListener('change', () => {
+    if (!checkAll.checked) {
+      tableBody.querySelectorAll('.row-check').forEach(cb => cb.checked = false);
+      updateSelection();
+      return;
     }
-
-    btnSearch.addEventListener('click', () => {
-        const params = new URLSearchParams();
-        params.append('date_from', document.getElementById('date_from').value || '');
-        params.append('date_to', document.getElementById('date_to').value || '');
-        params.append('series', document.getElementById('series').value || '');
-        getSelectedColors().forEach(c => params.append('colors[]', c));
-
-        fetch(`{{ route('manufacturing.job_planning.lookup') }}?` + params.toString(), {
-            headers: { 'Accept': 'application/json' }
-        })
-        .then(r => r.json())
-        .then(json => renderRows(json && json.success ? (json.data || []) : []))
-        .catch(() => renderRows([]));
+    let running = 0;
+    tableBody.querySelectorAll('tr').forEach(tr => {
+      const cb = tr.querySelector('.row-check');
+      const q = parseInt(tr.dataset.qty || '0', 10) || 0;
+      if (cb) {
+        if (running + q <= MAX_QTY) {
+          cb.checked = true;
+          running += q;
+        } else {
+          cb.checked = false;
+        }
+      }
     });
+    updateSelection();
+  });
+
+  // ——— drag & drop ———
+  function enableDrag() {
+    if (window.Sortable) {
+      Sortable.create(tableBody, { animation: 150, onSort: updateSelection });
+      return;
+    }
+    // native fallback
+    let dragEl = null;
+    tableBody.querySelectorAll('tr').forEach(tr => {
+      tr.addEventListener('dragstart', (e) => {
+        dragEl = tr; tr.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move';
+      });
+      tr.addEventListener('dragend', () => { tr.classList.remove('dragging'); dragEl = null; updateSelection(); });
+      tr.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const target = e.currentTarget;
+        if (!dragEl || dragEl === target) return;
+        const rect = target.getBoundingClientRect();
+        const before = (e.clientY - rect.top) < rect.height / 2;
+        tableBody.insertBefore(dragEl, before ? target : target.nextSibling);
+      });
+    });
+  }
+
+  // ——— search ———
+  btnSearch.addEventListener('click', () => {
+    const params = new URLSearchParams();
+    params.append('date_from', document.getElementById('date_from').value || '');
+    params.append('date_to', document.getElementById('date_to').value || '');
+    params.append('series', document.getElementById('series').value || '');
+    getSelectedColors().forEach(c => params.append('colors[]', c));
+
+    fetch(`{{ route('manufacturing.job_planning.lookup') }}?` + params.toString(), {
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(json => renderRows(json && json.success ? (json.data || []) : []))
+    .catch(() => renderRows([]));
+  });
+
+  // safety: block submits over cap
+  form.addEventListener('submit', (e) => {
+    if (getSelectedTotalQty() > MAX_QTY) {
+      e.preventDefault();
+      alert(`Total Qty exceeds ${MAX_QTY}. Please adjust your selection.`);
+    }
+  });
 })();
 </script>
+
 @endpush
