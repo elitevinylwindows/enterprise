@@ -2,6 +2,7 @@
 
 namespace App\Models\Sales;
 
+use App\Models\Master\Series\Series;
 use Illuminate\Database\Eloquent\Model;
 
 class QuoteItem extends Model
@@ -54,6 +55,6 @@ class QuoteItem extends Model
 
     public function series()
     {
-        return $this->belongsTo(App\Models\Master\Series::class, 'series_id');
+        return $this->belongsTo(Series::class, 'series_id');
     }
 }

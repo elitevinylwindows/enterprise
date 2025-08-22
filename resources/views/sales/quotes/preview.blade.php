@@ -1,8 +1,10 @@
 <div class="modal-header">
     <h5 class="modal-title">Quote: {{ $quote->quote_number }}</h5>
-    {{-- <a href="{{route('sales.quotes.pdf.preview', $quote->id)}}" target="_blank" class="btn btn-sm btn-primary ms-auto">
+    
+    <a href="{{route('sales.quotes.pdf.preview', $quote->id)}}" target="_blank" class="btn btn-sm btn-primary ms-auto">
         <i class="fa fa-download"></i> Download PDF
-    </a> --}}
+    </a>
+    
     <a href="{{route('sales.quotes.send', $quote->id)}}" class="btn btn-sm btn-primary ms-2">
         <i class="fa fa-envelope"></i> Send Email
     </a>

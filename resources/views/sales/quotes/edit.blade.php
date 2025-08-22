@@ -818,12 +818,13 @@
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
+                    // Close modal and dropdown overlay if open
                     const currentModal = document.getElementById('addItemModal');
-                    // close modal if open
                     const currentModalInstance = bootstrap.Modal.getInstance(currentModal) ?? new bootstrap.Modal(currentModal);
                     if (currentModalInstance) {
                         currentModalInstance.hide();
                     }
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
 
                     const row = `
                         <tr data-id="${data.item_id}" data-type="quote_item">
@@ -936,6 +937,7 @@
                             });
                         });
                     }
+
                     console.log('Modal closed');
                 } else {
                     alert('Item failed to save.');

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Sales\Invoice;
 use App\Models\Sales\InvoicePayment;
+use App\Models\Sales\Quote;
+use App\Services\RingCentralService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -155,5 +157,82 @@ class WebhookController extends Controller
                 'gateway_response' => json_encode($data)
             ]);
         }
+    }
+
+    public function handleIncomingSms(Request $request)
+    {
+         // Check if it's a validation request
+        if ($request->hasHeader('Validation-Token')) {
+            $token = $request->header('Validation-Token');
+            Log::info("RingCentral validation token received: $token");
+
+            // Respond with the same token in the header
+            return response('', 200)
+                ->header('Validation-Token', $token);
+        }
+
+        $payload = $request->all();
+        Log::info('RingCentral webhook event:', $payload);
+
+        if (isset($payload['body']['changes'])) {
+            foreach ($payload['body']['changes'] as $change) {
+                if ($change['type'] === 'SMS' && !empty($change['newMessageIds'])) {
+                    foreach ($change['newMessageIds'] as $messageId) {
+                        $ringCentralService = new RingCentralService();
+                        // fetch full SMS message from RingCentral
+                        $messageData = $ringCentralService->getSmsMessage($messageId);
+
+                        Log::info("Received SMS Message: ". json_encode($messageData));
+
+                        $conversationData = $ringCentralService->getConversation($messageData->conversation->id ?? '');
+
+                        if (!empty($conversationData)) {
+                            // Latest inbound message (first one)
+                            $latest = $conversationData[0];
+                            Log::info("Latest reply ". json_encode($latest));
+                            $messageId   = $latest->id;
+                            $from        = $latest->from->phoneNumber ?? 'Unknown';
+                            $to        = $latest->to[0]->phoneNumber ?? 'Unknown';
+                            $text        = trim($latest->subject ?? '');
+                            $createdAt   = $latest->creationTime;
+
+                            Log::info("Latest inbound reply from {$from} at {$createdAt}: {$text}");
+                            $response = explode(' ', $text);
+                            // Handle commands
+                            switch ($response[0]) {
+                                case '1':
+                                    Log::info("Received Quote Approval command from {$from}");
+                                    Log::info("messageId: {$messageId}");
+                                    Quote::where('ringcentral_message_id', $latest->conversation->id)
+                                        ->orWhere('quote_number', $response[1])
+                                        ->update(['status' => 'approved']);
+                                    // Optionally, you can also send a confirmation SMS back
+                                    $ringCentralService->sendGeneralSms($to, "Your quote #$response[1] has been approved successfully.");
+                                    break;
+                                case '2':
+                                    Log::info("Received Quote Decline command from {$from}");
+                                    Quote::where('ringcentral_message_id', $latest->conversation->id)
+                                        ->orWhere('quote_number', $response[1])
+                                        ->update(['status' => 'declined']);
+                                    $ringCentralService->sendGeneralSms($to, "Your quote #$response[1] has been declined.");
+                                    break;
+                                case '3':
+                                    Log::info("Received Quote Modification request from {$from}");
+                                    Quote::where('ringcentral_message_id', $latest->conversation->id)
+                                        ->orWhere('quote_number', $response[1])
+                                        ->update(['status' => 'modification_requested']);
+                                    break;
+                                default:
+                                    // Unknown command
+                                    Log::info("Received Unknown command from {$from}");
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return response()->json(['status' => 'ok']);
     }
 }

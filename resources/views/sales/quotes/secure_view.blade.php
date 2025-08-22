@@ -137,12 +137,16 @@
                 </div>
 
                 <div class="mt-4">
-                    <a href="{{ route('sales.quotes.update.status', ['id' => $quote->id, 'status' => 'approved']) }}" target="_blank" class="btn btn-primary">
-                        <i class="fa fa-check"></i> Approve Quote
-                    </a>
-                    <a href="{{ route('sales.quotes.update.status', ['id' => $quote->id, 'status' => 'rejected']) }}" class="btn btn-primary ms-2">
-                        <i class="fa fa-times"></i> Reject Quote
-                    </a>
+                    @if(!$quote->order)
+                        <a href="{{ route('sales.quotes.update.status', ['id' => $quote->id, 'status' => 'approved']) }}" target="_blank" class="btn btn-primary">
+                            <i class="fa fa-check"></i> Approve Quote
+                        </a>
+                    @endif
+                    @if($quote->status !== 'rejected')
+                        <a href="{{ route('sales.quotes.update.status', ['id' => $quote->id, 'status' => 'rejected']) }}" class="btn btn-primary ms-2">
+                            <i class="fa fa-times"></i> Reject Quote
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>

@@ -10,22 +10,23 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 
 class QuoteEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $quote, $pdf;
+    public $quote, $pdfPath;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($quote, $pdf = null)
+    public function __construct($quote, $pdfPath = null)
     {
         $this->quote = $quote;
-        $this->pdf = $pdf;
+        $this->pdfPath = $pdfPath;
     }
 
     /**
@@ -43,43 +44,42 @@ class QuoteEmail extends Mailable
                 'url' => route('quote.request.show', ['token' => Crypt::encryptString($this->quote->id)]),
             ]);
 
-        // if ($this->pdf) {
-        //     $email->attachData(
-        //         $this->pdf->output(),
-        //         "Quote_{$this->quote->id}.pdf",
-        //         [
-        //             'mime' => 'application/pdf',
-        //             'as' => "Quote_{$this->quote->id}.pdf",
-        //             'disposition' => 'attachment'
-        //         ]
-        //     );
-        // }
+        if ($this->pdfPath && Storage::disk('public')->exists($this->pdfPath)) {
+            $email->attachFromStorageDisk(
+                'public',
+                $this->pdfPath,
+                'Quote_'.$this->quote->quote_number.'.pdf',
+                [
+                    'mime' => 'application/pdf'
+                ]
+            );
+        }
 
         return $email;
     }
 
-    // public function attachments(): array
-    // {
-    //     $attachments = [];
-   
-    //     $extension = strtolower($this->pdf->getClientOriginalExtension());
-    //     $mimeType = $this->getMimeTypeForExtension($extension, $this->pdf);
+    public function attachments(): array
+    {
+        $attachments = [];
+        
+        if ($this->pdfPath && Storage::disk('public')->exists($this->pdfPath)) {
+            $fullPath = Storage::disk('public')->path($this->pdfPath);
+            
+            $attachments[] = Attachment::fromPath($fullPath)
+                ->as('Quote_'.$this->quote->quote_number.'.pdf')
+                ->withMime('application/pdf');
+        }
 
-    //     $attachments[] = Attachment::fromPath($this->pdf->getRealPath())
-    //         ->as($this->pdf->getClientOriginalName())
-    //         ->withMime($mimeType);
-    
+        return $attachments;
+    }
 
-    //     return $attachments;
-    // }
-
-    // private function getMimeTypeForExtension(string $extension, $file): string
-    // {
-    //     return match ($extension) {
-    //         'dst' => 'application/x-dst',
-    //         'emb' => 'application/x-emb',
-    //         'pdf' => 'application/pdf',
-    //         default => $file->getMimeType(), // Fallback to Laravel's MIME type detection
-    //     };
-    // }
+    private function getMimeTypeForExtension(string $extension, $file): string
+    {
+        return match ($extension) {
+            'dst' => 'application/x-dst',
+            'emb' => 'application/x-emb',
+            'pdf' => 'application/pdf',
+            default => $file->getMimeType(), // Fallback to Laravel's MIME type detection
+        };
+    }
 }

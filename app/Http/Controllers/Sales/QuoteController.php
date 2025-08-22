@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use App\Models\Sales\QuoteItem;
+use App\Services\RingCentralService;
 use Illuminate\Support\Facades\View;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
@@ -29,11 +30,6 @@ class QuoteController extends Controller
 
 public function index(Request $request)
 {
-    // $order = Order::with('user')->latest()->first();
-
-    // $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order])->stream();
-    // return $pdf;
-
     $status = $request->get('status', 'all');
 
     $quotes = Quote::query();
@@ -768,10 +764,13 @@ public function index(Request $request)
 
     public function previewPDF($id)
     {
-        $quote = Quote::findOrFail($id);
+        $quote = Quote::find($id);
         $order = $quote->order ?? null;
-        $pdf = PDF::loadView('sales.quotes.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
-        return $pdf->stream('quote-' . $order->id . '.pdf');
+        if($order) {
+            $pdf = PDF::loadView('sales.order.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
+            return $pdf->stream('quote-' . $order->id . '.pdf');
+        }
+        return redirect()->back()->withErrors(['error' => 'Quote not found or has no associated order.']);
     }
 
     public function updateStatus($id, $status)
@@ -822,13 +821,31 @@ public function index(Request $request)
 
         if($request->status === 'Quote Submitted') {
 
-            $pdf = Pdf::loadView('sales.quotes.preview', compact('quote', 'modificationsByDate'));
+            $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['quote' => $quote, 'modificationsByDate' => $modificationsByDate])->setPaper('a4', 'landscape');
+            $pdfPath = 'quotes/quote_'.$quote->quote_number.'.pdf';
+
+            Storage::disk('public')->put($pdfPath, $pdf->output());
 
             Mail::to($quote->customer->email)
-            ->send(new QuoteEmail($quote, $pdf));
+            ->send(new QuoteEmail($quote, $pdfPath));
+
+            if($quote->customer->billing_phone) {
+                $rcService = new RingCentralService();
+                $result = $rcService->sendQuoteApprovalSms(
+                    $quote->customer->billing_phone, // e.g., +15558675309
+                    $quote->quote_number,
+                    $quote->customer->customer_name,
+                    $pdfPath
+                );
+
+                // 3. Update quote status to "sent_for_approval"
+                if ($result['data']->messageStatus) {
+                    $quote->update(['status' => 'Sent For Approval']);
+                }
+            }   
         }
 
-        return response()->json(['success' => true, 'message' => 'Quote saved as draft successfully.']);
+        return response()->json(['success' => true, 'message' => 'Quote sent for approval.']);
     }
 
     public function email($id)
@@ -947,4 +964,21 @@ public function index(Request $request)
 
     }
 
+    public function sendMessage($id)
+    {
+        $quote = Quote::findOrFail($id);
+        $rcService = new RingCentralService();
+        
+        $pdfPath = 'quotes/quote_'.$quote->quote_number.'.pdf';
+
+        $result = $rcService->sendQuoteApprovalSms(
+                    $quote->customer->billing_phone, // e.g., +15558675309
+                    $quote->quote_number,
+                    $quote->customer->customer_name,
+                    $pdfPath
+                );
+
+        $quote->update(['ringcentral_message_id' => $result['data']->conversation->id]);
+        dd($result);
+    }
 }

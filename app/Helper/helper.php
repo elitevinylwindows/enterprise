@@ -2083,7 +2083,7 @@ if(!function_exists('sendOrderMail')) {
             return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d h:i A');
         });
 
-        $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['order' => $order, 'modificationsByDate' => $modificationsByDate])->setPaper('a4', 'landscape');
+        $pdf = Pdf::loadView('sales.order.preview_pdf', ['order' => $order, 'modificationsByDate' => $modificationsByDate])->setPaper('a4', 'landscape');
         $pdfPath = 'orders/order_'.$order->order_number.'.pdf';
         Storage::disk('public')->put($pdfPath, $pdf->output());
 
