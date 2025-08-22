@@ -175,11 +175,22 @@ public function download(Request $request, $job)
         return view('manufacturing.job_planning.payment', compact('job'));
     }
 
-    // Returns the modal body above
 public function create()
-{
-    return view('manufacturing.job_planning.create');
-}
+    {
+        // Load from your master tables
+        $series = DB::table('elitevw_master_series')
+            ->select('series_code', 'series_name')
+            ->orderBy('series_code')
+            ->get();
+
+        $colors = DB::table('elitevw_master_colors_color_configurations')
+            ->select('color_code', 'color_name')
+            ->orderBy('color_name')
+            ->get();
+
+        // Return a PARTIAL (no @extends in the blade)
+        return view('manufacturing.job_planning.create', compact('series', 'colors'));
+    }
 
 public function lookup(Request $req)
 {
