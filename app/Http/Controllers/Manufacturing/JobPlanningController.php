@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Manufacturing\JobPlanning;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\DB;
 
 
 class JobPlanningController extends Controller
@@ -176,21 +177,18 @@ public function download(Request $request, $job)
     }
 
 public function create()
-    {
-        // Load from your master tables
-        $series = DB::table('elitevw_master_series')
-            ->select('series_code', 'series_name')
-            ->orderBy('series_code')
-            ->get();
+{
+    $series = DB::table('elitevw_master_series')
+        ->select('series_code','series_name')
+        ->orderBy('series_code')->get();
 
-        $colors = DB::table('elitevw_master_colors_color_configurations')
-            ->select('color_code', 'color_name')
-            ->orderBy('color_name')
-            ->get();
+    $colors = DB::table('elitevw_master_colors_color_configurations')
+        ->select('color_code','color_name')
+        ->orderBy('color_name')->get();
 
-        // Return a PARTIAL (no @extends in the blade)
-        return view('manufacturing.job_planning.create', compact('series', 'colors'));
-    }
+    // Return a PARTIAL (no @extends in this blade)
+    return view('manufacturing.job_planning.create', compact('series','colors'));
+}
 
 public function lookup(Request $req)
 {

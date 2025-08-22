@@ -39,7 +39,7 @@
       <div class="card p-3">
         <div class="fw-semibold mb-2">&nbsp;</div>
         <div class="d-flex gap-2">
-          <a href="{{ route('manufacturing.job_planning.index') }}" class="btn btn-outline-secondary w-50">
+          <a href="{{ route('manufacturing.job_planning.index') }}" class="btn btn-primary w-50">
             {{ __('Clear') }}
           </a>
           <a href="#" class="btn btn-primary customModal w-50"
