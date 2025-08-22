@@ -199,7 +199,7 @@ class OrderController extends Controller
             quoteToInvoice($order->quote, $order); // re-use your helper
         }
 
-        return back()->with('success', 'Order marked as rush successfully.');
+        return back()->with('success', 'Rush order requested successfully.');
     }
 
     public function restore($id)
