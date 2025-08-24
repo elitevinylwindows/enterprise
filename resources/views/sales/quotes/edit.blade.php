@@ -91,7 +91,7 @@
 
                 {{-- Add Item --}}
                 <div class="col-md-2 text-end">
-                    <a href="#" class="btn btn-primary w-100 d-flex align-items-center justify-content-center" style="height: 44px;" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                    <a href="#" class="btn btn-primary w-100 d-flex align-items-center justify-content-center" id="addItemButton" style="height: 44px;" data-bs-toggle="modal" data-bs-target="#addItemModal">
                         <i class="fas fa-plus me-2"></i> Add Item
                     </a>
                 </div>
@@ -248,7 +248,7 @@
                         data-size="xl"
                         data-url="{{ route('sales.quotes.preview', $quote->id) }}"
                         data-title="Quote Preview">
-                       Continue &rarr;
+                       <span id="continueBtn">Continue &rarr;</span> 
                     </a>
                 </div>
             </div>
@@ -272,6 +272,7 @@
                 <input type="hidden" name="size" id="size">
                 <input type="hidden" name="price" id="price">
                 <input type="hidden" name="total" id="total">
+                <input type="hidden" name="addon[]" id="addon">
 
 
                 <div class="modal-header bg-white text-dark">
@@ -384,7 +385,7 @@
                                 <div class="tab-pane fade" id="glasss">
                                     <div class="mb-3">
                                         <label>Glass Type</label>
-                                        <select class="form-control" name="glass_type">
+                                        <select class="form-control" name="glass_type" id="glass_type">
                                             <option value="CLR/CLR">CLR/CLR</option>
                                             <option value="LE3/CLR">LE3/CLR</option>
                                             <option value="LE3/LAM">LE3/LAM</option>
@@ -599,7 +600,12 @@
                             </div>
                         </div>
                         <div class="modal-footer d-flex justify-content-between align-items-center">
-                            <h2 class="mb-0">Total Price: $<span id="globalTotalPrice">0.00</span></h2>
+                            <h2 class="mb-0">Total Price: $<span class="total-price" id="globalTotalPrice"><i class="fas fa-spinner fa-spin"></i></span>
+                            </h2>
+                            <div class="addon-list">
+                                    <h3>Current Addons:</h3>
+                                    <div id="currentAddons">None</div>
+                            </div>
                             <div>
                                 <a href="javascript:void(0);" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
                                 <button type="button" id="saveQuoteItem" class="btn btn-primary">Add to Quote</button>
@@ -723,7 +729,7 @@
         const item_id = form.querySelector('[name="item_id"]').value;
         const laminateExtText = colorExt ?.selectedOptions[0] ?.text ?? '';
         const colorIntText = colorInt ?.selectedOptions[0] ?.text ?? '';
-
+        const addon = form.querySelector('[name="addon[]"]').value;
         let colorDisplay = '';
         if (colorConfig.includes('LAM')) {
             colorDisplay = `LAM (${laminateExtText}) - ${colorIntText}`;
@@ -803,6 +809,7 @@
         formData.append('custom_vent_latch', form.querySelector('[name="custom_vent_latch"]').checked ? 1 : 0);
         formData.append('knocked_down', form.querySelector('[name="knocked_down"]').checked ? 1 : 0);
         formData.append('is_modification', true);
+        formData.append('addon', addon);
 
 
         const quoteId = document.getElementById('quoteId').value;
@@ -993,7 +1000,10 @@
 
     });
 
-   
+    document.getElementById('addItemButton').addEventListener('click', function() {
+        initializeDefaultSelections();
+
+    });
 
 
     // open modal in view mode
@@ -1059,7 +1069,8 @@
                     }
 
                     form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
-                   
+                    
+                        
                     setTimeout(() => {
                         form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
                         form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
@@ -1078,6 +1089,8 @@
                     document.getElementById('saveQuoteItem').style.display = 'none';
                     // Show modal
                     document.getElementById('modalTitle').textContent = 'View Quote Item';
+
+
                     const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
                     modal.show();
                 })
@@ -1170,7 +1183,32 @@
 
                     }, 1000);
 
-                    form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                     setTimeout(() => {
+                         let addonsHtml = '';
+                        if (data.item.addon) {
+                            try {
+                                const addonObj = typeof data.item.addon === 'string' ? JSON.parse(data.item.addon) : data.item.addon;
+                                for (const [type, price] of Object.entries(addonObj)) {
+                                    addonsHtml += `<div class="addon-item"><span>${type}:</span> <span class="badge-price">+$${price.toFixed(2)}</span></div>`;
+                                }
+                            } catch (e) {
+                                console.error('Error parsing addons:', e);
+                                addonsHtml = '<div class="text-center text-muted">No addons available</div>';
+                            }
+                        } else {
+                            addonsHtml = '<div class="text-center text-muted">No addons selected</div>';
+                        }
+                        $('#currentAddons').html(addonsHtml);
+                    }, 1500);
+
+                    // Show loading spinner
+                    
+                    setTimeout(() => {
+                        form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                    }, 4000);
+
+                    form.querySelector('#addon').value = data.item.addon || '';
+
                     // Show modal
                     document.getElementById('modalTitle').textContent = 'Edit Quote Item';
                     document.getElementById('saveQuoteItem').textContent = 'Update Quote Item';
@@ -1265,6 +1303,25 @@
                             el.disabled = true;
                         }
                     });
+                    form.querySelector('#addon').value = data.item.addon || '';
+
+                    let addonsHtml = '';
+                    if (data.item.addon) {
+                        try {
+                            const addonObj = typeof data.item.addon === 'string' ? JSON.parse(data.item.addon) : data.item.addon;
+                            for (const [type, price] of Object.entries(addonObj)) {
+                                addonsHtml += `<div class="addon-item"><span>${type}:</span> <span class="badge-price">+$${price.toFixed(2)}</span></div>`;
+                            }
+                        } catch (e) {
+                            console.error('Error parsing addons:', e);
+                            addonsHtml = '<div class="text-center text-muted">No addons available</div>';
+                        }
+                    } else {
+                        addonsHtml = '<div class="text-center text-muted">No addons selected</div>';
+                    }
+                    
+                    $('#currentAddons').html(addonsHtml);
+
                     document.getElementById('saveQuoteItem').style.display = 'none';
                         if(type == 'modification') {
                         document.getElementById('modalTitle').textContent = 'View Modification Item';
@@ -1329,7 +1386,32 @@
                         });
                         document.getElementById('seriesTypeSelect').dispatchEvent(new Event('change'));
                     }, 1000);
-                    form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+
+                    setTimeout(() => {
+                         let addonsHtml = '';
+                        if (data.item.addon) {
+                            try {
+                                const addonObj = typeof data.item.addon === 'string' ? JSON.parse(data.item.addon) : data.item.addon;
+                                for (const [type, price] of Object.entries(addonObj)) {
+                                    addonsHtml += `<div class="addon-item"><span>${type}:</span> <span class="badge-price">+$${price.toFixed(2)}</span></div>`;
+                                }
+                            } catch (e) {
+                                console.error('Error parsing addons:', e);
+                                addonsHtml = '<div class="text-center text-muted">No addons available</div>';
+                            }
+                        } else {
+                            addonsHtml = '<div class="text-center text-muted">No addons selected</div>';
+                        }
+                        $('#currentAddons').html(addonsHtml);
+                    }, 1500);
+
+                    // Show loading spinner
+                    
+                    setTimeout(() => {
+                        form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                    }, 4000);
+
+                    form.querySelector('#addon').value = data.item.addon || '';
                     
                     if(type == 'modification') {
                         document.getElementById('modalTitle').textContent = 'Edit Modification Item';
@@ -1343,7 +1425,7 @@
                     modal.show();
                 })
                 .catch(() => alert('Server error'));
-        }
+            }
     });
 
     // When modal closes, re-enable fields and show add button
@@ -1418,6 +1500,7 @@
                 interiorDropdown.classList.add('readonly');
             }
         }
+
 
     });
 
@@ -1747,28 +1830,195 @@
     });
     @endif
 
-    $('#frame_type').on('change', function() {
-        const selectedFrame = $(this).val();
-        $.ajax({
-            url: '/sales/quotes/schema/price',
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                dropdown_value: selectedFrame,
-                series_type: $('#seriesTypeSelect').val()
-            },
-            success: function(data) {
+        let frameAddons = {};
+        let glassAddons = {};
 
-                const currentTotal = parseFloat($('#globalTotalPrice').text()) || 0;
-                $('#globalTotalPrice').text(currentTotal + data.price);
-                // You can update the UI or perform other actions based on the response
-            },
-            error: function(xhr, status, error) {
-                console.error('Error fetching frame details:', error);
+        function updateDisplay() {
+            let basePrice = parseFloat($('input[name="price"]').val());
+            const frameAddonTotal = Object.values(frameAddons).reduce((a, b) => a + b, 0);
+            const glassAddonTotal = Object.values(glassAddons).reduce((a, b) => a + b, 0);
+            const totalAddons = frameAddonTotal + glassAddonTotal;
+            const totalPrice = basePrice + totalAddons;
+
+            $('#globalTotalPrice').text(parseFloat(totalPrice).toFixed(2));
+
+            // Update addons list
+            const allAddons = {...frameAddons, ...glassAddons};
+            if (Object.keys(allAddons).length === 0) {
+                $('#currentAddons').html('<div class="text-center text-muted">No addons selected</div>');
+            } else {
+                let addonsHtml = '';
+                for (const [type, price] of Object.entries(allAddons)) {
+                    addonsHtml += `<div class="addon-item"><span>${type}:</span> <span class="badge-price">+$${price.toFixed(2)}</span></div>`;
+                }
+                $('#currentAddons').html(addonsHtml);
             }
+            
+            // Update hidden input
+            $('#addon').val(JSON.stringify(allAddons));
+        }
+
+      // Handle frame type changes
+        $('#frame_type').on('change', function() {
+            const selectedFrame = $(this).val();
+            const previousFrame = $(this).data('previous-value') || null;
+            
+            // Remove previous frame addon if exists
+            if (previousFrame && frameAddons[previousFrame]) {
+                delete frameAddons[previousFrame];
+                console.log('Removed previous frame addon:', previousFrame);
+            }
+            
+            // Store current selection as previous for next change
+            $(this).data('previous-value', selectedFrame);
+            
+            // Get price from server
+            getPriceFromServer('frame', selectedFrame, function(price) {
+
+                // Only add if price > 0 and not already added
+                if (price > 0 && !frameAddons[selectedFrame]) {
+                    frameAddons[selectedFrame] = price;
+                    console.log('Added frame:', selectedFrame, 'with price:', price);
+                } else if (price <= 0) {
+                    console.log('Frame', selectedFrame, 'has no addon price (0 or less)');
+                }
+                
+                updateDisplay();
+            });
         });
-        console.log('Selected frame type:', selectedFrame);
+
+    // Handle glass type changes
+    $('#glass_type').on('change', function() {
+            const selectedGlass = $(this).val();
+            const previousGlass = $(this).data('previous-value') || null;
+            
+            // Remove previous glass addon if exists
+            if (previousGlass && glassAddons[previousGlass]) {
+                delete glassAddons[previousGlass];
+                console.log('Removed previous glass addon:', previousGlass);
+            }
+            
+            // Store current selection as previous for next change
+            $(this).data('previous-value', selectedGlass);
+            
+            // Get price from server
+            getPriceFromServer('glass', selectedGlass, function(price) {
+
+                // Only add if price > 0 and not already added
+            if (price > 0 && !glassAddons[selectedGlass]) {
+                glassAddons[selectedGlass] = price;
+                console.log('Added glass:', selectedGlass, 'with price:', price);
+            } else if (price <= 0) {
+                console.log('Glass', selectedGlass, 'has no addon price (0 or less)');
+            }
+            
+            updateDisplay();
+        });
     });
+
+    function getPriceFromServer(type, value, callback) {
+            if (type === 'frame') {
+                $.ajax({
+                    url: '/sales/quotes/schema/price',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        dropdown_value: value,
+                        series_type: $('#seriesTypeSelect').val(),
+                        series: $('#seriesSelect').val()
+                    },
+                    success: function(data) {
+                       callback(data.price || 0);
+                    },
+                    error: function(xhr, status, error) {
+                        callback(0); 
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            Object.values(xhr.responseJSON.errors).forEach(errorMessages => {
+                                errorMessages.forEach(message => {
+                                    toastr.error(message, 'Error', {
+                                        timeOut: 3000,
+                                        progressBar: true,
+                                        closeButton: true
+                                    });
+                                });
+                            });
+                        } else {
+                            toastr.error('Failed to fetch price. Please try again.', 'Error', {
+                                timeOut: 3000,
+                                progressBar: true, 
+                                closeButton: true
+                            });
+                        }
+                    }
+                });
+
+            } else if (type === 'glass') {
+               $.ajax({
+                    url: '/sales/quotes/schema/price',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        dropdown_value: value,
+                        series_type: $('#seriesTypeSelect').val(),
+                        series: $('#seriesSelect').val()
+                    },
+                    success: function(data) {
+                        callback(data.price || 0);
+                    },
+                    error: function(xhr, status, error) {
+                        callback(0); 
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            Object.values(xhr.responseJSON.errors).forEach(errorMessages => {
+                                errorMessages.forEach(message => {
+                                    toastr.error(message, 'Error', {
+                                        timeOut: 3000,
+                                        progressBar: true,
+                                        closeButton: true
+                                    });
+                                });
+                            });
+                        } else {
+                            toastr.error('Failed to fetch price. Please try again.', 'Error', {
+                                timeOut: 3000,
+                                progressBar: true, 
+                                closeButton: true
+                            });
+                        }
+                  }
+                });
+            }
+    }
+    
+
+     // Initialize default selections on page load
+    function initializeDefaultSelections() {
+            // Get default selected values
+            const defaultFrame = $('#frame_type').val();
+            const defaultGlass = $('#glass_type').val();
+            
+            // Set as previous values
+            $('#frame_type').data('previous-value', defaultFrame);
+            $('#glass_type').data('previous-value', defaultGlass);
+            
+            getPriceFromServer('frame', defaultFrame, function(price) {
+                console.log('Default frame price:', price);
+                if (price > 0) {
+                    frameAddons[defaultFrame] = price;
+                }
+                
+                // Then get glass price
+                getPriceFromServer('glass', defaultGlass, function(glassPrice) {
+                    console.log('Default glass price:', glassPrice);
+                    if (glassPrice > 0) {
+                        glassAddons[defaultGlass] = glassPrice;
+                    }
+                    
+                    // Update display after both prices are fetched
+                    updateDisplay();
+                });
+            });
+
+    }
 
     $('#fin_type').on('change', function() {
         const selectedFin = $(this).val();
@@ -1921,7 +2171,7 @@
     document.getElementById('customModal').addEventListener('shown.bs.modal', function() {
         var shipping = $('#shipping').val();
         calculateTotals(shipping, true);
-    });
+    });    
 
     // Initial calculation on page load
     document.addEventListener('DOMContentLoaded', calculateTotals);

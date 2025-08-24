@@ -110,6 +110,11 @@
         const url = $(this).data('url');
         const title = $(this).data('title') || 'Modal';
         const size = $(this).data('size') || 'md';
+        const originalText = $(this).html();
+
+        // Show loader on button
+        $(this).html('<i class="ti ti-loader ti-spin"></i> Loading...');
+        $(this).prop('disabled', true);
 
         $('#mainModal .modal-dialog').removeClass('modal-sm modal-md modal-lg modal-xl').addClass('modal-' + size);
         $('#mainModal .modal-title').text(title);
@@ -119,8 +124,14 @@
 
         $.get(url, function (data) {
             $('#mainModal .modal-body').html(data);
-        }).fail(function () {
+        })
+        .fail(function () {
             $('#mainModal .modal-body').html('<div class="alert alert-danger">Failed to load content.</div>');
+        })
+        .always(function() {
+            // Restore original button state
+            $('.customModal').html(originalText);
+            $('.customModal').prop('disabled', false);
         });
     });
     

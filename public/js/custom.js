@@ -8,13 +8,22 @@ $(document).ready(function () {
     }, 1000);
 });
 
-$(document).on("click", ".customModal", function () {
+$(document).on("click", ".customModal", function (e) {
     "use strict";
+    e.preventDefault();
     var modalTitle = $(this).data("title");
     var modalUrl = $(this).data("url");
     var modalSize = $(this).data("size") == "" ? "md" : $(this).data("size");
+    var originalText = $(this).html();
+
+    // Show loader on button
+    $(this).html('<i class="ti ti-loader ti-spin"></i> Loading...');
+    $(this).prop('disabled', true);
+
     $("#customModal .modal-title").html(modalTitle);
     $("#customModal .modal-dialog").addClass("modal-" + modalSize);
+    $("#customModal .body").html('<div class="text-center p-5"><i class="ti ti-loader ti-spin"></i></div>');
+
     $.ajax({
         url: modalUrl,
         success: function (result) {
@@ -33,7 +42,14 @@ $(document).on("click", ".customModal", function () {
                 ckediter();
             }
         },
-        error: function (result) {},
+        error: function (result) {
+            $("#customModal .body").html('<div class="alert alert-danger">Failed to load content.</div>');
+        },
+        complete: function() {
+            // Restore original button state
+            $('.customModal').html(originalText);
+            $('.customModal').prop('disabled', false);
+        }
     });
 });
 

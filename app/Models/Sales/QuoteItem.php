@@ -44,10 +44,30 @@ class QuoteItem extends Model
         'discount',
         'is_modification',
         'modification_date',
-        'tempered_fields'
+        'tempered_fields',
+        'addon'
     ];
 
+    public function getPriceAttribute($value)
+    {
+        $addons = json_decode($this->addon, true);
+        if (!$addons) {
+            return number_format($value, 2);
+        }
 
+        return number_format(array_sum(array_values($addons)) + $value, 2);
+    }
+
+    public function getTotalAttribute($value)
+    {
+        $addons = json_decode($this->addon, true);
+        if (!$addons) {
+            return number_format($value, 2);
+        }
+
+        return number_format(array_sum(array_values($addons)) + $value, 2);
+    }
+    
     public function quote()
     {
         return $this->belongsTo(Quote::class, 'quote_id');

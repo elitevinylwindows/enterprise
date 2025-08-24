@@ -31,6 +31,12 @@ use Illuminate\Support\Facades\Storage;
 use PragmaRX\Google2FAQRCode\Google2FA;
 use Spatie\Permission\Models\Role;
 use App\Models\Sales\SalesSetting;
+use App\Models\Schemas\CMUnit;
+use App\Models\Schemas\HSUnit;
+use App\Models\Schemas\PWUnit;
+use App\Models\Schemas\SHUnit;
+use App\Models\Schemas\SLDUnit;
+use App\Models\Schemas\SWDUnit;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Spatie\PdfToImage\Pdf as PdfToImage;
 
@@ -2047,8 +2053,17 @@ if (!function_exists('calculateTotal')) {
     function calculateTotal($quote, $shipping = 0)
     {
         $total = $quote->items->sum(function ($item) {
-            return $item->price * $item->qty;
+            $basePrice = $item->price * $item->qty;
+            
+            $addons = json_decode($item->addon, true);
+            if ($addons) {
+                $addonTotal = array_sum(array_values($addons));
+                return ($basePrice + ($addonTotal * $item->qty)); 
+            }
+            
+            return $basePrice;
         });
+
 
         $taxCode = TaxCode::where('city', $quote->customer->billing_city)->first();
 
@@ -2104,4 +2119,3 @@ if(!function_exists('sendOrderMail')) {
         Mail::to($order->customer->email)->send($mail);
     }
 }
-

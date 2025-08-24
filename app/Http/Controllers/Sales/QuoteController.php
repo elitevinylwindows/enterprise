@@ -12,15 +12,23 @@ use App\Models\Master\Series\Series;
 use App\Models\Master\Series\SeriesType;
 use App\Models\Master\Customers\Customer;
 use App\Models\Master\Prices\TaxCode;
+use App\Models\Master\Series\SeriesConfiguration;
 use App\Models\Sales\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use App\Models\Sales\QuoteItem;
+use App\Models\Schemas\CMUnit;
+use App\Models\Schemas\HSUnit;
+use App\Models\Schemas\PWUnit;
+use App\Models\Schemas\SHUnit;
+use App\Models\Schemas\SLDUnit;
+use App\Models\Schemas\SWDUnit;
 use App\Services\RingCentralService;
 use Illuminate\Support\Facades\View;
 use Barryvdh\DomPDF\Facade\Pdf;
+use GuzzleHttp\Psr7\Query;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -167,6 +175,7 @@ public function index(Request $request)
                 'custom_vent_latch' => 'nullable|boolean',
                 'knocked_down' => 'nullable|boolean',
                 'is_modification' => 'nullable',
+                'addon' => 'nullable|string',
             ]);
 
             $isUpdate = false;
@@ -214,6 +223,7 @@ public function index(Request $request)
                             $request->custom_lock_position,
                             $request->custom_vent_latch
                         ])->filter()->count(),
+                        'addon' => $request->addon
                     ]);
 
                     $oldDiscount = $existingItem->quote->discount;
@@ -267,6 +277,7 @@ public function index(Request $request)
                     ])->filter()->count(),
                     'is_modification' => (bool) $request->is_modification,
                     'modification_date' => (bool) $request->is_modification ? now() : null,
+                    'addon' => $request->addon
                 ]);
 
                 // Update the quote's discount with the previous value before this item was added/updated
@@ -829,20 +840,20 @@ public function index(Request $request)
             Mail::to($quote->customer->email)
             ->send(new QuoteEmail($quote, $pdfPath));
 
-            if($quote->customer->billing_phone) {
-                $rcService = new RingCentralService();
-                $result = $rcService->sendQuoteApprovalSms(
-                    $quote->customer->billing_phone, // e.g., +15558675309
-                    $quote->quote_number,
-                    $quote->customer->customer_name,
-                    $pdfPath
-                );
+            // if($quote->customer->billing_phone) {
+            //     $rcService = new RingCentralService();
+            //     $result = $rcService->sendQuoteApprovalSms(
+            //         $quote->customer->billing_phone, // e.g., +15558675309
+            //         $quote->quote_number,
+            //         $quote->customer->customer_name,
+            //         $pdfPath
+            //     );
 
-                // 3. Update quote status to "sent_for_approval"
-                if ($result['data']->messageStatus) {
-                    $quote->update(['status' => 'Sent For Approval']);
-                }
-            }   
+            //     // 3. Update quote status to "sent_for_approval"
+            //     if ($result['data']->messageStatus) {
+            //         $quote->update(['status' => 'Sent For Approval']);
+            //     }
+            // }   
         }
 
         return response()->json(['success' => true, 'message' => 'Quote sent for approval.']);
@@ -980,5 +991,58 @@ public function index(Request $request)
 
         $quote->update(['ringcentral_message_id' => $result['data']->conversation->id]);
         dd($result);
+    }
+
+    public function getSchemaPrice(Request $request)
+    {
+        $validated = $request->validate([
+            'dropdown_value' => 'required|string',
+            'series_type' => 'required|string',
+            'series' => 'required|string',
+        ]);
+
+        $series = Series::where('id', $validated['series'])->first();
+
+        $seriesType = SeriesConfiguration::with([
+                'productTypes' => function ($query) use ($series) {
+                    $query->where('series', $series->series);
+                }
+            ])
+            ->where('series_type', $validated['series_type'])
+            ->first();
+       
+            if (!$seriesType->productTypes->isEmpty()) {
+                $description = strtoupper($seriesType->productTypes[0]->description); // normalize to uppercase
+                // ✅ Define mappings: keyword => model
+                $mappings = [
+                    'HORIZONTAL SLIDING' => HSUnit::class,
+                    'SINGLE HUNG'        => SHUnit::class,
+                    'PICTURE'            => PWUnit::class,
+                    'SWING DOOR'              => SWDUnit::class,
+                    'SLIDING DOOR'              => SLDUnit::class,
+                    'CASEMENT/AWNING' => CMUnit::class,
+                ];
+
+                $model = null;
+
+                foreach ($mappings as $keyword => $mappedModel) {
+                    if (str_contains($description, $keyword)) {
+                        $model = $mappedModel;
+                        break;
+                    }
+                }
+                if ($model) {
+                    // Example: fetch record from that model
+                    $unit = $model::where('schema_id', $validated['series'])->first(); // change to ->where(...) as needed
+                    $column = str_replace('/','_', strtolower($validated['dropdown_value']));
+                    $addOnPrice = $unit->$column;
+                } else {
+                    $addOnPrice = 0;
+                    dd("No matching model found for description: " . $description);
+                }
+
+                return response()->json(['success' => true, 'price' => (float)$addOnPrice]);
+            }
+        return response()->json(['success' => false, 'message' => 'Series type not found']);
     }
 }

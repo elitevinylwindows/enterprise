@@ -50,18 +50,18 @@
                                 <td>{{ $hsunit->schema_id }}</td>
                                 <td>{{ $hsunit->product_id }}</td>
                                 <td>{{ $hsunit->product_code }}</td>
-                                <td>{{ $hsunit->retrofit }}</td>
-                                <td>{{ $hsunit->nailon }}</td>
-                                <td>{{ $hsunit->block }}</td>
-                                <td>{{ $hsunit->le3_clr }}</td>
-                                <td>{{ $hsunit->clr_clr }}</td>
-                                <td>{{ $hsunit->le3_lam }}</td>
-                                <td>{{ $hsunit->le3_clr_le3 }}</td>
-                                <td>{{ $hsunit->clr_temp }}</td>
-                                <td>{{ $hsunit->lam_temp }}</td>
-                                <td>{{ $hsunit->obs }}</td>
-                                <td>{{ $hsunit->feat2 }}</td>
-                                <td>{{ $hsunit->feat3 }}</td>
+                                <td>${{ $hsunit->retrofit }}</td>
+                                <td>${{ $hsunit->nailon }}</td>
+                                <td>${{ $hsunit->block }}</td>
+                                <td>${{ $hsunit->le3_clr }}</td>
+                                <td>${{ $hsunit->clr_clr }}</td>
+                                <td>${{ $hsunit->le3_lam }}</td>
+                                <td>${{ $hsunit->le3_clr_le3 }}</td>
+                                <td>${{ $hsunit->clr_temp }}</td>
+                                <td>${{ $hsunit->lam_temp }}</td>
+                                <td>${{ $hsunit->obs }}</td>
+                                <td>${{ $hsunit->feat2 }}</td>
+                                <td>${{ $hsunit->feat3 }}</td>
                                 <td>{{ $hsunit->status }}</td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-info customModal"

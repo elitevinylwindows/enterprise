@@ -52,7 +52,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($quote->items as $index => $item)
+                @foreach($quote->items->where('is_modification', 0) as $index => $item)
                 <tr>
                     <td style="width: 0%;">{{ $item->description ?? 'N/A' }}</td>
                      <td>{{ $item->qty }}</td>
@@ -103,7 +103,7 @@
                 <table class="table">
                     <tr>
                         <th>Discount:</th>
-                        <td id="discount-amount">${{ number_format($quote->discount, 2) }}</td>
+                        <td id="discount-amount">-${{ number_format($quote->discount, 2) }}</td>
                     </tr>
                     <tr>
                         <th>Shipping:</th>
@@ -136,6 +136,11 @@
 
 <script>
     document.getElementById('saveQuoteButton').addEventListener('click', function() {
+        const button = this;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Submitting...';
+        button.disabled = true;
+
         const formData = new FormData();
         formData.append('discount', document.getElementById('discount-amount').innerText.replace(/[$,]/g, ''));
         formData.append('subtotal', document.getElementById('sub-total-amount').innerText.replace(/[$,]/g, ''));
@@ -143,6 +148,7 @@
         formData.append('shipping', document.getElementById('shipping-amount').innerText.replace(/[$,]/g, ''));
         formData.append('total', document.getElementById('grand-total-amount').innerText.replace(/[$,]/g, ''));
         formData.append('status', 'Quote Submitted');
+        
         fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
             method: 'POST',
             body: formData,
@@ -154,22 +160,25 @@
         .then(data => {
             if (data.success) {
                 toastr.success('Draft saved successfully!', 'Success', {
-                        timeOut: 3000
-                        , progressBar: true
-                        , closeButton: true
-                    });
+                    timeOut: 3000,
+                    progressBar: true,
+                    closeButton: true
+                });
                 window.location.href = '{{ route('sales.quotes.index') }}';
             } else {
-                alert('Error saving draft.');
+                button.innerHTML = originalText;
+                button.disabled = false;
                 toastr.error('Failed to save draft. Please try again.', 'Error', {
-                        timeOut: 3000
-                        , progressBar: true
-                        , closeButton: true
-                    });
+                    timeOut: 3000,
+                    progressBar: true,
+                    closeButton: true
+                });
             }
         })
         .catch(error => {
             console.error('Error:', error);
+            button.innerHTML = originalText;
+            button.disabled = false;
         });
     });
 </script>
