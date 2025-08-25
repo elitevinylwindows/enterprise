@@ -42,32 +42,33 @@
     <div class="row g-3">
       @forelse($assignments as $a)
         @php
-          $u          = $a->user;
-          $name       = $u->name ?? __('Unassigned');
-          $phone      = $u->phone_number ?? '—';
+          $u         = $a->user;
+          $name      = $u->name ?? __('Unassigned');
+          $email     = $u->email ?? '—';
+          $phone     = $u->phone_number ?? '—';
           $department = $u && method_exists($u,'getRoleNames') ? ($u->getRoleNames()->first() ?? '—') : '—';
 
-          // Build profile URL from user->profile (filename or full URL)
+          // Build profile URL
           $profileUrl = null;
           if ($u && $u->profile) {
               $p = $u->profile;
               $profileUrl = filter_var($p, FILTER_VALIDATE_URL)
                   ? $p
-                  : \Illuminate\Support\Facades\Storage::url(ltrim($p, '/')); // requires `php artisan storage:link`
+                  : \Illuminate\Support\Facades\Storage::url(ltrim($p, '/'));
           }
         @endphp
 
         <div class="col-12 col-sm-6 col-lg-3 col-xl-2">
           <div class="parking-card card border-0 shadow-sm h-100 position-relative text-center">
 
-            {{-- Wheelchair icon (forced blue) --}}
+            {{-- wheelchair icon top-left (forced blue) --}}
             @if($a->wheelchair)
               <div class="position-absolute top-0 start-0 m-2">
                 <i class="fa-solid fa-wheelchair" style="color:#0d6efd; font-size:18px;"></i>
               </div>
             @endif
 
-            {{-- Edit (top-right) --}}
+            {{-- edit icon top-right --}}
             <div class="position-absolute top-0 end-0 m-2">
               <a href="#"
                  class="text-muted customModal"
@@ -79,6 +80,7 @@
             </div>
 
             <div class="card-body d-flex flex-column align-items-center p-3">
+
               {{-- Avatar --}}
               @if($profileUrl)
                 <img src="{{ $profileUrl }}" alt="avatar"
@@ -102,8 +104,8 @@
 
               {{-- Quick Look -> SHOW modal --}}
               <a href="#"
-                 class="btn btn-danger btn-sm w-100 customModal"
-                 data-size="lg"
+                 class="btn btn-danger btn-sm w-80 customModal"
+                 data-size="xl"
                  data-url="{{ route('misc.parking.show', $a->id) }}"
                  data-title="{{ __('Parking Details') }}">
                 {{ __('Quick Look') }}
@@ -120,17 +122,6 @@
   </div>
 </div>
 
-{{-- Reusable AJAX modal --}}
-<div class="modal fade" id="ajaxModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog"><div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title"></h5>
-      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
-    </div>
-    <div class="modal-body p-0"></div>
-  </div></div>
-</div>
-
 <style>
 .parking-card{ border-radius:14px; font-size:.85rem; }
 .parking-avatar-img{ width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid #9b0000; }
@@ -139,41 +130,3 @@
 .parking-value{ font-size:.8rem; color:#444; }
 </style>
 @endsection
-
-@push('scripts')
-<script>
-// Safe customModal handler: only updates the modal, never the clicked element
-(function(){
-  $(document).on('click', '.customModal', function (e) {
-    e.preventDefault();
-
-    const $btn  = $(this);
-    const url   = $btn.data('url');
-    const title = $btn.data('title') || '';
-    const size  = (String($btn.data('size') || 'md')).toLowerCase();
-
-    const $modal = $('#ajaxModal');
-    const $dlg   = $modal.find('.modal-dialog');
-
-    // Reset and set size
-    $dlg.removeClass('modal-sm modal-lg modal-xl');
-    if (size === 'sm') $dlg.addClass('modal-sm');
-    if (size === 'lg') $dlg.addClass('modal-lg');
-    if (size === 'xl') $dlg.addClass('modal-xl');
-
-    // Update ONLY the modal title/body
-    $modal.find('.modal-title').text(title);
-    $modal.find('.modal-body').html('<div class="p-5 text-center text-muted small">Loading…</div>');
-
-    // Load partial into modal
-    $.get(url)
-      .done(function(html){ $modal.find('.modal-body').html(html); })
-      .fail(function(){ $modal.find('.modal-body').html('<div class="p-5 text-center text-danger">Failed to load content.</div>'); });
-
-    // Show modal
-    const bsModal = new bootstrap.Modal($modal[0]);
-    bsModal.show();
-  });
-})();
-</script>
-@endpush
