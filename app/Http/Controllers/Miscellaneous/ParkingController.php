@@ -1,6 +1,6 @@
 <?php
-
 // app/Http/Controllers/Miscellaneous/ParkingController.php
+
 namespace App\Http\Controllers\Miscellaneous;
 
 use App\Http\Controllers\Controller;
@@ -13,10 +13,10 @@ class ParkingController extends Controller
 {
     public function index(Request $request)
     {
-        // Ensure 1..50 exist as rows
+        // Ensure 1..50 rows exist so cards always render
         for ($i = 1; $i <= 50; $i++) {
             Parking::firstOrCreate(
-                ['spot' => (string) $i], // keep as string since your existing schema uses string
+                ['spot' => (string) $i],
                 ['user_id' => null, 'notes' => null, 'wheelchair' => false]
             );
         }
@@ -31,7 +31,7 @@ class ParkingController extends Controller
                           ->orWhere('email', 'like', "%{$q}%");
                    });
             })
-            ->orderByRaw('CAST(spot AS UNSIGNED) asc') // sort 1..50 correctly even if stored as strings
+            ->orderByRaw('CAST(spot AS UNSIGNED) asc')
             ->get();
 
         return view('miscellaneous.parking.index', compact('assignments', 'q'));
@@ -39,7 +39,7 @@ class ParkingController extends Controller
 
     public function create()
     {
-        // users without an existing parking row (still OK to keep)
+        // Users without any parking row
         $users = User::leftJoin('elitevw_miscellaneous_parking as p', 'p.user_id', '=', 'users.id')
             ->whereNull('p.id')
             ->orderBy('users.name')
@@ -52,17 +52,17 @@ class ParkingController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => ['required','integer','exists:users,id', Rule::unique('elitevw_miscellaneous_parking', 'user_id')],
-            'spot'    => ['required','string','max:50', Rule::unique('elitevw_miscellaneous_parking', 'spot')],
-            'notes'   => ['nullable','string'],
-            'wheelchair' => ['sometimes','boolean'],
+            'user_id'    => ['required','integer','exists:users,id', Rule::unique('elitevw_miscellaneous_parking', 'user_id')],
+            'spot'       => ['required','string','max:50', Rule::unique('elitevw_miscellaneous_parking', 'spot')],
+            'notes'      => ['nullable','string'],
+            'wheelchair' => ['boolean'],
         ]);
 
         Parking::create([
-            'user_id'      => $request->integer('user_id'),
-            'spot'         => (string) $request->input('spot'),
-            'notes'        => $request->input('notes'),
-            'wheelchair'=> (bool) $request->boolean('wheelchair'),
+            'user_id'    => $request->integer('user_id'),
+            'spot'       => (string) $request->input('spot'),
+            'notes'      => $request->input('notes'),
+            'wheelchair' => (int) $request->input('wheelchair', 0), // 0/1
         ]);
 
         return redirect()->route('misc.parking.index')->with('success', 'Parking assigned.');
@@ -70,7 +70,7 @@ class ParkingController extends Controller
 
     public function edit(Parking $parking)
     {
-        // allow switching to any unassigned user + keep current
+        // Allow switching to any unassigned user + keep current one
         $users = User::leftJoin('elitevw_miscellaneous_parking as p', 'p.user_id', '=', 'users.id')
             ->whereNull('p.id')
             ->orWhere('users.id', $parking->user_id)
@@ -89,23 +89,17 @@ class ParkingController extends Controller
     public function update(Request $request, Parking $parking)
     {
         $request->validate([
-            'user_id' => [
-                'nullable','integer','exists:users,id',
-                Rule::unique('elitevw_miscellaneous_parking', 'user_id')->ignore($parking->id),
-            ],
-            'spot'  => [
-                'required','string','max:50',
-                Rule::unique('elitevw_miscellaneous_parking', 'spot')->ignore($parking->id),
-            ],
-            'notes' => ['nullable','string'],
-            'wheelchair' => ['sometimes','boolean'],
+            'user_id'    => ['nullable','integer','exists:users,id', Rule::unique('elitevw_miscellaneous_parking', 'user_id')->ignore($parking->id)],
+            'spot'       => ['required','string','max:50', Rule::unique('elitevw_miscellaneous_parking', 'spot')->ignore($parking->id)],
+            'notes'      => ['nullable','string'],
+            'wheelchair' => ['boolean'],
         ]);
 
         $parking->update([
-            'user_id'      => $request->filled('user_id') ? $request->integer('user_id') : null, // allow Unassigned
-            'spot'         => (string) $request->input('spot'),
-            'notes'        => $request->input('notes'),
-            'wheelchair'=> (bool) $request->boolean('wheelchair'),
+            'user_id'    => $request->filled('user_id') ? $request->integer('user_id') : null,
+            'spot'       => (string) $request->input('spot'),
+            'notes'      => $request->input('notes'),
+            'wheelchair' => (int) $request->input('wheelchair', 0), // 0/1
         ]);
 
         return redirect()->route('misc.parking.index')->with('success', 'Parking updated.');

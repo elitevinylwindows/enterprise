@@ -1,4 +1,5 @@
 <?php
+// app/Models/Miscellaneous/Parking.php
 
 namespace App\Models\Miscellaneous;
 
@@ -12,7 +13,11 @@ class Parking extends Model
         'user_id',
         'spot',
         'notes',
-        'wheelchair',
+        'wheelchair', // <-- use this column name
+    ];
+
+    protected $casts = [
+        'wheelchair' => 'boolean',
     ];
 
     public function user()
