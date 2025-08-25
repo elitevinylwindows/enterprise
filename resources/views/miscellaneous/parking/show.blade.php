@@ -6,20 +6,14 @@
         use Illuminate\Support\Facades\Storage;
 
         $u = $assignment->user;
-        $profileUrl = null;
-        if ($u && $u->profile) {
-            $p = $u->profile;
-            $profileUrl = filter_var($p, FILTER_VALIDATE_URL)
-                ? $p
-                : Storage::url(ltrim($p, '/'));
-        }
+        $profileUrl = $u->profile ?? null;
+       
       @endphp
 
       @if($profileUrl)
         <img src="{{ $profileUrl }}" alt="avatar"
              class="img-fluid rounded-circle border"
-             style="max-width:160px; max-height:160px; object-fit:cover;"
-             onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('div'),{className:'parking-avatar-fallback'}));">
+             style="max-width:160px; max-height:160px; object-fit:cover;">
       @else
         <div class="parking-avatar-fallback"></div>
       @endif

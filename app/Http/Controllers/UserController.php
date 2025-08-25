@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -234,7 +235,6 @@ class UserController extends Controller
 
                 $userData = $request->all();
                 $user->fill($userData)->save();
-
                 if ($request->profile != '') {
                     $tenantFilenameWithExt = $request->file('profile')->getClientOriginalName();
                     $tenantFilename = pathinfo($tenantFilenameWithExt, PATHINFO_FILENAME);
@@ -244,7 +244,7 @@ class UserController extends Controller
                     if (!file_exists($dir)) {
                         mkdir($dir, 0777, true);
                     }
-                    $request->file('profile')->storeAs('upload/profile/', $tenantFileName);
+                    Storage::disk('public')->putFileAs('upload/profile/', $request->file('profile'), $tenantFileName);
                     $user->profile = $tenantFileName;
                     $user->save();
                 }
@@ -284,7 +284,7 @@ class UserController extends Controller
                     if (!file_exists($dir)) {
                         mkdir($dir, 0777, true);
                     }
-                    $request->file('profile')->storeAs('upload/profile/', $tenantFileName);
+                    Storage::disk('public')->putFileAs('upload/profile/', $request->file('profile'), $tenantFileName);
                     $user->profile = $tenantFileName;
                     $user->save();
                 }

@@ -139,7 +139,7 @@ class User extends Authenticatable
     public function getProfileAttribute($value)
     {
         if ($value && $value != 'avatar.png') {
-            return Storage::url(ltrim($value, '/'));
+            return Storage::url('upload/profile/' . ltrim($value, '/'));
         } else {
             return asset('assets/images/avatar.png');
         }

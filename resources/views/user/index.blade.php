@@ -78,7 +78,7 @@
                                             <div class="d-flex align-items-center">
                                                 <div class="flex-shrink-0 wid-40">
                                                     <img class="img-radius img-fluid wid-40"
-                                                        src="{{ !empty($user->profile) ? asset(Storage::url('upload/profile')) . '/' . $user->profile : asset(Storage::url('upload/profile')) . '/avatar.png' }}"
+                                                        src="{{ $user->profile }}"
                                                         alt="User image">
                                                 </div>
                                                 <div class="flex-grow-1 ms-3">
