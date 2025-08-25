@@ -202,7 +202,7 @@
                         <tr>
                             <th>Discount:</th>
                             <input type="hidden" name="discount" id="discount" value="{{ number_format($quote->discount, 2) }}">
-                            <td id="discount-amount">${{ number_format($quote->discount, 2) }}</td>
+                            <td id="discount-amount">-${{ number_format($quote->discount, 2) }}</td>
                         </tr>
                         <tr>
                             <th>Shipping:</th>
@@ -2070,7 +2070,7 @@
                 } else {
                     // Update the UI with the new totals
                     $('#subtotal-amount').text('$' + data.data.sub_total);
-                    $('#discount-amount').text("$" + data.data.total_discount);
+                    $('#discount-amount').text("-$" + data.data.total_discount);
                     $('#tax-amount').text('$' + data.data.tax + ' (' + data.data.tax_rate + '%)');
                     $('#total-amount').text('$' + data.data.grand_total);
                     document.getElementById('tax').value = data.data.tax;

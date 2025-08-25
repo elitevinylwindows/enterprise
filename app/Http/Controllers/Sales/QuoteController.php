@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use App\Models\Sales\QuoteItem;
 use App\Models\Schemas\CMUnit;
+use App\Models\Schemas\DHUnit;
 use App\Models\Schemas\HSUnit;
 use App\Models\Schemas\PWUnit;
 use App\Models\Schemas\SHUnit;
@@ -746,8 +747,13 @@ public function index(Request $request)
             if(!$item) {
                 return response()->json(['success' => false, 'message' => 'Item not found.'], 404);
             }
+
+            $data = calculateTotal($item->quote, $item->quote->shipping);
+
             $item->quote->update([
                 'discount' => $item->quote->discount - $item->discount,
+                'total'     => max(0, $data['total']),
+                'sub_total' => max(0, $data['sub_total']),
             ]);
             $item->delete();
         } else if($type == 'modification') {
@@ -756,9 +762,13 @@ public function index(Request $request)
                 return response()->json(['success' => false, 'message' => 'Item not found.'], 404);
             }
 
+            $data = calculateTotal($item->quote, $item->quote->shipping);
             $item->quote->update([
                 'discount' => $item->quote->discount - $item->discount,
+                'total'     => max(0, $data['total']),
+                'sub_total' => max(0, $data['sub_total']),
             ]);
+
             $item->delete();
 
         }
@@ -1021,6 +1031,8 @@ public function index(Request $request)
                     'SWING DOOR'              => SWDUnit::class,
                     'SLIDING DOOR'              => SLDUnit::class,
                     'CASEMENT/AWNING' => CMUnit::class,
+                    'DOUBLE HUNG' => DHUnit::class,
+                    'SLIDING DOOR' => SLDUnit::class,
                 ];
 
                 $model = null;

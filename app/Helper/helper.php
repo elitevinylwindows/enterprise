@@ -2055,12 +2055,6 @@ if (!function_exists('calculateTotal')) {
         $total = $quote->items->sum(function ($item) {
             $basePrice = $item->price * $item->qty;
             
-            $addons = json_decode($item->addon, true);
-            if ($addons) {
-                $addonTotal = array_sum(array_values($addons));
-                return ($basePrice + ($addonTotal * $item->qty)); 
-            }
-            
             return $basePrice;
         });
 

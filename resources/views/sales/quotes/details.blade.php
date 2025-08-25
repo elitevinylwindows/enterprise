@@ -198,7 +198,7 @@
                         data-size="xl"
                         data-url="{{ route('sales.quotes.preview', $quote->id) }}"
                         data-title="Quote Preview">
-                       Continue &rarr;
+                       <span id="continueBtn">Continue &rarr;</span> 
                     </a>
                 </div>
             </div>
@@ -222,6 +222,7 @@
                 <input type="hidden" name="size" id="size">
                 <input type="hidden" name="price" id="price">
                 <input type="hidden" name="total" id="total">
+                <input type="hidden" name="addon[]" id="addon">
 
 
                 <div class="modal-header bg-white text-dark">
@@ -548,7 +549,12 @@
                             </div>
                         </div>
                         <div class="modal-footer d-flex justify-content-between align-items-center">
-                            <h2 class="mb-0">Total Price: $<span id="globalTotalPrice">0.00</span></h2>
+                            <h2 class="mb-0">Total Price: $<span class="total-price" id="globalTotalPrice"><i class="fas fa-spinner fa-spin"></i></span>
+                            </h2>
+                            <div class="addon-list">
+                                    <h3>Current Addons:</h3>
+                                    <div id="currentAddons">None</div>
+                            </div>
                             <div>
                                 <a href="javascript:void(0);" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
                                 <button type="button" id="saveQuoteItem" class="btn btn-primary">Add to Quote</button>
