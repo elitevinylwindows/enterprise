@@ -110,4 +110,16 @@ class ParkingController extends Controller
         $parking->delete();
         return redirect()->route('misc.parking.index')->with('success', 'Parking removed.');
     }
+
+    // app/Http/Controllers/Miscellaneous/ParkingController.php
+
+public function show(Parking $parking)
+{
+    // eager-load roles for “Department”
+    $parking->load('user.roles');
+    return view('miscellaneous.parking.show', [
+        'assignment' => $parking,
+    ]);
+}
+
 }

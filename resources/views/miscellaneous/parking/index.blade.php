@@ -105,13 +105,14 @@
               <div class="parking-label">{{ __('Spot #') }}</div>
               <div class="parking-value mb-2">{{ $a->spot }}</div>
 
-              <a href="#"
-                 class="btn btn-primary btn-sm w-60 customModal"
-                 data-size="md"
-                 data-url="{{ route('misc.parking.show', $a->id) }}"
-                 data-title="{{ __('Quick Look') }}">
-                {{ __('Quick Look') }}
-              </a>
+             <a href="#"
+   class="btn btn-danger btn-sm w-100 customModal"
+   data-size="lg"
+   data-url="{{ route('misc.parking.show', $a->id) }}"
+   data-title="{{ __('Parking Details') }}">
+  {{ __('Quick Look') }}
+</a>
+
             </div>
           </div>
         </div>
