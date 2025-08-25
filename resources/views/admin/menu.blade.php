@@ -300,17 +300,24 @@
         <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
     </a>
 
-    <ul class="pc-submenu" style="{{ request()->routeIs('purchasing.*') ? 'display: block;' : 'display: none;' }}">
+    {{-- auto-expand when on any purchasing.* route --}}
+    <ul class="pc-submenu" style="{{ request()->routeIs('purchasing.*') ? 'display:block;' : 'display:none;' }}">
         @if (Gate::check('manage purchase requests'))
-        <li><a class="pc-link" href="{{ route('purchasing.purchase-requests.index') }}">Purchase Requests</a></li>
+        <li class="pc-item {{ request()->routeIs('purchasing.purchase-requests.*') ? 'active' : '' }}">
+            <a class="pc-link" href="{{ route('purchasing.purchase-requests.index') }}">Purchase Requests</a>
+        </li>
         @endif
 
         @if (Gate::check('manage supplier quotes'))
-        <li><a class="pc-link" href="{{ route('purchasing.supplier-quotes.index') }}">Supplier Quotes</a></li>
+        <li class="pc-item {{ request()->routeIs('purchasing.supplier-quotes.*') ? 'active' : '' }}">
+            <a class="pc-link" href="{{ route('purchasing.supplier-quotes.index') }}">Supplier Quotes</a>
+        </li>
         @endif
 
         @if (Gate::check('manage purchase orders'))
-        <li><a class="pc-link" href="{{ route('purchasing.purchase-orders.index') }}">Purchase Orders</a></li>
+        <li class="pc-item {{ request()->routeIs('purchasing.purchase-orders.*') ? 'active' : '' }}">
+            <a class="pc-link" href="{{ route('purchasing.purchase-orders.index') }}">Purchase Orders</a>
+        </li>
         @endif
     </ul>
 </li>
