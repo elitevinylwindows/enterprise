@@ -47,15 +47,7 @@
           $email     = $u->email ?? '—';
           $phone     = $u->phone_number ?? '—';
           $department = $u && method_exists($u,'getRoleNames') ? ($u->getRoleNames()->first() ?? '—') : '—';
-
-          // Build profile URL
-          $profileUrl = null;
-          if ($u && $u->profile) {
-              $p = $u->profile;
-              $profileUrl = filter_var($p, FILTER_VALIDATE_URL)
-                  ? $p
-                  : \Illuminate\Support\Facades\Storage::url(ltrim($p, '/'));
-          }
+          $profileUrl  = $u->profile ?? null;
         @endphp
 
         <div class="col-12 col-sm-6 col-lg-3 col-xl-2">

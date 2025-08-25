@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Lab404\Impersonate\Models\Impersonate;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -135,15 +136,24 @@ class User extends Authenticatable
         return $return;
     }
     
-    public function driver()
-{
-    return $this->belongsTo(Driver::class);
-}
+    public function getProfileAttribute($value)
+    {
+        if ($value && $value != 'avatar.png') {
+            return Storage::url(ltrim($value, '/'));
+        } else {
+            return asset('assets/images/avatar.png');
+        }
+    }
 
-public function assignedLeads()
-{
-    return $this->hasMany(Lead::class, 'assigned_to');
-}
+    public function driver()
+    {
+        return $this->belongsTo(Driver::class);
+    }
+
+    public function assignedLeads()
+    {
+        return $this->hasMany(Lead::class, 'assigned_to');
+    }
 
 
 
