@@ -57,7 +57,7 @@
         <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
           <div class="card h-100 shadow-sm rounded-3 position-relative">
             {{-- Wheelchair badge top-left --}}
-            @if($a->is_wheelchair)
+            @if($a->wheelchair)
               <div class="position-absolute top-0 start-0 m-2">
                 <span class="badge bg-primary d-inline-flex align-items-center gap-1">
                   <i class="fa-solid fa-wheelchair"></i>

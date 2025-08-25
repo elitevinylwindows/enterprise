@@ -26,9 +26,9 @@
     </div>
 
     <div class="mb-3 form-check">
-      <input type="checkbox" class="form-check-input" id="is_wheelchair" name="is_wheelchair"
-             {{ old('is_wheelchair', $assignment->is_wheelchair) ? 'checked' : '' }}>
-      <label class="form-check-label" for="is_wheelchair">{{ __('Wheelchair / Accessible') }}</label>
+      <input type="checkbox" class="form-check-input" id="wheelchair" name="wheelchair"
+             {{ old('wheelchair', $assignment->wheelchair) ? 'checked' : '' }}>
+      <label class="form-check-label" for="wheelchair">{{ __('Wheelchair / Accessible') }}</label>
     </div>
 
     <div class="mb-3">
