@@ -80,7 +80,7 @@
                 <div class="col-md-6">
                     <label>Configuration</label>
                     <div class="d-flex gap-2">
-                        <select name="series_type_id" id="seriesTypeSelect" class="form-control flex-grow-1" style="height: 44px;">
+                        <select name="series_type_id" id="seriesTypeSelect" class="form-control flex-grow-1 select2" style="height: 44px;">
                             <option value="">Select a configuration</option>
                         </select>
                         <a href="#" class="btn btn-primary d-flex align-items-center justify-content-center" style="height: 44px;" data-bs-toggle="modal" data-bs-target="#configLookupModal">
@@ -625,6 +625,14 @@
 
 @push('scripts')
 <script>
+
+    $(document).ready(function () {
+        $('#seriesTypeSelect').select2({
+            placeholder: "Select a configuration",
+            allowClear: true,
+            width: 'resolve' // ensures it adapts to your form-control width
+        });
+    });
     // Load configurations based on series
     document.getElementById('seriesSelect').addEventListener('change', function() {
         const seriesId = this.value;
