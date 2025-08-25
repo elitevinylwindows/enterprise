@@ -13,7 +13,7 @@
       @if($profileUrl)
         <img src="{{ $profileUrl }}" alt="avatar"
              class="img-fluid rounded-circle border"
-             style="max-width:160px; max-height:160px; object-fit:cover;">
+             style="max-width:160px; max-height:160px; width:160px; height:160px; object-fit:cover;">
       @else
         <div class="parking-avatar-fallback"></div>
       @endif
