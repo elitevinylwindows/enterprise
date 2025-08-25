@@ -300,7 +300,7 @@
         <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
     </a>
 
-    <ul class="pc-submenu">
+    <ul class="pc-submenu" style="{{ request()->routeIs('purchasing.*') ? 'display: block;' : 'display: none;' }}">
         @if (Gate::check('manage purchase requests'))
         <li><a class="pc-link" href="{{ route('purchasing.purchase-requests.index') }}">Purchase Requests</a></li>
         @endif
@@ -312,17 +312,10 @@
         @if (Gate::check('manage purchase orders'))
         <li><a class="pc-link" href="{{ route('purchasing.purchase-orders.index') }}">Purchase Orders</a></li>
         @endif
-
-       <!-- @if (Gate::check('manage receiving'))
-        <li><a class="pc-link" href="{{ route('purchasing.receiving.index') }}">Receiving</a></li>
-        @endif
-
-        @if (Gate::check('manage purchase invoices'))
-        <li><a class="pc-link" href="{{ route('purchasing.invoices.index') }}">Purchase Invoices</a></li>
-        @endif-->
     </ul>
 </li>
 @endif
+
 
 
 
