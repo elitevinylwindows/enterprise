@@ -25,7 +25,7 @@ class SHUnitController extends Controller
 
     public function store(Request $request)
     {
-                $validated = $request->validate([
+        $validated = $request->validate([
             'schema_id' => 'nullable|string',
             'product_id' => 'nullable|string',
             'product_code' => 'nullable|string',
@@ -50,7 +50,7 @@ class SHUnitController extends Controller
             'solar_cool' => 'nullable|string',
             'status' => 'nullable|string',
         ]);
-SHUnit::create($validated);
+        SHUnit::create($validated);
         return redirect()->route('sh-unit.index')->with('success', 'Created successfully.');
     }
 
@@ -118,9 +118,11 @@ SHUnit::create($validated);
             DB::beginTransaction();
             $file = $request->file('file');
             Excel::import(new SHUnitImport, $file);
+
             DB::commit();
             return redirect()->route('sh-unit.index')->with('success', 'Data imported successfully.');
         } catch (\Exception $e) {
+            dd($e);
             DB::rollBack();
             Log::error($e);
             return redirect()->back()->with('error', 'Error importing data: ' . $e->getMessage());

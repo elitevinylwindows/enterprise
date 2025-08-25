@@ -7,7 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class SHUnit extends Model
 {
     protected $table = 'elitevw_schema_shunit';
+    
     protected $fillable = [
+        'id',
+        'product_id',
+        'product_code',
+        'product_class',
+        'description',
         'schema_id',
         'retrofit',
         'nailon',
@@ -29,4 +35,5 @@ class SHUnit extends Model
         'acid_edge',
         'solar_cool',
     ];
+
 }
