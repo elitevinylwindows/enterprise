@@ -26,13 +26,8 @@
     </div>
 
     <div class="mb-3 form-check">
-      {{-- Ensure value always posts (0/1) --}}
       <input type="hidden" name="wheelchair" value="0">
-      <input type="checkbox"
-             class="form-check-input"
-             id="wheelchair"
-             name="wheelchair"
-             value="1"
+      <input type="checkbox" class="form-check-input" id="wheelchair" name="wheelchair" value="1"
              {{ old('wheelchair', $assignment->wheelchair) ? 'checked' : '' }}>
       <label class="form-check-label" for="wheelchair">{{ __('Wheelchair / Accessible') }}</label>
     </div>

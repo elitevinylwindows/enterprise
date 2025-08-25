@@ -30,8 +30,7 @@
       <div class="col-md-6">
         <form method="GET" action="{{ route('misc.parking.index') }}">
           <div class="input-group">
-            <input type="text" name="q" class="form-control" placeholder="{{ __('Search name/email/spot…') }}"
-                   value="{{ $q ?? '' }}">
+            <input type="text" name="q" class="form-control" placeholder="{{ __('Search name/email/spot…') }}" value="{{ $q ?? '' }}">
             <button class="btn btn-primary" type="submit">{{ __('Search') }}</button>
           </div>
         </form>
@@ -43,21 +42,33 @@
     <div class="row g-3">
       @forelse($assignments as $a)
         @php
-          $u = $a->user;
-          $name  = $u->name ?? __('Unassigned');
-          $email = $u->email ?? '—';
-          $department = $u->department ?? '—';
-          $phone      = $u->phone ?? '—';
-          $profileImg = $u && $u->profile ? asset('storage/'.$u->profile) : null; 
+          $u         = $a->user;
+          $name      = $u->name ?? __('Unassigned');
+          $email     = $u->email ?? '—';
+          $phone     = $u->phone_number ?? '—';    // <- your field
+          // Primary role name (Spatie)
+          $department = $u && method_exists($u, 'getRoleNames') ? ($u->getRoleNames()->first() ?? '—') : '—';
+
+          // Build profile URL
+          $profileUrl = null;
+          if ($u && $u->profile) {
+              $p = $u->profile;
+              if (filter_var($p, FILTER_VALIDATE_URL)) {
+                  $profileUrl = $p; // already a full URL
+              } else {
+                  // assume stored as 'avatars/foo.png' or 'avatar.png' under storage/app/public
+                  $profileUrl = asset('storage/' . ltrim($p, '/'));
+              }
+          }
         @endphp
 
         <div class="col-12 col-sm-6 col-lg-3 col-xl-2">
           <div class="parking-card card border-0 shadow-sm h-100 position-relative text-center">
 
-            {{-- wheelchair icon top-left (blue) --}}
+            {{-- wheelchair icon top-left (force blue) --}}
             @if($a->wheelchair)
               <div class="position-absolute top-0 start-0 m-2">
-                <i class="fa-solid fa-wheelchair text-primary" style="font-size:18px;"></i>
+                <i class="fa-solid fa-wheelchair wheelchair-icon"></i>
               </div>
             @endif
 
@@ -73,10 +84,11 @@
             </div>
 
             <div class="card-body d-flex flex-column align-items-center p-3">
-              {{-- avatar: image or red circle --}}
-              @if($profileImg)
-                <img src="{{ $profileImg }}" alt="avatar"
-                     class="parking-avatar-img mb-2">
+              {{-- avatar: image or fallback red circle with onerror fallback --}}
+              @if($profileUrl)
+                <img src="{{ $profileUrl }}" alt="avatar"
+                     class="parking-avatar-img mb-2"
+                     onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('div'),{className:'parking-avatar-fallback mb-2'}));">
               @else
                 <div class="parking-avatar-fallback mb-2"></div>
               @endif
@@ -113,31 +125,12 @@
 </div>
 
 <style>
-.parking-card{
-  border-radius: 14px;
-  font-size: 0.85rem;
-}
-.parking-avatar-img{
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #9b0000;
-}
-.parking-avatar-fallback{
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background: #9b0000;
-}
-.parking-label{
-  font-weight: 700;
-  font-size: 0.8rem;
-  color: #222;
-}
-.parking-value{
-  font-size: 0.8rem;
-  color: #444;
-}
+.parking-card{ border-radius:14px; font-size:.85rem; }
+.parking-avatar-img{ width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid #9b0000; }
+.parking-avatar-fallback{ width:70px; height:70px; border-radius:50%; background:#9b0000; }
+.parking-label{ font-weight:700; font-size:.8rem; color:#222; }
+.parking-value{ font-size:.8rem; color:#444; }
+/* force blue in case theme overrides text-primary */
+.wheelchair-icon{ font-size:18px; color:#0d6efd !important; }
 </style>
 @endsection

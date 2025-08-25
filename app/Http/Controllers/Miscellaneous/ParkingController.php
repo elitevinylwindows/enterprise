@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/Miscellaneous/ParkingController.php
 
 namespace App\Http\Controllers\Miscellaneous;
 
@@ -13,7 +12,7 @@ class ParkingController extends Controller
 {
     public function index(Request $request)
     {
-        // Ensure 1..50 rows exist so cards always render
+        // Ensure 1..50 rows exist
         for ($i = 1; $i <= 50; $i++) {
             Parking::firstOrCreate(
                 ['spot' => (string) $i],
@@ -23,7 +22,8 @@ class ParkingController extends Controller
 
         $q = trim((string) $request->get('q', ''));
 
-        $assignments = Parking::with('user')
+        // Eager-load roles to show department without N+1
+        $assignments = Parking::with(['user.roles'])
             ->when($q !== '', function ($qq) use ($q) {
                 $qq->where('spot', 'like', "%{$q}%")
                    ->orWhereHas('user', function ($uq) use ($q) {
@@ -39,7 +39,7 @@ class ParkingController extends Controller
 
     public function create()
     {
-        // Users without any parking row
+        // Users without any parking row yet
         $users = User::leftJoin('elitevw_miscellaneous_parking as p', 'p.user_id', '=', 'users.id')
             ->whereNull('p.id')
             ->orderBy('users.name')
@@ -62,7 +62,7 @@ class ParkingController extends Controller
             'user_id'    => $request->integer('user_id'),
             'spot'       => (string) $request->input('spot'),
             'notes'      => $request->input('notes'),
-            'wheelchair' => (int) $request->input('wheelchair', 0), // 0/1
+            'wheelchair' => (int) $request->input('wheelchair', 0),
         ]);
 
         return redirect()->route('misc.parking.index')->with('success', 'Parking assigned.');
@@ -70,7 +70,7 @@ class ParkingController extends Controller
 
     public function edit(Parking $parking)
     {
-        // Allow switching to any unassigned user + keep current one
+        // Allow switching to any unassigned user + keep current user
         $users = User::leftJoin('elitevw_miscellaneous_parking as p', 'p.user_id', '=', 'users.id')
             ->whereNull('p.id')
             ->orWhere('users.id', $parking->user_id)
@@ -81,7 +81,7 @@ class ParkingController extends Controller
             ->values();
 
         return view('miscellaneous.parking.edit', [
-            'assignment' => $parking,
+            'assignment' => $parking->load('user.roles'),
             'users'      => $users,
         ]);
     }
@@ -99,7 +99,7 @@ class ParkingController extends Controller
             'user_id'    => $request->filled('user_id') ? $request->integer('user_id') : null,
             'spot'       => (string) $request->input('spot'),
             'notes'      => $request->input('notes'),
-            'wheelchair' => (int) $request->input('wheelchair', 0), // 0/1
+            'wheelchair' => (int) $request->input('wheelchair', 0),
         ]);
 
         return redirect()->route('misc.parking.index')->with('success', 'Parking updated.');
