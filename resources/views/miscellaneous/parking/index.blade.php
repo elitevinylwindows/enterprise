@@ -47,6 +47,15 @@
           $email     = $u->email ?? '—';
           $phone     = $u->phone_number ?? '—';
           $department = $u && method_exists($u,'getRoleNames') ? ($u->getRoleNames()->first() ?? '—') : '—';
+
+          // Build profile URL
+          $profileUrl = null;
+          if ($u && $u->profile) {
+              $p = $u->profile;
+              $profileUrl = filter_var($p, FILTER_VALIDATE_URL)
+                  ? $p
+                  : \Illuminate\Support\Facades\Storage::url(ltrim($p, '/'));
+          }
         @endphp
 
         <div class="col-12 col-sm-6 col-lg-3 col-xl-2">
@@ -72,19 +81,7 @@
 
             <div class="card-body d-flex flex-column align-items-center p-3">
 
-              {{-- AVATAR (your requested snippet goes RIGHT HERE) --}}
-              @php
-                use Illuminate\Support\Facades\Storage;
-
-                $profileUrl = null;
-                if ($u && $u->profile) {
-                    $p = $u->profile;
-                    $profileUrl = filter_var($p, FILTER_VALIDATE_URL)
-                        ? $p
-                        : Storage::url(ltrim($p, '/')); // requires `php artisan storage:link`
-                }
-              @endphp
-
+              {{-- Avatar --}}
               @if($profileUrl)
                 <img src="{{ $profileUrl }}" alt="avatar"
                      class="parking-avatar-img mb-2"
@@ -92,7 +89,6 @@
               @else
                 <div class="parking-avatar-fallback mb-2"></div>
               @endif
-              {{-- END AVATAR --}}
 
               <div class="parking-label">{{ __('Name') }}</div>
               <div class="parking-value mb-1">{{ $name }}</div>
