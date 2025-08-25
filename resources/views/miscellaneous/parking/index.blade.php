@@ -106,9 +106,9 @@
               <div class="parking-value mb-2">{{ $a->spot }}</div>
 
               <a href="#"
-                 class="btn btn-danger btn-sm w-100 customModal"
+                 class="btn btn-primary btn-sm w-60 customModal"
                  data-size="md"
-                 data-url="{{ route('misc.parking.edit', $a->id) }}"
+                 data-url="{{ route('misc.parking.show', $a->id) }}"
                  data-title="{{ __('Quick Look') }}">
                 {{ __('Quick Look') }}
               </a>
