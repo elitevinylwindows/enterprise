@@ -55,6 +55,7 @@
 @else
 	<link rel="stylesheet" id="Pstylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
 @endif
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     @stack('css-page')
     <link href="{{ asset('css/custom.css') }}"  rel="stylesheet">

@@ -80,7 +80,7 @@
                 <div class="col-md-6">
                     <label>Configuration</label>
                     <div class="d-flex gap-2">
-                        <select name="series_type_id" id="seriesTypeSelect" class="form-control flex-grow-1" style="height: 44px;">
+                        <select name="series_type_id" id="seriesTypeSelect" class="form-control flex-grow-1 select2" style="height: 44px;">
                             <option value="">Select a configuration</option>
                         </select>
                         <a href="#" class="btn btn-primary d-flex align-items-center justify-content-center" style="height: 44px;" data-bs-toggle="modal" data-bs-target="#configLookupModal">
@@ -91,7 +91,7 @@
 
                 {{-- Add Item --}}
                 <div class="col-md-2 text-end">
-                    <a href="#" class="btn btn-primary w-100 d-flex align-items-center justify-content-center" style="height: 44px;" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                    <a href="#" class="btn btn-primary w-100 d-flex align-items-center justify-content-center" id="addItemButton" style="height: 44px;" data-bs-toggle="modal" data-bs-target="#addItemModal">
                         <i class="fas fa-plus me-2"></i> Add Item
                     </a>
                 </div>
@@ -152,7 +152,7 @@
                         <tr>
                             <th>Discount:</th>
                             <input type="hidden" name="discount" id="discount" value="{{ number_format($quote->discount, 2) }}">
-                            <td id="discount-amount">${{ number_format($quote->discount, 2) }}</td>
+                            <td id="discount-amount">-${{ number_format($quote->discount, 2) }}</td>
                         </tr>
                         <tr>
                             <th>Shipping:</th>
@@ -335,7 +335,7 @@
                                 <div class="tab-pane fade" id="glasss">
                                     <div class="mb-3">
                                         <label>Glass Type</label>
-                                        <select class="form-control" name="glass_type">
+                                        <select class="form-control" name="glass_type" id="glass_type">
                                             <option value="CLR/CLR">CLR/CLR</option>
                                             <option value="LE3/CLR">LE3/CLR</option>
                                             <option value="LE3/LAM">LE3/LAM</option>
@@ -548,7 +548,7 @@
                                 <p class="text-muted text-center">Detailed pricing breakdown can be shown here.</p>
                             </div>
                         </div>
-                        <div class="modal-footer d-flex justify-content-between align-items-center">
+                       <div class="modal-footer d-flex justify-content-between align-items-center">
                             <h2 class="mb-0">Total Price: $<span class="total-price" id="globalTotalPrice"><i class="fas fa-spinner fa-spin"></i></span>
                             </h2>
                             <div class="addon-list">
@@ -625,6 +625,14 @@
 
 @push('scripts')
 <script>
+
+    $(document).ready(function () {
+        $('#seriesTypeSelect').select2({
+            placeholder: "Select a configuration",
+            allowClear: true,
+            width: 'resolve' // ensures it adapts to your form-control width
+        });
+    });
     // Load configurations based on series
     document.getElementById('seriesSelect').addEventListener('change', function() {
         const seriesId = this.value;
@@ -684,6 +692,7 @@
         const laminateExtText = colorExt ?.selectedOptions[0] ?.text ?? '';
         const colorIntText = colorInt ?.selectedOptions[0] ?.text ?? '';
         const temperedFields = [];
+        const addon = form.querySelector('[name="addon[]"]').value;
 
        
 
@@ -760,6 +769,7 @@
         formData.append('custom_lock_position', form.querySelector('[name="custom_lock_position"]').checked ? 1 : 0);
         formData.append('custom_vent_latch', form.querySelector('[name="custom_vent_latch"]').checked ? 1 : 0);
         formData.append('knocked_down', form.querySelector('[name="knocked_down"]').checked ? 1 : 0);
+        formData.append('addon', addon);
 
 
         const quoteId = document.getElementById('quoteId').value;
@@ -783,23 +793,23 @@
                     }
 
                     const row = `
-                        <tr data-id="${data.item_id}">
-                            <td style="text-wrap:auto">${itemDesc}</td>
-                            <td><input type="number" name="qty[]" value="${qty}" min="1" class="form-control form-control-sm qty-input" style="width: 60px;" data-price="${price}" data-id="${data.item_id}"></td>
-                            <td>${size}</td>
-                            <td>${glass}</td>
-                            <td>${grid}</td>
-                            <td>$${price}</td>
-                            <td class="item-total" data-id="${data.item_id}">$${total}</td>
+                        <tr data-id="${data.item.id}">
+                            <td style="text-wrap:auto">${data.item.description}</td>
+                            <td><input type="number" name="qty[]" value="${data.item.qty}" min="1" class="form-control form-control-sm qty-input" style="width: 60px;" data-price="${data.item.price}" data-id="${data.item.id}"></td>
+                            <td>${data.item.width}" x ${data.item.height}"</td>
+                            <td>${data.item.glass}</td>
+                            <td>${data.item.grid}</td>
+                            <td>$${data.item.price}</td>
+                            <td class="item-total" data-id="${data.item.id}">$${data.item.total}</td>
                             <td><img src="https://via.placeholder.com/40" class="img-thumbnail" alt="Item"></td>
                             <td class="text-nowrap">
-                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item" data-id="${data.item_id}">
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-success text-success view-quote-item" data-id="${data.item.id}">
                                     <i data-feather="eye"></i>
                                 </a>
-                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item" data-id="${data.item_id}">
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-primary text-primary edit-quote-item" data-id="${data.item.id}">
                                     <i data-feather="edit"></i>
                                 </a>
-                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row" data-id="${data.item_id}">
+                                <a href="javascript:void(0);" class="avtar avtar-xs btn-link-danger text-danger remove-row" data-id="${data.item.id}">
                                     <i data-feather="trash-2"></i>
                                 </a>
                             </td>
@@ -868,6 +878,10 @@
 
     });
 
+     document.getElementById('addItemButton').addEventListener('click', function() {
+        initializeDefaultSelections();
+    });
+
     // open modal in view mode
     document.querySelector('#quoteDetailsTable tbody').addEventListener('click', function(e) {
         const viewBtn = e.target.closest('.view-quote-item');
@@ -932,6 +946,7 @@
                         $('#temperedMatrix').removeClass('d-none');
                     }
                     
+                    
                     setTimeout(() => {
                         form.querySelector('[name="color_exterior"]').value = data.item.color_exterior || '';
                         form.querySelector('[name="color_interior"]').value = data.item.color_interior || '';
@@ -946,6 +961,26 @@
                             el.disabled = true;
                         }
                     });
+
+                    form.querySelector('#addon').value = data.item.addon || '';
+
+                    let addonsHtml = '';
+                    if (data.item.addon) {
+                        try {
+                            const addonObj = typeof data.item.addon === 'string' ? JSON.parse(data.item.addon) : data.item.addon;
+                            for (const [type, price] of Object.entries(addonObj)) {
+                                addonsHtml += `<div class="addon-item"><span>${type}:</span> <span class="badge-price">+$${price.toFixed(2)}</span></div>`;
+                            }
+                        } catch (e) {
+                            console.error('Error parsing addons:', e);
+                            addonsHtml = '<div class="text-center text-muted">No addons available</div>';
+                        }
+                    } else {
+                        addonsHtml = '<div class="text-center text-muted">No addons selected</div>';
+                    }
+                    
+                    $('#currentAddons').html(addonsHtml);
+
                     // Hide add button
                     document.getElementById('saveQuoteItem').style.display = 'none';
                     // Show modal
@@ -1037,7 +1072,44 @@
 
                     }, 1000);
 
-                    form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                     setTimeout(() => {
+                        const seriesTypeSelect = document.getElementById('seriesTypeSelect');
+                        Array.from(seriesTypeSelect.options).forEach(opt => {
+                            if (opt.value == (data.item.series_type ?? '')) {
+                                seriesTypeSelect.value = opt.value;
+                            }
+                        });
+
+                        document.getElementById('seriesTypeSelect').dispatchEvent(new Event('change'));
+
+                    }, 1000);
+
+                     setTimeout(() => {
+                         let addonsHtml = '';
+                        if (data.item.addon) {
+                            try {
+                                const addonObj = typeof data.item.addon === 'string' ? JSON.parse(data.item.addon) : data.item.addon;
+                                for (const [type, price] of Object.entries(addonObj)) {
+                                    addonsHtml += `<div class="addon-item"><span>${type}:</span> <span class="badge-price">+$${price.toFixed(2)}</span></div>`;
+                                }
+                            } catch (e) {
+                                console.error('Error parsing addons:', e);
+                                addonsHtml = '<div class="text-center text-muted">No addons available</div>';
+                            }
+                        } else {
+                            addonsHtml = '<div class="text-center text-muted">No addons selected</div>';
+                        }
+                        $('#currentAddons').html(addonsHtml);
+                    }, 1500);
+
+                    // Show loading spinner
+                    
+                    setTimeout(() => {
+                        form.querySelector('#globalTotalPrice').textContent = data.item.price || '';
+                    }, 4000);
+
+                    form.querySelector('#addon').value = data.item.addon || '';
+
                     // Show modal
                     document.getElementById('modalTitle').textContent = 'Edit Quote Item';
                     document.getElementById('saveQuoteItem').textContent = 'Update Quote Item';
@@ -1514,28 +1586,194 @@ updateWindowPreview();
     });
     @endif
 
+     let frameAddons = {};
+    let glassAddons = {};
+
+    function updateDisplay() {
+        let basePrice = parseFloat($('input[name="price"]').val());
+        const frameAddonTotal = Object.values(frameAddons).reduce((a, b) => a + b, 0);
+        const glassAddonTotal = Object.values(glassAddons).reduce((a, b) => a + b, 0);
+        const totalAddons = frameAddonTotal + glassAddonTotal;
+        const totalPrice = basePrice + totalAddons;
+
+        $('#globalTotalPrice').text(parseFloat(totalPrice).toFixed(2));
+
+        // Update addons list
+        const allAddons = {...frameAddons, ...glassAddons};
+        if (Object.keys(allAddons).length === 0) {
+            $('#currentAddons').html('<div class="text-center text-muted">No addons selected</div>');
+        } else {
+            let addonsHtml = '';
+            for (const [type, price] of Object.entries(allAddons)) {
+                addonsHtml += `<div class="addon-item"><span>${type}:</span> <span class="badge-price">+$${price.toFixed(2)}</span></div>`;
+            }
+            $('#currentAddons').html(addonsHtml);
+        }
+        
+        // Update hidden input
+        $('#addon').val(JSON.stringify(allAddons));
+    }
+
+    // Handle frame type changes
     $('#frame_type').on('change', function() {
         const selectedFrame = $(this).val();
-        $.ajax({
-            url: '/sales/quotes/schema/price',
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                dropdown_value: selectedFrame,
-                series_type: $('#seriesTypeSelect').val()
-            },
-            success: function(data) {
+        const previousFrame = $(this).data('previous-value') || null;
+        
+        // Remove previous frame addon if exists
+        if (previousFrame && frameAddons[previousFrame]) {
+            delete frameAddons[previousFrame];
+            console.log('Removed previous frame addon:', previousFrame);
+        }
+        
+        // Store current selection as previous for next change
+        $(this).data('previous-value', selectedFrame);
+        
+        // Get price from server
+        getPriceFromServer('frame', selectedFrame, function(price) {
 
-                const currentTotal = parseFloat($('#globalTotalPrice').text()) || 0;
-                $('#globalTotalPrice').text(currentTotal + data.price);
-                // You can update the UI or perform other actions based on the response
-            },
-            error: function(xhr, status, error) {
-                console.error('Error fetching frame details:', error);
+            // Only add if price > 0 and not already added
+            if (price > 0 && !frameAddons[selectedFrame]) {
+                frameAddons[selectedFrame] = price;
+                console.log('Added frame:', selectedFrame, 'with price:', price);
+            } else if (price <= 0) {
+                console.log('Frame', selectedFrame, 'has no addon price (0 or less)');
             }
+            
+            updateDisplay();
         });
-        console.log('Selected frame type:', selectedFrame);
     });
+
+    // Handle glass type changes
+    $('#glass_type').on('change', function() {
+            const selectedGlass = $(this).val();
+            const previousGlass = $(this).data('previous-value') || null;
+            
+            // Remove previous glass addon if exists
+            if (previousGlass && glassAddons[previousGlass]) {
+                delete glassAddons[previousGlass];
+                console.log('Removed previous glass addon:', previousGlass);
+            }
+            
+            // Store current selection as previous for next change
+            $(this).data('previous-value', selectedGlass);
+            
+            // Get price from server
+            getPriceFromServer('glass', selectedGlass, function(price) {
+
+                // Only add if price > 0 and not already added
+            if (price > 0 && !glassAddons[selectedGlass]) {
+                glassAddons[selectedGlass] = price;
+                console.log('Added glass:', selectedGlass, 'with price:', price);
+            } else if (price <= 0) {
+                console.log('Glass', selectedGlass, 'has no addon price (0 or less)');
+            }
+            
+            updateDisplay();
+        });
+    });
+
+    function getPriceFromServer(type, value, callback) {
+            if (type === 'frame') {
+                $.ajax({
+                    url: '/sales/quotes/schema/price',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        dropdown_value: value,
+                        series_type: $('#seriesTypeSelect').val(),
+                        series: $('#seriesSelect').val()
+                    },
+                    success: function(data) {
+                       callback(data.price || 0);
+                    },
+                    error: function(xhr, status, error) {
+                        callback(0); 
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            Object.values(xhr.responseJSON.errors).forEach(errorMessages => {
+                                errorMessages.forEach(message => {
+                                    toastr.error(message, 'Error', {
+                                        timeOut: 3000,
+                                        progressBar: true,
+                                        closeButton: true
+                                    });
+                                });
+                            });
+                        } else {
+                            toastr.error('Failed to fetch price. Please try again.', 'Error', {
+                                timeOut: 3000,
+                                progressBar: true, 
+                                closeButton: true
+                            });
+                        }
+                    }
+                });
+
+            } else if (type === 'glass') {
+               $.ajax({
+                    url: '/sales/quotes/schema/price',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        dropdown_value: value,
+                        series_type: $('#seriesTypeSelect').val(),
+                        series: $('#seriesSelect').val()
+                    },
+                    success: function(data) {
+                        callback(data.price || 0);
+                    },
+                    error: function(xhr, status, error) {
+                        callback(0); 
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            Object.values(xhr.responseJSON.errors).forEach(errorMessages => {
+                                errorMessages.forEach(message => {
+                                    toastr.error(message, 'Error', {
+                                        timeOut: 3000,
+                                        progressBar: true,
+                                        closeButton: true
+                                    });
+                                });
+                            });
+                        } else {
+                            toastr.error('Failed to fetch price. Please try again.', 'Error', {
+                                timeOut: 3000,
+                                progressBar: true, 
+                                closeButton: true
+                            });
+                        }
+                  }
+                });
+            }
+    }
+
+     // Initialize default selections on page load
+    function initializeDefaultSelections() {
+            // Get default selected values
+            const defaultFrame = $('#frame_type').val();
+            const defaultGlass = $('#glass_type').val();
+            
+            // Set as previous values
+            $('#frame_type').data('previous-value', defaultFrame);
+            $('#glass_type').data('previous-value', defaultGlass);
+            
+            getPriceFromServer('frame', defaultFrame, function(price) {
+                console.log('Default frame price:', price);
+                if (price > 0) {
+                    frameAddons[defaultFrame] = price;
+                }
+                
+                // Then get glass price
+                getPriceFromServer('glass', defaultGlass, function(glassPrice) {
+                    console.log('Default glass price:', glassPrice);
+                    if (glassPrice > 0) {
+                        glassAddons[defaultGlass] = glassPrice;
+                    }
+                    
+                    // Update display after both prices are fetched
+                    updateDisplay();
+                });
+            });
+
+    }
 
     $('#fin_type').on('change', function() {
         const selectedFin = $(this).val();
@@ -1589,7 +1827,7 @@ updateWindowPreview();
                     $('#subtotal-amount').text('$' + data.data.sub_total);
                     $('#tax-amount').text('$' + data.data.tax + ' (' + data.data.tax_rate + '%)');
                     $('#total-amount').text('$' + data.data.grand_total);
-                    document.getElementById('discount-amount').textContent = '$' + data.data.total_discount;
+                    document.getElementById('discount-amount').textContent = '-$' + data.data.total_discount;
                     document.getElementById('tax').value = data.data.tax;
                     document.getElementById('subtotal').value = data.data.sub_total;
                     document.getElementById('tax').value = data.data.tax;

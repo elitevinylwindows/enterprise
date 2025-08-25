@@ -46,6 +46,8 @@
 <script src="{{ asset('assets/js/plugins/vfs_fonts.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/buttons.html5.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/buttons.bootstrap5.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
     font_change("{{ $settings['layout_font'] }}");
 </script>
