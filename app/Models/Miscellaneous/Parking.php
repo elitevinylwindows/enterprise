@@ -12,6 +12,7 @@ class Parking extends Model
         'user_id',
         'spot',
         'notes',
+        'wheelchair',
     ];
 
     public function user()
