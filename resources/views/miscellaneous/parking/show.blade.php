@@ -13,6 +13,7 @@
                 ? $p
                 : Storage::url(ltrim($p, '/'));
         }
+        dd($profileUrl);
       @endphp
 
       @if($profileUrl)

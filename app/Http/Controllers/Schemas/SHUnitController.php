@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Schemas;
 
 use App\Http\Controllers\Controller;
+use App\Imports\SHUnitImport;
 use Illuminate\Http\Request;
 use App\Models\Schemas\SHUnit;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SHUnitController extends Controller
 {
@@ -87,7 +91,7 @@ SHUnit::create($validated);
             'solar_cool' => 'nullable|string',
             'status' => 'nullable|string',
         ]);
-$item = SHUnit::findOrFail($id);
+        $item = SHUnit::findOrFail($id);
         $item->update($validated);
         return redirect()->route('shunit.index')->with('success', 'Updated successfully.');
     }
@@ -97,5 +101,29 @@ $item = SHUnit::findOrFail($id);
         $item = SHUnit::findOrFail($id);
         $item->delete();
         return redirect()->route('shunit.index')->with('success', 'Deleted successfully.');
+    }
+
+    public function importModal()
+    {
+        return view('schemas.shunit.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        try{
+            DB::beginTransaction();
+            $file = $request->file('file');
+            Excel::import(new SHUnitImport, $file);
+            DB::commit();
+            return redirect()->route('sh-unit.index')->with('success', 'Data imported successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e);
+            return redirect()->back()->with('error', 'Error importing data: ' . $e->getMessage());
+        }
     }
 }
