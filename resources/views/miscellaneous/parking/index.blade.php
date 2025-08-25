@@ -9,8 +9,7 @@
 @endsection
 
 @section('content')
-<div class="mb-4"></div>
-<div class="mb-4"></div>
+<div class="mb-3"></div>
 
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-white">
@@ -41,63 +40,61 @@
   </div>
 
   <div class="card-body">
-    <div class="row g-4">
+    <div class="row g-3">
       @forelse($assignments as $a)
         @php
           $u = $a->user;
           $name  = $u->name ?? __('Unassigned');
           $email = $u->email ?? '—';
-          // Optional: adjust these if your users table has different columns
           $department = $u->department ?? '—';
           $phone      = $u->phone ?? '—';
-
-          // For avatar: show big red circle; text is optional (spot or initials)
-          $avatarText = ''; // leave empty for solid red circle (like mock)
+          $profileImg = $u && $u->profile ? asset('storage/'.$u->profile) : null; 
         @endphp
 
-        <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
-          <div class="parking-card card border-0 shadow-sm h-100 position-relative">
+        <div class="col-12 col-sm-6 col-lg-3 col-xl-2">
+          <div class="parking-card card border-0 shadow-sm h-100 position-relative text-center">
 
             {{-- wheelchair icon top-left (blue) --}}
             @if($a->wheelchair)
-              <div class="position-absolute top-0 start-0 m-3">
-                <i class="fa-solid fa-wheelchair text-primary" style="font-size:22px;"></i>
+              <div class="position-absolute top-0 start-0 m-2">
+                <i class="fa-solid fa-wheelchair text-primary" style="font-size:18px;"></i>
               </div>
             @endif
 
             {{-- edit icon top-right --}}
-            <div class="position-absolute top-0 end-0 m-3">
+            <div class="position-absolute top-0 end-0 m-2">
               <a href="#"
                  class="text-muted customModal"
                  data-size="xl"
                  data-url="{{ route('misc.parking.edit', $a->id) }}"
                  data-title="{{ __('Edit Parking') }}">
-                <i class="fa-regular fa-pen-to-square" style="font-size:20px;"></i>
+                <i class="fa-regular fa-pen-to-square" style="font-size:16px;"></i>
               </a>
             </div>
 
-            <div class="card-body d-flex flex-column align-items-center text-center">
-              {{-- big red avatar --}}
-              <div class="parking-avatar mb-3">{{ $avatarText }}</div>
+            <div class="card-body d-flex flex-column align-items-center p-3">
+              {{-- avatar: image or red circle --}}
+              @if($profileImg)
+                <img src="{{ $profileImg }}" alt="avatar"
+                     class="parking-avatar-img mb-2">
+              @else
+                <div class="parking-avatar-fallback mb-2"></div>
+              @endif
 
-              {{-- stacked labels + values --}}
-              <div class="w-100">
-                <div class="parking-label">{{ __('Name') }}</div>
-                <div class="parking-value mb-2">{{ $name }}</div>
+              <div class="parking-label">{{ __('Name') }}</div>
+              <div class="parking-value mb-1">{{ $name }}</div>
 
-                <div class="parking-label">{{ __('Department') }}</div>
-                <div class="parking-value mb-2">{{ $department }}</div>
+              <div class="parking-label">{{ __('Department') }}</div>
+              <div class="parking-value mb-1">{{ $department }}</div>
 
-                <div class="parking-label">{{ __('Phone') }}</div>
-                <div class="parking-value mb-2">{{ $phone }}</div>
+              <div class="parking-label">{{ __('Phone') }}</div>
+              <div class="parking-value mb-1">{{ $phone }}</div>
 
-                <div class="parking-label">{{ __('Spot #') }}</div>
-                <div class="parking-value mb-3">{{ $a->spot }}</div>
-              </div>
+              <div class="parking-label">{{ __('Spot #') }}</div>
+              <div class="parking-value mb-2">{{ $a->spot }}</div>
 
-              {{-- Quick Look button (opens the same edit modal, or wire to a show modal if you prefer) --}}
               <a href="#"
-                 class="btn btn-danger w-75 mt-2 customModal"
+                 class="btn btn-danger btn-sm w-100 customModal"
                  data-size="md"
                  data-url="{{ route('misc.parking.edit', $a->id) }}"
                  data-title="{{ __('Quick Look') }}">
@@ -115,28 +112,31 @@
   </div>
 </div>
 
-{{-- styles to match the mock --}}
 <style>
 .parking-card{
-  border-radius: 18px;
+  border-radius: 14px;
+  font-size: 0.85rem;
 }
-.parking-avatar{
-  width: 140px;
-  height: 140px;
+.parking-avatar-img{
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
-  background: #9b0000; /* deep red */
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 28px;
+  object-fit: cover;
+  border: 2px solid #9b0000;
+}
+.parking-avatar-fallback{
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #9b0000;
 }
 .parking-label{
   font-weight: 700;
-  color: #2b2b2b;
+  font-size: 0.8rem;
+  color: #222;
 }
 .parking-value{
+  font-size: 0.8rem;
   color: #444;
 }
 </style>
