@@ -5,7 +5,8 @@
   <div class="modal-body">
     <div class="mb-3">
       <label class="form-label">{{ __('User') }}</label>
-      <select name="user_id" class="form-select @error('user_id') is-invalid @enderror" required>
+      <select name="user_id" class="form-select @error('user_id') is-invalid @enderror">
+        <option value="">{{ __('— Unassigned —') }}</option>
         @foreach($users as $u)
           <option value="{{ $u->id }}" {{ (old('user_id', $assignment->user_id) == $u->id) ? 'selected' : '' }}>
             {{ $u->name }} @if($u->email) — {{ $u->email }} @endif
@@ -13,20 +14,26 @@
         @endforeach
       </select>
       @error('user_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
-      <div class="form-text">{{ __('Change who this spot is assigned to, if needed.') }}</div>
+      <div class="form-text">{{ __('Pick who this spot is assigned to (or leave Unassigned).') }}</div>
     </div>
 
     <div class="mb-3">
       <label class="form-label">{{ __('Spot') }}</label>
-      <input type="text" name="spot" class="form-control @error('spot') is-invalid @enderror"
+      <input type="number" min="1" max="50" name="spot"
+             class="form-control @error('spot') is-invalid @enderror"
              value="{{ old('spot', $assignment->spot) }}" required>
       @error('spot') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="is_wheelchair" name="is_wheelchair"
+             {{ old('is_wheelchair', $assignment->is_wheelchair) ? 'checked' : '' }}>
+      <label class="form-check-label" for="is_wheelchair">{{ __('Wheelchair / Accessible') }}</label>
+    </div>
+
     <div class="mb-3">
       <label class="form-label">{{ __('Notes') }}</label>
-      <textarea name="notes" rows="3" class="form-control @error('notes') is-invalid @enderror"
-      >{{ old('notes', $assignment->notes) }}</textarea>
+      <textarea name="notes" rows="3" class="form-control @error('notes') is-invalid @enderror">{{ old('notes', $assignment->notes) }}</textarea>
       @error('notes') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
   </div>
