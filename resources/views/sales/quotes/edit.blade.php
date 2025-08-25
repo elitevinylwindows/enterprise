@@ -1303,6 +1303,7 @@
                             el.disabled = true;
                         }
                     });
+
                     form.querySelector('#addon').value = data.item.addon || '';
 
                     let addonsHtml = '';
@@ -1830,62 +1831,62 @@
     });
     @endif
 
-        let frameAddons = {};
-        let glassAddons = {};
+    let frameAddons = {};
+    let glassAddons = {};
 
-        function updateDisplay() {
-            let basePrice = parseFloat($('input[name="price"]').val());
-            const frameAddonTotal = Object.values(frameAddons).reduce((a, b) => a + b, 0);
-            const glassAddonTotal = Object.values(glassAddons).reduce((a, b) => a + b, 0);
-            const totalAddons = frameAddonTotal + glassAddonTotal;
-            const totalPrice = basePrice + totalAddons;
+    function updateDisplay() {
+        let basePrice = parseFloat($('input[name="price"]').val());
+        const frameAddonTotal = Object.values(frameAddons).reduce((a, b) => a + b, 0);
+        const glassAddonTotal = Object.values(glassAddons).reduce((a, b) => a + b, 0);
+        const totalAddons = frameAddonTotal + glassAddonTotal;
+        const totalPrice = basePrice + totalAddons;
 
-            $('#globalTotalPrice').text(parseFloat(totalPrice).toFixed(2));
+        $('#globalTotalPrice').text(parseFloat(totalPrice).toFixed(2));
 
-            // Update addons list
-            const allAddons = {...frameAddons, ...glassAddons};
-            if (Object.keys(allAddons).length === 0) {
-                $('#currentAddons').html('<div class="text-center text-muted">No addons selected</div>');
-            } else {
-                let addonsHtml = '';
-                for (const [type, price] of Object.entries(allAddons)) {
-                    addonsHtml += `<div class="addon-item"><span>${type}:</span> <span class="badge-price">+$${price.toFixed(2)}</span></div>`;
-                }
-                $('#currentAddons').html(addonsHtml);
+        // Update addons list
+        const allAddons = {...frameAddons, ...glassAddons};
+        if (Object.keys(allAddons).length === 0) {
+            $('#currentAddons').html('<div class="text-center text-muted">No addons selected</div>');
+        } else {
+            let addonsHtml = '';
+            for (const [type, price] of Object.entries(allAddons)) {
+                addonsHtml += `<div class="addon-item"><span>${type}:</span> <span class="badge-price">+$${price.toFixed(2)}</span></div>`;
             }
-            
-            // Update hidden input
-            $('#addon').val(JSON.stringify(allAddons));
+            $('#currentAddons').html(addonsHtml);
         }
+        
+        // Update hidden input
+        $('#addon').val(JSON.stringify(allAddons));
+    }
 
-      // Handle frame type changes
-        $('#frame_type').on('change', function() {
-            const selectedFrame = $(this).val();
-            const previousFrame = $(this).data('previous-value') || null;
-            
-            // Remove previous frame addon if exists
-            if (previousFrame && frameAddons[previousFrame]) {
-                delete frameAddons[previousFrame];
-                console.log('Removed previous frame addon:', previousFrame);
+    // Handle frame type changes
+    $('#frame_type').on('change', function() {
+        const selectedFrame = $(this).val();
+        const previousFrame = $(this).data('previous-value') || null;
+        
+        // Remove previous frame addon if exists
+        if (previousFrame && frameAddons[previousFrame]) {
+            delete frameAddons[previousFrame];
+            console.log('Removed previous frame addon:', previousFrame);
+        }
+        
+        // Store current selection as previous for next change
+        $(this).data('previous-value', selectedFrame);
+        
+        // Get price from server
+        getPriceFromServer('frame', selectedFrame, function(price) {
+
+            // Only add if price > 0 and not already added
+            if (price > 0 && !frameAddons[selectedFrame]) {
+                frameAddons[selectedFrame] = price;
+                console.log('Added frame:', selectedFrame, 'with price:', price);
+            } else if (price <= 0) {
+                console.log('Frame', selectedFrame, 'has no addon price (0 or less)');
             }
             
-            // Store current selection as previous for next change
-            $(this).data('previous-value', selectedFrame);
-            
-            // Get price from server
-            getPriceFromServer('frame', selectedFrame, function(price) {
-
-                // Only add if price > 0 and not already added
-                if (price > 0 && !frameAddons[selectedFrame]) {
-                    frameAddons[selectedFrame] = price;
-                    console.log('Added frame:', selectedFrame, 'with price:', price);
-                } else if (price <= 0) {
-                    console.log('Frame', selectedFrame, 'has no addon price (0 or less)');
-                }
-                
-                updateDisplay();
-            });
+            updateDisplay();
         });
+    });
 
     // Handle glass type changes
     $('#glass_type').on('change', function() {
@@ -1988,7 +1989,6 @@
                 });
             }
     }
-    
 
      // Initialize default selections on page load
     function initializeDefaultSelections() {

@@ -233,7 +233,7 @@ public function index(Request $request)
                         'discount' => $oldDiscount + $request->discount
                     ]);
                 }
-                $item = $existingItem;
+                $item = QuoteItem::where('id', $validated['item_id'])->first();
                 $isUpdate = true;
             } else {
                 $item = QuoteItem::create([
@@ -300,6 +300,7 @@ public function index(Request $request)
                 'success' => true,
                 'is_modification' => $validated['is_modification'] ?? false,
                 'item_id' => $item->id,
+                'item' => $item,
                 'is_update' => $isUpdate ?? false,
                 'modifications' => $allModifications ?? [],
             ]);
