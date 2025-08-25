@@ -45,30 +45,17 @@
           $u         = $a->user;
           $name      = $u->name ?? __('Unassigned');
           $email     = $u->email ?? '—';
-          $phone     = $u->phone_number ?? '—';    // <- your field
-          // Primary role name (Spatie)
-          $department = $u && method_exists($u, 'getRoleNames') ? ($u->getRoleNames()->first() ?? '—') : '—';
-
-          // Build profile URL
-          $profileUrl = null;
-          if ($u && $u->profile) {
-              $p = $u->profile;
-              if (filter_var($p, FILTER_VALIDATE_URL)) {
-                  $profileUrl = $p; // already a full URL
-              } else {
-                  // assume stored as 'avatars/foo.png' or 'avatar.png' under storage/app/public
-                  $profileUrl = asset('storage/' . ltrim($p, '/'));
-              }
-          }
+          $phone     = $u->phone_number ?? '—';
+          $department = $u && method_exists($u,'getRoleNames') ? ($u->getRoleNames()->first() ?? '—') : '—';
         @endphp
 
         <div class="col-12 col-sm-6 col-lg-3 col-xl-2">
           <div class="parking-card card border-0 shadow-sm h-100 position-relative text-center">
 
-            {{-- wheelchair icon top-left (force blue) --}}
+            {{-- wheelchair icon top-left (forced blue) --}}
             @if($a->wheelchair)
               <div class="position-absolute top-0 start-0 m-2">
-                <i class="fa-solid fa-wheelchair wheelchair-icon"></i>
+                <i class="fa-solid fa-wheelchair" style="color:#0d6efd; font-size:18px;"></i>
               </div>
             @endif
 
@@ -84,7 +71,20 @@
             </div>
 
             <div class="card-body d-flex flex-column align-items-center p-3">
-              {{-- avatar: image or fallback red circle with onerror fallback --}}
+
+              {{-- AVATAR (your requested snippet goes RIGHT HERE) --}}
+              @php
+                use Illuminate\Support\Facades\Storage;
+
+                $profileUrl = null;
+                if ($u && $u->profile) {
+                    $p = $u->profile;
+                    $profileUrl = filter_var($p, FILTER_VALIDATE_URL)
+                        ? $p
+                        : Storage::url(ltrim($p, '/')); // requires `php artisan storage:link`
+                }
+              @endphp
+
               @if($profileUrl)
                 <img src="{{ $profileUrl }}" alt="avatar"
                      class="parking-avatar-img mb-2"
@@ -92,6 +92,7 @@
               @else
                 <div class="parking-avatar-fallback mb-2"></div>
               @endif
+              {{-- END AVATAR --}}
 
               <div class="parking-label">{{ __('Name') }}</div>
               <div class="parking-value mb-1">{{ $name }}</div>
@@ -105,14 +106,14 @@
               <div class="parking-label">{{ __('Spot #') }}</div>
               <div class="parking-value mb-2">{{ $a->spot }}</div>
 
-             <a href="#"
-   class="btn btn-danger btn-sm w-100 customModal"
-   data-size="lg"
-   data-url="{{ route('misc.parking.show', $a->id) }}"
-   data-title="{{ __('Parking Details') }}">
-  {{ __('Quick Look') }}
-</a>
-
+              {{-- Quick Look -> SHOW modal --}}
+              <a href="#"
+                 class="btn btn-danger btn-sm w-100 customModal"
+                 data-size="lg"
+                 data-url="{{ route('misc.parking.show', $a->id) }}"
+                 data-title="{{ __('Parking Details') }}">
+                {{ __('Quick Look') }}
+              </a>
             </div>
           </div>
         </div>
@@ -131,7 +132,5 @@
 .parking-avatar-fallback{ width:70px; height:70px; border-radius:50%; background:#9b0000; }
 .parking-label{ font-weight:700; font-size:.8rem; color:#222; }
 .parking-value{ font-size:.8rem; color:#444; }
-/* force blue in case theme overrides text-primary */
-.wheelchair-icon{ font-size:18px; color:#0d6efd !important; }
 </style>
 @endsection

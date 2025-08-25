@@ -1,17 +1,17 @@
 <div class="modal-body">
-  <div class="row">
+  <div class="row g-3">
     {{-- LEFT: Avatar --}}
     <div class="col-md-4 text-center d-flex align-items-start justify-content-center">
       @php
+        use Illuminate\Support\Facades\Storage;
+
         $u = $assignment->user;
         $profileUrl = null;
         if ($u && $u->profile) {
             $p = $u->profile;
-            if (filter_var($p, FILTER_VALIDATE_URL)) {
-                $profileUrl = $p;
-            } else {
-                $profileUrl = asset('storage/' . ltrim($p, '/'));
-            }
+            $profileUrl = filter_var($p, FILTER_VALIDATE_URL)
+                ? $p
+                : Storage::url(ltrim($p, '/'));
         }
       @endphp
 
@@ -28,10 +28,9 @@
     {{-- RIGHT: Info --}}
     <div class="col-md-8">
       <h5 class="fw-bold mb-3">{{ $u->name ?? __('Unassigned') }}</h5>
-
       <dl class="row mb-0">
         <dt class="col-sm-4">{{ __('Department') }}</dt>
-        <dd class="col-sm-8">{{ $u && method_exists($u, 'getRoleNames') ? ($u->getRoleNames()->first() ?? '—') : '—' }}</dd>
+        <dd class="col-sm-8">{{ $u && method_exists($u,'getRoleNames') ? ($u->getRoleNames()->first() ?? '—') : '—' }}</dd>
 
         <dt class="col-sm-4">{{ __('Email') }}</dt>
         <dd class="col-sm-8">{{ $u->email ?? '—' }}</dd>
@@ -45,7 +44,7 @@
         <dt class="col-sm-4">{{ __('Wheelchair') }}</dt>
         <dd class="col-sm-8">
           @if($assignment->wheelchair)
-            <i class="fa-solid fa-wheelchair text-primary"></i> {{ __('Accessible') }}
+            <i class="fa-solid fa-wheelchair" style="color:#0d6efd;"></i> {{ __('Accessible') }}
           @else
             {{ __('No') }}
           @endif
@@ -65,15 +64,7 @@
 </div>
 
 <style>
-.parking-avatar-fallback {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  background: #9b0000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: bold;
+.parking-avatar-fallback{
+  width:160px;height:160px;border-radius:50%;background:#9b0000;
 }
 </style>
