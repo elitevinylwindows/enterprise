@@ -104,8 +104,8 @@
 
               {{-- Quick Look -> SHOW modal --}}
               <a href="#"
-                 class="btn btn-danger btn-sm w-100 customModal"
-                 data-size="lg"
+                 class="btn btn-danger btn-sm w-80 customModal"
+                 data-size="xl"
                  data-url="{{ route('misc.parking.show', $a->id) }}"
                  data-title="{{ __('Parking Details') }}">
                 {{ __('Quick Look') }}
