@@ -62,8 +62,8 @@ class SHUnitController extends Controller
 
     public function edit($id)
     {
-        $item = SHUnit::findOrFail($id);
-        return view('schemas.shunit.edit', compact('item'));
+        $shunit = SHUnit::findOrFail($id);
+        return view('schemas.shunit.edit', compact('shunit'));
     }
 
     public function update(Request $request, $id)
