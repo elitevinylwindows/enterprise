@@ -15,7 +15,7 @@
              class="img-fluid rounded-circle border"
              style="max-width:160px; max-height:160px; width:160px; height:160px; object-fit:cover;">
       @else
-        <div class="parking-avatar-fallback"></div>
+        <div id="parking-avatar-fallback"></div>
       @endif
     </div>
 
@@ -58,7 +58,7 @@
 </div>
 
 <style>
-.parking-avatar-fallback{
+#parking-avatar-fallback{
   width:160px;height:160px;border-radius:50%;background:#9b0000;
 }
 </style>
