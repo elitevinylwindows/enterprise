@@ -15,10 +15,11 @@ $(document).on("click", ".customModal", function (e) {
     var modalUrl = $(this).data("url");
     var modalSize = $(this).data("size") == "" ? "md" : $(this).data("size");
     var originalText = $(this).html();
+    var $button = $(this);
 
     // Show loader on button
-    $(this).html('<i class="ti ti-loader ti-spin"></i> Loading...');
-    $(this).prop('disabled', true);
+    $button.html('<i class="ti ti-loader ti-spin"></i> Loading...');
+    $button.prop('disabled', true);
 
     $("#customModal .modal-title").html(modalTitle);
     $("#customModal .modal-dialog").addClass("modal-" + modalSize);
@@ -47,8 +48,8 @@ $(document).on("click", ".customModal", function (e) {
         },
         complete: function() {
             // Restore original button state
-            $('.customModal').html(originalText);
-            $('.customModal').prop('disabled', false);
+            $button.html(originalText);
+            $button.prop('disabled', false);
         }
     });
 });
