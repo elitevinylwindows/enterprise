@@ -21,8 +21,14 @@
                     <div class="col-auto">
                         <a href="#" class="btn btn-primary customModal"
                            data-size="lg"
-                           data-url="{ route('dh-unit.create') }"
-                           data-title="{ __('Create DH Unit') }">
+                           data-url="{{ route('sh-unit.import.modal') }}"
+                           data-title="{{ __('Import SH Unit') }}">
+                           <i data-feather="plus"></i> {{ __('Import') }}
+                        </a>
+                        <a href="#" class="btn btn-primary customModal"
+                           data-size="lg"
+                           data-url="{{ route('dh-unit.create') }}"
+                           data-title="{{ __('Create DH Unit') }}">
                            <i data-feather="plus"></i> {{ __('Create') }}
                         </a>
                     </div>

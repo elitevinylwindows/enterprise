@@ -3,6 +3,12 @@
 @section('content')
 <div class="container">
     <h1>PW Unit</h1>
+    <a href="#" class="btn btn-primary customModal"
+        data-size="lg"
+        data-url="{{ route('sh-unit.import.modal') }}"
+        data-title="{{ __('Import SH Unit') }}">
+        <i data-feather="plus"></i> {{ __('Import') }}
+    </a>
     <a href="{{ route('pw-unit.create') }}" class="btn btn-primary mb-3">Add New PW Unit</a>
     <table class="table table-bordered">
         <thead>

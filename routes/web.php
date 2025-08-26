@@ -665,7 +665,10 @@ Route::prefix('miscellaneous')->name('misc.')->group(function () {
 
 
         Route::prefix('schemas')->group(function () {
+            Route::get('hs-unit/import', [HSUnitController::class, 'importModal'])->name('hs-unit.import.modal');
+            Route::post('hs-unit/import', [HSUnitController::class, 'import'])->name('hs-unit.import');
             Route::resource('hs-unit', HSUnitController::class);
+           
             Route::get('sh-unit/import', [SHUnitController::class, 'importModal'])->name('sh-unit.import.modal');
             Route::post('sh-unit/import', [SHUnitController::class, 'import'])->name('sh-unit.import');
             Route::resource('sh-unit', SHUnitController::class);

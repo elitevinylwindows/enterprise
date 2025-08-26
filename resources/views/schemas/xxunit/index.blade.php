@@ -19,6 +19,12 @@
                         <h5>{{ __('XX Units') }}</h5>
                     </div>
                     <div class="col-auto">
+                        <a href="#" class="btn btn-primary customModal"
+                           data-size="lg"
+                           data-url="{{ route('sh-unit.import.modal') }}"
+                           data-title="{{ __('Import SH Unit') }}">
+                           <i data-feather="plus"></i> {{ __('Import') }}
+                        </a>
 <a href="#" class="btn btn-primary customModal"
    data-size="lg"
    data-url="{{ route('xx-unit.create') }}"

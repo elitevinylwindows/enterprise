@@ -7,8 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class HSUnit extends Model
 {
     protected $table = 'elitevw_schema_hsunit';
+    
     protected $fillable = [
         'schema_id',
+        'product_code',
+        'product_class',
+        'description',
         'retrofit',
         'nailon',
         'block',
