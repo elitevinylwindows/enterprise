@@ -54,26 +54,26 @@
                         <tbody>
                             @foreach ($gscopwunits as $gscopwunit)
                             <tr>
-                                <td>{{ $hsunit->schema_id }}</td>
-                                <td>{{ $hsunit->product_id }}</td>
-                                <td>{{ $hsunit->product_code }}</td>
-                                <td>${{ $hsunit->retrofit }}</td>
-                                <td>${{ $hsunit->nailon }}</td>
-                                <td>${{ $hsunit->block }}</td>
-                                <td>${{ $hsunit->le3_clr }}</td>
-                                <td>${{ $hsunit->clr_clr }}</td>
-                                <td>${{ $hsunit->le3_lam }}</td>
-                                <td>${{ $hsunit->le3_clr_le3 }}</td>
-                                <td>${{ $hsunit->clr_temp }}</td>
-                                <td>${{ $hsunit->lam_temp }}</td>
-                                <td>${{ $hsunit->obs }}</td>
-                                <td>${{ $hsunit->feat2 }}</td>
-                                <td>${{ $hsunit->feat3 }}</td>
-                                <td>{{ $hsunit->status }}</td>
+                                <td>{{ $gscopwunit->schema_id }}</td>
+                                <td>{{ $gscopwunit->product_id }}</td>
+                                <td>{{ $gscopwunit->product_code }}</td>
+                                <td>${{ $gscopwunit->retrofit }}</td>
+                                <td>${{ $gscopwunit->nailon }}</td>
+                                <td>${{ $gscopwunit->block }}</td>
+                                <td>${{ $gscopwunit->le3_clr }}</td>
+                                <td>${{ $gscopwunit->clr_clr }}</td>
+                                <td>${{ $gscopwunit->le3_lam }}</td>
+                                <td>${{ $gscopwunit->le3_clr_le3 }}</td>
+                                <td>${{ $gscopwunit->clr_temp }}</td>
+                                <td>${{ $gscopwunit->lam_temp }}</td>
+                                <td>${{ $gscopwunit->obs }}</td>
+                                <td>${{ $gscopwunit->feat2 }}</td>
+                                <td>${{ $gscopwunit->feat3 }}</td>
+                                <td>{{ $gscopwunit->status }}</td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-info customModal"
                                        data-size="lg"
-                                       data-url="{{ route('hs-unit.edit', $hsunit->id) }}"
+                                       data-url="{{ route('hs-unit.edit', $gscopwunit->id) }}"
                                        data-title="{{ __('Edit HS Unit') }}">
                                        <i data-feather="edit"></i>
                                     </a>
