@@ -556,6 +556,8 @@ Route::prefix('email')->name('email.')->group(function () {
             Route::resource('series-configuration', SeriesConfigurationController::class);
             Route::get('series-type/configs-by-series/{series}', [SeriesTypeController::class, 'configsBySeries'])
         ->name('series-type.configs');
+        Route::get('series-configuration/import',  [SeriesConfigurationController::class, 'importForm'])->name('series-configuration.import.form');
+    Route::post('series-configuration/import', [SeriesConfigurationController::class, 'importUpload'])->name('series-configuration.import.upload');
 Route::get('series-type/manage/{series}', [SeriesTypeController::class, 'manage'])
     ->name('series-type.manage');
 
@@ -665,14 +667,8 @@ Route::prefix('miscellaneous')->name('misc.')->group(function () {
 
 
         Route::prefix('schemas')->group(function () {
-            Route::get('hs-unit/import', [HSUnitController::class, 'importModal'])->name('hs-unit.import.modal');
-            Route::post('hs-unit/import', [HSUnitController::class, 'import'])->name('hs-unit.import');
             Route::resource('hs-unit', HSUnitController::class);
-           
-            Route::get('sh-unit/import', [SHUnitController::class, 'importModal'])->name('sh-unit.import.modal');
-            Route::post('sh-unit/import', [SHUnitController::class, 'import'])->name('sh-unit.import');
             Route::resource('sh-unit', SHUnitController::class);
-
             Route::resource('dh-unit', DHUnitController::class);
             Route::resource('xx-unit', XXUnitController::class);
             Route::resource('cm-unit', CMUnitController::class);
@@ -1081,8 +1077,7 @@ Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 
-    // Job Planning
-    // URL stays "job-planning/..."; route NAMES use underscores: manufacturing.job_planning.*
+  
     Route::resource('job-planning', JobPlanningController::class)
         ->parameters(['job-planning' => 'job'])
         ->names('job_planning');
