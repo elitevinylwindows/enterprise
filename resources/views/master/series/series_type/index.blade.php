@@ -56,8 +56,8 @@
       </div>
 
       <div class="card-body pt-0">
-        <div class="dt-responsive table-responsive">
-          <table class="table table-hover align-middle">
+          <div class="dt-responsive table-responsive">
+                    <table class="table table-hover advance-datatable">
             <thead>
               <tr>
                 <th>{{ __('ID') }}</th>
