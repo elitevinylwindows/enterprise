@@ -2,7 +2,11 @@
 
 @section('page-title', __('Formulas'))
 
+
+
 @section('content')
+
+<div class='mb-4'></div>
 <div class="card shadow-sm border-0">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h5 class="mb-0">{{ __('Formulas') }}</h5>
