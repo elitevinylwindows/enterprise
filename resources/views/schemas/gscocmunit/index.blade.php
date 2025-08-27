@@ -32,48 +32,61 @@
                 <div class="dt-responsive table-responsive">
                     <table class="table table-hover advance-datatable">
                         <thead>
-                            <tr><th>{{ __('Schema Id') }}</th>
-                            <th>{{ __('Product Id') }}</th>
-                            <th>{{ __('Product Code') }}</th>
-                            <th>{{ __('Retrofit') }}</th>
-                            <th>{{ __('Nailon') }}</th>
-                            <th>{{ __('Block') }}</th>
-                            <th>{{ __('Le3 Clr') }}</th>
-                            <th>{{ __('Clr Clr') }}</th>
-                            <th>{{ __('Le3 Lam') }}</th>
-                            <th>{{ __('Le3 Clr Le3') }}</th>
-                            <th>{{ __('Clr Temp') }}</th>
-                            <th>{{ __('Lam Temp') }}</th>
-                            <th>{{ __('Obs') }}</th>
-                            <th>{{ __('Feat2') }}</th>
-                            <th>{{ __('Feat3') }}</th>
-                            <th>{{ __('Status') }}</th>
-                                <th>{{ __('Action') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($gscocmunits as $gscocmunit)
-                            <tr>
-                                <td>{{ $hsunit->schema_id }}</td>
-                                <td>{{ $hsunit->product_id }}</td>
-                                <td>{{ $hsunit->product_code }}</td>
-                                <td>${{ $hsunit->retrofit }}</td>
-                                <td>${{ $hsunit->nailon }}</td>
-                                <td>${{ $hsunit->block }}</td>
-                                <td>${{ $hsunit->le3_clr }}</td>
-                                <td>${{ $hsunit->clr_clr }}</td>
-                                <td>${{ $hsunit->le3_lam }}</td>
-                                <td>${{ $hsunit->le3_clr_le3 }}</td>
-                                <td>${{ $hsunit->clr_temp }}</td>
-                                <td>${{ $hsunit->lam_temp }}</td>
-                                <td>${{ $hsunit->obs }}</td>
-                                <td>${{ $hsunit->feat2 }}</td>
-                                <td>${{ $hsunit->feat3 }}</td>
-                                <td>{{ $hsunit->status }}</td>
+    <tr>
+        <th>{{ __('ID') }}</th>
+        <th>{{ __('Schema Id') }}</th>
+        <th>{{ __('Product Id') }}</th>
+        <th>{{ __('Product Code') }}</th>
+        <th>{{ __('Retrofit') }}</th>
+        <th>{{ __('Nailon') }}</th>
+        <th>{{ __('Block') }}</th>
+        <th>{{ __('Le3 Clr') }}</th>
+        <th>{{ __('Le3 Lam') }}</th>
+        <th>{{ __('Clr Temp') }}</th>
+        <th>{{ __('OneLe3 OneClr Temp') }}</th>
+        <th>{{ __('Lam Temp') }}</th>
+        <th>{{ __('Feat1') }}</th>
+        <th>{{ __('Feat2') }}</th>
+        <th>{{ __('Feat3') }}</th>
+        <th>{{ __('Clr Clr') }}</th>
+        <th>{{ __('Le3 Clr Le3') }}</th>
+        <th>{{ __('TwoLe3 OneClr Temp') }}</th>
+        <th>{{ __('Sta Grid') }}</th>
+        <th>{{ __('TPI') }}</th>
+        <th>{{ __('TPO') }}</th>
+        <th>{{ __('Status') }}</th>
+        <th>{{ __('Action') }}</th>
+    </tr>
+</thead>
+<tbody>
+    @foreach ($gscocmunits as $gscocmunit)
+    <tr>
+        <td>{{ $gscocmunit->id }}</td>
+        <td>{{ $gscocmunit->schema_id }}</td>
+        <td>{{ $gscocmunit->product_id }}</td>
+        <td>{{ $gscocmunit->product_code }}</td>
+        <td>{{ $gscocmunit->retrofit }}</td>
+        <td>{{ $gscocmunit->nailon }}</td>
+        <td>{{ $gscocmunit->block }}</td>
+        <td>{{ $gscocmunit->le3_clr }}</td>
+        <td>{{ $gscocmunit->le3_lam }}</td>
+        <td>{{ $gscocmunit->clr_temp }}</td>
+        <td>{{ $gscocmunit->onele3_oneclr_temp }}</td>
+        <td>{{ $gscocmunit->lam_temp }}</td>
+        <td>{{ $gscocmunit->feat1 }}</td>
+        <td>{{ $gscocmunit->feat2 }}</td>
+        <td>{{ $gscocmunit->feat3 }}</td>
+        <td>{{ $gscocmunit->clr_clr }}</td>
+        <td>{{ $gscocmunit->le3_clr_le3 }}</td>
+        <td>{{ $gscocmunit->twole3_oneclr_temp }}</td>
+        <td>{{ $gscocmunit->sta_grid }}</td>
+        <td>{{ $gscocmunit->tpi }}</td>
+        <td>{{ $gscocmunit->tpo }}</td>
+        <td>{{ $gscocmunit->status }}</td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-info customModal"
                                        data-size="lg"
-                                       data-url="{{ route('hs-unit.edit', $hsunit->id) }}"
+                                       data-url="{{ route('hs-unit.edit', $gscocmunit->id) }}"
                                        data-title="{{ __('Edit GSCO CM Unit') }}">
                                        <i data-feather="edit"></i>
                                     </a>

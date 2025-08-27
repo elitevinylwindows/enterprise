@@ -602,14 +602,14 @@
     </ul>
 </li>
 
-<li class="pc-item pc-hasmenu {{ request()->routeIs('manufacturing.job_planning.*') || request()->routeIs('manufacturing.tempered.*') ? 'active pc-trigger' : '' }}">
+<!-- Manufacturing Menu -->
+<li class="pc-item pc-hasmenu {{ request()->routeIs('production.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="fa-solid fa-check-to-slot"></i></span>
-        <span class="pc-mtext ms-2">Work Orders</span>
+        <span class="pc-micon"><i class="fa-solid fa-code-fork"></i></span>
+        <span class="pc-mtext ms-2">Production</span>
         <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
     </a>
-
-    <ul class="pc-submenu">
+<ul class="pc-submenu">
         <li class="pc-item {{ request()->routeIs('manufacturing.job_pool.*') ? 'active' : '' }}">
             <a href="{{ route('manufacturing.job_pool.index') }}" class="pc-link">
                 <span class="pc-mtext">Job Pool</span>
@@ -620,38 +620,38 @@
                 <span class="pc-mtext">Job Planning</span>
             </a>
         </li>
-        <li class="pc-item {{ request()->routeIs('manufacturing.tempered.*') ? 'active' : '' }}">
-            <a href="" class="pc-link">
-                <span class="pc-mtext">Tempered</span>
-            </a>
-        </li>
+        
     </ul>
+   
 </li>
 
-
-
-<!-- Manufacturing Menu -->
-<li class="pc-item pc-hasmenu {{ request()->routeIs('production.*') ? 'active pc-trigger' : '' }}">
+<li class="pc-item pc-hasmenu {{ request()->routeIs('manufacturing.job_planning.*') || request()->routeIs('manufacturing.tempered.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
-        <span class="pc-micon"><i class="fa-solid fa-code-fork"></i></span>
-        <span class="pc-mtext ms-2">Production</span>
+        <span class="pc-micon"><i class="fa-solid fa-check-to-slot"></i></span>
+        <span class="pc-mtext ms-2">Work Orders</span>
         <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
     </a>
 
-    <ul class="pc-submenu">
+     <ul class="pc-submenu">
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Dashboard</span>
                 <span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>
             </a>
-            <ul class="pc-submenu" style="display: none;">
-                <li><a class="pc-link" href="{{ route('manufacturing.machines.index') }}">Machines</a></li>
-                <li><a class="pc-link" href="{{ route('pages.index') }}">Stations</a></li>
-                <li><a class="pc-link" href="{{ route('FAQ.index') }}">FAQ</a></li>
-            </ul>
+        </li>
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Repairs</span>
+                <span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>
+            </a>
         </li>
     </ul>
+    
 </li>
+
+
+
+
 
 <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
@@ -1160,7 +1160,48 @@
 </li>
 @endif
 
+<!-- Formula -->
+@if (Gate::check('manage executive'))
+<li class="pc-item pc-hasmenu {{ request()->routeIs('executives.*') ? 'active pc-trigger' : '' }}">
+    <a href="#" class="pc-link d-flex align-items-center">
+        <span class="pc-micon"><i class="ti ti-briefcase"></i></span>
+        <span class="pc-mtext ms-2">Formula</span>
+        <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
+    </a>
 
+    <ul class="pc-submenu">
+        <li><a class="pc-link" href="{{ route('formulas.index') }}">Formulas</a></li>
+        <li><a class="pc-link" href="{{ route('master.prices.markup.index') }}">Markup</a></li>
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Field Definition</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="">Schemas</a></li>
+                <li><a class="pc-link" href="">Raffle</a></li>
+            </ul>
+        </li>
+        <!-- Orders submenu with toggle icon -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Pricing</span>
+                <span class="ms-auto icon-wrapper">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+            </a>
+            <ul class="pc-submenu" style="display: none;">
+                <li><a class="pc-link" href="{{ route('inventory.configurator.index') }}">Configurator</a></li>
+                <li><a class="pc-link" href="{{ route('executives.formulas.index') }}">Formula</a></li>
+                <li><a class="pc-link" href="">Pricing</a></li>
+                <li><a class="pc-link" href="{{ route('form-options.index') }}">Form Options</a></li>
+            </ul>
+        </li>
+    </ul>
+</li>
+@endif
 
 
 <!-- Settings Section -->
