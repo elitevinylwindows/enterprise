@@ -14,7 +14,7 @@
                     <div class="col-auto">
                         <a href="#" class="btn btn-primary customModal"
                            data-size="lg"
-                           data-url="{{ route('hs-unit.import.modal') }}"
+                           data-url="{{ route('schemas.import.form') }}"
                            data-title="{{ __('Import HS Unit') }}">
                            <i data-feather="plus"></i> {{ __('Import') }}
                         </a>

@@ -194,6 +194,7 @@ use App\Http\Controllers\Schemas\{
     GSCOSWDUnitController,
 
     CMPromoController,
+    SchemaController,
     WindowDoorFieldController
 };
 
@@ -556,30 +557,25 @@ Route::prefix('email')->name('email.')->group(function () {
             Route::resource('series-configuration', SeriesConfigurationController::class);
             Route::get('series-type/configs-by-series/{series}', [SeriesTypeController::class, 'configsBySeries'])
         ->name('series-type.configs');
- Route::get('series-configuration/import',
-        [SeriesConfigurationController::class, 'importForm'])
-        ->name('series-configuration.import.form');
+        Route::get('series-configuration/import/form', [SeriesConfigurationController::class, 'importForm'])->name('series-configuration.import.form');
 
-    Route::post('series-configuration/import',
-        [SeriesConfigurationController::class, 'importUpload'])
-        ->name('series-configuration.import.upload');
+        Route::post('series-configuration/import', [SeriesConfigurationController::class, 'importUpload'])->name('series-configuration.import.upload');
 
-        
-Route::get('series-type/manage/{series}', [SeriesTypeController::class, 'manage'])
-    ->name('series-type.manage');
+        Route::get('series-type/manage/{series}', [SeriesTypeController::class, 'manage'])
+            ->name('series-type.manage');
 
-Route::put('series-type/manage/{series}', [SeriesTypeController::class, 'manageUpdate'])
-    ->name('series-type.manage.update');
+        Route::put('series-type/manage/{series}', [SeriesTypeController::class, 'manageUpdate'])
+            ->name('series-type.manage.update');
 
-Route::delete('series-type/destroy-by-series/{series}', [SeriesTypeController::class, 'destroyBySeries'])
-    ->name('series-type.destroy-by-series');
+        Route::delete('series-type/destroy-by-series/{series}', [SeriesTypeController::class, 'destroyBySeries'])
+            ->name('series-type.destroy-by-series');
 
         });
 
 
-Route::prefix('miscellaneous')->name('misc.')->group(function () {
-    Route::resource('parking', \App\Http\Controllers\Miscellaneous\ParkingController::class)->names('parking');
-});
+        Route::prefix('miscellaneous')->name('misc.')->group(function () {
+            Route::resource('parking', \App\Http\Controllers\Miscellaneous\ParkingController::class)->names('parking');
+        });
 
 
         //Prices
@@ -674,6 +670,9 @@ Route::prefix('miscellaneous')->name('misc.')->group(function () {
 
 
         Route::prefix('schemas')->group(function () {
+
+            Route::get('import/form', [SchemaController::class, 'importForm'])->name('schemas.import.form');
+            Route::post('import', [SchemaController::class, 'import'])->name('schemas.import');
             Route::resource('hs-unit', HSUnitController::class);
             Route::resource('sh-unit', SHUnitController::class);
             Route::resource('dh-unit', DHUnitController::class);

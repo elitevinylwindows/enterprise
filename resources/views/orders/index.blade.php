@@ -18,12 +18,12 @@
     </button>
 </form>
 
-     <!-- <a class="btn btn-outline-primary btn-sm" href="{{ route('orders.import') }}">
+    <a class="btn btn-outline-primary btn-sm" href="{{ route('orders.import') }}">
         <i class="ti ti-upload"></i> {{ __('Import Orders') }}
     </a>
   <a class="btn btn-outline-success btn-sm" href="{{ route('orders.create') }}">
         <i class="ti ti-plus"></i> {{ __('Add Order') }}
-    </a>-->
+    </a>
 @endsection
 
 @section('content')

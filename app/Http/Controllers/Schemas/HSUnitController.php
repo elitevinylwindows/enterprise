@@ -103,29 +103,4 @@ class HSUnitController extends Controller
         return redirect()->route('hs-unit.index')->with('success', 'Deleted successfully.');
     }
 
-    public function importModal()
-    {
-        return view('schemas.hsunit.import');
-    }
-
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,csv',
-        ]);
-
-        try{
-            DB::beginTransaction();
-            $file = $request->file('file');
-            Excel::import(new HSUnitImport, $file);
-
-            DB::commit();
-            return redirect()->route('hs-unit.index')->with('success', 'Data imported successfully.');
-        } catch (\Exception $e) {
-            dd($e);
-            DB::rollBack();
-            Log::error($e);
-            return redirect()->back()->with('error', 'Error importing data: ' . $e->getMessage());
-        }
-    }
 }
