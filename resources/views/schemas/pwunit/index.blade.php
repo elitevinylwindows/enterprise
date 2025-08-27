@@ -5,7 +5,7 @@
     <h1>PW Unit</h1>
     <a href="#" class="btn btn-primary customModal"
         data-size="lg"
-        data-url="{{ route('sh-unit.import.modal') }}"
+        data-url="{{ route('schemas.import.form') }}"
         data-title="{{ __('Import SH Unit') }}">
         <i data-feather="plus"></i> {{ __('Import') }}
     </a>
