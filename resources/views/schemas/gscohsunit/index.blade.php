@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('page-title', __('HS Units'))
+@section('page-title', __('GSCO HS Units'))
 @section('breadcrumb')
 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-<li class="breadcrumb-item active" aria-current="page">{{ __('HS Units') }}</li>
+<li class="breadcrumb-item active" aria-current="page">{{ __('GSCO HS Units') }}</li>
 @endsection
 @section('content')
 <div class="row">
@@ -10,13 +10,13 @@
         <div class="card table-card">
             <div class="card-header">
                 <div class="row align-items-center g-2">
-                    <div class="col"><h5>{{ __('HS Units') }}</h5></div>
+                    <div class="col"><h5>{{ __('GSCO HS Units') }}</h5></div>
                     <div class="col-auto">
                         <a href="#" class="btn btn-primary customModal"
                            data-size="lg"
                            data-model="HSUnit"
                            data-url="{{ route('schemas.import.form') }}"
-                           data-title="{{ __('Import HS Unit') }}">
+                           data-title="{{ __('Import GSCO HS Unit') }}">
                            <i data-feather="plus"></i> {{ __('Import') }}
                         </a>
                         <a href="#" class="btn btn-primary customModal"
