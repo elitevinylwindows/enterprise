@@ -86,7 +86,7 @@
                                     <td>{{ $unit->clr_clr }}</td>
                                     <td>{{ $unit->le3_clr_le3 }}</td>
                                     <td>{{ $unit->le3_combo }}</td>
-                                    <td>{{ $unit->sta_grid }}</td>
+                                    <td>{{ $unit->sta_grd }}</td>
                                     <td>{{ $unit->tpi }}</td>
                                     <td>{{ $unit->tpo }}</td>
                                     <td>{{ $unit->acid_edge }}</td>

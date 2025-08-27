@@ -48,7 +48,7 @@ class SchemaAddonImportHelper
             'FEAT2' => 'feat2',
             'FEAT3' => 'feat3',
             'STA GRD' => 'sta_grd',
-            'STA GRID' => 'sta_grid',
+            'STA GRID' => 'sta_grd',
             'TPI' => 'tpi',
             'TPO' => 'tpo',
             'Acid Etch' => 'acid_etch',

@@ -37,7 +37,7 @@
                     <table class="table table-hover advance-datatable">
                         <thead>
                             <tr>
-                                @foreach(['schema_id','retrofit','nailon','block','le3_clr','le3_lam','clr_temp','le3_temp','lam_temp','feat1','feat2','feat3','clr_clr','le3_clr_le3','le3_combo','sta_grid','tpi','tpo','acid_edge','solar_cool','status'] as $field)
+                                @foreach(['schema_id','retrofit','nailon','block','le3_clr','le3_lam','clr_temp','le3_temp','lam_temp','feat1','feat2','feat3','clr_clr','le3_clr_le3','le3_combo','sta_grd','tpi','tpo','acid_edge','solar_cool','status'] as $field)
                                 <th>{{ __(ucwords(str_replace('_',' ', $field))) }}</th>
                                 @endforeach
                                 <th>{{ __('Action') }}</th>
@@ -46,7 +46,7 @@
                         <tbody>
                             @foreach ($cmunits as $unit)
                                 <tr>
-                                    @foreach(['schema_id','retrofit','nailon','block','le3_clr','le3_lam','clr_temp','le3_temp','lam_temp','feat1','feat2','feat3','clr_clr','le3_clr_le3','le3_combo','sta_grid','tpi','tpo','acid_edge','solar_cool','status'] as $field)
+                                    @foreach(['schema_id','retrofit','nailon','block','le3_clr','le3_lam','clr_temp','le3_temp','lam_temp','feat1','feat2','feat3','clr_clr','le3_clr_le3','le3_combo','sta_grd','tpi','tpo','acid_edge','solar_cool','status'] as $field)
                                     <td>{{ $unit->$field }}</td>
                                     @endforeach
                                     <td>
