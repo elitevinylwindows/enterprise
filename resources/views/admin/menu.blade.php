@@ -1166,6 +1166,7 @@
     </a>
 
     <ul class="pc-submenu">
+        <li><a class="pc-link" href="{{ route('formulas.index') }}">Formulas</a></li>
         <li><a class="pc-link" href="{{ route('master.prices.markup.index') }}">Markup</a></li>
          <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
