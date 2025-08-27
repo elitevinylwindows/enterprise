@@ -108,4 +108,10 @@ class SeriesConfigurationController extends Controller
         return redirect()->route('master.series-configuration.index')
             ->with('success', 'Series Type deleted.');
     }
+    public function show($id)
+{
+    $sc = SeriesConfiguration::with('productTypes')->findOrFail($id);
+    return view('master.series.series_configuration.show', compact('sc')); // partial
+}
+
 }
