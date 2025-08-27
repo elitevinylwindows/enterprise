@@ -4,7 +4,7 @@ namespace App\Helper;
 
 class OrderImportHelper
 {
-    public static function getHeaderMap()
+public static function getHeaderMap()
     {
         return [
 'Order #' => 'order_number',
@@ -95,7 +95,6 @@ class OrderImportHelper
 'Shipping Stages' => 'shipping_stages',
 'Waiting for change order' => 'waiting_for_change_order',
 'Production site' => 'production_site',
-
         ];
     }
 }
