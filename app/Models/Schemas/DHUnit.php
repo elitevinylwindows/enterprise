@@ -23,7 +23,7 @@ class DHUnit extends Model
         'clr_clr',
         'le3_clr_le3',
         'twole3_oneclr_temp',
-        'sta_grd',
+        'sta_grid',
         'tpi',
         'tpo',
         'acid_edge',

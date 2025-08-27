@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Order #{{ $quote->quote_number }}</title>
+    <title>Quote #{{ $quote->quote_number }}</title>
     <style>
         @page {
             margin: 0.1cm;

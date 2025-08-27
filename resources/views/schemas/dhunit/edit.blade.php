@@ -19,7 +19,7 @@
             'feat3' => 'FEAT3',
             'le3_clr_le3' => 'LE3 CLR LE3',
             'le3_combo' => 'LE3 COMBO',
-            'sta_grd' => 'STA GRID',
+            'sta_grid' => 'STA GRIID',
             'tpi' => 'TPI',
             'tpo' => 'TPO',
             'acid_edge' => 'ACID EDGE',

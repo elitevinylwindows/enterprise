@@ -2122,8 +2122,8 @@ if(!function_exists('handleSchemaImport')) {
     {
         $integerFields = [
             'schema_id', 'product_id', 'retrofit', 'nailon', 'block', 'le3_clr', 'clr_clr' , 'le3_lam', 'le3_clr_le3','clr_temp', 
-            'onele3_oneclr_temp', 'twole3_oneclr_temp', 'lam_temp', 'obs', 'feat2', 'feat3', 'sta_grd', 'tpi', 'tpo',
-            'acid_etch', 'solar_cool', 'solar_cool_g', 'le3_temp', 'feat1', 'sta_grd', 'acid_edge', 'le3_combo',
+            'onele3_oneclr_temp', 'twole3_oneclr_temp', 'lam_temp', 'obs', 'feat2', 'feat3', 'sta_grid', 'tpi', 'tpo',
+            'acid_etch', 'solar_cool', 'solar_cool_g', 'le3_temp', 'feat1', 'sta_grid', 'acid_edge', 'le3_combo',
         ];
         
         $booleanFields = [

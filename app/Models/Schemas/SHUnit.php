@@ -29,7 +29,7 @@ class SHUnit extends Model
         'clr_clr',
         'le3_clr_le3',
         'le3_combo',
-        'sta_grd',
+        'sta_grid',
         'tpi',
         'tpo',
         'acid_edge',

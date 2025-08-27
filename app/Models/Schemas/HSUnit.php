@@ -27,7 +27,7 @@ class HSUnit extends Model
         'obs',
         'feat2',
         'feat3',
-        'sta_grd',
+        'sta_grid',
         'tpi',
         'tpo',
         'acid_etch',
