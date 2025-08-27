@@ -134,7 +134,7 @@
                                         <i data-feather="mail"></i>
                                     </a>
                                     {{-- Call --}}
-                                    <a class="avtar avtar-xs btn-link-light text-light" data-bs-toggle="tooltip" data-bs-original-title="Call" href="{{route('sales.invoices.email', $invoice->id)}}" data-title="Call">
+                                    <a class="avtar avtar-xs btn-link-light text-light" data-bs-toggle="tooltip" data-bs-original-title="Call" href="tel:{{ $formattedNumber }}" data-title="Call">
                                         <i data-feather="phone-outgoing"></i>
                                     </a>
 
