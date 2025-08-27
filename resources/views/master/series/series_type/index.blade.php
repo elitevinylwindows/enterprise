@@ -64,48 +64,50 @@
                 <th>{{ __('ID') }}</th>
                 <th>{{ __('Series') }}</th>
                 <th>{{ __('Series Types') }}</th>
-                <th class="text-end">{{ __('Actions') }}</th>
+                <th class="text-end" style="white-space: nowrap; width: 160px;">{{ __('Actions') }}</th>
               </tr>
             </thead>
-           <tbody>
-  @forelse($series as $s)
-    <tr>
-      <td>{{ $s->id }}</td>
-      <td class="fw-semibold">{{ $s->series }}</td>
-      <td>
-        @forelse($s->seriesTypes as $st)
-          <span class="badge bg-secondary me-1 mb-1">{{ $st->series_type }}</span>
-        @empty
-          <span class="text-muted">-</span>
-        @endforelse
-      </td>
-      <td class="text-end">
-        {{-- EDIT: manage checkboxes for this series --}}
-        <a href="#"
-           class="btn btn-sm btn-info customModal me-1"
-           data-size="lg"
-           data-title="{{ __('Edit Series Types for') }} {{ $s->series }}"
-           data-url="{{ route('master.series-type.manage', $s->id) }}">
-          <i data-feather="edit"></i>
-        </a>
+            <tbody>
+              @forelse($series as $s)
+                <tr>
+                  <td>{{ $s->id }}</td>
+                  <td class="fw-semibold">{{ $s->series }}</td>
+                  <td>
+                    <div class="badge-scroll">
+                      @forelse($s->seriesTypes as $st)
+                        <span class="badge bg-secondary me-1 mb-1">{{ $st->series_type }}</span>
+                      @empty
+                        <span class="text-muted">-</span>
+                      @endforelse
+                    </div>
+                  </td>
+                  <td class="text-end">
+                    {{-- EDIT: manage checkboxes for this series --}}
+                    <a href="#"
+                       class="btn btn-sm btn-info customModal me-1"
+                       data-size="lg"
+                       data-title="{{ __('Edit Series Types for') }} {{ $s->series }}"
+                       data-url="{{ route('master.series-type.manage', $s->id) }}">
+                      <i data-feather="edit"></i>
+                    </a>
 
-        {{-- DELETE: remove all types for this series (not the series itself) --}}
-        <form action="{{ route('master.series-type.destroy-by-series', $s->id) }}"
-              method="POST" class="d-inline">
-          @csrf @method('DELETE')
-          <button type="submit" class="btn btn-sm btn-danger"
-                  onclick="return confirm('{{ __('Remove ALL types for this series?') }}')">
-            <i data-feather="trash-2"></i>
-          </button>
-        </form>
-      </td>
-    </tr>
-  @empty
-    <tr>
-      <td colspan="4" class="text-center text-muted">{{ __('No series found.') }}</td>
-    </tr>
-  @endforelse
-</tbody>
+                    {{-- DELETE: remove all types for this series (not the series itself) --}}
+                    <form action="{{ route('master.series-type.destroy-by-series', $s->id) }}"
+                          method="POST" class="d-inline">
+                      @csrf @method('DELETE')
+                      <button type="submit" class="btn btn-sm btn-danger"
+                              onclick="return confirm('{{ __('Remove ALL types for this series?') }}')">
+                        <i data-feather="trash-2"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              @empty
+                <tr>
+                  <td colspan="4" class="text-center text-muted">{{ __('No series found.') }}</td>
+                </tr>
+              @endforelse
+            </tbody>
           </table>
         </div>
       </div>
@@ -113,5 +115,14 @@
     </div>
   </div>
 </div>
+
+{{-- Keep rows compact by scrolling badges inside the cell --}}
+<style>
+.badge-scroll {
+  max-height: 64px;       /* ~3 rows of badges */
+  overflow-y: auto;
+  padding-right: 4px;     /* some room for scrollbar */
+}
+</style>
 
 @endsection
