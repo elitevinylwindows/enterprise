@@ -32,7 +32,8 @@
         <div class="row align-items-center g-2">
           <div class="col"><h5>{{ __('Configurations - Product Type') }}</h5></div>
           <div class="col-auto">
-            <a href="#"
+            
+<a href="#"
    class="btn btn-primary customModal"
    data-size="lg"
    data-title="{{ __('Import Series & Product Types') }}"

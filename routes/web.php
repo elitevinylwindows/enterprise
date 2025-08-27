@@ -556,8 +556,15 @@ Route::prefix('email')->name('email.')->group(function () {
             Route::resource('series-configuration', SeriesConfigurationController::class);
             Route::get('series-type/configs-by-series/{series}', [SeriesTypeController::class, 'configsBySeries'])
         ->name('series-type.configs');
-        Route::get('series-configuration/import',  [SeriesConfigurationController::class, 'importForm'])->name('series-configuration.import.form');
-    Route::post('series-configuration/import', [SeriesConfigurationController::class, 'importUpload'])->name('series-configuration.import.upload');
+ Route::get('series-configuration/import',
+        [SeriesConfigurationController::class, 'importForm'])
+        ->name('series-configuration.import.form');
+
+    Route::post('series-configuration/import',
+        [SeriesConfigurationController::class, 'importUpload'])
+        ->name('series-configuration.import.upload');
+
+        
 Route::get('series-type/manage/{series}', [SeriesTypeController::class, 'manage'])
     ->name('series-type.manage');
 
