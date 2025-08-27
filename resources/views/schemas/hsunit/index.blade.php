@@ -44,7 +44,10 @@
                             <th>{{ __('Le3 Clr Le3') }}</th>
                             <th>{{ __('Clr Temp') }}</th>
                             <th>{{ __('Lam Temp') }}</th>
+                            <th>{{ __('Sta Grid') }}</th>
                             <th>{{ __('Obs') }}</th>
+                            <th>{{ __('TPI') }}</th>
+                            <th>{{ __('TPO') }}</th>
                             <th>{{ __('Feat2') }}</th>
                             <th>{{ __('Feat3') }}</th>
                             <th>{{ __('Status') }}</th>
@@ -66,7 +69,10 @@
                                 <td>${{ $hsunit->le3_clr_le3 }}</td>
                                 <td>${{ $hsunit->clr_temp }}</td>
                                 <td>${{ $hsunit->lam_temp }}</td>
+                                <td>${{ $hsunit->sta_grid }}</td>
                                 <td>${{ $hsunit->obs }}</td>
+                                <td>${{ $hsunit->tpi }}</td>
+                                <td>${{ $hsunit->tpo }}</td>
                                 <td>${{ $hsunit->feat2 }}</td>
                                 <td>${{ $hsunit->feat3 }}</td>
                                 <td>{{ $hsunit->status }}</td>
