@@ -23,10 +23,13 @@ class DHUnit extends Model
         'clr_clr',
         'le3_clr_le3',
         'twole3_oneclr_temp',
-        'sta_grid',
+        'sta_grd',
         'tpi',
         'tpo',
         'acid_edge',
         'solar_cool',
+        'product_id',
+        'description',
+        'product_code'
     ];
 }

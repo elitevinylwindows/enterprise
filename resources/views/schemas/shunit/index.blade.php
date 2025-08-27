@@ -21,7 +21,8 @@
                     <div class="col-auto">
                         <a href="#" class="btn btn-primary customModal"
                            data-size="lg"
-                           data-url="{{ route('sh-unit.import.modal') }}"
+                           data-model="SHUnit"
+                           data-url="{{ route('schemas.import.form') }}"
                            data-title="{{ __('Import SH Unit') }}">
                            <i data-feather="plus"></i> {{ __('Import') }}
                         </a>
@@ -85,7 +86,7 @@
                                     <td>{{ $unit->clr_clr }}</td>
                                     <td>{{ $unit->le3_clr_le3 }}</td>
                                     <td>{{ $unit->le3_combo }}</td>
-                                    <td>{{ $unit->sta_grid }}</td>
+                                    <td>{{ $unit->sta_grd }}</td>
                                     <td>{{ $unit->tpi }}</td>
                                     <td>{{ $unit->tpo }}</td>
                                     <td>{{ $unit->acid_edge }}</td>

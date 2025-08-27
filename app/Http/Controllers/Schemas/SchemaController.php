@@ -17,6 +17,7 @@ class SchemaController extends Controller
         $validated = $request->validate([
             'import_file' => 'required',
             'action_type' => 'nullable|in:skip,overwrite',
+            'model' => 'required',
         ]);
 
         // Call the helper function to handle the import

@@ -13,5 +13,8 @@ class SWDUnit extends Model
         'feat1',
         'feat2',
         'feat3',
+        'product_id',
+        'description',
+        'product_code'
     ];
 }

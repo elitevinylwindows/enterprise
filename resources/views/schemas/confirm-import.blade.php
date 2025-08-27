@@ -9,6 +9,7 @@
         <form method="POST" action="{{ route('schemas.import') }}" class="d-flex gap-2" id="confirmImportForm">
             @csrf
             <input type="hidden" name="import_file" value="{{ $originalFile }}">
+            <input type="hidden" name="model" value="{{ $model }}">
             
             <button type="button" name="action_type" id="skipBtn" value="skip" class="btn btn-warning">
                 Skip Existing

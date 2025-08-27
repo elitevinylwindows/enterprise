@@ -33,5 +33,6 @@ class HSUnit extends Model
         'acid_etch',
         'solar_cool',
         'solar_cool_g',
+        'product_id',
     ];
 }

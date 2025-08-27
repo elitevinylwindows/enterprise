@@ -13,6 +13,8 @@ $(document).on("click", ".customModal", function (e) {
     e.preventDefault();
     var modalTitle = $(this).data("title");
     var modalUrl = $(this).data("url");
+    var dataModel = $(this).data("model") ?? null;
+    console.log(dataModel);
     var modalSize = $(this).data("size") == "" ? "md" : $(this).data("size");
     var originalText = $(this).html();
     var $button = $(this);
@@ -20,7 +22,8 @@ $(document).on("click", ".customModal", function (e) {
     // Show loader on button
     $button.html('<i class="ti ti-loader ti-spin"></i> Loading...');
     $button.prop('disabled', true);
-
+    $('#customModal').attr('data-model', dataModel);
+    
     $("#customModal .modal-title").html(modalTitle);
     $("#customModal .modal-dialog").addClass("modal-" + modalSize);
     $("#customModal .body").html('<div class="text-center p-5"><i class="ti ti-loader ti-spin"></i></div>');
