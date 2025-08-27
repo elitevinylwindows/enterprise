@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Master\Series\SeriesConfiguration;
 use App\Models\Master\ProductKeys\ProductType;
+use App\Imports\SeriesConfigurationImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SeriesConfigurationController extends Controller
 {
@@ -15,7 +17,6 @@ class SeriesConfigurationController extends Controller
         $productTypes = ProductType::orderBy('product_type')->get();
 
         return view('master.series.series_configuration.index', compact('seriesTypes', 'productTypes'));
-        // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ underscore folder
     }
 
     public function create()
@@ -25,6 +26,32 @@ class SeriesConfigurationController extends Controller
         // Return a PARTIAL (no @extends) because customModal will inject it
         return view('master.series.series_configuration.create', compact('productTypes'));
     }
+
+
+    public function importForm()
+    {
+        // modal partial (no @extends)
+        return view('master.series.series_configuration.import');
+    }
+
+    public function importUpload(Request $request)
+    {
+        $request->validate([
+            'file' => ['required','file','mimes:xlsx,xls,csv'],
+        ]);
+
+        $summary = Excel::toCollection(new SeriesConfigurationImport, $request->file('file'));
+     
+
+        $import = new SeriesConfigurationImport;
+        Excel::import($import, $request->file('file'));
+
+        return redirect()
+            ->route('master.series-configuration.index')
+            ->with('success', __('Import completed.'))
+            ->with('import_report', $import->report());
+    }
+
 
     public function store(Request $request)
     {
