@@ -35,16 +35,14 @@
                             <tr><th>{{ __('Schema Id') }}</th>
                             <th>{{ __('Product Id') }}</th>
                             <th>{{ __('Product Code') }}</th>
-                            <th>{{ __('Retrofit') }}</th>
-                            <th>{{ __('Nailon') }}</th>
-                            <th>{{ __('Block') }}</th>
                             <th>{{ __('Le3 Clr') }}</th>
                             <th>{{ __('Clr Clr') }}</th>
                             <th>{{ __('Le3 Lam') }}</th>
                             <th>{{ __('Le3 Clr Le3') }}</th>
-                            <th>{{ __('Clr Temp') }}</th>
-                            <th>{{ __('Lam Temp') }}</th>
-                            <th>{{ __('Obs') }}</th>
+                            <th>{{ __('Clr Lam') }}</th>
+                            <th>{{ __('Color Multi') }}</th>
+                            <th>{{ __('Base Multi') }}</th>
+                            <th>{{ __('Feat1') }}</th>
                             <th>{{ __('Feat2') }}</th>
                             <th>{{ __('Feat3') }}</th>
                             <th>{{ __('Status') }}</th>
@@ -54,26 +52,24 @@
                         <tbody>
                             @foreach ($gscosldunits as $gscosldunit)
                             <tr>
-                                <td>{{ $hsunit->schema_id }}</td>
-                                <td>{{ $hsunit->product_id }}</td>
-                                <td>{{ $hsunit->product_code }}</td>
-                                <td>${{ $hsunit->retrofit }}</td>
-                                <td>${{ $hsunit->nailon }}</td>
-                                <td>${{ $hsunit->block }}</td>
-                                <td>${{ $hsunit->le3_clr }}</td>
-                                <td>${{ $hsunit->clr_clr }}</td>
-                                <td>${{ $hsunit->le3_lam }}</td>
-                                <td>${{ $hsunit->le3_clr_le3 }}</td>
-                                <td>${{ $hsunit->clr_temp }}</td>
-                                <td>${{ $hsunit->lam_temp }}</td>
-                                <td>${{ $hsunit->obs }}</td>
-                                <td>${{ $hsunit->feat2 }}</td>
-                                <td>${{ $hsunit->feat3 }}</td>
-                                <td>{{ $hsunit->status }}</td>
+                                <td>{{ $gscosldunit->schema_id }}</td>
+                                <td>{{ $gscosldunit->product_id }}</td>
+                                <td>{{ $gscosldunit->product_code }}</td>
+                                <td>${{ $gscosldunit->le3_clr }}</td>
+                                <td>${{ $gscosldunit->clr_clr }}</td>
+                                <td>${{ $gscosldunit->le3_lam }}</td>
+                                <td>${{ $gscosldunit->le3_clr_le3 }}</td>
+                                <td>${{ $gscosldunit->clr_lam }}</td>
+                                <td>${{ $gscosldunit->color_multi }}</td>
+                                <td>${{ $gscosldunit->base_multi }}</td>
+                                <td>${{ $gscosldunit->feat1 }}</td>
+                                <td>${{ $gscosldunit->feat2 }}</td>
+                                <td>${{ $gscosldunit->feat3 }}</td>
+                                <td>{{ $gscosldunit->status }}</td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-info customModal"
                                        data-size="lg"
-                                       data-url="{{ route('hs-unit.edit', $hsunit->id) }}"
+                                       data-url="{{ route('hs-unit.edit', $gscosldunit->id) }}"
                                        data-title="{{ __('Edit GSCO SLD Unit') }}">
                                        <i data-feather="edit"></i>
                                     </a>
