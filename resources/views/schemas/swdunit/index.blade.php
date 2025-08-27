@@ -52,7 +52,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($gscoswdunits as $gscoswdunit)
+                            @foreach ($swdunits as $swdunit)
                             <tr>
                                 <td>{{ $hsunit->schema_id }}</td>
                                 <td>{{ $hsunit->product_id }}</td>
