@@ -1,6 +1,7 @@
 <?php
 
 use App\Helper\FirstServe;
+use App\Helper\SchemaAddonImportHelper;
 use App\Mail\Common;
 use App\Mail\EmailVerification;
 use App\Mail\InvoiceMail;
@@ -38,6 +39,7 @@ use App\Models\Schemas\SHUnit;
 use App\Models\Schemas\SLDUnit;
 use App\Models\Schemas\SWDUnit;
 use Barryvdh\DomPDF\Facade\Pdf;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Spatie\PdfToImage\Pdf as PdfToImage;
 
 if (!function_exists('settingsKeys')) {
@@ -2111,5 +2113,129 @@ if(!function_exists('sendOrderMail')) {
 
         $mail = new OrderMail($order, $pdfPath);
         Mail::to($order->customer->email)->send($mail);
+    }
+}
+
+if(!function_exists('handleSchemaImport')) {
+    function handleSchemaImport($request)
+    {
+        $integerFields = [
+            'schema_id', 'product_id', 'retrofit', 'nailon', 'block', 'le3_clr', 'clr_clr' , 'le3_lam', 'le3_clr_le3','clr_temp', 
+            'onele3_oneclr_temp', 'twole3_oneclr_temp', 'lam_temp', 'obs', 'feat2', 'feat3', 'sta_grd', 'tpi', 'tpo',
+            'acid_etch', 'solar_cool', 'solar_cool_g',
+        ];
+
+        $booleanFields = [
+
+        ];
+
+        $file = $request->file('import_file');
+        // Handle re-import from confirmation page
+        if ($request->filled('import_file') && is_string($request->import_file)) {
+            $tempPath = storage_path('app/temp_import.xlsx');
+            file_put_contents($tempPath, base64_decode($request->import_file));
+            $file = new \Symfony\Component\HttpFoundation\File\UploadedFile(
+                $tempPath,
+                'import.xlsx',
+                null,
+                null,
+                true
+            );
+        }
+
+        if (!$file) {
+            return redirect()->back()->with('error', 'The uploaded file is invalid.');
+        }
+
+        $actionType = $request->input('action_type');
+        $spreadsheet = IOFactory::load($file->getRealPath());
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray();
+
+        if (empty($rows)) {
+            return redirect()->back()->with('error', 'The uploaded file is empty or incorrectly formatted.');
+        }
+
+        $headerRow = array_shift($rows);
+        $headerMap = SchemaAddonImportHelper::getHeaderMap();
+        $schemaToImport = [];
+        $duplicateRecords = [];
+            $schemaData = [];
+
+        foreach ($rows as $row) {
+            foreach ($headerRow as $index => $columnHeader) {
+                $mappedField = $headerMap[trim($columnHeader)] ?? null;
+
+                if ($mappedField && isset($row[$index])) {
+                    $value = trim($row[$index]);
+
+                    // Format date
+                    if (in_array($mappedField, ['entry_date', 'required_date', 'delivery_date', 'arrival_date', 'required_date_cw', 'entry_date_original', 'print_date', 'validity_date', 'purchase_order_date'])) {
+                        $value = formatDate($value);
+                    }
+                    // Set integer fields
+                    elseif (in_array($mappedField, $integerFields) && $value === '') {
+                        $value = 0;
+                    }
+                    // Set boolean fields
+                    elseif (in_array($mappedField, $booleanFields) && $value === '') {
+                        $value = 0;
+                    }   
+
+                    $schemaData[$mappedField] = $value;
+                }
+            }
+            if (!empty($schemaData['product_id'])) {
+                if (HSUnit::where('product_id', $schemaData['product_id'])->exists()) {
+                    $duplicateRecords[] = $schemaData['product_id'];
+                }
+                $schemaToImport[] = $schemaData;
+            }
+        }
+        // Confirmation View if not choosing action yet
+        if (!$actionType && !empty($duplicateRecords)) {
+            
+            $view = view('schemas.confirm-import', [
+                'duplicates' => $duplicateRecords,
+                'originalFile' => base64_encode(file_get_contents($file->getRealPath()))
+            ])->render();
+            return response()->json([
+                'view' => $view,
+                'has_duplicates' => true,
+                'success' => false,
+            ]);
+        }
+
+        // Insert/Update
+        foreach ($schemaToImport as $data) {
+            if ($actionType === 'skip' && HSUnit::where('product_id', $data['product_id'])->exists()) {
+                continue;
+            }
+
+            HSUnit::updateOrCreate(
+                ['product_id' => $data['product_id']],
+                $data
+            );
+        }
+
+        return response()->json([
+            'has_duplicates' => false,
+            'success' => true,
+        ]);
+    }
+}
+
+if (!function_exists('formatDate')) {
+    function formatDate($value)
+    {
+        $value = trim($value);
+        if (!$value) return null;
+
+        try {
+            $date = DateTime::createFromFormat('m/d/Y', $value);
+            return $date ? $date->format('Y-m-d') : null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }
