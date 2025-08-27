@@ -15,5 +15,8 @@ class SLDUnit extends Model
         'feat3',
         'acid_edge',
         'solar_cool',
+        'product_id',
+        'description',
+        'product_code'
     ];
 }

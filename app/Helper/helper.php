@@ -300,10 +300,10 @@ if (!function_exists('priceFormat')) {
 if (!function_exists('parentId')) {
     function parentId()
     {
-        if (\Auth::user()->type == 'owner' || \Auth::user()->type == 'super admin') {
-            return \Auth::user()->id;
+        if (Auth::user()->type == 'owner' || Auth::user()->type == 'super admin') {
+            return Auth::user()->id;
         } else {
-            return \Auth::user()->parent_id;
+            return Auth::user()->parent_id;
         }
     }
 }
@@ -312,17 +312,17 @@ if (!function_exists('assignSubscription')) {
     {
         $subscription = Subscription::find($id);
         if ($subscription) {
-            \Auth::user()->subscription = $subscription->id;
+            Auth::user()->subscription = $subscription->id;
             if ($subscription->interval == 'Monthly') {
-                \Auth::user()->subscription_expire_date = Carbon::now()->addMonths(1)->isoFormat('YYYY-MM-DD');
+                Auth::user()->subscription_expire_date = Carbon::now()->addMonths(1)->isoFormat('YYYY-MM-DD');
             } elseif ($subscription->interval == 'Quarterly') {
-                \Auth::user()->subscription_expire_date = Carbon::now()->addMonths(3)->isoFormat('YYYY-MM-DD');
+                Auth::user()->subscription_expire_date = Carbon::now()->addMonths(3)->isoFormat('YYYY-MM-DD');
             } elseif ($subscription->interval == 'Yearly') {
-                \Auth::user()->subscription_expire_date = Carbon::now()->addYears(1)->isoFormat('YYYY-MM-DD');
+                Auth::user()->subscription_expire_date = Carbon::now()->addYears(1)->isoFormat('YYYY-MM-DD');
             } else {
-                \Auth::user()->subscription_expire_date = null;
+                Auth::user()->subscription_expire_date = null;
             }
-            \Auth::user()->save();
+            Auth::user()->save();
 
             $users = User::where('parent_id', '=', parentId())->whereNotIn('type', ['super admin', 'owner'])->get();
 
@@ -2123,12 +2123,15 @@ if(!function_exists('handleSchemaImport')) {
         $integerFields = [
             'schema_id', 'product_id', 'retrofit', 'nailon', 'block', 'le3_clr', 'clr_clr' , 'le3_lam', 'le3_clr_le3','clr_temp', 
             'onele3_oneclr_temp', 'twole3_oneclr_temp', 'lam_temp', 'obs', 'feat2', 'feat3', 'sta_grd', 'tpi', 'tpo',
-            'acid_etch', 'solar_cool', 'solar_cool_g',
+            'acid_etch', 'solar_cool', 'solar_cool_g', 'le3_temp', 'feat1', 'sta_grid', 'acid_edge', 'le3_combo',
         ];
-
+        
         $booleanFields = [
 
         ];
+        
+        $model = $request->model;
+        $className = "App\\Models\\Schemas\\" . $model;
 
         $file = $request->file('import_file');
         // Handle re-import from confirmation page
@@ -2161,7 +2164,7 @@ if(!function_exists('handleSchemaImport')) {
         $headerMap = SchemaAddonImportHelper::getHeaderMap();
         $schemaToImport = [];
         $duplicateRecords = [];
-            $schemaData = [];
+        $schemaData = [];
 
         foreach ($rows as $row) {
             foreach ($headerRow as $index => $columnHeader) {
@@ -2186,7 +2189,6 @@ if(!function_exists('handleSchemaImport')) {
                     $schemaData[$mappedField] = $value;
                 }
             }
-
             $oldNamesToNewNames = config('constants.old_names_to_new_names');
             $schemaId = null;
             foreach ($oldNamesToNewNames as $oldName => $newName) {
@@ -2206,7 +2208,7 @@ if(!function_exists('handleSchemaImport')) {
             $schemaData['schema_id'] = $schemaId;
 
             if (!empty($schemaData['product_id'])) {
-                if (HSUnit::where('product_id', $schemaData['product_id'])->exists()) {
+                if ($className::where('product_id', $schemaData['product_id'])->exists()) {
                     $duplicateRecords[] = $schemaData['product_id'];
                 }
                 $schemaToImport[] = $schemaData;
@@ -2218,6 +2220,7 @@ if(!function_exists('handleSchemaImport')) {
             
             $view = view('schemas.confirm-import', [
                 'duplicates' => $duplicateRecords,
+                'model' => $model,
                 'originalFile' => base64_encode(file_get_contents($file->getRealPath()))
             ])->render();
             return response()->json([
@@ -2232,8 +2235,8 @@ if(!function_exists('handleSchemaImport')) {
             if ($actionType === 'skip' && HSUnit::where('product_id', $data['product_id'])->exists()) {
                 continue;
             }
-
-            HSUnit::updateOrCreate(
+            
+            $className::updateOrCreate(
                 ['product_id' => $data['product_id']],
                 $data
             );

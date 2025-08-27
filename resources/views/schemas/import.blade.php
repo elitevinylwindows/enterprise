@@ -15,12 +15,16 @@
 <script>
     document.getElementById('submitBtn').addEventListener('click', function() {
         const fileInput = document.getElementById('file');
+
+        const model = $('#customModal').data('model');
+
         if (fileInput.files.length === 0) {
             alert('Please select a file to import.');
             return;
         }
         const formData = new FormData();
         formData.append('import_file', fileInput.files[0]);
+        formData.append('model', model);
 
         fetch('{{route("schemas.import")}}', {
             method: 'POST',

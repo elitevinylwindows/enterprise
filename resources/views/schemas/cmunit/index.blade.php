@@ -16,6 +16,13 @@
                         <h5>{{ __('CM Units') }}</h5>
                     </div>
                     <div class="col-auto">
+                          <a href="#" class="btn btn-primary customModal"
+                           data-size="lg"
+                           data-model="CMUnit"
+                           data-url="{{ route('schemas.import.form') }}"
+                           data-title="{{ __('Import CM Unit') }}">
+                           <i data-feather="plus"></i> {{ __('Import') }}
+                        </a>
                         <a href="#" class="btn btn-primary customModal"
                            data-size="lg"
                            data-url="{{ route('cm-unit.create') }}"

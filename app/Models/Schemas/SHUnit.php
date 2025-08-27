@@ -34,6 +34,7 @@ class SHUnit extends Model
         'tpo',
         'acid_edge',
         'solar_cool',
+        
     ];
 
 }

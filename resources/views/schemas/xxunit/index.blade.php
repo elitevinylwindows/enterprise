@@ -21,16 +21,17 @@
                     <div class="col-auto">
                         <a href="#" class="btn btn-primary customModal"
                            data-size="lg"
-                           data-url="{{ route('sh-unit.import.modal') }}"
-                           data-title="{{ __('Import SH Unit') }}">
+                           data-model="XXUnit"
+                           data-url="{{ route('schemas.import.form') }}"
+                           data-title="{{ __('Import XX Unit') }}">
                            <i data-feather="plus"></i> {{ __('Import') }}
                         </a>
-<a href="#" class="btn btn-primary customModal"
-   data-size="lg"
-   data-url="{{ route('xx-unit.create') }}"
-   data-title="{{ __('Create XX Unit') }}">
-   <i data-feather="plus"></i> {{ __('Create') }}
-</a>
+                        <a href="#" class="btn btn-primary customModal"
+                            data-size="lg"
+                            data-url="{{ route('xx-unit.create') }}"
+                            data-title="{{ __('Create XX Unit') }}">
+                            <i data-feather="plus"></i> {{ __('Create') }}
+                        </a>
 
                     </div>
                 </div>

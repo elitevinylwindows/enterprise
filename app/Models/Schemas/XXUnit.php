@@ -28,5 +28,8 @@ class XXUnit extends Model
         'tpo',
         'acid_edge',
         'solar_cool',
+        'product_id',
+        'description',
+        'product_code'
     ];
 }

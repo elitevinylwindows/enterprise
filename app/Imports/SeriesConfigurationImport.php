@@ -72,7 +72,7 @@ class SeriesConfigurationImport implements ToCollection
                 }
 
                 $attachedBefore = $series->productTypes()
-                    ->where('product_types.id', $product->id)
+                    ->where('product_type_id', $product->id)
                     ->exists();
 
                 $series->productTypes()->syncWithoutDetaching([$product->id]);

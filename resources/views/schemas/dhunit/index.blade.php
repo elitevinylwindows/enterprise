@@ -21,8 +21,9 @@
                     <div class="col-auto">
                         <a href="#" class="btn btn-primary customModal"
                            data-size="lg"
-                           data-url="{{ route('sh-unit.import.modal') }}"
-                           data-title="{{ __('Import SH Unit') }}">
+                           data-model="DHUnit"
+                           data-url="{{ route('schemas.import.form') }}"
+                           data-title="{{ __('Import DH Unit') }}">
                            <i data-feather="plus"></i> {{ __('Import') }}
                         </a>
                         <a href="#" class="btn btn-primary customModal"
