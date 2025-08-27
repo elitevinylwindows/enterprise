@@ -638,11 +638,12 @@
                 <span>Dashboard</span>
                 <span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>
             </a>
-            <ul class="pc-submenu" style="display: none;">
-                <li><a class="pc-link" href="{{ route('manufacturing.machines.index') }}">Repairs</a></li>
-                <li><a class="pc-link" href="{{ route('pages.index') }}">Outsource Repairs</a></li>
-                <li><a class="pc-link" href="{{ route('FAQ.index') }}">Internal</a></li>
-            </ul>
+        </li>
+         <li class="pc-item pc-hasmenu">
+            <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+                <span>Repairs</span>
+                <span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>
+            </a>
         </li>
     </ul>
     
