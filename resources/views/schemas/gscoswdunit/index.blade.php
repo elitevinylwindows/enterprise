@@ -32,44 +32,43 @@
                 <div class="dt-responsive table-responsive">
                     <table class="table table-hover advance-datatable">
                         <thead>
-                            <tr><th>{{ __('Schema Id') }}</th>
-                            <th>{{ __('Product Id') }}</th>
-                            <th>{{ __('Product Code') }}</th>
-                            <th>{{ __('Retrofit') }}</th>
-                            <th>{{ __('Nailon') }}</th>
-                            <th>{{ __('Block') }}</th>
-                            <th>{{ __('Le3 Clr') }}</th>
-                            <th>{{ __('Clr Clr') }}</th>
-                            <th>{{ __('Le3 Lam') }}</th>
-                            <th>{{ __('Le3 Clr Le3') }}</th>
-                            <th>{{ __('Clr Temp') }}</th>
-                            <th>{{ __('Lam Temp') }}</th>
-                            <th>{{ __('Obs') }}</th>
-                            <th>{{ __('Feat2') }}</th>
-                            <th>{{ __('Feat3') }}</th>
-                            <th>{{ __('Status') }}</th>
-                                <th>{{ __('Action') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($gscoswdunits as $gscoswdunit)
-                            <tr>
-                                <td>{{ $gscoswdunit->schema_id }}</td>
-                                <td>{{ $gscoswdunit->product_id }}</td>
-                                <td>{{ $gscoswdunit->product_code }}</td>
-                                <td>${{ $gscoswdunit->retrofit }}</td>
-                                <td>${{ $gscoswdunit->nailon }}</td>
-                                <td>${{ $gscoswdunit->block }}</td>
-                                <td>${{ $gscoswdunit->le3_clr }}</td>
-                                <td>${{ $gscoswdunit->clr_clr }}</td>
-                                <td>${{ $gscoswdunit->le3_lam }}</td>
-                                <td>${{ $gscoswdunit->le3_clr_le3 }}</td>
-                                <td>${{ $gscoswdunit->clr_temp }}</td>
-                                <td>${{ $gscoswdunit->lam_temp }}</td>
-                                <td>${{ $gscoswdunit->obs }}</td>
-                                <td>${{ $gscoswdunit->feat2 }}</td>
-                                <td>${{ $gscoswdunit->feat3 }}</td>
-                                <td>{{ $gscoswdunit->status }}</td>
+    <tr>
+        <th>{{ __('ID') }}</th>
+        <th>{{ __('Schema Id') }}</th>
+        <th>{{ __('Product Id') }}</th>
+        <th>{{ __('Product Code') }}</th>
+        <th>{{ __('Clr Clr') }}</th>
+        <th>{{ __('Le3 Clr') }}</th>
+        <th>{{ __('Le3 Clr Le3') }}</th>
+        <th>{{ __('Le3 Lam') }}</th>
+        <th>{{ __('Clr Lam') }}</th>
+        <th>{{ __('Color Multi') }}</th>
+        <th>{{ __('Base Multi') }}</th>
+        <th>{{ __('Feat1') }}</th>
+        <th>{{ __('Feat2') }}</th>
+        <th>{{ __('Feat3') }}</th>
+        <th>{{ __('Status') }}</th>
+        <th>{{ __('Action') }}</th>
+    </tr>
+</thead>
+<tbody>
+    @foreach ($gscoswdunits as $gscoswdunit)
+    <tr>
+        <td>{{ $gscoswdunit->id }}</td>
+        <td>{{ $gscoswdunit->schema_id }}</td>
+        <td>{{ $gscoswdunit->product_id }}</td>
+        <td>{{ $gscoswdunit->product_code }}</td>
+        <td>{{ $gscoswdunit->clr_clr }}</td>
+        <td>{{ $gscoswdunit->le3_clr }}</td>
+        <td>{{ $gscoswdunit->le3_clr_le3 }}</td>
+        <td>{{ $gscoswdunit->le3_lam }}</td>
+        <td>{{ $gscoswdunit->clr_lam }}</td>
+        <td>{{ $gscoswdunit->color_multi }}</td>
+        <td>{{ $gscoswdunit->base_multi }}</td>
+        <td>{{ $gscoswdunit->feat1 }}</td>
+        <td>{{ $gscoswdunit->feat2 }}</td>
+        <td>{{ $gscoswdunit->feat3 }}</td>
+        <td>{{ $gscoswdunit->status }}</td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-info customModal"
                                        data-size="lg"

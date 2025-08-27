@@ -32,44 +32,57 @@
                 <div class="dt-responsive table-responsive">
                     <table class="table table-hover advance-datatable">
                         <thead>
-                            <tr><th>{{ __('Schema Id') }}</th>
-                            <th>{{ __('Product Id') }}</th>
-                            <th>{{ __('Product Code') }}</th>
-                            <th>{{ __('Retrofit') }}</th>
-                            <th>{{ __('Nailon') }}</th>
-                            <th>{{ __('Block') }}</th>
-                            <th>{{ __('Le3 Clr') }}</th>
-                            <th>{{ __('Clr Clr') }}</th>
-                            <th>{{ __('Le3 Lam') }}</th>
-                            <th>{{ __('Le3 Clr Le3') }}</th>
-                            <th>{{ __('Clr Temp') }}</th>
-                            <th>{{ __('Lam Temp') }}</th>
-                            <th>{{ __('Obs') }}</th>
-                            <th>{{ __('Feat2') }}</th>
-                            <th>{{ __('Feat3') }}</th>
-                            <th>{{ __('Status') }}</th>
-                                <th>{{ __('Action') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($gscoxxunits as $gscoxxunit)
-                            <tr>
-                                <td>{{ $gscoxxunit->schema_id }}</td>
-                                <td>{{ $gscoxxunit->product_id }}</td>
-                                <td>{{ $gscoxxunit->product_code }}</td>
-                                <td>${{ $gscoxxunit->retrofit }}</td>
-                                <td>${{ $gscoxxunit->nailon }}</td>
-                                <td>${{ $gscoxxunit->block }}</td>
-                                <td>${{ $gscoxxunit->le3_clr }}</td>
-                                <td>${{ $gscoxxunit->clr_clr }}</td>
-                                <td>${{ $gscoxxunit->le3_lam }}</td>
-                                <td>${{ $gscoxxunit->le3_clr_le3 }}</td>
-                                <td>${{ $gscoxxunit->clr_temp }}</td>
-                                <td>${{ $gscoxxunit->lam_temp }}</td>
-                                <td>${{ $gscoxxunit->obs }}</td>
-                                <td>${{ $gscoxxunit->feat2 }}</td>
-                                <td>${{ $gscoxxunit->feat3 }}</td>
-                                <td>{{ $gscoxxunit->status }}</td>
+    <tr>
+        <th>{{ __('ID') }}</th>
+        <th>{{ __('Schema Id') }}</th>
+        <th>{{ __('Product Id') }}</th>
+        <th>{{ __('Product Code') }}</th>
+        <th>{{ __('Retrofit') }}</th>
+        <th>{{ __('Nailon') }}</th>
+        <th>{{ __('Block') }}</th>
+        <th>{{ __('Le3 Clr') }}</th>
+        <th>{{ __('Le3 Lam') }}</th>
+        <th>{{ __('Clr Temp') }}</th>
+        <th>{{ __('OneLe3 OneClr Temp') }}</th>
+        <th>{{ __('Lam Temp') }}</th>
+        <th>{{ __('Feat1') }}</th>
+        <th>{{ __('Feat2') }}</th>
+        <th>{{ __('Feat3') }}</th>
+        <th>{{ __('Clr Clr') }}</th>
+        <th>{{ __('Le3 Clr Le3') }}</th>
+        <th>{{ __('TwoLe3 OneClr Temp') }}</th>
+        <th>{{ __('Sta Grid') }}</th>
+        <th>{{ __('TPI') }}</th>
+        <th>{{ __('TPO') }}</th>
+        <th>{{ __('Status') }}</th>
+        <th>{{ __('Action') }}</th>
+    </tr>
+</thead>
+<tbody>
+    @foreach ($gscoxxunits as $gscoxxunit)
+    <tr>
+        <td>{{ $gscoxxunit->id }}</td>
+        <td>{{ $gscoxxunit->schema_id }}</td>
+        <td>{{ $gscoxxunit->product_id }}</td>
+        <td>{{ $gscoxxunit->product_code }}</td>
+        <td>{{ $gscoxxunit->retrofit }}</td>
+        <td>{{ $gscoxxunit->nailon }}</td>
+        <td>{{ $gscoxxunit->block }}</td>
+        <td>{{ $gscoxxunit->le3_clr }}</td>
+        <td>{{ $gscoxxunit->le3_lam }}</td>
+        <td>{{ $gscoxxunit->clr_temp }}</td>
+        <td>{{ $gscoxxunit->onele3_oneclr_temp }}</td>
+        <td>{{ $gscoxxunit->lam_temp }}</td>
+        <td>{{ $gscoxxunit->feat1 }}</td>
+        <td>{{ $gscoxxunit->feat2 }}</td>
+        <td>{{ $gscoxxunit->feat3 }}</td>
+        <td>{{ $gscoxxunit->clr_clr }}</td>
+        <td>{{ $gscoxxunit->le3_clr_le3 }}</td>
+        <td>{{ $gscoxxunit->twole3_oneclr_temp }}</td>
+        <td>{{ $gscoxxunit->sta_grid }}</td>
+        <td>{{ $gscoxxunit->tpi }}</td>
+        <td>{{ $gscoxxunit->tpo }}</td>
+        <td>{{ $gscoxxunit->status }}</td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-info customModal"
                                        data-size="lg"
