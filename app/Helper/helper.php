@@ -14,6 +14,7 @@ use App\Models\HomePage;
 use App\Models\LoggedHistory;
 use App\Models\Manufacturing\JobPool;
 use App\Models\Master\Prices\TaxCode;
+use App\Models\Master\Series\Series;
 use App\Models\Notification;
 use App\Models\Page;
 use App\Models\Sales\Invoice;
@@ -2185,6 +2186,25 @@ if(!function_exists('handleSchemaImport')) {
                     $schemaData[$mappedField] = $value;
                 }
             }
+
+            $oldNamesToNewNames = config('constants.old_names_to_new_names');
+            $schemaId = null;
+            foreach ($oldNamesToNewNames as $oldName => $newName) {
+                if (stripos($schemaData['description'], $oldName) !== false) {
+                    // Replace old name with new name in description
+                    $schemaData['description'] = str_ireplace($oldName, $newName, $schemaData['description']);
+                    $schemaData['product_code'] = str_ireplace($oldName, $newName, $schemaData['product_code']);
+                    
+                    $series = Series::where('series', strtoupper($newName))->first();
+                    if ($series) {
+                        $schemaId = $series->id;
+                        break;
+                    }
+                }
+            }
+
+            $schemaData['schema_id'] = $schemaId;
+
             if (!empty($schemaData['product_id'])) {
                 if (HSUnit::where('product_id', $schemaData['product_id'])->exists()) {
                     $duplicateRecords[] = $schemaData['product_id'];
@@ -2192,6 +2212,7 @@ if(!function_exists('handleSchemaImport')) {
                 $schemaToImport[] = $schemaData;
             }
         }
+
         // Confirmation View if not choosing action yet
         if (!$actionType && !empty($duplicateRecords)) {
             
