@@ -54,26 +54,26 @@
                         <tbody>
                             @foreach ($swdunits as $swdunit)
                             <tr>
-                                <td>{{ $hsunit->schema_id }}</td>
-                                <td>{{ $hsunit->product_id }}</td>
-                                <td>{{ $hsunit->product_code }}</td>
-                                <td>${{ $hsunit->retrofit }}</td>
-                                <td>${{ $hsunit->nailon }}</td>
-                                <td>${{ $hsunit->block }}</td>
-                                <td>${{ $hsunit->le3_clr }}</td>
-                                <td>${{ $hsunit->clr_clr }}</td>
-                                <td>${{ $hsunit->le3_lam }}</td>
-                                <td>${{ $hsunit->le3_clr_le3 }}</td>
-                                <td>${{ $hsunit->clr_temp }}</td>
-                                <td>${{ $hsunit->lam_temp }}</td>
-                                <td>${{ $hsunit->obs }}</td>
-                                <td>${{ $hsunit->feat2 }}</td>
-                                <td>${{ $hsunit->feat3 }}</td>
-                                <td>{{ $hsunit->status }}</td>
+                                <td>{{ $swdunit->schema_id }}</td>
+                                <td>{{ $swdunit->product_id }}</td>
+                                <td>{{ $swdunit->product_code }}</td>
+                                <td>${{ $swdunit->retrofit }}</td>
+                                <td>${{ $swdunit->nailon }}</td>
+                                <td>${{ $swdunit->block }}</td>
+                                <td>${{ $swdunit->le3_clr }}</td>
+                                <td>${{ $swdunit->clr_clr }}</td>
+                                <td>${{ $swdunit->le3_lam }}</td>
+                                <td>${{ $swdunit->le3_clr_le3 }}</td>
+                                <td>${{ $swdunit->clr_temp }}</td>
+                                <td>${{ $swdunit->lam_temp }}</td>
+                                <td>${{ $swdunit->obs }}</td>
+                                <td>${{ $swdunit->feat2 }}</td>
+                                <td>${{ $swdunit->feat3 }}</td>
+                                <td>{{ $swdunit->status }}</td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-info customModal"
                                        data-size="lg"
-                                       data-url="{{ route('hs-unit.edit', $hsunit->id) }}"
+                                       data-url="{{ route('hs-unit.edit', $swdunit->id) }}"
                                        data-title="{{ __('Edit SWD Unit') }}">
                                        <i data-feather="edit"></i>
                                     </a>
