@@ -33,7 +33,7 @@
           <div class="col"><h5>{{ __('Configurations - Product Type') }}</h5></div>
           <div class="col-auto">
             <a href="#"
-   class="btn btn-outline-primary customModal"
+   class="btn btn-primary customModal"
    data-size="lg"
    data-title="{{ __('Import Series & Product Types') }}"
    data-url="{{ route('master.series-configuration.import.form') }}">
