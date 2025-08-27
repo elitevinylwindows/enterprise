@@ -29,7 +29,7 @@ class WindowDoorFieldController extends Controller
             'feat1' => 'nullable|string',
             'feat2' => 'nullable|string',
             'feat3' => 'nullable|string',
-            'sta_grd' => 'nullable|string',
+            'sta_grid' => 'nullable|string',
             'le3_clr_temp_combo' => 'nullable|string',
             'status' => 'nullable|string',
         ]);
@@ -59,7 +59,7 @@ WindowDoorField::create($validated);
             'feat1' => 'nullable|string',
             'feat2' => 'nullable|string',
             'feat3' => 'nullable|string',
-            'sta_grd' => 'nullable|string',
+            'sta_grid' => 'nullable|string',
             'le3_clr_temp_combo' => 'nullable|string',
             'status' => 'nullable|string',
         ]);

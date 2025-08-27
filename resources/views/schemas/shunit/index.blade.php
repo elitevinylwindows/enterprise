@@ -57,7 +57,7 @@
                                 <th>{{ __('CLR CLR') }}</th>
                                 <th>{{ __('LE3 CLR LE3') }}</th>
                                 <th>{{ __('LE3 COMBO') }}</th>
-                                <th>{{ __('STA GRID') }}</th>
+                                <th>{{ __('STA GRIID') }}</th>
                                 <th>{{ __('TPI') }}</th>
                                 <th>{{ __('TPO') }}</th>
                                 <th>{{ __('Acid Edge') }}</th>
@@ -86,7 +86,7 @@
                                     <td>{{ $unit->clr_clr }}</td>
                                     <td>{{ $unit->le3_clr_le3 }}</td>
                                     <td>{{ $unit->le3_combo }}</td>
-                                    <td>{{ $unit->sta_grd }}</td>
+                                    <td>{{ $unit->sta_grid }}</td>
                                     <td>{{ $unit->tpi }}</td>
                                     <td>{{ $unit->tpo }}</td>
                                     <td>{{ $unit->acid_edge }}</td>

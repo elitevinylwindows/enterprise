@@ -69,7 +69,7 @@
     <th>Feat1</th>
     <th>Feat2</th>
     <th>Feat3</th>
-    <th>Sta Grd</th>
+    <th>Sta Grid</th>
     <th>Tpi</th>
     <th>Tpo</th>
     <th>Acid Etch</th>
@@ -161,7 +161,7 @@
     <td>{{ $item->feat1 }}</td>
     <td>{{ $item->feat2 }}</td>
     <td>{{ $item->feat3 }}</td>
-    <td>{{ $item->sta_grd }}</td>
+    <td>{{ $item->sta_grid }}</td>
     <td>{{ $item->tpi }}</td>
     <td>{{ $item->tpo }}</td>
     <td>{{ $item->acid_etch }}</td>

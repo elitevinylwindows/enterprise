@@ -43,7 +43,7 @@ class PricesImportHelper
             'FEAT1' => 'feat1',
             'FEAT2' => 'feat2',
             'FEAT3' => 'feat3',
-            'STA GRD' => 'sta_grd',
+            'STA GRID' => 'sta_grid',
             'TPI' => 'tpi',
             'TPO' => 'tpo',
             'Acid Etch' => 'acid_etch',

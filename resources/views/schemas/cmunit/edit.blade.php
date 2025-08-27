@@ -62,8 +62,8 @@
             {!! Form::text('twole3_oneclr_temp', null, ['class' => 'form-control']) !!}
         </div>
         <div class="form-group col-md-6">
-            {!! Form::label('sta_grd', __('Sta Grid'), ['class' => 'form-label']) !!}
-            {!! Form::text('sta_grd', null, ['class' => 'form-control']) !!}
+            {!! Form::label('sta_grid', __('Sta Grid'), ['class' => 'form-label']) !!}
+            {!! Form::text('sta_grid', null, ['class' => 'form-control']) !!}
         </div>
         <div class="form-group col-md-6">
             {!! Form::label('tpi', __('Tpi'), ['class' => 'form-label']) !!}

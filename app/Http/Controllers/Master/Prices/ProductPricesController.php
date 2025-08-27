@@ -60,7 +60,7 @@ class ProductPricesController extends \App\Http\Controllers\Controller
     'retrofit', 'nailon', 'block', 'clr', 'le3',
         'le3_clr', 'clr_clr', 'le3_lam', 'le3_clr_le3', 'clr_temp', 'onele3_1clrtemp', 'twole3_1clrtemp', 'lam_temp',
         'clt_clt', 'let_let_let', 'let_clt_let', 'let_lam_let', 'let_clt', 'obs', 'gery', 'rain', 'temp', 'clr_lam',
-        'color_multi', 'base_multi', 'feat1', 'feat2', 'feat3', 'sta_grd', 'tpi', 'tpo', 'acid_etch', 'acid_edge',
+        'color_multi', 'base_multi', 'feat1', 'feat2', 'feat3', 'sta_grid', 'tpi', 'tpo', 'acid_etch', 'acid_edge',
         'solar_cool', 'solar_cool_g', 'sales_factor', 'total_cost', 'cost_ft', 'cost_pc', 'cost', 'mark_up', 'rate',
         'm_cost', 'calculated_cost', 'cost_inch', 'unit_box', 'price_box', 'price_piece', 'box_weight', 'ft_box',
         'inch_box', 'price_inch', 'vent', 'xfix', 'fix', 'grid', 'lam_im_gx', 'two_panel_frame', 'three_panel_frame',
