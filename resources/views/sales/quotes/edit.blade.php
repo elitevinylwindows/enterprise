@@ -1568,7 +1568,7 @@ function updateWindowPreview() {
     // Clear previous content and ensure container is visible
     previewBox.innerHTML = '';
     previewBox.style.display = 'block';
-    previewBox.style.width = '300px';
+    previewBox.style.width = '800px';
     previewBox.style.height = '300px';
     previewBox.style.backgroundColor = '#f8f9fa'; // Fallback background
 
