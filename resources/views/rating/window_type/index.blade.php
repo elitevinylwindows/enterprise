@@ -4,7 +4,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h4 class="mb-0">NFRC Window Types</h4>
-  <a href="{{ route('rating.window-types.create') }}" class="btn btn-primary">New Type</a>
+  <a href="{{ route('rating.window-type.create') }}" class="btn btn-primary">New Type</a>
 </div>
 
 <form class="row g-2 mb-3">
@@ -32,8 +32,8 @@
             <td>{{ $t->name }}</td>
             <td class="text-muted">{{ $t->slug }}</td>
             <td class="text-end">
-              <a href="{{ route('rating.window-types.edit',$t) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-              <form action="{{ route('rating.window-types.destroy',$t) }}" method="POST" class="d-inline"
+              <a href="{{ route('rating.window-type.edit',$t) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+              <form action="{{ route('rating.window-type.destroy',$t) }}" method="POST" class="d-inline"
                     onsubmit="return confirm('Delete this type?');">
                 @csrf @method('DELETE')
                 <button class="btn btn-sm btn-outline-danger">Delete</button>
