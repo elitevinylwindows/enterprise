@@ -1162,7 +1162,7 @@
 
 <!-- Formula -->
 @if (Gate::check('manage executive'))
-<li class="pc-item pc-hasmenu {{ request()->routeIs('executives.*') ? 'active pc-trigger' : '' }}">
+<li class="pc-item pc-hasmenu {{ request()->routeIs('formulas.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="ti ti-briefcase"></i></span>
         <span class="pc-mtext ms-2">Formula</span>
