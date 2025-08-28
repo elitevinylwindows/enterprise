@@ -792,7 +792,7 @@ public function index(Request $request)
         $quote = Quote::find($id);
         $order = $quote->order ?? null;
         if($order) {
-            $pdf = PDF::loadView('sales.order.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
+            $pdf = PDF::loadView('sales.orders.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
             return $pdf->stream('quote-' . $order->id . '.pdf');
         }
         return redirect()->back()->withErrors(['error' => 'Quote not found or has no associated order.']);
