@@ -495,10 +495,9 @@
 
 
 
-                        <!-- Right Preview + Tabs -->
+                    <!-- Right Preview + Tabs -->
 <div class="col-md-6">
 
-  {{-- Tabs --}}
   <ul class="nav nav-pills justify-content-end mb-3" id="previewTabs" role="tablist">
     <li class="nav-item">
       <a class="nav-link active" id="preview-tab" data-bs-toggle="pill" href="#preview-panel" role="tab" aria-controls="preview-panel" aria-selected="true">
@@ -517,26 +516,31 @@
     </li>
   </ul>
 
-  {{-- Tab panes --}}
   <div class="tab-content" id="previewTabContent">
 
     {{-- PREVIEW --}}
     <div class="tab-pane fade show active" id="preview-panel" role="tabpanel" aria-labelledby="preview-tab">
-      {{-- SVG Preview via Blade component --}}
-      <x-window-config
-        :code="old('series_type', $quoteItems->first()->series_type ?? 'XO')"
-        :width="old('width', 60)"
-        :height="old('height', 48)"
-      />
 
-      {{-- View Mode Buttons (optional) --}}
+      <!-- SVG Preview Box -->
+      <div id="window-svg-preview"
+           class="border rounded-3 p-2"
+           style="min-height:300px;display:flex;align-items:center;justify-content:center;">
+        {{-- Seed with server-rendered component so something is visible immediately --}}
+        <x-window-config
+          :code="old('series_type', $quoteItems->first()->series_type ?? 'XO')"
+          :width="old('width', 60)"
+          :height="old('height', 48)"
+        />
+      </div>
+
+      <!-- View Mode Buttons (optional) -->
       <div class="btn-group my-3 w-100" role="group" aria-label="View mode">
         <a href="javascript:void(0);" class="btn btn-secondary active">Inside</a>
         <a href="javascript:void(0);" class="btn btn-light">Outside</a>
         <a href="javascript:void(0);" class="btn btn-light">Both</a>
       </div>
 
-      {{-- Ratings --}}
+      <!-- Ratings -->
       <div class="alert alert-light border text-muted small text-center">
         <strong>NFRC Ratings</strong> — SHG: 0.34 · Uₑ: 0.22 · VT: 0.47
       </div>
@@ -555,6 +559,7 @@
 
   </div>
 </div>
+
 
                        <div class="modal-footer d-flex justify-content-between align-items-center">
                             <h2 class="mb-0">Total Price: $<span class="total-price" id="globalTotalPrice"><i class="fas fa-spinner fa-spin"></i></span>
