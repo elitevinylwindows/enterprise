@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\NfrcProductLine;
-use App\Models\NfrcWindowType;
+use App\Models\Rating\NfrcProductLine;
+use App\Models\Rating\NfrcWindowType;
 use Illuminate\Http\Request;
 
 class NfrcProductLineController extends Controller
