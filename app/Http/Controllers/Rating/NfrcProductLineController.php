@@ -10,23 +10,29 @@ use App\Models\Rating\NfrcWindowType;
 class NfrcProductLineController extends Controller
 {
     public function index(Request $request)
-    {
-        $q = NfrcProductLine::with('type');
-        if ($request->filled('type_id')) {
-            $q->where('window_type_id', $request->integer('type_id'));
-        }
-        if ($s = trim($request->get('s',''))) {
-            $q->where(fn($w) => $w
-                ->where('manufacturer','like',"%$s%")
-                ->orWhere('series_model','like',"%$s%")
-                ->orWhere('product_line','like',"%$s%"));
-        }
+{
+    $typeId = $request->query('type_id');              // ✅ capture
+    $s      = trim((string)$request->query('s', ''));  // ✅ capture
 
-        $lines = $q->orderBy('series_model')->orderBy('product_line')->paginate(20)->withQueryString();
-        $types = NfrcWindowType::orderBy('name')->get(['id','name']);
-
-        return view('rating.product_line.index', compact('lines','types'));
+    $q = \App\Models\Rating\NfrcProductLine::with('type');
+    if ($typeId) {
+        $q->where('window_type_id', $typeId);
     }
+    if ($s !== '') {
+        $q->where(function ($w) use ($s) {
+            $w->where('manufacturer','like',"%$s%")
+              ->orWhere('series_model','like',"%$s%")
+              ->orWhere('product_line','like',"%$s%");
+        });
+    }
+
+    $lines = $q->orderBy('series_model')->orderBy('product_line')
+               ->paginate(20)->withQueryString();
+    $types = \App\Models\Rating\NfrcWindowType::orderBy('name')->get(['id','name']);
+
+    return view('rating.product_line.index', compact('lines','types','typeId','s')); // ✅ pass them
+}
+
 
     public function create()
     {
