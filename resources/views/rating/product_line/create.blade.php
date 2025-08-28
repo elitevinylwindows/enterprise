@@ -6,7 +6,7 @@
 <div class="card">
   <div class="card-header fw-semibold">Create NFRC Product Line</div>
   <div class="card-body">
-    <form method="POST" action="{{ route('rating.product-lines.store') }}">
+    <form method="POST" action="{{ route('rating.product-line.store') }}">
       @csrf
 
       <div class="row g-3">
@@ -47,7 +47,7 @@
 
       <div class="mt-3">
         <button class="btn btn-primary">Save</button>
-        <a href="{{ route('rating.product-lines.index') }}" class="btn btn-light">Cancel</a>
+        <a href="{{ route('rating.product-line.index') }}" class="btn btn-light">Cancel</a>
       </div>
     </form>
   </div>

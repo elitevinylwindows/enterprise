@@ -305,7 +305,6 @@
             </td>
         </tr>
     </table>-->
-<hr style="margin:8px 0; border-top:1px solid #000;">
 
     {{-- INFO BLOCKS: Vendor / Bill To / Ship To --}}
     <table class="w-100" style="width:100%; border-collapse:collapse; margin-top:10px;">
@@ -366,7 +365,6 @@
         </td>
     </tr>
 </table>
-<hr style="margin:8px 0; border-top:1px solid #000;">
 
 
     <table class="w-100 note-row">
