@@ -252,21 +252,22 @@
                     alt="Elite Vinyl Windows Logo" style="height: 150px; margin-top:-30px;">
         </td>
 
-        {{-- Center: Company Info --}}
-        <td style="width:50%; vertical-align:top; text-align:center;">
+        {{-- Middle: Company Info (left-aligned) --}}
+        <td style="width:50%; vertical-align:top; text-align:left; padding-left:10px;">
             <div style="font-size:13px; line-height:1.6;">
                 <strong>Elite Vinyl Windows Inc.</strong><br>
                 4231 Liberty Blvd.<br>
                 South Gate, CA 90280<br>
-                Tel: 562-945-7700 &nbsp; | &nbsp; Fax: 562-945-5900<br>
+                Tel: 562-945-7700<br>
+                Fax: 562-945-5900<br>
                 <a href="http://www.elitevinylwindows.com" style="color:#000; text-decoration:none;">
                     www.elitevinylwindows.com
                 </a>
             </div>
         </td>
 
-        {{-- Right: Quotation Info --}}
-        <td style="width:30%; vertical-align:top; text-align:right;">
+        {{-- Right: Quotation Info (left-aligned) --}}
+        <td style="width:30%; vertical-align:top; text-align:left; padding-left:10px;">
             <div style="font-size:14px; margin-bottom:6px;">
                 <strong>Quotation# {{ $quote->quote_number ?? '—' }}</strong>
             </div>
@@ -280,6 +281,7 @@
         </td>
     </tr>
 </table>
+
 
 <hr style="margin:8px 0; border-top:1px solid #000;">
 
