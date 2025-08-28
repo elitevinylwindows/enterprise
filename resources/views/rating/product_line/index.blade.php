@@ -5,7 +5,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h4 class="mb-0">NFRC Product Lines</h4>
-  <a href="{{ route('admin.nfrc.product-lines.create') }}" class="btn btn-primary">New Product Line</a>
+  <a href="{{ route('rating.product-line.create') }}" class="btn btn-primary">New Product Line</a>
 </div>
 
 <form class="row g-2 mb-3">
@@ -53,8 +53,8 @@
             </td>
             <td>{!! $l->is_energy_star ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>' !!}</td>
             <td class="text-end">
-              <a href="{{ route('admin.nfrc.product-lines.edit',$l) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-              <form action="{{ route('admin.nfrc.product-lines.destroy',$l) }}" method="POST" class="d-inline"
+              <a href="{{ route('rating.product-line.edit',$l) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+              <form action="{{ route('rating.product-line.destroy',$l) }}" method="POST" class="d-inline"
                     onsubmit="return confirm('Delete this product line?');">
                 @csrf @method('DELETE')
                 <button class="btn btn-sm btn-outline-danger">Delete</button>
