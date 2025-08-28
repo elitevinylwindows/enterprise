@@ -858,28 +858,28 @@ public function index(Request $request)
             Storage::disk('public')->put($pdfPath, $pdf->output());
 
             // Send email if preferred
-            if (in_array('email', $preferences) && $quote->customer->email) {
-                Mail::to($quote->customer->email)
-                    ->send(new QuoteEmail($quote, $pdfPath));
+            // if (in_array('email', $preferences) && $quote->customer->email) {
+            //     Mail::to($quote->customer->email)
+            //         ->send(new QuoteEmail($quote, $pdfPath));
 
-                $quote->update(['status' => 'Sent For Approval']);
-            }
+            //     $quote->update(['status' => 'Sent For Approval']);
+            // }
 
             // Send SMS if preferred
-            // if (in_array('sms', $preferences) && $quote->customer->billing_phone) {
-            //     $rcService = new RingCentralService();
-            //     $result = $rcService->sendQuoteApprovalSms(
-            //         $quote->customer->billing_phone,
-            //         $quote->quote_number,
-            //         $quote->customer->customer_name,
-            //         $pdfPath
-            //     );
+            if (in_array('sms', $preferences) && $quote->customer->billing_phone) {
+                $rcService = new RingCentralService();
+                $result = $rcService->sendQuoteApprovalSms(
+                    $quote->customer->billing_phone,
+                    $quote->quote_number,
+                    $quote->customer->customer_name,
+                    $pdfPath
+                );
 
-            //     // Update quote status to "sent_for_approval" if SMS sent
-            //     if (isset($result['data']->messageStatus)) {
-            //         $quote->update(['status' => 'Sent For Approval']);
-            //     }
-            // }
+                // Update quote status to "sent_for_approval" if SMS sent
+                if (isset($result['data']->messageStatus)) {
+                    $quote->update(['status' => 'Sent For Approval']);
+                }
+            }
         }
 
         return response()->json(['success' => true, 'message' => 'Quote sent for approval.']);
