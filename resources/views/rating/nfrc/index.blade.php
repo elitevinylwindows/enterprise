@@ -8,7 +8,7 @@
   {{-- Top bar / title --}}
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h4 class="mb-0">NFRC Directory Search</h4>
-    <a href="{{ route('nfrc.index') }}" class="btn btn-outline-secondary btn-sm">New Search</a>
+    <a href="{{ route('rating.nfrc.index') }}" class="btn btn-outline-secondary btn-sm">New Search</a>
   </div>
 
   {{-- Search cards (two up) --}}
