@@ -307,7 +307,7 @@
     </table>-->
 
     {{-- INFO BLOCKS: Vendor / Bill To / Ship To --}}
-    <table class="w-100" style="width:100%; border-collapse:collapse; margin-top:10px;">
+   <table class="w-100" style="width:100%; border-collapse:collapse; margin-top:10px;">
     <tr>
         {{-- Billing Address --}}
         <td style="width:50%; vertical-align:top; padding:6px;">
@@ -315,16 +315,16 @@
                 Billing Address
             </div>
             <div style="font-size:12px; margin-bottom:2px;">
-                <strong>Customer#:</strong> {{ $quote->customer_number }}
+                Customer# {{ $quote->customer_number }}
             </div>
-            <div style="font-size:12px; font-weight:600; margin-bottom:2px;">
+            <div style="font-size:12px; font-weight:600; margin-bottom:2px; text-transform:uppercase;">
                 {{ $quote->customer_name }}
             </div>
-            <div style="font-size:12px; line-height:1.4; margin-bottom:4px;">
+            <div style="font-size:12px; line-height:1.4; margin-bottom:4px; text-transform:uppercase;">
                 {!! nl2br(e($quote->customer->billing_address ?? $quote->billing_address ?? '')) !!}<br>
-                {{ $quote->customer->billing_city ?? '' }},
-                {{ $quote->customer->billing_state ?? '' }}
-                {{ $quote->customer->billing_zip ?? '' }}
+                {{ strtoupper($quote->customer->billing_city ?? '') }},
+                {{ strtoupper($quote->customer->billing_state ?? '') }}
+                {{ strtoupper($quote->customer->billing_zip ?? '') }}
             </div>
             @if(!empty($quote->customer->billing_phone))
                 <div style="font-size:12px;">
@@ -343,14 +343,14 @@
             <div style="font-weight:bold; font-style:italic; margin-bottom:4px; font-size:14px;">
                 Delivery Address
             </div>
-            <div style="font-size:12px; font-weight:600; margin-bottom:2px;">
+            <div style="font-size:12px; font-weight:600; margin-bottom:2px; text-transform:uppercase;">
                 {{ $quote->customer_name }}
             </div>
-            <div style="font-size:12px; line-height:1.4; margin-bottom:4px;">
+            <div style="font-size:12px; line-height:1.4; margin-bottom:4px; text-transform:uppercase;">
                 {!! nl2br(e($quote->delivery_address ?? ($quote->customer->delivery_address ?? ''))) !!}<br>
-                {{ $quote->customer->delivery_city ?? '' }},
-                {{ $quote->customer->delivery_state ?? '' }}
-                {{ $quote->customer->delivery_zip ?? '' }}
+                {{ strtoupper($quote->customer->delivery_city ?? '') }},
+                {{ strtoupper($quote->customer->delivery_state ?? '') }}
+                {{ strtoupper($quote->customer->delivery_zip ?? '') }}
             </div>
             @if(!empty($quote->customer->delivery_phone))
                 <div style="font-size:12px;">
@@ -365,6 +365,7 @@
         </td>
     </tr>
 </table>
+
 
 
     <table class="w-100 note-row">
