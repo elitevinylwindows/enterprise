@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Rating;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Rating;
 use Illuminate\Http\Request;
 use App\Models\Rating\NfrcWindowType;  // ✅ correct namespace
 

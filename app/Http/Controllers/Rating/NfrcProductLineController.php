@@ -1,6 +1,6 @@
 <?php
 // app/Http/Controllers/Admin/NfrcProductLineController.php
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Rating;
 
 use App\Http\Controllers\Controller;
 use App\Models\Rating\NfrcProductLine;
