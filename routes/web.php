@@ -172,6 +172,9 @@ use App\Http\Controllers\Master\Colors\{
     StatusColorController
 };
 
+use App\Http\Controllers\Rating\WindowTypeController;
+use App\Http\Controllers\Rating\ProductLineController;
+use App\Http\Controllers\Rating\NfrcSearchController;
 
 
 use App\Http\Controllers\Schemas\{
@@ -580,6 +583,30 @@ Route::delete('series-type/destroy-by-series/{series}', [SeriesTypeController::c
 Route::get('/formulas', function () {
     return view('formulas.index');
 })->name('formulas.index');
+
+
+Route::prefix('rating')->name('rating.')->group(function () {
+
+    /* ------ NFRC Search UI (3-card search + results) ------ */
+    Route::get('/nfrc',          [NfrcSearchController::class, 'index'])->name('nfrc.index');
+
+    // JSON endpoints for dependent selects + table
+    Route::get('/nfrc/types',    [NfrcSearchController::class, 'types'])->name('nfrc.types');       // ? none
+    Route::get('/nfrc/models',   [NfrcSearchController::class, 'models'])->name('nfrc.models');     // ?type_id=
+    Route::get('/nfrc/lines',    [NfrcSearchController::class, 'lines'])->name('nfrc.lines');       // ?type_id=
+    Route::get('/nfrc/ratings',  [NfrcSearchController::class, 'ratings'])->name('nfrc.ratings');   // ?product_line_id=
+    Route::get('/nfrc/export',   [NfrcSearchController::class, 'export'])->name('nfrc.export');     // optional CSV/XLSX
+
+    /* ------ Admin-style CRUD menus (no auth) ------ */
+    // Window Types
+    Route::resource('window-type', WindowTypeController::class)
+         ->parameters(['window-type' => 'type']);   // route key name
+
+    // Product Lines
+    Route::resource('product-line', ProductLineController::class)
+         ->parameters(['product-line' => 'line']);  // route key name
+});
+
 
 
 
