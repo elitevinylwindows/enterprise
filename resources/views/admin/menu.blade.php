@@ -636,13 +636,13 @@
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Dashboard</span>
-                <span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>
+                <!--<span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>-->
             </a>
         </li>
          <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Repairs</span>
-                <span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>
+                <!--<span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>-->
             </a>
         </li>
     </ul>
