@@ -21,6 +21,26 @@
         </div>
 
         <div class="row mb-4">
+            <div class="col-md-12">
+            <label class="form-label d-block mb-2">Receive Quote Via</label>
+            @php
+                $receiveQuoteVia = is_array($customer->receive_quote_via)
+                ? $customer->receive_quote_via
+                : (json_decode($customer->receive_quote_via, true) ?? []);
+            @endphp
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="receive_quote_via[]" id="receive_quote_email" value="email" {{ in_array('email', $receiveQuoteVia) ? 'checked' : '' }}>
+                <label class="form-check-label" for="receive_quote_email">Email</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="receive_quote_via[]" id="receive_quote_sms" value="sms" {{ in_array('sms', $receiveQuoteVia) ? 'checked' : '' }}>
+                <label class="form-check-label" for="receive_quote_sms">Text (SMS)</label>
+            </div>
+            <div class="form-text">Tick either or both. If SMS is ticked, quotes will be sent via text.</div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Tier</label>
                 <select name="tier_id" class="form-control">
