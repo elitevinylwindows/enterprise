@@ -432,12 +432,7 @@
                                                     <label class="form-check-label" for="gf1_e">Exterior</label>
                                                 </div>
 
-                                                <div class="form-check">
-                                                    <input class="form-check-input tempered-box" type="checkbox" id="gf1_b" name="tempered_fields[]"
-                                                        value="gf1_b"
-                                                        {{ in_array('gf1_b', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
-                                                    <label class="form-check-label" for="gf1_b">Both</label>
-                                                </div>
+                                            
                                             </div>
 
                                             {{-- Glass Field 2 --}}
@@ -458,12 +453,7 @@
                                                     <label class="form-check-label" for="gf2_e">Exterior</label>
                                                 </div>
 
-                                                <div class="form-check">
-                                                    <input class="form-check-input tempered-box" type="checkbox" id="gf2_b" name="tempered_fields[]"
-                                                        value="gf2_b"
-                                                        {{ in_array('gf2_b', old('tempered_fields', [])) || old('tempered')==='All' ? 'checked' : '' }}>
-                                                    <label class="form-check-label" for="gf2_b">Both</label>
-                                                </div>
+                                            
                                             </div>
                                         </div>
 
