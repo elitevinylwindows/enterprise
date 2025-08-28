@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Rating;
 
-use App\Http\Controllers\Rating;
+use App\Http\Controllers\Controller; // ✅
 use Illuminate\Http\Request;
-use App\Models\Rating\NfrcWindowType;  // ✅ correct namespace
+use App\Models\Rating\NfrcWindowType;
 
 class NfrcWindowTypeController extends Controller
 {
@@ -27,9 +27,7 @@ class NfrcWindowTypeController extends Controller
         ]);
 
         NfrcWindowType::create($data);
-
-        return redirect()->route('rating.window-type.index')
-                         ->with('success','Window type created successfully.');
+        return redirect()->route('rating.window-type.index')->with('success','Window type created.');
     }
 
     public function edit(NfrcWindowType $type)
@@ -45,15 +43,12 @@ class NfrcWindowTypeController extends Controller
         ]);
 
         $type->update($data);
-
-        return redirect()->route('rating.window-type.index')
-                         ->with('success','Window type updated successfully.');
+        return redirect()->route('rating.window-type.index')->with('success','Window type updated.');
     }
 
     public function destroy(NfrcWindowType $type)
     {
         $type->delete();
-        return redirect()->route('rating.window-type.index')
-                         ->with('success','Window type deleted successfully.');
+        return redirect()->route('rating.window-type.index')->with('success','Window type deleted.');
     }
 }

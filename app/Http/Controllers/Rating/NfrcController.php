@@ -2,63 +2,59 @@
 
 namespace App\Http\Controllers\Rating;
 
+use App\Http\Controllers\Controller; // ✅
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Rating\NfrcWindowType;
+use App\Models\Rating\NfrcProductLine;
 
 class NfrcController extends Controller
 {
-    /** Page */
     public function index()
     {
-        return view('nfrc.index');
+        return view('rating.nfrc.index'); // your 3-card search UI
     }
 
-    /** GET /api/nfrc/types */
     public function types()
     {
-        $rows = DB::connection('elitevw_ratings_nfrc')
-            ->table('nfrc_window_types')
-            ->orderBy('name')->get(['id','name','slug']);
-        return response()->json($rows);
+        return response()->json(
+            NfrcWindowType::orderBy('name')->get(['id','name','slug'])
+        );
     }
 
-    /** GET /api/nfrc/lines?type_id= */
-    public function lines(Request $r)
+    public function models(Request $request)
     {
-        $typeId = (int)$r->query('type_id', 0);
-        $q = DB::connection('elitevw_ratings_nfrc')->table('nfrc_product_lines');
+        $typeId = (int)$request->query('type_id', 0);
+        $q = NfrcProductLine::query()->select('series_model')->distinct();
         if ($typeId) $q->where('window_type_id', $typeId);
-        $rows = $q->orderBy('series_model')->orderBy('product_line')
-                  ->get(['id','series_model','product_line','product_line_url']);
-        return response()->json($rows);
+        return response()->json($q->orderBy('series_model')->pluck('series_model'));
     }
 
-    /** GET /api/nfrc/models?type_id=  (distinct series_model for selected type) */
-    public function models(Request $r)
+    public function lines(Request $request)
     {
-        $typeId = (int)$r->query('type_id', 0);
-        $q = DB::connection('elitevw_ratings_nfrc')->table('nfrc_product_lines')
-             ->select('series_model')->distinct();
+        $typeId = (int)$request->query('type_id', 0);
+        $q = NfrcProductLine::query()->select(['id','series_model','product_line','product_line_url','is_energy_star']);
         if ($typeId) $q->where('window_type_id', $typeId);
-        $rows = $q->orderBy('series_model')->pluck('series_model');
-        return response()->json($rows);
+        return response()->json($q->orderBy('series_model')->orderBy('product_line')->get());
     }
 
-    /** GET /api/nfrc/ratings?product_line_id= */
-    public function ratings(Request $r)
+    public function ratings(Request $request)
     {
-        $lineId = (int)$r->query('product_line_id', 0);
-        if (!$lineId) return response()->json([]);
+        $lineId = (int)$request->query('product_line_id', 0);
+        if (!$lineId) return response()->json(['product_line'=>null,'ratings'=>[]]);
 
-        $pl = DB::connection('elitevw_ratings_nfrc')->table('nfrc_product_lines')->find($lineId);
-        $ratings = DB::connection('elitevw_ratings_nfrc')->table('nfrc_ratings')
+        $pl = DB::table('elitevw_rating_product_lines')->find($lineId);
+        $ratings = DB::table('elitevw_rating_ratings')
             ->where('product_line_id', $lineId)
             ->orderBy('cpd_number')
             ->get(['id','cpd_number','manufacturer_code','u_factor','shgc','vt','condensation_res','product_description']);
 
-        return response()->json([
-            'product_line' => $pl,
-            'ratings'      => $ratings,
-        ]);
+        return response()->json(['product_line' => $pl, 'ratings' => $ratings]);
+    }
+
+    public function export(Request $request)
+    {
+        // stub for CSV/XLSX export
+        return response('Coming soon', 200);
     }
 }
