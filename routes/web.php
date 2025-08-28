@@ -680,6 +680,10 @@ Route::prefix('miscellaneous')->name('misc.')->group(function () {
 
 
         Route::prefix('schemas')->group(function () {
+
+            Route::get('import/form', [SchemaController::class, 'importForm'])->name('schemas.import.form');
+            Route::post('import', [SchemaController::class, 'import'])->name('schemas.import');
+            
             Route::resource('hs-unit', HSUnitController::class);
             Route::resource('sh-unit', SHUnitController::class);
             Route::resource('dh-unit', DHUnitController::class);
