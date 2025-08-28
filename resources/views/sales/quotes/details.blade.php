@@ -492,51 +492,70 @@
                                 </div>
                             </div>
                         </div>
+
+
+
                         <!-- Right Preview + Tabs -->
-                        <div class="col-md-6">
-                            <ul class="nav nav-pills justify-content-end mb-3" id="previewTabs" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="pill" href="#preview-panel">Preview</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#options-panel">Options</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#pricing-panel">
-                                        Pricing - $<span id="totalPrice">0.00</span>
-                                    </a>
-                                </li>
-                            </ul>
+<div class="col-md-6">
 
-                            <div class="tab-pane fade show active" id="preview-panel">
-                                <div class="tab-pane fade show active" id="preview-panel">
+  {{-- Tabs --}}
+  <ul class="nav nav-pills justify-content-end mb-3" id="previewTabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="preview-tab" data-bs-toggle="pill" href="#preview-panel" role="tab" aria-controls="preview-panel" aria-selected="true">
+        Preview
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="options-tab" data-bs-toggle="pill" href="#options-panel" role="tab" aria-controls="options-panel" aria-selected="false">
+        Options
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="pricing-tab" data-bs-toggle="pill" href="#pricing-panel" role="tab" aria-controls="pricing-panel" aria-selected="false">
+        Pricing - $<span id="totalPrice">0.00</span>
+      </a>
+    </li>
+  </ul>
 
-                                    <!-- SVG Preview Box -->
-                                    <div id="window-svg-preview" style="height: 300px; display: flex; align-items: center;"></div>
+  {{-- Tab panes --}}
+  <div class="tab-content" id="previewTabContent">
 
-                                    <!-- View Mode Buttons -->
-                                    <div class="btn-group mb-3 w-100" role="group">
-                                        <a href="javascript:void(0);" class="btn btn-secondary active">Inside</a>
-                                        <a href="javascript:void(0);" class="btn btn-light text-light">Outside</a>
-                                    </div>
+    {{-- PREVIEW --}}
+    <div class="tab-pane fade show active" id="preview-panel" role="tabpanel" aria-labelledby="preview-tab">
+      {{-- SVG Preview via Blade component --}}
+      <x-window-config
+        :code="old('series_type', $quoteItems->first()->series_type ?? 'XO')"
+        :width="old('width', 60)"
+        :height="old('height', 48)"
+      />
 
+      {{-- View Mode Buttons (optional) --}}
+      <div class="btn-group my-3 w-100" role="group" aria-label="View mode">
+        <a href="javascript:void(0);" class="btn btn-secondary active">Inside</a>
+        <a href="javascript:void(0);" class="btn btn-light">Outside</a>
+        <a href="javascript:void(0);" class="btn btn-light">Both</a>
+      </div>
 
-                                    <!-- Ratings -->
-                                    <div class="alert alert-light border text-muted small text-center">
-                                        <strong>NFRC Ratings</strong> â€” SHG: 0.34 UF: 0.22 VT: 0.47
-                                    </div>
-                                </div>
-                            </div>
+      {{-- Ratings --}}
+      <div class="alert alert-light border text-muted small text-center">
+        <strong>NFRC Ratings</strong> — SHG: 0.34 · Uₑ: 0.22 · VT: 0.47
+      </div>
+    </div>
 
-                            <div class="tab-pane fade" id="options-panel">
-                                <p class="text-muted">Option settings will go here.</p>
-                            </div>
+    {{-- OPTIONS --}}
+    <div class="tab-pane fade" id="options-panel" role="tabpanel" aria-labelledby="options-tab">
+      <p class="text-muted">Option settings will go here.</p>
+    </div>
 
-                            <div class="tab-pane fade" id="pricing-panel">
-                                <h5 class="text-center">$0.00</h5>
-                                <p class="text-muted text-center">Detailed pricing breakdown can be shown here.</p>
-                            </div>
-                        </div>
+    {{-- PRICING --}}
+    <div class="tab-pane fade" id="pricing-panel" role="tabpanel" aria-labelledby="pricing-tab">
+      <h5 class="text-center">$0.00</h5>
+      <p class="text-muted text-center">Detailed pricing breakdown can be shown here.</p>
+    </div>
+
+  </div>
+</div>
+
                        <div class="modal-footer d-flex justify-content-between align-items-center">
                             <h2 class="mb-0">Total Price: $<span class="total-price" id="globalTotalPrice"><i class="fas fa-spinner fa-spin"></i></span>
                             </h2>
