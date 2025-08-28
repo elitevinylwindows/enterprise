@@ -172,9 +172,9 @@ use App\Http\Controllers\Master\Colors\{
     StatusColorController
 };
 
-use App\Http\Controllers\Rating\WindowTypeController;
-use App\Http\Controllers\Rating\ProductLineController;
-use App\Http\Controllers\Rating\NfrcSearchController;
+use App\Http\Controllers\Rating\NfrcController;
+use App\Http\Controllers\Rating\NfrcProductLineController;
+use App\Http\Controllers\Rating\NfrcWindowTypeController;
 
 
 use App\Http\Controllers\Schemas\{
@@ -587,26 +587,22 @@ Route::get('/formulas', function () {
 
 Route::prefix('rating')->name('rating.')->group(function () {
 
-    /* ------ NFRC Search UI (3-card search + results) ------ */
-    Route::get('/nfrc',          [NfrcSearchController::class, 'index'])->name('nfrc.index');
+    /* ------ NFRC Search / Details ------ */
+    Route::get('/nfrc',          [NfrcController::class, 'index'])->name('nfrc.index');
+    Route::get('/nfrc/types',    [NfrcController::class, 'types'])->name('nfrc.types');
+    Route::get('/nfrc/models',   [NfrcController::class, 'models'])->name('nfrc.models');
+    Route::get('/nfrc/lines',    [NfrcController::class, 'lines'])->name('nfrc.lines');
+    Route::get('/nfrc/ratings',  [NfrcController::class, 'ratings'])->name('nfrc.ratings');
+    Route::get('/nfrc/export',   [NfrcController::class, 'export'])->name('nfrc.export');
 
-    // JSON endpoints for dependent selects + table
-    Route::get('/nfrc/types',    [NfrcSearchController::class, 'types'])->name('nfrc.types');       // ? none
-    Route::get('/nfrc/models',   [NfrcSearchController::class, 'models'])->name('nfrc.models');     // ?type_id=
-    Route::get('/nfrc/lines',    [NfrcSearchController::class, 'lines'])->name('nfrc.lines');       // ?type_id=
-    Route::get('/nfrc/ratings',  [NfrcSearchController::class, 'ratings'])->name('nfrc.ratings');   // ?product_line_id=
-    Route::get('/nfrc/export',   [NfrcSearchController::class, 'export'])->name('nfrc.export');     // optional CSV/XLSX
+    /* ------ Window Types CRUD ------ */
+    Route::resource('window-type', NfrcWindowTypeController::class)
+         ->parameters(['window-type' => 'type']);
 
-    /* ------ Admin-style CRUD menus (no auth) ------ */
-    // Window Types
-    Route::resource('window-type', WindowTypeController::class)
-         ->parameters(['window-type' => 'type']);   // route key name
-
-    // Product Lines
-    Route::resource('product-line', ProductLineController::class)
-         ->parameters(['product-line' => 'line']);  // route key name
+    /* ------ Product Lines CRUD ------ */
+    Route::resource('product-line', NfrcProductLineController::class)
+         ->parameters(['product-line' => 'line']);
 });
-
 
 
 
