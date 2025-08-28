@@ -692,9 +692,7 @@ public function index(Request $request)
         $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
             return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d h:i A');
         });
-        $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['quote' => $quote, 'modificationsByDate' => $modificationsByDate])->setPaper('a4', 'portrait');
-
-        return $pdf->stream("quote-{$quote->quote_number}.pdf");
+       
 
         $seriesList = DB::table('elitevw_master_series')->pluck('series', 'id');
 
