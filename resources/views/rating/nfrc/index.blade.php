@@ -86,17 +86,20 @@
   const exportBtn = document.getElementById('exportBtn');
   const energyStarOnly = document.getElementById('energyStarOnly');
 
+  // ✅ Use your named routes so URLs are always correct
   const api = {
-    types:   () => fetch('/api/nfrc/types').then(r=>r.json()),
-    models:  (typeId) => fetch('/api/nfrc/models?type_id='+typeId).then(r=>r.json()),
-    lines:   (typeId) => fetch('/api/nfrc/lines?type_id='+typeId).then(r=>r.json()),
-    ratings: (plId)   => fetch('/api/nfrc/ratings?product_line_id='+plId).then(r=>r.json()),
+    types:   () => fetch(@json(route('rating.nfrc.types'))).then(r=>r.json()),
+    models:  (typeId) => fetch(@json(route('rating.nfrc.models')) + '?type_id=' + encodeURIComponent(typeId)).then(r=>r.json()),
+    lines:   (typeId) => fetch(@json(route('rating.nfrc.lines'))  + '?type_id=' + encodeURIComponent(typeId)).then(r=>r.json()),
+    ratings: (plId)   => fetch(@json(route('rating.nfrc.ratings'))+ '?product_line_id=' + encodeURIComponent(plId)).then(r=>r.json()),
   };
 
   // Populate window types
   const types = await api.types();
-  typeSel.innerHTML = '<option value="">— Select Type —</option>' + types.map(t =>
+  typeSel.innerHTML = '<option value="">— Select Type —</option>' + (types || []).map(t =>
     `<option value="${t.id}">${t.name}</option>`).join('');
+
+
 
   // When type changes, refresh models + product lines
   typeSel.addEventListener('change', async () => {
