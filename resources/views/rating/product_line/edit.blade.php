@@ -6,7 +6,7 @@
 <div class="card">
   <div class="card-header fw-semibold">Edit NFRC Product Line</div>
   <div class="card-body">
-    <form method="POST" action="{{ route('admin.nfrc.product-lines.update',$line) }}">
+    <form method="POST" action="{{ route('rating.product-lines.update',$line) }}">
       @csrf @method('PUT')
 
       <div class="row g-3">
@@ -46,7 +46,7 @@
 
       <div class="mt-3">
         <button class="btn btn-primary">Update</button>
-        <a href="{{ route('admin.nfrc.product-lines.index') }}" class="btn btn-light">Cancel</a>
+        <a href="{{ route('rating.product-lines.index') }}" class="btn btn-light">Cancel</a>
       </div>
     </form>
   </div>

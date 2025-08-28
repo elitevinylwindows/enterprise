@@ -6,7 +6,7 @@
 <div class="card">
   <div class="card-header fw-semibold">Create NFRC Window Type</div>
   <div class="card-body">
-    <form method="POST" action="{{ route('admin.nfrc.window-types.store') }}">
+    <form method="POST" action="{{ route('rating.window-type.store') }}">
       @csrf
       <div class="mb-3">
         <label class="form-label">Name</label>
@@ -18,7 +18,7 @@
         <div class="form-text">Lowercase, hyphenated key (e.g., <code>casement</code>).</div>
       </div>
       <button class="btn btn-primary">Save</button>
-      <a href="{{ route('admin.nfrc.window-types.index') }}" class="btn btn-light">Cancel</a>
+      <a href="{{ route('rating.window-type.index') }}" class="btn btn-light">Cancel</a>
     </form>
   </div>
 </div>

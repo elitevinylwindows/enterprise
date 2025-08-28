@@ -172,6 +172,9 @@ use App\Http\Controllers\Master\Colors\{
     StatusColorController
 };
 
+use App\Http\Controllers\Rating\NfrcController;
+use App\Http\Controllers\Rating\NfrcProductLineController;
+use App\Http\Controllers\Rating\NfrcWindowTypeController;
 
 
 use App\Http\Controllers\Schemas\{
@@ -580,6 +583,26 @@ Route::delete('series-type/destroy-by-series/{series}', [SeriesTypeController::c
 Route::get('/formulas', function () {
     return view('formulas.index');
 })->name('formulas.index');
+
+
+Route::prefix('rating')->name('rating.')->group(function () {
+
+    /* ------ NFRC Search / Details ------ */
+    Route::get('/nfrc',          [NfrcController::class, 'index'])->name('nfrc.index');
+    Route::get('/nfrc/types',    [NfrcController::class, 'types'])->name('nfrc.types');
+    Route::get('/nfrc/models',   [NfrcController::class, 'models'])->name('nfrc.models');
+    Route::get('/nfrc/lines',    [NfrcController::class, 'lines'])->name('nfrc.lines');
+    Route::get('/nfrc/ratings',  [NfrcController::class, 'ratings'])->name('nfrc.ratings');
+    Route::get('/nfrc/export',   [NfrcController::class, 'export'])->name('nfrc.export');
+
+    /* ------ Window Types CRUD ------ */
+    Route::resource('window-type', NfrcWindowTypeController::class)
+         ->parameters(['window-type' => 'type']);
+
+    /* ------ Product Lines CRUD ------ */
+    Route::resource('product-line', NfrcProductLineController::class)
+         ->parameters(['product-line' => 'line']);
+});
 
 
 

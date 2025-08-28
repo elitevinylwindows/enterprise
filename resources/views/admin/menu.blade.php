@@ -872,6 +872,38 @@
     </ul>
 </li>
 
+<li class="pc-item pc-hasmenu">
+    <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+        <span>NFRC Data</span>
+        <span class="ms-auto icon-wrapper">
+            <i class="fa-solid fa-circle-plus"></i>
+        </span>
+    </a>
+    <ul class="pc-submenu" style="display: none;">
+        {{-- Window Types CRUD --}}
+        <li>
+            <a class="pc-link" href="{{ route('rating.window-type.index') }}">
+                Window Type
+            </a>
+        </li>
+
+        {{-- Product Lines CRUD --}}
+        <li>
+            <a class="pc-link" href="{{ route('rating.product-line.index') }}">
+                Product Line
+            </a>
+        </li>
+
+        {{-- NFRC Search / Details Page --}}
+        <li>
+            <a class="pc-link" href="{{ route('rating.nfrc.index') }}">
+                NFRC Details
+            </a>
+        </li>
+    </ul>
+</li>
+
+
         <!-- Products -->
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
