@@ -131,54 +131,65 @@
 </div>
 
 <div class="modal-footer">
-    <button class="btn btn-primary" type="button" id="saveQuoteButton">Submit Quote</button>
+  <button class="btn btn-primary" type="button" id="saveQuoteButton">Submit Quote</button>
 </div>
 
 <script>
-    document.getElementById('saveQuoteButton').addEventListener('click', function() {
-        const button = this;
-        const originalText = button.innerHTML;
-        button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Submitting...';
-        button.disabled = true;
+document.getElementById('saveQuoteButton').addEventListener('click', async function () {
+  const button = this;
+  const originalText = button.innerHTML;
+  button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Submitting...';
+  button.disabled = true;
 
-        const formData = new FormData();
-        formData.append('discount', document.getElementById('discount-amount').innerText.replace(/[$,]/g, ''));
-        formData.append('subtotal', document.getElementById('sub-total-amount').innerText.replace(/[$,]/g, ''));
-        formData.append('tax', document.getElementById('tax-amount-preview').innerText.replace(/[$,]/g, '').replace(/\s*\(.*\)/, ''));
-        formData.append('shipping', document.getElementById('shipping-amount').innerText.replace(/[$,]/g, ''));
-        formData.append('total', document.getElementById('grand-total-amount').innerText.replace(/[$,]/g, ''));
-        formData.append('status', 'Quote Submitted');
+  const formData = new FormData();
+  formData.append('discount', document.getElementById('discount-amount').innerText.replace(/[$,]/g, ''));
+  formData.append('subtotal', document.getElementById('sub-total-amount').innerText.replace(/[$,]/g, ''));
+  formData.append('tax', document.getElementById('tax-amount-preview').innerText.replace(/[$,]/g, '').replace(/\s*\(.*\)/, ''));
+  formData.append('shipping', document.getElementById('shipping-amount').innerText.replace(/[$,]/g, ''));
+  formData.append('total', document.getElementById('grand-total-amount').innerText.replace(/[$,]/g, ''));
+  formData.append('status', 'Quote Submitted');
 
-        fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                toastr.success('Draft saved successfully!', 'Success', {
-                    timeOut: 3000,
-                    progressBar: true,
-                    closeButton: true
-                });
-                window.location.href = '{{ route('sales.quotes.index') }}';
-            } else {
-                button.innerHTML = originalText;
-                button.disabled = false;
-                toastr.error('Failed to save draft. Please try again.', 'Error', {
-                    timeOut: 3000,
-                    progressBar: true,
-                    closeButton: true
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            button.innerHTML = originalText;
-            button.disabled = false;
-        });
+  try {
+    const resp = await fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Accept': 'application/json' // helps Laravel return JSON on errors
+      }
     });
+    const data = await resp.json();
+
+    if (data.success) {
+      // hide the modal
+      const modalEl = button.closest('.modal');
+      if (modalEl) {
+        if (window.bootstrap?.Modal) {
+          const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+          modal.hide();
+        } else if (window.$ && typeof $(modalEl).modal === 'function') {
+          $(modalEl).modal('hide'); // Bootstrap 4
+        } else {
+          // vanilla fallback
+          modalEl.classList.remove('show');
+          modalEl.style.display = 'none';
+          document.body.classList.remove('modal-open');
+          document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        }
+      }
+
+      toastr.success('Draft saved successfully!', 'Success', { timeOut: 3000, progressBar: true, closeButton: true });
+
+      // then navigate away if that's what you want
+      window.location.href = '{{ route('sales.quotes.index') }}';
+    } else {
+      throw new Error('Save failed');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    button.innerHTML = originalText;
+    button.disabled = false;
+    toastr.error('Failed to save draft. Please try again.', 'Error', { timeOut: 3000, progressBar: true, closeButton: true });
+  }
+});
 </script>
