@@ -692,7 +692,7 @@ public function index(Request $request)
         $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
             return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d h:i A');
         });
-       
+
 
         $seriesList = DB::table('elitevw_master_series')->pluck('series', 'id');
 
@@ -1063,7 +1063,11 @@ public function index(Request $request)
                     // Example: fetch record from that model
                     $unit = $model::where('schema_id', $validated['series'])->first(); // change to ->where(...) as needed
                     $column = str_replace('/','_', strtolower($validated['dropdown_value']));
-                    $addOnPrice = $unit->$column;
+
+                    $addOnPrice = $unit?->$column;
+                    if (!$addOnPrice) {
+                        $addOnPrice = 0;
+                    }
                 } else {
                     $addOnPrice = 0;
                     dd("No matching model found for description: " . $description);
