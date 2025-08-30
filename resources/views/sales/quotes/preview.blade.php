@@ -1,10 +1,10 @@
 <div class="modal-header">
     <h5 class="modal-title">Quote: {{ $quote->quote_number }}</h5>
-    
+
     <a href="{{route('sales.quotes.pdf.preview', $quote->id)}}" target="_blank" class="btn btn-sm btn-primary ms-auto">
         <i class="fa fa-download"></i> Download PDF
     </a>
-    
+
     <a href="{{route('sales.quotes.send', $quote->id)}}" class="btn btn-sm btn-primary ms-2">
         <i class="fa fa-envelope"></i> Send Email
     </a>
@@ -58,7 +58,7 @@
                      <td>{{ $item->qty }}</td>
                     <td>{{ $item->width }}" x {{ $item->height }}"</td>
                     <td style="width: 0%;">{{ $item->glass ?? 'N/A' }}</td>
-                    <td style="width: 0%;">{{ $item->grid ?? 'N/A' }}</td>  
+                    <td style="width: 0%;">{{ $item->grid ?? 'N/A' }}</td>
                     <td>${{ number_format($item->price, 2) }}</td>
                     <td>${{ number_format($item->total, 2) }}</td>
                 </tr>
@@ -119,7 +119,7 @@
                         <th>Tax:</th>
                         <td id="tax-amount-preview">${{ number_format($quote->tax, 2) }}</td>
                     </tr>
-                     
+
                     <tr>
                         <th>Total:</th>
                         <td><strong id="grand-total-amount">${{ number_format($quote->total, 2) }}</strong></td>
@@ -148,7 +148,7 @@
         formData.append('shipping', document.getElementById('shipping-amount').innerText.replace(/[$,]/g, ''));
         formData.append('total', document.getElementById('grand-total-amount').innerText.replace(/[$,]/g, ''));
         formData.append('status', 'Quote Submitted');
-        
+
         fetch('{{ route('sales.quotes.save.draft', $quote->id) }}', {
             method: 'POST',
             body: formData,

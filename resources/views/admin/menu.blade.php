@@ -877,7 +877,39 @@
         <li><a class="pc-link" href="{{ route('master.series-configuration.index') }}">Configuration</a></li>
         <li><a class="pc-link" href="{{ route('master.series-type.index') }}">Series Type</a></li>
     </ul>
+</li>
+
+<li class="pc-item pc-hasmenu">
+    <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
+        <span>NFRC Data</span>
+        <span class="ms-auto icon-wrapper">
+            <i class="fa-solid fa-circle-plus"></i>
+        </span>
+    </a>
+    <ul class="pc-submenu" style="display: none;">
+        {{-- Window Types CRUD --}}
+        <li>
+            <a class="pc-link" href="{{ route('rating.window-type.index') }}">
+                Window Type
+            </a>
+        </li>
+
+        {{-- Product Lines CRUD --}}
+        <li>
+            <a class="pc-link" href="{{ route('rating.product-line.index') }}">
+                Product Line
+            </a>
+        </li>
+
+        {{-- NFRC Search / Details Page --}}
+        <li>
+            <a class="pc-link" href="{{ route('rating.nfrc.index') }}">
+                NFRC Details
+            </a>
+        </li>
+    </ul>
 </li>-->
+
 
         <!-- Products 
         <li class="pc-item pc-hasmenu">
@@ -931,12 +963,12 @@
 <li><a class="pc-link" href="{{ route('products.sealing_assignment.index') }}">Sealing Assignment</a></li>
 <li><a class="pc-link" href="{{ route('products.reinforcement_assignments.index') }}">Reinforcement Assignments</a></li>
 <li><a class="pc-link" href="{{ route('products.hardware_types.index') }}">Hardware Types</a></li>
-<li><a class="pc-link" href="{{ route('products.system_color.index') }}">System / Color</a></li>-->
+<li><a class="pc-link" href="{{ route('products.system_color.index') }}">System / Color</a></li>
 
 
             </ul>
-        </li>
-        <!-- Colors -->
+        </li>-->
+        <!-- Colors 
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Product Keys</span>
@@ -948,7 +980,7 @@
 <li><a class="pc-link" href="{{ route('product_keys.producttypes.index') }}">Product Types</a></li>
 <li><a class="pc-link" href="{{ route('product_keys.productareas.index') }}">Product Areas</a></li>
 <li><a class="pc-link" href="{{ route('product_keys.productsystems.index') }}">Product Systems</a></li>
-<!--<li><a class="pc-link" href="{{ route('product_keys.manufacturersystems.index') }}">Manufacturer Systems</a></li>
+<li><a class="pc-link" href="{{ route('product_keys.manufacturersystems.index') }}">Manufacturer Systems</a></li>
 <li><a class="pc-link" href="{{ route('product_keys.specialshapemacros.index') }}">Special Shape Macros</a></li>
 <li><a class="pc-link" href="{{ route('product_keys.shapecatalog.index') }}">Shape Catalog</a></li>
 <li><a class="pc-link" href="{{ route('product_keys.drawingobjects.index') }}">Drawing Objects</a></li>

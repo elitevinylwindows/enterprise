@@ -36,7 +36,8 @@ class Customer extends Model
         'delivery_fax',
         'delivery_phone',
         'email',
-        'serve_customer_id'
+        'serve_customer_id',
+        'receive_quote_via'
     ];
 
     public function tier()

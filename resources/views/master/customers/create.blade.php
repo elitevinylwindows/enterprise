@@ -24,6 +24,21 @@
         </div>
 
         <div class="row mb-4">
+            <div class="col-md-12">
+                <label class="form-label d-block mb-2">Receive Quote Via</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="receive_quote_via[]" id="receive_quote_email" value="email" checked>
+                    <label class="form-check-label" for="receive_quote_email">Email</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="receive_quote_via[]" id="receive_quote_sms" value="sms">
+                    <label class="form-check-label" for="receive_quote_sms">Text (SMS)</label>
+                </div>
+                <div class="form-text">Tick either or both. If SMS is ticked, quotes will be sent via text.</div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Tier</label>
                 <select name="tier_id" class="form-control">

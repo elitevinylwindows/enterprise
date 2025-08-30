@@ -464,7 +464,7 @@ public function index(Request $request)
         $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
             return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d h:i A');
         });
-        
+
 
         return view('sales.quotes.preview', compact('quote', 'modificationsByDate'));
     }
@@ -512,7 +512,7 @@ public function index(Request $request)
     public function view($id)
     {
         $quote = Quote::findOrFail($id);
-        
+
         $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
             return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d h:i A');
         });
@@ -687,10 +687,13 @@ public function index(Request $request)
     {
         $quote = Quote::with(['items'])->findOrFail($id);
 
+
         // Group modifications by created date (Y-m-d)
         $modificationsByDate = $quote->items->where('is_modification', true)->groupBy(function ($mod) {
             return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d h:i A');
         });
+
+
         $seriesList = DB::table('elitevw_master_series')->pluck('series', 'id');
 
         $colorConfigurations = \App\Models\Master\Colors\ColorConfiguration::all();
@@ -741,7 +744,7 @@ public function index(Request $request)
 
     public function destroyItem($id, $itemId, $type = 'quote_item')
     {
-        if($type == 'quote_item') 
+        if($type == 'quote_item')
         {
 
             $item = QuoteItem::find($itemId);
@@ -789,7 +792,7 @@ public function index(Request $request)
         $quote = Quote::find($id);
         $order = $quote->order ?? null;
         if($order) {
-            $pdf = PDF::loadView('sales.order.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
+            $pdf = PDF::loadView('sales.orders.preview_pdf', compact('order'))->setPaper('a4', 'landscape');
             return $pdf->stream('quote-' . $order->id . '.pdf');
         }
         return redirect()->back()->withErrors(['error' => 'Quote not found or has no associated order.']);
@@ -841,30 +844,42 @@ public function index(Request $request)
             return \Carbon\Carbon::parse($mod->modification_date)->format('Y-m-d h:i A');
         });
 
-        if($request->status === 'Quote Submitted') {
+        // Get customer preferences (array: ['email', 'sms'] or just one)
+        $preferences = [];
+        if ($quote->customer && $quote->customer->receive_quote_via) {
+            $preferences = json_decode($quote->customer->receive_quote_via, true) ?? [];
+        }
 
+        if ($request->status === 'Quote Submitted') {
             $pdf = Pdf::loadView('sales.quotes.preview_pdf', ['quote' => $quote, 'modificationsByDate' => $modificationsByDate])->setPaper('a4', 'landscape');
-            $pdfPath = 'quotes/quote_'.$quote->quote_number.'.pdf';
+            $pdfPath = 'quotes/quote_' . $quote->quote_number . '.pdf';
 
+            // Always generate PDF and store
             Storage::disk('public')->put($pdfPath, $pdf->output());
 
-            Mail::to($quote->customer->email)
-            ->send(new QuoteEmail($quote, $pdfPath));
+            // Send email if preferred
+            // if (in_array('email', $preferences) && $quote->customer->email) {
+            //     Mail::to($quote->customer->email)
+            //         ->send(new QuoteEmail($quote, $pdfPath));
 
-            // if($quote->customer->billing_phone) {
-            //     $rcService = new RingCentralService();
-            //     $result = $rcService->sendQuoteApprovalSms(
-            //         $quote->customer->billing_phone, // e.g., +15558675309
-            //         $quote->quote_number,
-            //         $quote->customer->customer_name,
-            //         $pdfPath
-            //     );
+            //     $quote->update(['status' => 'Sent For Approval']);
+            // }
 
-            //     // 3. Update quote status to "sent_for_approval"
-            //     if ($result['data']->messageStatus) {
-            //         $quote->update(['status' => 'Sent For Approval']);
-            //     }
-            // }   
+            // Send SMS if preferred
+            if (in_array('sms', $preferences) && $quote->customer->billing_phone) {
+                $rcService = new RingCentralService();
+                $result = $rcService->sendQuoteApprovalSms(
+                    $quote->customer->billing_phone,
+                    $quote->quote_number,
+                    $quote->customer->customer_name,
+                    $pdfPath
+                );
+
+                // Update quote status to "sent_for_approval" if SMS sent
+                if (isset($result['data']->messageStatus)) {
+                    $quote->update(['status' => 'Sent For Approval']);
+                }
+            }
         }
 
         return response()->json(['success' => true, 'message' => 'Quote sent for approval.']);
@@ -990,7 +1005,7 @@ public function index(Request $request)
     {
         $quote = Quote::findOrFail($id);
         $rcService = new RingCentralService();
-        
+
         $pdfPath = 'quotes/quote_'.$quote->quote_number.'.pdf';
 
         $result = $rcService->sendQuoteApprovalSms(
@@ -1021,7 +1036,7 @@ public function index(Request $request)
             ])
             ->where('series_type', $validated['series_type'])
             ->first();
-       
+
             if (!$seriesType->productTypes->isEmpty()) {
                 $description = strtoupper($seriesType->productTypes[0]->description); // normalize to uppercase
                 // ✅ Define mappings: keyword => model
@@ -1048,7 +1063,11 @@ public function index(Request $request)
                     // Example: fetch record from that model
                     $unit = $model::where('schema_id', $validated['series'])->first(); // change to ->where(...) as needed
                     $column = str_replace('/','_', strtolower($validated['dropdown_value']));
-                    $addOnPrice = $unit->$column;
+
+                    $addOnPrice = $unit?->$column;
+                    if (!$addOnPrice) {
+                        $addOnPrice = 0;
+                    }
                 } else {
                     $addOnPrice = 0;
                     dd("No matching model found for description: " . $description);
