@@ -143,6 +143,8 @@
 @endif
 @endif-->
 
+
+<!--
 @if (
     Gate::check('view sales dashboard') ||
     Gate::check('manage leads') ||
@@ -283,9 +285,10 @@
 </li>
 @endif
 
-
+-->
 
 <!-- Purchasing -->
+ <!--
 @if (
     Gate::check('manage purchase requests') ||
     Gate::check('manage supplier quotes') ||
@@ -322,11 +325,12 @@
     </ul>
 </li>
 @endif
-
+-->
 
 
 
 <!-- Inventory -->
+ <!--
 @if (Gate::check('manage inventory'))
 <li class="pc-item pc-hasmenu {{ request()->routeIs('inventory.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
@@ -335,8 +339,9 @@
         <span class="ms-auto"><i class="fa-solid fa-circle-plus"></i></span>
     </a>
 
-    <ul class="pc-submenu">
+    <ul class="pc-submenu">-->
         <!-- Inventory Operations -->
+         <!--
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Operations</span>
@@ -353,7 +358,7 @@
                 <li><a class="pc-link" href="{{ route('inventory.stock-alerts.index') }}">Stock Alert</a></li>
             </ul>
         </li>
-
+-->
         <!-- Purchase Request 
         <li class="pc-item {{ request()->routeIs('inventory.purchase-requests.index') ? 'active' : '' }}">
             <a href="{{ route('inventory.purchase-requests.index') }}" class="pc-link">
@@ -527,9 +532,10 @@
 
 
 
-
-@if (Gate::check('manage manufacturing'))
+<!--
+@if (Gate::check('manage manufacturing'))-->
 <!-- Manufacturing Section Label -->
+ 
 <li class="pc-item pc-caption d-flex justify-content-between align-items-center">
     <div>
         <label>{{ __('Manufacturing') }}</label>
@@ -539,12 +545,13 @@
 </li>
 
 <!-- Manufacturing -->
+ <!--
  <li class="pc-item {{ in_array($routeName, ['manufacturing.dashboard']) ? 'active' : '' }}">
                             <a href="{{ route('manufacturing.dashboard') }}" class="pc-link">
                                 <span class="pc-micon"><i class="fa-solid fa-grip"></i></span>
                                 <span class="pc-mtext">{{ __('Dashboard') }}</span>
                             </a>
-                        </li>
+                        </li>-->
 
 <!-- <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
@@ -571,6 +578,7 @@
         </li>
     </ul>
 </li>-->
+<!--
 <li class="pc-item pc-hasmenu {{ request()->routeIs('manufacturing.machines.*') || request()->routeIs('manufacturing.stations.*') || request()->routeIs('manufacturing.capacity.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-wrench"></i></span>
@@ -600,7 +608,7 @@
             </a>
         </li>
     </ul>
-</li>
+</li>-->
 
 <!-- Manufacturing Menu -->
 <li class="pc-item pc-hasmenu {{ request()->routeIs('production.*') ? 'active pc-trigger' : '' }}">
@@ -624,7 +632,7 @@
     </ul>
    
 </li>
-
+<!--
 <li class="pc-item pc-hasmenu {{ request()->routeIs('manufacturing.job_planning.*') || request()->routeIs('manufacturing.tempered.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-check-to-slot"></i></span>
@@ -635,24 +643,24 @@
      <ul class="pc-submenu">
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
-                <span>Dashboard</span>
+                <span>Dashboard</span>-->
                 <!--<span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>-->
-            </a>
+          <!--  </a>
         </li>
          <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
-                <span>Repairs</span>
+                <span>Repairs</span>-->
                 <!--<span class="ms-auto icon-wrapper"><i class="fa-solid fa-circle-plus"></i></span>-->
-            </a>
+           <!-- </a>
         </li>
     </ul>
     
-</li>
+</li>-->
 
 
 
 
-
+<!--
 <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
         <span class="pc-micon"><i class="fa-solid fa-worm"></i></span>
@@ -674,7 +682,7 @@
     </ul>
 </li>
 
-@endif
+@endif-->
 
 
 
@@ -698,21 +706,21 @@
 @endif
 
 
-
+<!--
 <li class="pc-item pc-caption d-flex justify-content-between align-items-center">
     <div>
         <label>{{ __('Admin Views') }}</label>
         <i class="ti ti-chart-arcs"></i>
     </div>
     <i class="ti ti-plus text-muted pe-2" style="font-size: 0.9rem;"></i>
-</li>
+</li>-->
 
 
 
 
 
 
-<!-- Bill of Material -->
+<!-- Bill of Material 
 @if (Gate::check('manage bom'))
 <li class="pc-item pc-hasmenu {{ request()->routeIs('bom.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
@@ -728,7 +736,6 @@
     </a>
 </li>   
 
-        <!-- Colors -->
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Menu</span>
@@ -778,8 +785,8 @@
 <a class="pc-link" href="{{ route('sashreinforcement.index') }}">Sash Reinforcement</a>
 
             </ul>
-        </li>
-        <!-- Prices -->
+        </li>-->
+        <!-- Prices 
 <li class="pc-item {{ request()->routeIs('master.dashboard.*') ? 'active' : '' }}">
     <a href="{{ route('prices.index') }}" class="pc-link">
         <span class="pc-mtext">Prices</span>
@@ -788,7 +795,7 @@
         
     </ul>
 </li>
-@endif
+@endif-->
 
 
 
@@ -802,7 +809,7 @@
 
 
 
-<!-- Master -->
+<!-- Master 
 @if (Gate::check('manage master'))
 <li class="pc-item pc-hasmenu {{ request()->routeIs('master.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
@@ -821,8 +828,8 @@
     <a href="{{ route('master.suppliers.index') }}" class="pc-link">
         <span class="pc-mtext">Suppliers</span>
     </a>
-</li>
-        <!-- Library -->
+</li>-->
+        <!-- Library 
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Library</span>
@@ -835,10 +842,10 @@
                 <li><a class="pc-link" href="#">Files</a></li>
 
             </ul>
-        </li>
+        </li>-->
 
 
-        <!-- Colors -->
+        <!-- Colors 
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Colors</span>
@@ -852,12 +859,12 @@
 <li><a class="pc-link" href="{{ route('color-options.interior-colors.index') }}">Interior Colors</a></li>
 <li><a class="pc-link" href="{{ route('color-options.laminate-colors.index') }}">Laminate Colors</a></li>
 <li><a class="pc-link" href="{{ route('color-options.status-colors.index') }}">Status Colors</a></li>
-                <!--<li><a class="pc-link" href="#">System Colors</a></li>-->
+                <li><a class="pc-link" href="#">System Colors</a></li>
                 
 
             </ul>
-        </li>
-        <!-- Series -->
+        </li>-->
+        <!-- Series 
 <li class="pc-item pc-hasmenu">
     <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
         <span>Series</span>
@@ -870,9 +877,9 @@
         <li><a class="pc-link" href="{{ route('master.series-configuration.index') }}">Configuration</a></li>
         <li><a class="pc-link" href="{{ route('master.series-type.index') }}">Series Type</a></li>
     </ul>
-</li>
+</li>-->
 
-        <!-- Products -->
+        <!-- Products 
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Products</span>
@@ -913,7 +920,7 @@
                 <a class="pc-link" href="{{ route('product_master.units.index') }}">Units</a>
             </li>
         </ul>
-    </li>
+    </li>-->
 
                 <!--<li><a class="pc-link" href="{{ route('products.product_classes.index') }}">Product Classes</a></li>
 <li><a class="pc-link" href="{{ route('products.basic_products.index') }}">Basic Products</a></li>
@@ -949,7 +956,7 @@
                 <li><a class="pc-link" href="#">Color Groups</a></li>
                 <li><a class="pc-link" href="#">Color Classes</a></li>
                 <li><a class="pc-link" href="#">Color Levels</a></li>
-                <li><a class="pc-link" href="#">System / Color</a></li>-->
+                <li><a class="pc-link" href="#">System / Color</a></li>
 
             </ul>
         </li>
@@ -967,13 +974,13 @@
                 <li><a class="pc-link" href="#">Customer Prices</a></li>
 <li><a class="pc-link" href="{{ route('prices.productprices.index') }}">Add-On Prices</a></li>
                 <li><a class="pc-link" href="{{ route('master.prices.markup.index') }}">Markup</a></li>
-                <!--<li><a class="pc-link" href="#">Schema</a></li>
+                <li><a class="pc-link" href="#">Schema</a></li>
                 <li><a class="pc-link" href="#">Price Group</a></li>
                 <li><a class="pc-link" href="#">Global Discount</a></li>
                 <li><a class="pc-link" href="#">Price Cycle</a></li>
-                <li><a class="pc-link" href="#">Generation</a></li>-->
+                <li><a class="pc-link" href="#">Generation</a></li>
                 <li><a class="pc-link" href="#">Currencies</a></li>
-                <!--<li><a class="pc-link" href="#">Exchange Rates</a></li>
+               <li><a class="pc-link" href="#">Exchange Rates</a></li>
                 <li><a class="pc-link" href="#">FinAc Accounts</a></li>
                 <li><a class="pc-link" href="#">Acc Assignment</a></li>
                 <li><a class="pc-link" href="#">Global Discount</a></li>
@@ -982,12 +989,12 @@
                 <li><a class="pc-link" href="#">Commissions</a></li>
                 <li><a class="pc-link" href="#">Tax Classes</a></li>
                 <li><a class="pc-link" href="#">Exchange Rules</a></li>
-                <li><a class="pc-link" href="#">Tax Rules</a></li>-->
+                <li><a class="pc-link" href="#">Tax Rules</a></li>
 
                 <li><a class="pc-link" href="{{ route('master.prices.tax_codes.index') }}">Tax Codes</a></li>
                 
             </ul>
-        </li>
+        </li>-->
         
          <!--<li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
@@ -1000,12 +1007,14 @@
                 <li><a class="pc-link" href="#">Schema</a></li>
                 <li><a class="pc-link" href="">Price Addon Formula</a></li>
             </ul>
-        </li>-->
+        </li>
     </ul>
 </li>
-@endif
+@endif-->
 
 <!-- Addon Schema -->
+
+<!--
 @if (Gate::check('manage schema'))
 <li class="pc-item pc-hasmenu {{ request()->routeIs('schema.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
@@ -1044,9 +1053,10 @@
 
 
             </ul>
-        </li>
+        </li>-->
 
         <!-- Orders submenu with toggle icon -->
+         <!--
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>AddOns</span>
@@ -1061,11 +1071,12 @@
         </li>
     </ul>
 </li>
-@endif
+@endif-->
 
 
 
 <!-- Reports -->
+ <!--
 @if (Gate::check('view reports'))
 <li class="pc-item pc-hasmenu {{ request()->routeIs('reports.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
@@ -1086,9 +1097,10 @@
                 <li><a class="pc-link" href="#">New Quote</a></li>
                 <li><a class="pc-link" href="#">Quote History</a></li>
             </ul>
-        </li>
+        </li>-->
 
         <!-- Orders submenu with toggle icon -->
+         <!--
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Orders</span>
@@ -1115,11 +1127,11 @@
         </li>
     </ul>
 </li>
-@endif
+@endif-->
 
                 
-                
 <!-- Executive -->
+ <!--
 @if (Gate::check('manage executive'))
 <li class="pc-item pc-hasmenu {{ request()->routeIs('executives.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
@@ -1140,8 +1152,9 @@
                 <li><a class="pc-link" href="{{ route('executives.tiers.index') }}">Tiers</a></li>
                 <li><a class="pc-link" href="{{ route('executives.raffle.index') }}">Raffle</a></li>
             </ul>
-        </li>
+        </li>-->
         <!-- Orders submenu with toggle icon -->
+         <!--
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Pricing</span>
@@ -1158,9 +1171,10 @@
         </li>
     </ul>
 </li>
-@endif
+@endif-->
 
 <!-- Formula -->
+ <!--
 @if (Gate::check('manage executive'))
 <li class="pc-item pc-hasmenu {{ request()->routeIs('formulas.*') ? 'active pc-trigger' : '' }}">
     <a href="#" class="pc-link d-flex align-items-center">
@@ -1183,8 +1197,9 @@
                 <li><a class="pc-link" href="">Schemas</a></li>
                 <li><a class="pc-link" href="">Raffle</a></li>
             </ul>
-        </li>
+        </li>-->
         <!-- Orders submenu with toggle icon -->
+         <!--
         <li class="pc-item pc-hasmenu">
             <a href="#" class="pc-link d-flex justify-content-between align-items-center" onclick="toggleSubmenu(this)">
                 <span>Pricing</span>
@@ -1201,7 +1216,14 @@
         </li>
     </ul>
 </li>
-@endif
+@endif-->
+
+
+
+
+
+
+
 
 
 <!-- Settings Section -->
