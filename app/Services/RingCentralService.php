@@ -45,16 +45,6 @@ class RingCentralService
     public function sendQuoteApprovalSms(string $toPhoneNumber, string $quoteId, string $customerName, $pdfPath): array
     {
 
-         $subscription = $this->platform->post('/restapi/v1.0/subscription', [
-            'eventFilters' => [
-                '/restapi/v1.0/account/~/extension/~/message-store', // incoming/outgoing SMS
-            ],
-            'deliveryMode' => [
-                'transportType' => 'WebHook',
-                'address'       => 'https://app.elitevinylwindows.com/api/webhooks/incoming-sms'
-            ]
-        ]);
-
         $fullPath = config('app.url') .'/storage/app/public/' . $pdfPath;
 
         $message = "Dear $customerName, your Quote from Elite Vinyl Windows is ready #$quoteId.\n";
@@ -70,7 +60,7 @@ class RingCentralService
                 'to'   => [['phoneNumber' => $toPhoneNumber]], // Format: +1234567890
                 'text' => $message
             ]);
-
+            Log::info("Message sent to $toPhoneNumber: $message");
             return ['success' => true, 'data' => $response->json()];
 
         } catch (\RingCentral\SDK\Http\ApiException $e) {
